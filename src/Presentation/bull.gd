@@ -44,6 +44,7 @@ var _last_state: BullState.State = BullState.State.SAFE
 signal chaser_blocked(bull: Node2D)
 var _effective_flee_speed: float = 0.0  ## real value set on entering ESCAPED, before first use — see _on_state_changed
 var _sprite_swap: SpriteSwap
+var _facing: SpriteFacing = SpriteFacing.new()  # stable sprite direction: no flicker near fences/corners
 
 func set_peers(peers: Array) -> void:
 	_peers = peers
@@ -93,13 +94,14 @@ func _physics_process(delta: float) -> void:
 	match controller.current_state():
 		BullState.State.ESCAPED, BullState.State.PURSUED:
 			_random_chase.update(delta, _is_chaser, capture_held, chase_probability)
-			velocity = _compute_flee_direction() * _effective_flee_speed
+			var flee_direction: Vector2 = _compute_flee_direction()
+			velocity = flee_direction * _effective_flee_speed
 			var position_before: Vector2 = global_position
 			move_and_slide()
 			global_position = global_position.clamp(world_bounds.position, world_bounds.end)
 			_watch_for_blocked_chaser(delta, position_before)
 			_check_player_contact()
-			_update_flee_animation()
+			_update_flee_animation(flee_direction, delta)
 		BullState.State.CAPTURED, BullState.State.CALMING:
 			_apply_tow_movement()
 			var disturbance: float = _compute_disturbance()
@@ -209,10 +211,14 @@ func _update_hold_visual() -> void:
 
 ## Flee direction changes continuously while still in the same ESCAPED/PURSUED state, so
 ## this runs every physics frame rather than only reacting to state_changed.
-func _update_flee_animation() -> void:
-	if velocity.length() == 0.0:
+##
+## Fed with the INTENDED flee direction (not the post-move_and_slide velocity, which the fence
+## bends every frame) and filtered by SpriteFacing (hysteresis + minimum hold), so a bull
+## pinned against a wall or corner no longer flickers between direction animations.
+func _update_flee_animation(flee_direction: Vector2, delta: float) -> void:
+	if flee_direction == Vector2.ZERO:
 		return
-	var dir_info: Array = SpriteSwap.direction_suffix(velocity)
+	var dir_info: Array = SpriteSwap.direction_suffix(_facing.update(flee_direction, delta))
 	if _sprite_swap.play("flee_" + dir_info[0]):
 		_sprite_swap.set_flip_h(dir_info[1])
 		modulate = Color.WHITE
@@ -234,6 +240,7 @@ func _on_state_changed(new_state: BullState.State) -> void:
 	_last_state = new_state
 	if new_state == BullState.State.ESCAPED:
 		_random_chase.reset()
+		_facing.reset()
 		_effective_flee_speed = _compute_flee_speed_for_nerves()
 	_update_collision(new_state)
 	var anim_name: String = _animation_name_for_state(new_state)
