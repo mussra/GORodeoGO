@@ -1,0 +1,5 @@
+Borrar de tu proyecto (ya no se usan):
+src/Application/level_config.gd
+src/Application/level_config.gd.uid
+tests/unit/test_level_config.gd
+tests/unit/test_level_config.gd.uid
