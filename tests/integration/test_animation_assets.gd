@@ -14,3 +14,20 @@ func test_all_movement_animations_have_six_registered_frames() -> void:
 func test_idle_bull_matches_the_movement_canvas() -> void:
 	var texture: Texture2D = load("res://art/bull/idle/frame_00.png")
 	assert_eq(texture.get_size(), Vector2(96, 96))
+
+func test_turn_preserves_gait_phase_instead_of_restarting_cycle() -> void:
+	var host := Node2D.new()
+	add_child_autofree(host)
+	var placeholder := Polygon2D.new()
+	host.add_child(placeholder)
+	var swap := SpriteSwap.new(host, placeholder, "res://art/player/", ["walk_side", "walk_down", "idle"])
+	swap.play("walk_side")
+	swap._sprite.set_frame_and_progress(3, 0.4)
+	swap.play("walk_down")
+	assert_eq(swap._sprite.frame, 3)
+	assert_almost_eq(swap._sprite.frame_progress, 0.4, 0.001)
+	swap.set_motion_speed(130, 260)
+	assert_eq(swap._sprite.speed_scale, 0.5, "stride follows speed, not only input")
+	swap.play("idle")
+	swap.set_motion_speed(0, 260)
+	assert_eq(swap._sprite.speed_scale, 1.0)

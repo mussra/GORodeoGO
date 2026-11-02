@@ -133,6 +133,7 @@ func _physics_process(delta: float) -> void:
 		_sprite_swap.play("idle")
 
 	move_and_slide()
+	_sprite_swap.set_motion_speed(velocity.length(), 260.0)
 	global_position = global_position.clamp(world_bounds.position, world_bounds.end)
 
 	if Input.is_action_just_pressed("release_capture"):

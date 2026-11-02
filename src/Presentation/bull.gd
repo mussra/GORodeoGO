@@ -136,6 +136,7 @@ func _physics_process(delta: float) -> void:
 			_watch_for_blocked_chaser(delta, position_before)
 			_check_player_contact()
 			_update_flee_animation(flee_direction, delta)
+			_sprite_swap.set_motion_speed(velocity.length(), flee_speed)
 		BullState.State.CAPTURED, BullState.State.CALMING:
 			_apply_tow_movement()
 			var disturbance: float = _compute_disturbance()
@@ -257,10 +258,12 @@ func _update_hold_visual() -> void:
 		var direction: Array = SpriteSwap.direction_suffix(velocity)
 		if _sprite_swap.play("flee_" + direction[0]):
 			_sprite_swap.set_flip_h(direction[1])
+			_sprite_swap.set_motion_speed(velocity.length(), flee_speed)
 			modulate = Color.WHITE
 			return
 	var anim_name: String = _animation_name_for_state(controller.current_state())
 	if _sprite_swap.play(anim_name):
+		_sprite_swap.set_motion_speed(0.0, flee_speed)
 		modulate = Color.WHITE
 	else:
 		_sprite_swap.stop_on_idle()
@@ -278,6 +281,7 @@ func _update_flee_animation(flee_direction: Vector2, delta: float) -> void:
 	var dir_info: Array = SpriteSwap.direction_suffix(_facing.update(flee_direction, delta))
 	if _sprite_swap.play("flee_" + dir_info[0]):
 		_sprite_swap.set_flip_h(dir_info[1])
+		_sprite_swap.set_motion_speed(0.0, flee_speed)
 		modulate = Color.WHITE
 	else:
 		_sprite_swap.stop_on_idle()

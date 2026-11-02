@@ -109,7 +109,19 @@ static func direction_suffix(dir: Vector2) -> Array:
 func play(anim_name: String) -> bool:
 	if _sprite != null and _frames.has_animation(anim_name):
 		if _sprite.animation != anim_name or not _sprite.is_playing():
+			# A turn changes the view, not the gait phase. Restarting frame0 on every
+			# direction change made quick steering visibly hitch.
+			var old_name: String = _sprite.animation
+			var keep_phase: bool = _is_gait(old_name) and _is_gait(anim_name)
+			var phase: float = 0.0
+			if keep_phase:
+				phase = (float(_sprite.frame) + _sprite.frame_progress) / _frames.get_frame_count(old_name)
 			_sprite.play(anim_name)
+			if not _is_gait(anim_name):
+				_sprite.speed_scale = 1.0
+			if keep_phase:
+				var new_frame: float = phase * _frames.get_frame_count(anim_name)
+				_sprite.set_frame_and_progress(int(new_frame), fposmod(new_frame, 1.0))
 		return true
 	return false
 
@@ -126,3 +138,14 @@ func stop_on_idle(fallback: String = "flee_down") -> void:
 		else:
 			_sprite.stop()
 			_sprite.frame = 0
+
+static func _is_gait(animation: String) -> bool:
+	return animation.begins_with("walk_") or animation.begins_with("flee_")
+
+func set_motion_speed(speed: float, reference_speed: float) -> void:
+	if _sprite == null:
+		return
+	if _is_gait(_sprite.animation):
+		_sprite.speed_scale = clampf(speed / maxf(reference_speed, 1.0), 0.35, 1.6)
+	else:
+		_sprite.speed_scale = 1.0

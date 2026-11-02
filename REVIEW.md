@@ -121,3 +121,11 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Hueco físico aumentado de70a120px y guía inicial de salida: alinear, cruzar, despejar al pasillo lateral lejos de barrera META. Salida escalonada1.25s por toro; después vuelve steering original. Capturar cancela guía para no desplazar toro retenido. No teleports ni desactivar colisión entre toros.
 - Prueba de liberación simultánea de11,13,20: todos los toros terminan guía inicial dentro de12s con física real. Más pruebas de salida remolcada de todos los toros11-20 conservadas.236tests/3866aserciones. No demuestra navegación universal tras salida: un toro puede volver a entrar en recintos abiertos con steering normal. No navegación global nueva ni equilibrio humano.
 - Capturas reales antes/después inspeccionadas; mismoID/firma, code218.
+
+## Undécimo incremento (0.21.9)
+
+- Cambio de dirección conserva fase y fracción del paso en vez de reiniciar frame0. Cadencia ligada a velocidad física de jugador/toro, no solo input, para reducir patinaje de pasos lentos. Reposo vuelve a speed_scale1.
+- Orden de profundidad por coordenadaY para toro/caballo; capturas de delante/detrás inspeccionadas.
+- No se añadieron frames ni modelos3D: siguen72frames. Continuidad/profundidad mejoradas, arte de mayor volumen todavía pendiente y no comparado con calidadBrawlStars.
+-237tests/3870aserciones; incluye preservación de fase3.4 al girar y speed_scale0.5 a media velocidad. Sin rendimiento/multitáctil/tacto de dispositivo medidos.
+- MismoID/firmaPrueba, code219.

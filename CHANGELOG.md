@@ -151,3 +151,8 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Corrige atasco de salida AI inicial de corrales con gate120px, guía y escalonado.
 - Mantiene colisiones/posiciones físicas, captura cancela guía. Regresión liberación11/13/20.
 - versionCode218, misma firma/identidad.
+
+## 0.21.9
+- Conserva fase de marcha al girar; cadencia según velocidad física, reposo normal.
+- ProfundidadY al cruzarse toro/caballo; mismos72frames, sin promesa3D.
+- versionCode219, misma identidad/firma.
