@@ -170,3 +170,8 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 ## 0.21.12
 - Acercamiento físico corto para alinear gesto de beber/comer con objeto, sinteleport.
 - Captura tardía de revisión y regresión del punto de parada;code222.
+
+## 0.21.13
+-6poses trote diagonalabajo toro con volumen pintado, conservando identidad.
+- Registro máximo opcional de sheets para gestos de altura variable.
+- code223; sinmodelos3D, otrosángulosprevios.

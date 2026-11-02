@@ -8,7 +8,9 @@ import argparse
 import statistics
 from PIL import Image
 
-def import_sheet(source, destination):
+def import_sheet(source, destination, registration="median"):
+    if registration not in ("median", "max"):
+        raise ValueError("registration must be median or max")
     im=Image.open(source).convert('RGBA'); w,h=im.size
     cells=[]; heights=[]
     for i in range(6):
@@ -28,7 +30,7 @@ def import_sheet(source, destination):
         bbox=alpha.getbbox()
         if not bbox: raise ValueError('empty animation cell')
         cells.append((cell,bbox));heights.append(bbox[3]-bbox[1])
-    scale=84/statistics.median(heights)
+    scale=84/(max(heights) if registration == "max" else statistics.median(heights))
     out=Path(destination);out.mkdir(parents=True,exist_ok=True)
     for stale in out.glob('frame_*.png'): stale.unlink()
     for i,(cell,bbox) in enumerate(cells):
@@ -40,4 +42,4 @@ def import_sheet(source, destination):
     return out
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('source');p.add_argument('destination');a=p.parse_args();import_sheet(a.source,a.destination)
+    p=argparse.ArgumentParser();p.add_argument('source');p.add_argument('destination');p.add_argument('--registration', choices=['median','max'], default='median');a=p.parse_args();import_sheet(a.source,a.destination,a.registration)

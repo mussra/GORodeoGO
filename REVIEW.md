@@ -151,3 +151,10 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Captura al segundo1.1 inspeccionada: hocico sobre superficie agua, cuerpo permanece en física real. Alineación aproximada2D, no simulación3D; pie frontal puede superponer borde del objeto no sólido.
 -241tests/3895aserciones pasan; test de reposo actual espera final del acercamiento y comprueba target en1.1px.
 - MismoID/firmaPrueba,code222.
+
+## Decimoquinto incremento (0.21.13)
+
+-6poses nuevas de trote diagonalabajo toro, con volumen pintado coherente con cabeza baja y manteniendo manta roja/dorada, cuernos y silueta reconocible. Sustituyen6poses previas, total78dibujosúnicos/82runtime sin aumentar.
+- Comparación vieja/nueva inspeccionada a192px y ciclo real motor reimportado. Otros4ángulos de toro conservan arte previo, hay diferencia de acabado entre vistas; no declaración de renovación total ni3D.
+- Herramienta importer incorpora --registration max reproducible para gestos de altura variable; no cambia defaultmedian de marcha.
+-241tests/3895aserciones conservadas; misma identidad/firmaPrueba,code223. Prototipo artístico, no revisión humana de continuidad final.
