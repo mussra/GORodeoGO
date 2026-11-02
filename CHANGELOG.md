@@ -111,3 +111,6 @@ Primera versión comprobada con Godot 4.7.2 + GUT 9.7.1 en headless: 138 tests (
 - Sistema de guardado persistente (`SaveData`, `user://save.dat`).
 - Mejoras desbloqueables permanentemente por nivel completado: velocidad del caballo (Nivel 2), resistencia a aturdimiento (Nivel 4), tiempo de vuelo del lazo (Nivel 6), alcance de lanzamiento (Nivel 8).
 - Objeto tranquilizante: calma instantánea, 1 uso por partida, se repone automáticamente si está desbloqueado (Nivel 1).
+
+## v0.21.0 - rama de revisión, no main
+Ver `REVIEW.md`: controles de teclado/pausa, entrega del toro calmado dentro del corral, fin de puertas, 60 frames de animación integrados, arena/HUD y feedback. 200 tests pasando en Godot 4.7.2. Android no probado en dispositivo.

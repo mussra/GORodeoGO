@@ -68,7 +68,7 @@ func _list_sorted_image_paths(folder: String) -> Array:
 					paths.append(image_path)
 		file_name = dir.get_next()
 	dir.list_dir_end()
-	paths.sort()
+	paths.sort_custom(func(a: String, b: String) -> bool: return a.naturalnocasecmp_to(b) < 0)
 	return paths
 
 func has_sprite() -> bool:
@@ -112,3 +112,14 @@ func play(anim_name: String) -> bool:
 			_sprite.play(anim_name)
 		return true
 	return false
+
+## State animations are optional: keep a deliberate static idle, not a running cycle
+## frozen in whichever direction happened to play before capture.
+func stop_on_idle(fallback: String = "flee_down") -> void:
+	if _sprite == null:
+		return
+	var animation: String = "idle" if _frames.has_animation("idle") else fallback
+	if _frames.has_animation(animation):
+		_sprite.animation = animation
+		_sprite.stop()
+		_sprite.frame = 0

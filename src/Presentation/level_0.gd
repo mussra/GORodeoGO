@@ -50,6 +50,7 @@ func _ready() -> void:
 	_obstacle_rects = level_data.obstacle_rects
 	_win_requires_all_bulls = level_data.win_requires_all_bulls
 	_spawn_obstacles(_obstacle_rects)
+	_setup_art()
 
 	var bull_count: int = clampi(level_data.bull_count, 1, all_bulls.size())
 	_active_bulls = all_bulls.slice(0, bull_count)
@@ -77,10 +78,12 @@ func _ready() -> void:
 
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
 	hud.update_timer(_time_remaining)
+	hud.set_level(_level_number)
 	hud.hide_nerves_slot(0)
 	hud.hide_nerves_slot(1)
 	hud.restart_requested.connect(_on_restart_requested)
 	hud.resume_requested.connect(resume_game)
+	hud.pause_requested.connect(pause_game)
 	hud.quit_requested.connect(_on_quit_requested)
 	hud.tranquilizer_requested.connect(_on_tranquilizer_requested)
 
@@ -89,6 +92,22 @@ func _ready() -> void:
 
 ## Spawns each obstacle as a StaticBody2D on the fence's collision layer (4) — reuses the
 ## exact same "solid to Player/Bull, invisible to Pen detection" setup, no new layer needed.
+func _setup_art() -> void:
+	var art := ArenaArt.new()
+	art.obstacle_rects = _obstacle_rects
+	art.pen_position = pen.position
+	add_child(art)
+	for fence_name: String in ["FenceTop", "FenceBottom", "FenceLeft", "FenceRight", "Pen"]:
+		get_node(fence_name + "/Polygon2D").hide()
+	get_viewport().size_changed.connect(_fit_camera)
+	_fit_camera()
+
+func _fit_camera() -> void:
+	var size: Vector2 = get_viewport_rect().size
+	var factor: float = minf((size.x - 48.0) / 1046.0, (size.y - 136.0) / 626.0)
+	$Camera2D.zoom = Vector2.ONE * maxf(factor, 0.1)
+	$Camera2D.offset = Vector2(0, -24.0 / maxf(factor, 0.1))
+
 func _spawn_obstacles(rects: Array) -> void:
 	for rect: Rect2 in rects:
 		var obstacle := StaticBody2D.new()
@@ -108,6 +127,7 @@ func _spawn_obstacles(rects: Array) -> void:
 			Vector2(-half.x, -half.y), Vector2(half.x, -half.y),
 			Vector2(half.x, half.y), Vector2(-half.x, half.y)
 		])
+		visual.visible = false
 		visual.color = Color(0.35, 0.28, 0.22, 1.0)  # placeholder "rock/crate" color, distinct from the fence
 		obstacle.add_child(visual)
 
@@ -323,7 +343,11 @@ func _trigger_lose(reason: String) -> void:
 	hud.show_lose(reason)
 
 func _freeze_gameplay() -> void:
+	player.cancel_input()
 	player.set_physics_process(false)
+	for door in _pen_doors:
+		if is_instance_valid(door):
+			door.set_process(false)
 	for bull in _active_bulls:
 		bull.set_physics_process(false)
 	touch_controls.visible = false  # stop joysticks from eating touches meant for the end-game buttons
@@ -335,6 +359,14 @@ func _on_restart_requested() -> void:
 ## Android lifecycle (ANDROID_REQUIREMENTS.md): going to background / losing focus pauses the
 ## game (otherwise the countdown would jump on resume); the back button toggles the pause
 ## menu. WM_GO_BACK_REQUEST is only delivered because project.godot sets quit_on_go_back=false.
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		if _paused_by_user_or_os:
+			resume_game()
+		else:
+			pause_game()
+		get_viewport().set_input_as_handled()
+
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_WM_WINDOW_FOCUS_OUT:
@@ -349,6 +381,8 @@ func pause_game() -> void:
 	if _game_over or _paused_by_user_or_os:
 		return
 	_paused_by_user_or_os = true
+	player.cancel_input()
+	touch_controls.visible = false
 	get_tree().paused = true
 	hud.show_pause()
 
@@ -358,6 +392,7 @@ func resume_game() -> void:
 	_paused_by_user_or_os = false
 	get_tree().paused = false
 	hud.hide_pause()
+	touch_controls.visible = true
 
 func _on_quit_requested() -> void:
 	get_tree().paused = false

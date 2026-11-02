@@ -5,3 +5,5 @@ BIN/
 *.apk
 *.idsig
 *.aab
+
+__pycache__/

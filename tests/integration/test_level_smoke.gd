@@ -278,3 +278,50 @@ func test_a_bull_released_on_purpose_cannot_stun_the_player_right_away() -> void
 
 func after_each() -> void:
 	get_tree().paused = false
+
+func test_keyboard_charge_increases_range_without_a_touch_stick() -> void:
+	var level: Node = await _spawn_level(1)
+	var player = level.player
+	player._start_charging()
+	player._process_throw_input(0.25)
+	assert_almost_eq(player._charge_distance, player.charge_speed * 0.25, 0.1)
+	player._process_throw_input(5.0)
+	assert_almost_eq(player._charge_distance, player.max_throw_distance, 0.1)
+
+func test_touch_aim_does_not_use_keyboard_charge_growth() -> void:
+	var level: Node = await _spawn_level(1)
+	level.player._on_aim_pressed()
+	level.player._process_throw_input(0.5)
+	assert_eq(level.player._charge_distance, 0.0)
+
+func test_pause_cancels_a_charge_and_hides_touch_input() -> void:
+	var level: Node = await _spawn_level(1)
+	level.player._on_aim_pressed()
+	level.pause_game()
+	assert_false(level.player._is_charging)
+	assert_false(level.touch_controls.visible)
+	level.resume_game()
+	assert_true(level.touch_controls.visible)
+
+func test_bull_that_calms_inside_the_goal_is_delivered_without_reentering() -> void:
+	var level: Node = await _spawn_level(1)
+	var bull = _capture(level, 0)
+	bull.set_physics_process(false)
+	bull.global_position = level.pen.global_position
+	await wait_physics_frames(3)
+	assert_eq(level._bulls_returned, 0, "still calming, not delivered")
+	# Do not write a real progression record when this one-bull level wins.
+	level._win_requires_all_bulls = false
+	bull.controller.update_hold(100.0, 0.0, 0.0)
+	bull.controller.update_hold(100.0, 0.0, 0.0)
+	await wait_physics_frames(3)
+	assert_eq(level._bulls_returned, 1)
+	await wait_physics_frames(3)
+	assert_eq(level._bulls_returned, 1, "delivery emits only once")
+
+func test_end_of_game_stops_door_progress() -> void:
+	var level: Node = await _spawn_level(11)
+	var door: PenDoor = _doors(level)[0]
+	level._trigger_lose("test")
+	assert_false(door.is_processing())
+	assert_false(level.player._is_charging)

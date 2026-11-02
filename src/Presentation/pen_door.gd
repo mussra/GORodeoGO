@@ -33,6 +33,7 @@ func set_player(player: CharacterBody2D) -> void:
 	_player = player
 
 func _process(delta: float) -> void:
+	queue_redraw()
 	if _opened or not _player_inside or _player == null:
 		return
 
@@ -79,6 +80,7 @@ func _build_shape() -> void:
 
 	var visual := Polygon2D.new()
 	visual.polygon = _circle_points(RADIUS, 16)
+	visual.visible = false
 	visual.color = Color(0.6, 0.4, 0.15, 1.0)  # placeholder "wooden gate" color
 	add_child(visual)
 
@@ -88,3 +90,17 @@ func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 		var angle: float = TAU * i / segments
 		points.append(Vector2(cos(angle), sin(angle)) * radius)
 	return points
+
+func _draw() -> void:
+	draw_circle(Vector2(2, 5), RADIUS, Color(0.2, 0.12, 0.06, 0.18))
+	draw_circle(Vector2.ZERO, RADIUS, Color("8c6844"))
+	draw_arc(Vector2.ZERO, RADIUS - 3, 0, TAU, 48, Color("f0d093"), 3, true)
+	for x: float in [-18.0, 0.0, 18.0]:
+		draw_line(Vector2(x, -23), Vector2(x, 23), Color("c39a61"), 9, true)
+	for y: float in [-14.0, 14.0]:
+		draw_line(Vector2(-25, y), Vector2(25, y), Color("e2bd7c"), 5, true)
+	if _player_inside:
+		var fraction: float = clampf(_hold_timer / hold_seconds, 0, 1)
+		draw_arc(Vector2.ZERO, RADIUS + 5, -PI / 2, -PI / 2 + TAU * fraction, 48, Color("8fe5b6"), 5, true)
+		var font: Font = ThemeDB.fallback_font
+		draw_string(font, Vector2(-54, -53), "Quieto para abrir", HORIZONTAL_ALIGNMENT_CENTER, 108, 14, Color("fff2d2"))

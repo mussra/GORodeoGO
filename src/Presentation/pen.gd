@@ -23,6 +23,12 @@ func _try_swap_sprite() -> void:
 	add_child(sprite)
 	$Polygon2D.visible = false
 
+## A bull may enter while still calming. Recheck the overlap instead of requiring
+## another exit/re-entry after CONTROLLED, which previously stranded it in the goal.
+func _physics_process(_delta: float) -> void:
+	for body: Node2D in get_overlapping_bodies():
+		_on_body_entered(body)
+
 func _on_body_entered(body: Node2D) -> void:
 	if not ("controller" in body):
 		return

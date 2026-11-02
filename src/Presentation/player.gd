@@ -35,6 +35,7 @@ var _charge_distance: float = 0.0
 var _charge_visual: Line2D = null
 var _sprite_swap: SpriteSwap
 var _active_capture_count: int = 0
+var _touch_aim_active: bool = false
 
 func _ready() -> void:
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, ART_ROOT, ANIM_NAMES)
@@ -55,6 +56,7 @@ func set_aim_joystick(aim_joystick: VirtualJoystick) -> void:
 	aim_joystick.released.connect(_on_aim_released)
 
 func _on_aim_pressed() -> void:
+	_touch_aim_active = true
 	_aim_pressed_at_seconds = _now_seconds()
 	if not _is_charging and not _lasso_in_flight:
 		_start_charging()
@@ -68,6 +70,7 @@ func _on_aim_pressed() -> void:
 ## one-frame staleness that was making the landing point slightly off from where you
 ## actually released, especially noticeable on fast drags.
 func _on_aim_released(input_vector: Vector2) -> void:
+	_touch_aim_active = false
 	var now: float = _now_seconds()
 	if LassoAim.is_tap(input_vector, now - _aim_pressed_at_seconds):
 		if _double_tap.register_tap(now):
@@ -128,7 +131,10 @@ func _process_throw_input(delta: float) -> void:
 		var aim_vec: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
 		if aim_vec.length() > 0.0:
 			aim_direction = aim_vec.normalized()
-		_charge_distance = LassoAim.throw_distance(aim_vec, max_throw_distance)
+		if _touch_aim_active:
+			_charge_distance = LassoAim.throw_distance(aim_vec, max_throw_distance)
+		else:
+			_charge_distance = minf(max_throw_distance, _charge_distance + charge_speed * delta)
 		_update_charge_visual()
 		if Input.is_action_just_released("throw_lasso"):
 			_release_throw()
@@ -151,6 +157,7 @@ func _start_charging() -> void:
 func _update_charge_visual() -> void:
 	if _charge_visual != null:
 		_charge_visual.points = PackedVector2Array([Vector2.ZERO, aim_direction * _charge_distance])
+	queue_redraw()
 
 ## [param final_vector]: when the aim stick provides its exact release vector, use it
 ## directly (fixes the one-frame staleness noted above). Empty/zero means "use whatever
@@ -175,12 +182,19 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 	lasso_thrown.emit(throw_origin, landing_point)
 	_flash_landing_area(landing_point)
 
+func cancel_input() -> void:
+	_touch_aim_active = false
+	_double_tap.reset()
+	_cancel_charge()
+	velocity = Vector2.ZERO
+
 func _cancel_charge() -> void:
 	if _charge_visual != null:
 		_charge_visual.queue_free()
 		_charge_visual = null
 	_is_charging = false
 	_charge_distance = 0.0
+	queue_redraw()
 
 ## Animates a line from throw_origin to landing_point over lasso_travel_time, in world
 ## space (parented to the level, not the player, so it stays put even as the player moves).
@@ -215,3 +229,14 @@ func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 		var angle: float = TAU * i / segments
 		points.append(Vector2(cos(angle), sin(angle)) * radius)
 	return points
+
+## Ring matches the forgiving capture area, not the bull's collision shape.
+func _draw() -> void:
+	draw_set_transform(Vector2(0, 33), 0.0, Vector2(1.0, 0.3))
+	draw_circle(Vector2.ZERO, 27, Color(0.15, 0.12, 0.08, 0.2))
+	draw_set_transform(Vector2.ZERO)
+	if _is_charging and _charge_distance > 1.0:
+		var target: Vector2 = aim_direction * _charge_distance
+		draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
+		draw_arc(target, capture_area_visual_radius, 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
+		draw_circle(target, 3.0, Color(1.0, 0.92, 0.7))

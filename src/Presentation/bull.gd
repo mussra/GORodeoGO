@@ -87,6 +87,7 @@ func set_player(player: Node2D) -> void:
 	_player = player
 
 func _physics_process(delta: float) -> void:
+	queue_redraw()
 	_touch_grace_remaining = maxf(_touch_grace_remaining - delta, 0.0)
 	if _player == null:
 		return
@@ -207,7 +208,8 @@ func _update_hold_visual() -> void:
 	if _sprite_swap.play(anim_name):
 		modulate = Color.WHITE
 	else:
-		modulate = _color_for_nerves(controller.current_state())
+		_sprite_swap.stop_on_idle()
+		modulate = Color.WHITE if _sprite_swap.has_sprite() else _color_for_nerves(controller.current_state())
 
 ## Flee direction changes continuously while still in the same ESCAPED/PURSUED state, so
 ## this runs every physics frame rather than only reacting to state_changed.
@@ -223,7 +225,8 @@ func _update_flee_animation(flee_direction: Vector2, delta: float) -> void:
 		_sprite_swap.set_flip_h(dir_info[1])
 		modulate = Color.WHITE
 	else:
-		modulate = _color_for_nerves(controller.current_state())
+		_sprite_swap.stop_on_idle()
+		modulate = Color.WHITE if _sprite_swap.has_sprite() else _color_for_nerves(controller.current_state())
 
 ## Requirement: a bull that broke free at low nerves (almost calm, or fully CONTROLLED —
 ## see _release_any_held_peer's force_escape) should flee slower, so it's easier to tell
@@ -247,7 +250,8 @@ func _on_state_changed(new_state: BullState.State) -> void:
 	if _sprite_swap.play(anim_name):
 		modulate = Color.WHITE  # real art is showing the state, no need to color-code too
 	else:
-		modulate = _color_for_nerves(new_state)  # no art yet: fall back to the colored box
+		_sprite_swap.stop_on_idle()
+		modulate = Color.WHITE if _sprite_swap.has_sprite() else _color_for_nerves(new_state)
 
 ## Collision setup per state. A wild bull physically can't enter/cross the pen (it used to
 ## cut through and steal the player's bull via _release_any_held_peer — D013), so wild bulls
@@ -305,3 +309,25 @@ func _color_for_nerves(state: BullState.State) -> Color:
 		return Color.WHITE
 	var nerves_fraction: float = controller.current_nerves() / NervesValue.MAX_VALUE
 	return CALM_TINT.lerp(AGITATED_TINT, nerves_fraction)
+
+## Readable state cues do not recolor the entire character or depend on missing art.
+func _draw() -> void:
+	if controller == null:
+		return
+	draw_set_transform(Vector2(0, 32), 0.0, Vector2(1.0, 0.32))
+	draw_circle(Vector2.ZERO, 26, Color(0.15, 0.12, 0.08, 0.18))
+	draw_set_transform(Vector2.ZERO)
+	if controller.is_held() and is_instance_valid(_player):
+		var color: Color = Color("74c9a0") if controller.current_state() == BullState.State.CONTROLLED else Color("eec879")
+		draw_line(Vector2(0, 12), to_local(_player.global_position) + Vector2(0, 12), Color("86613e"), 3.0, true)
+		draw_arc(Vector2(0, 25), 29, 0, TAU, 40, color, 2.5, true)
+		if controller.current_state() != BullState.State.CONTROLLED:
+			var amount: float = controller.current_nerves() / NervesValue.MAX_VALUE
+			draw_line(Vector2(-25, -48), Vector2(25, -48), Color("554335"), 6, true)
+			draw_line(Vector2(-25, -48), Vector2(-25 + 50 * (1.0 - amount), -48), Color("84d5a5"), 6, true)
+		else:
+			draw_polyline(PackedVector2Array([Vector2(-7, -47), Vector2(-1, -41), Vector2(10, -54)]), color, 3, true)
+	elif _is_chaser or _random_chase.is_active():
+		draw_circle(Vector2(0, -54), 10, Color("aa4535"))
+		draw_line(Vector2(0, -59), Vector2(0, -54), Color("fff1d2"), 2)
+		draw_circle(Vector2(0, -50), 1.5, Color("fff1d2"))
