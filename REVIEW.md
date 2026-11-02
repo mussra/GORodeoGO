@@ -96,3 +96,12 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Android normal conserva com.example.rancho; versionCode215 (anteriores pruebas1), sin presumir código/certificado de la app instalada del usuario.
 - Variante Android Review: com.example.rancho.review, nombre Rancho Prueba, versionCode215. Instalación separada, no reemplaza Rancho ni importa su progreso. Mismo juego/código, ambos APK debug arm64/minSdk24. No se ha instalado en dispositivo. No evita ni debe eludir controles Play Protect.
 - APK anterior local BIN/Rancho.apk no está rastreado en historial original ni entre releases anteriores; no se puede comparar su certificado con el actual. Diagnóstico exacto de Aplicación no instalada pendiente de APK original/error de sistema.
+
+## Octavo incremento (0.21.6, prototipo de distracciones)
+
+- Agua y heno desde nivel3, no sólidos: perseguidores salvajes próximos se paran3segundos, con10segundos adicionales de espera para reutilizar. No afecta a toros capturados/calmos ni sustituye el rol perseguidor al parar.
+- Mensaje Bebiendo/Comiendo mientras está quieto; puede capturarse y no aturde durante distracción. Por ahora usa reposo, no animación final de beber/comer.
+- Posiciones elegidas libres de obstáculos con margen48px en20niveles, sin cambiar geometrías/tiempos/reglas anteriores salvo nueva mecánica solicitada.
+- 230tests/3430aserciones, incluyendo parada física, captura/cancelación, cooldown y ausencia de stun durante pausa de bebida. No equilibrio humano ni rendimiento.
+- Rancho Prueba conserva ID/firma de0.21.5; versionCode216. El usuario confirmó instalación0.21.5, no se extrapola a prueba de este nuevo binario.
+- Corrales cerrados y animación de mayor volumen siguen pendientes de siguiente incremento, no declarados implementados.

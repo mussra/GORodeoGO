@@ -38,6 +38,7 @@ var _next_capture_order: int = 1
 var _upgrades: PlayerUpgrades
 var _paused_by_user_or_os: bool = false
 var _audio: RanchAudio
+var _distraction_stations: Array = []
 var _pens_data: Array = []  # LevelData.pens for this level
 var _pen_doors: Array = []  # PenDoor per pen index; entries may be freed instances once opened, hence untyped
 var _pen_released: Array = []  # bool per pen index — a pen's bulls are released at most once
@@ -55,6 +56,7 @@ func _ready() -> void:
 	_win_requires_all_bulls = level_data.win_requires_all_bulls
 	_spawn_obstacles(_obstacle_rects)
 	_setup_art()
+	_spawn_distraction_stations()
 
 	var bull_count: int = clampi(level_data.bull_count, 1, all_bulls.size())
 	_active_bulls = all_bulls.slice(0, bull_count)
@@ -69,6 +71,7 @@ func _ready() -> void:
 		bull.world_bounds = world_bounds
 		bull.obstacles = _obstacle_rects
 		bull.pen_rect = pen_zone_rect
+		bull.set_distraction_stations(_distraction_stations)
 		bull.set_player(player)
 		bull.set_peers(_active_bulls)
 		bull.chase_probability = level_data.chase_probability
@@ -377,6 +380,8 @@ func _trigger_lose(reason: String) -> void:
 func _freeze_gameplay() -> void:
 	pen.delivery_enabled = false
 	pen.set_physics_process(false)
+	for station in _distraction_stations:
+		station.set_process(false)
 	player.cancel_all_actions()
 	_reset_touch_controls()
 	player.set_physics_process(false)
@@ -456,3 +461,14 @@ func _reset_touch_controls() -> void:
 	for stick_name: String in ["MoveJoystick", "AimJoystick"]:
 		var stick: VirtualJoystick = touch_controls.get_node(stick_name)
 		stick.notification(Control.NOTIFICATION_RESIZED)
+
+## Non-solid tactical objects, introduced at level3; do not alter obstacle collisions.
+func _spawn_distraction_stations() -> void:
+	if _level_number < 3:
+		return
+	for entry: Dictionary in [{"kind": "water", "position": Vector2(-350, -150)}, {"kind": "hay", "position": Vector2(400, 100)}]:
+		var station := DistractionStation.new()
+		station.kind = entry["kind"]
+		station.position = entry["position"]
+		add_child(station)
+		_distraction_stations.append(station)

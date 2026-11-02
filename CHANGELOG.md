@@ -136,3 +136,7 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Bloqueo de entregas tardías tras derrota; regresión física.
 - Pruebas de remolque, apertura física y conectividad de20niveles.
 - versionCode215 y preset Android Review para Rancho Prueba separado del original, sin migrar progreso.
+
+## 0.21.6
+- Prototipo funcional de abrevadero/heno para distraer perseguidores3s, cooldown y feedback.
+- Pruebas motor de parada física/captura sin stun; versionCode216.

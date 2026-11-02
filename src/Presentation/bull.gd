@@ -26,6 +26,8 @@ const ART_ROOT: String = "res://art/bull/"
 const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_diag_down", "flee_diag_up", "captured", "calming", "controlled"]
 
 var controller: BullController
+var _distraction: BullDistraction = BullDistraction.new()
+var _stations: Array = []
 var _player: Node2D = null
 var _touching_player: bool = false
 var _touch_grace_remaining: float = 0.0
@@ -46,6 +48,9 @@ signal chaser_blocked(bull: Node2D)
 var _effective_flee_speed: float = 0.0  ## real value set on entering ESCAPED, before first use — see _on_state_changed
 var _sprite_swap: SpriteSwap
 var _facing: SpriteFacing = SpriteFacing.new()  # stable sprite direction: no flicker near fences/corners
+
+func set_distraction_stations(stations: Array) -> void:
+	_stations = stations
 
 func set_peers(peers: Array) -> void:
 	_peers = peers
@@ -89,6 +94,7 @@ func set_player(player: Node2D) -> void:
 
 func _physics_process(delta: float) -> void:
 	queue_redraw()
+	_distraction.update(delta)
 	_touch_grace_remaining = maxf(_touch_grace_remaining - delta, 0.0)
 	if _player == null:
 		return
@@ -96,6 +102,16 @@ func _physics_process(delta: float) -> void:
 	match controller.current_state():
 		BullState.State.ESCAPED, BullState.State.PURSUED:
 			_random_chase.update(delta, _is_chaser, capture_held, chase_probability)
+			if not _distraction.active():
+				for station in _stations:
+					if global_position.distance_to(station.global_position) <= DistractionStation.TRIGGER_RADIUS:
+						if _distraction.try_start(controller.is_wild(), _is_chaser or _random_chase.is_active(), station.kind):
+							break
+			if _distraction.active():
+				velocity = Vector2.ZERO
+				_blocked_detector.reset()
+				_sprite_swap.play("idle")
+				return
 			var flee_direction: Vector2 = _compute_flee_direction()
 			velocity = flee_direction * _effective_flee_speed
 			var position_before: Vector2 = global_position
@@ -247,6 +263,7 @@ func _compute_flee_speed_for_nerves() -> float:
 	return flee_speed * max(nerves_fraction, MIN_FLEE_SPEED_FACTOR)
 
 func _on_state_changed(new_state: BullState.State) -> void:
+	_distraction.cancel()
 	_delivered = new_state == BullState.State.SAFE and _last_state == BullState.State.CONTROLLED
 	_last_state = new_state
 	if new_state == BullState.State.ESCAPED:
@@ -338,6 +355,10 @@ func _draw() -> void:
 			draw_line(Vector2(-25, -48), Vector2(-25 + 50 * (1.0 - amount), -48), Color("84d5a5"), 6, true)
 		else:
 			draw_polyline(PackedVector2Array([Vector2(-7, -47), Vector2(-1, -41), Vector2(10, -54)]), color, 3, true)
+	elif _distraction.active():
+		var label: String = "Bebiendo..." if _distraction.kind == "water" else "Comiendo..."
+		draw_style_box(RanchTheme.box(Color("244b40"), Color("9dd5af"), 6), Rect2(-50, -73, 100, 25))
+		draw_string(ThemeDB.fallback_font, Vector2(-45, -55), label, HORIZONTAL_ALIGNMENT_CENTER, 90, 13, Color("fff1d2"))
 	elif _is_chaser or _random_chase.is_active():
 		draw_circle(Vector2(0, -54), 10, Color("aa4535"))
 		draw_line(Vector2(0, -59), Vector2(0, -54), Color("fff1d2"), 2)

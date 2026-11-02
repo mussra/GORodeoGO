@@ -64,3 +64,33 @@ func test_timeout_remains_defeat_if_controlled_bull_overlaps_goal_afterwards() -
 	assert_eq(level._bulls_returned, 0, "no late delivery after defeat")
 	assert_true(level.hud.end_label.text.contains("Tiempo agotado"), "defeat cannot become victory")
 	assert_eq(bull.controller.current_state(), BullState.State.CONTROLLED)
+
+func test_pursuer_stops_drinking_without_stun_then_can_be_captured() -> void:
+	GameState.selected_level = 3
+	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
+	await wait_physics_frames(2)
+	var bull: CharacterBody2D = level._active_bulls[0]
+	for other in level._active_bulls:
+		if other != bull: other.set_physics_process(false)
+	var station: Node2D = level._distraction_stations[0]
+	bull.global_position = station.global_position
+	level.player.global_position = station.global_position + Vector2(20, 0)
+	bull.set_is_chaser(true)
+	await wait_physics_frames(4)
+	assert_true(bull._distraction.active())
+	assert_eq(bull.velocity, Vector2.ZERO)
+	assert_eq(level.player._stun_time_remaining, 0.0, "drinking bull does not stun nearby player")
+	var before: Vector2 = bull.global_position
+	await wait_physics_frames(15)
+	assert_eq(bull.global_position, before, "bull stays still during distraction")
+	assert_true(bull.try_capture(bull.global_position))
+	assert_false(bull._distraction.active(), "capture immediately cancels drinking")
+	assert_true(bull.controller.is_held())
+
+func test_distraction_stations_are_non_solid_and_clear_of_obstacles() -> void:
+	for number in range(3, LevelCatalog.MAX_LEVEL + 1):
+		var data: LevelData = LevelCatalog.get_level(number)
+		for point: Vector2 in [Vector2(-350, -150), Vector2(400, 100)]:
+			for obstacle: Rect2 in data.obstacle_rects:
+				assert_false(obstacle.grow(DistractionStation.TRIGGER_RADIUS).has_point(point), "station trigger not blocked at level %d" % number)

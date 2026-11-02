@@ -225,5 +225,7 @@ func update_guidance(held_count: int, ready_count: int, has_closed_doors: bool) 
 		_hint_label.text = "Mantén la distancia con los toros sueltos mientras se calma"
 	elif _level_number >= 11 and has_closed_doors:
 		_hint_label.text = "Puerta y toro comparten número · Quédate quieto para abrir · M abre todas"
+	elif _level_number >= 3:
+		_hint_label.text = "Laza y calma · Lleva a los perseguidores al AGUA o HENO para distraerlos"
 	else:
 		_hint_label.text = "Laza un toro, espera a que se calme y llévalo al CORRAL"
