@@ -166,3 +166,7 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 -6poses nuevas cabeza toro para beber/comer,10framesping-pong, volumen pintado.
 -6poses renovadas diagonalabajo caballo/vaquero, misma identidad.
 - Otrosángulosno renovados, sinmodelos3D;code221.
+
+## 0.21.12
+- Acercamiento físico corto para alinear gesto de beber/comer con objeto, sinteleport.
+- Captura tardía de revisión y regresión del punto de parada;code222.

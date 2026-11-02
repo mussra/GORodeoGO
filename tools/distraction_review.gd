@@ -10,7 +10,7 @@ func run() -> void:
 	bull.global_position = level._distraction_stations[0].global_position + Vector2(25, 0)
 	level.player.global_position = bull.global_position + Vector2(65, 60)
 	bull.set_is_chaser(true)
-	for i in range(5): await physics_frame
+	for i in range(65): await physics_frame
 	print("DRINKING ", bull._distraction.active(), " velocity=", bull.velocity)
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png("/downloads/gorodeo/drinking.png")

@@ -28,6 +28,7 @@ const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_di
 var controller: BullController
 var _distraction: BullDistraction = BullDistraction.new()
 var _stations: Array = []
+var _distraction_target: Vector2 = Vector2.ZERO
 var _release_gate: Vector2 = Vector2.ZERO
 var _release_inward: float = 0.0
 var _leaving_corral: bool = false
@@ -119,9 +120,13 @@ func _physics_process(delta: float) -> void:
 					if global_position.distance_to(station.global_position) <= DistractionStation.TRIGGER_RADIUS:
 						if _distraction.try_start(controller.is_wild(), _is_chaser or _random_chase.is_active(), station.kind):
 							_sprite_swap.set_flip_h(station.global_position.x < global_position.x)
+							var side: float = 1.0 if station.global_position.x < global_position.x else -1.0
+							_distraction_target = station.global_position + Vector2(side * 24, -36)
 							break
 			if _distraction.active():
-				velocity = Vector2.ZERO
+				var offset: Vector2 = _distraction_target - global_position
+				velocity = offset.normalized() * minf(80.0, offset.length() / delta) if offset.length() > 1 else Vector2.ZERO
+				move_and_slide()
 				_blocked_detector.reset()
 				_sprite_swap.play("drinking")
 				return

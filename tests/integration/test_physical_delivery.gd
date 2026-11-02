@@ -79,6 +79,8 @@ func test_pursuer_stops_drinking_without_stun_then_can_be_captured() -> void:
 	bull.set_is_chaser(true)
 	await wait_physics_frames(4)
 	assert_true(bull._distraction.active())
+	await wait_physics_frames(40)
+	assert_lt(bull.global_position.distance_to(bull._distraction_target), 1.1, "short physical approach aligns muzzle with station")
 	assert_eq(bull.velocity, Vector2.ZERO)
 	assert_eq(level.player._stun_time_remaining, 0.0, "drinking bull does not stun nearby player")
 	var before: Vector2 = bull.global_position

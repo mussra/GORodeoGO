@@ -144,3 +144,10 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Total78dibujos únicos (72previos+6cabeza),82frames runtime por ping-pong. Otras direcciones conservan arte previo, por tanto no declarar todo el elenco renovado.
 - Motor real capturado en vídeo y sprite registrado96px, clipping cuernos detectado/corregido al normalizar con altura máxima para cabeza baja. Contacto exacto hocico/objeto aún aproximado, no simulación bebida3D.
 -241tests/3894aserciones pasan. Misma identidad/firmaPrueba,code221. Sin test de teléfono de nueva versión.
+
+## Decimocuarto incremento (0.21.12)
+
+- Acercamiento físico corto al agua/heno mientras empieza distracción, máximo80px/s, sin teleport. Objetivo ajustado al hocico de animación para que baje sobre agua y no sobre suelo lateral. Trigger sigue48px y ventana total3s, no añade tiempo extra.
+- Captura al segundo1.1 inspeccionada: hocico sobre superficie agua, cuerpo permanece en física real. Alineación aproximada2D, no simulación3D; pie frontal puede superponer borde del objeto no sólido.
+-241tests/3895aserciones pasan; test de reposo actual espera final del acercamiento y comprueba target en1.1px.
+- MismoID/firmaPrueba,code222.
