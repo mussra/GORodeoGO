@@ -62,3 +62,26 @@ func test_doors_are_not_under_the_player_spawn_or_the_pen() -> void:
 			var door: Vector2 = pen_entry["door_position"]
 			assert_gt(door.distance_to(PLAYER_SPAWN), PenDoor.RADIUS + PLAYER_HALF_HEIGHT, "level %d: player would spawn inside a door" % n)
 			assert_false(PEN_RECT.grow(PenDoor.RADIUS).has_point(door), "level %d: door %s overlaps the pen" % [n, door])
+
+## Flood fill with bull-size clearance, more conservative than the rider's rectangle.
+## This checks static route existence, not AI pathfinding or time-limit balance.
+func test_all_doors_bulls_and_goal_have_connected_clearance_routes() -> void:
+	for n in range(1, LevelCatalog.MAX_LEVEL + 1):
+		var data: LevelData = LevelCatalog.get_level(n)
+		var grid := AStarGrid2D.new()
+		grid.region = Rect2i(-45, -24, 91, 49)
+		grid.cell_size = Vector2(10, 10)
+		grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+		grid.update()
+		for x in range(-45, 46):
+			for y in range(-24, 25):
+				var point := Vector2(x * 10, y * 10)
+				for rect: Rect2 in data.obstacle_rects:
+					if rect.grow(BULL_RADIUS + 1).has_point(point):
+						grid.set_point_solid(Vector2i(x, y))
+		var targets: Array = [Vector2(-300, 0)]
+		for i in range(data.bull_count): targets.append(_bull_spawns[i])
+		for entry: Dictionary in data.pens: targets.append(entry["door_position"])
+		for target: Vector2 in targets:
+			var cell := Vector2i(roundi(target.x / 10), roundi(target.y / 10))
+			assert_false(grid.get_id_path(Vector2i.ZERO, cell).is_empty(), "level %d route to %s with bull clearance" % [n, target])

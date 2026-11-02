@@ -35,7 +35,7 @@ Siete pruebas nuevas cubren carga de teclado/stick, cancelación en pausa, entre
 - Animaciones de 6 dibujos a 8 fps. No son animación esquelética ni prueban rendimiento Android.
 - No se ha jugado en un teléfono: multitáctil, tacto, pausa/segundo plano y rendimiento siguen pendientes de dispositivo real.
 - Se conservan las reglas/progresión y los 20 niveles. Tiempos de niveles siguen necesitando sesiones de juego, no se han retocado a ciegas.
-- Sin publicación, sin merge a main, sin cambios de identidad de paquete o servicios.
+- Sin merge a main ni despliegue de tienda. Prereleases autorizadas por el usuario; a partir de0.21.5 hay variante de prueba con ID separado para coexistir con el original.
 - El APK antiguo `BIN/Rancho.apk` del historial no representa esta rama. Se ha creado aparte `GO-Rodeo-GO-review.apk` desde f195add; ver segundo incremento. Abrir `project.godot` con Godot 4.7.2 para probar el código.
 
 ## Historial revisado
@@ -87,3 +87,12 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Lazo en vuelo comprobado: se congela al pausar y aterriza al reanudar, pero se cancela si termina partida.
 - Señales sonoras generadas: PCM revisado sin clipping (picos <0.5 de escala), finales cero y volumen por voz -15dB. No hay evaluación auditiva humana: calidad y mezcla final pendientes de escuchar en el dispositivo.
 - 221 tests pasan, 3132 aserciones.
+
+## Séptimo incremento (0.21.5)
+
+- Cierre de partida inmutable: el corral ya no puede entregar al frame siguiente y cambiar una derrota por tiempo a victoria. Regresión reproducida antes de la corrección.
+- Remolque físico completo hasta victoria sin teletransportar toro al corral; apertura por overlap real y quietud; rutas estáticas conectadas a toros, puertas y corral en los20niveles con margen24px. Son escenarios guionados, no equilibrio ni juego humano.
+- 225 tests / 3348 aserciones pasan.
+- Android normal conserva com.example.rancho; versionCode215 (anteriores pruebas1), sin presumir código/certificado de la app instalada del usuario.
+- Variante Android Review: com.example.rancho.review, nombre Rancho Prueba, versionCode215. Instalación separada, no reemplaza Rancho ni importa su progreso. Mismo juego/código, ambos APK debug arm64/minSdk24. No se ha instalado en dispositivo. No evita ni debe eludir controles Play Protect.
+- APK anterior local BIN/Rancho.apk no está rastreado en historial original ni entre releases anteriores; no se puede comparar su certificado con el actual. Diagnóstico exacto de Aplicación no instalada pendiente de APK original/error de sistema.

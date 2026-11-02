@@ -7,6 +7,8 @@ const ART_PATH: String = "res://art/pen/pen.png"
 
 signal bull_returned(bull: Node2D)
 
+var delivery_enabled: bool = true
+
 func _ready() -> void:
 	collision_mask |= CollisionLayers.BULL_PASSIVE  # held bulls live on this layer (D036)
 	body_entered.connect(_on_body_entered)
@@ -30,6 +32,8 @@ func _physics_process(_delta: float) -> void:
 		_on_body_entered(body)
 
 func _on_body_entered(body: Node2D) -> void:
+	if not delivery_enabled:
+		return
 	if not ("controller" in body):
 		return
 

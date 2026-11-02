@@ -131,3 +131,8 @@ Esc reanuda con HUD always-processing. Cancelación del lazo en vuelo al termina
 
 ## v0.21.4 - guía de captura y cierre coherente
 R para liberar en teclado, ayuda contextual por estado, controles de juego ocultos al finalizar. Victoria real con contador/estado reconciliados. Regresión lazo/pausa. 221tests/3132aserciones. PCM sin clipping comprobado, audio no evaluado por oído humano.
+
+## 0.21.5
+- Bloqueo de entregas tardías tras derrota; regresión física.
+- Pruebas de remolque, apertura física y conectividad de20niveles.
+- versionCode215 y preset Android Review para Rancho Prueba separado del original, sin migrar progreso.

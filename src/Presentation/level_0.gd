@@ -349,6 +349,8 @@ func _on_tranquilizer_requested() -> void:
 		hud.set_tranquilizer_available(false)
 
 func _on_bull_returned(returned_bull: Node2D) -> void:
+	if _game_over:
+		return
 	_audio.play("return")
 	_bulls_returned += 1
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
@@ -356,6 +358,8 @@ func _on_bull_returned(returned_bull: Node2D) -> void:
 		_trigger_win()
 
 func _trigger_win() -> void:
+	if _game_over:
+		return
 	_game_over = true
 	_freeze_gameplay()
 	SaveData.record_level_completed(_level_number)
@@ -363,12 +367,16 @@ func _trigger_win() -> void:
 	_audio.play("win")
 
 func _trigger_lose(reason: String) -> void:
+	if _game_over:
+		return
 	_game_over = true
 	_freeze_gameplay()
 	hud.show_lose(reason)
 	_audio.play("lose")
 
 func _freeze_gameplay() -> void:
+	pen.delivery_enabled = false
+	pen.set_physics_process(false)
 	player.cancel_all_actions()
 	_reset_touch_controls()
 	player.set_physics_process(false)
