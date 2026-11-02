@@ -63,3 +63,10 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 
 - El ajuste de sonido se conserva al cambiar de nivel durante la sesión.
 - Registro del reposo del toro corregido usando alpha significativo, descartando ruido casi transparente.
+
+## Cuarto incremento (0.21.2)
+
+- Corregido: pausa/focus loss con dedos apoyados conservaba acciones activas del joystick nativo aunque se ocultase; reset explícito y verificado con dos contactos inyectados en Godot/Linux.
+- Harness `tools/touch_review.gd`: mover con dedo0, apuntar/soltar con dedo1, interrumpir con pausa y comprobar ambos vectores a cero. Resultado true. Es prueba sintética, no validación con dedos en un teléfono.
+- Guardado probado en rutas temporales aisladas: roundtrip atómico, fichero corrupto/ausente y rechazo de niveles fuera de campaña. Ruta de producción sin cambios.
+- 214 tests pasan, 3106 aserciones.

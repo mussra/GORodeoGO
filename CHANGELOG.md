@@ -122,3 +122,6 @@ Ver `REVIEW.md`: controles de teclado/pausa, entrega del toro calmado dentro del
 - Puertas y toros numerados, maestra 1M, enlaces detrás de personajes.
 - Mute conservado en la sesión y registro alpha de reposo corregido.
 - 210 tests, 3094 aserciones pasan. Pruebas en Linux, no en dispositivo Android.
+
+## v0.21.2 - pausa táctil y persistencia
+Reset de acciones nativas al pausar con dedos apoyados; harness multitáctil sintético de Godot real. Regresiones de guardado en rutas aisladas. 214 tests/3106 aserciones. No probado en teléfono.

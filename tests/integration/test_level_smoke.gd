@@ -391,3 +391,12 @@ func test_sound_choice_survives_level_instances_in_this_session() -> void:
 	level = await _spawn_level(2)
 	assert_false(level._audio.enabled)
 	GameState.sound_enabled = original
+
+func test_pause_clears_native_joystick_actions() -> void:
+	var level: Node = await _spawn_level(1)
+	Input.action_press("move_right", 0.75)
+	Input.action_press("aim_up", 0.75)
+	level.pause_game()
+	assert_false(Input.is_action_pressed("move_right"))
+	assert_false(Input.is_action_pressed("aim_up"))
+	level.resume_game()

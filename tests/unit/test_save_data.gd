@@ -16,3 +16,40 @@ func test_is_new_record_false_when_lower_or_equal() -> void:
 	assert_false(sut.is_new_record(3))
 	assert_false(sut.is_new_record(5))
 	sut.free()
+
+func test_record_rejects_levels_outside_the_campaign() -> void:
+	var sut: Node = load("res://src/Application/save_data.gd").new()
+	assert_false(sut.is_new_record(-1))
+	assert_false(sut.is_new_record(0))
+	assert_false(sut.is_new_record(LevelCatalog.MAX_LEVEL + 1))
+	sut.free()
+
+func test_atomic_save_roundtrip_on_an_isolated_path() -> void:
+	var path: String = "user://qa_progress_roundtrip.dat"
+	var sut: Node = load("res://src/Application/save_data.gd").new()
+	sut.save_path = path
+	sut.highest_level_completed = 12
+	assert_true(sut.save_progress())
+	assert_true(FileAccess.file_exists(path))
+	assert_false(FileAccess.file_exists(path + ".tmp"), "temp file was renamed")
+	sut.highest_level_completed = 0
+	sut.load_progress()
+	assert_eq(sut.highest_level_completed, 12)
+	DirAccess.remove_absolute(path)
+	sut.free()
+
+func test_corrupt_or_missing_save_resets_only_the_test_instance() -> void:
+	var path: String = "user://qa_progress_corrupt.dat"
+	var sut: Node = load("res://src/Application/save_data.gd").new()
+	sut.save_path = path
+	var config := ConfigFile.new()
+	config.set_value("progress", "highest_level_completed", "not an integer")
+	assert_eq(config.save(path), OK)
+	sut.highest_level_completed = 8
+	sut.load_progress()
+	assert_eq(sut.highest_level_completed, 0)
+	DirAccess.remove_absolute(path)
+	sut.highest_level_completed = 8
+	sut.load_progress()
+	assert_eq(sut.highest_level_completed, 0)
+	sut.free()

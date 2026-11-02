@@ -362,6 +362,7 @@ func _trigger_lose(reason: String) -> void:
 
 func _freeze_gameplay() -> void:
 	player.cancel_input()
+	_reset_touch_controls()
 	player.set_physics_process(false)
 	for door in _pen_doors:
 		if is_instance_valid(door):
@@ -407,6 +408,7 @@ func pause_game() -> void:
 		return
 	_paused_by_user_or_os = true
 	player.cancel_input()
+	_reset_touch_controls()
 	touch_controls.visible = false
 	get_tree().paused = true
 	hud.show_pause()
@@ -432,3 +434,11 @@ func _on_bull_audio_state(state: BullState.State) -> void:
 func _on_sound_toggled(value: bool) -> void:
 	_audio.enabled = value
 	GameState.sound_enabled = value
+
+func _reset_touch_controls() -> void:
+	# Godot 4.7 VirtualJoystick has no public reset method. Its RESIZED handler
+	# resets touch_index, vectors and action presses without emitting a throw.
+	# Hiding the CanvasLayer alone leaves held actions stuck after focus loss.
+	for stick_name: String in ["MoveJoystick", "AimJoystick"]:
+		var stick: VirtualJoystick = touch_controls.get_node(stick_name)
+		stick.notification(Control.NOTIFICATION_RESIZED)
