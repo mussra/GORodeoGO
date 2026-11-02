@@ -114,3 +114,10 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Agua/heno se colocan en pasillo central para puzzle; mantienen comportamiento0.21.6.
 - 235tests/3846aserciones pasan en revisión final. Incluyen contención/márgenes de spawns, no solapamiento, bloqueo físico antes de abrir, apertura por quietud real, salida remolcada de cada toro de11-20, maestra y cadena. Salidas son simulaciones controladas, no prueba de habilidad/dificultad ni rutas AI autónomas.
 - Rancho Prueba misma identidad/firma, versionCode217. Checkpoint0.21.6 preservado. Arte de mayor volumen/fluidez sigue pendiente; no pipeline3D supuesto.
+
+## Décimo incremento (0.21.8)
+
+- Reproducido: al abrir corrales, steering original podía apilar toros contra postes/entre sí. La salida remolcada no demostraba salida AI libre.
+- Hueco físico aumentado de70a120px y guía inicial de salida: alinear, cruzar, despejar al pasillo lateral lejos de barrera META. Salida escalonada1.25s por toro; después vuelve steering original. Capturar cancela guía para no desplazar toro retenido. No teleports ni desactivar colisión entre toros.
+- Prueba de liberación simultánea de11,13,20: todos los toros terminan guía inicial dentro de12s con física real. Más pruebas de salida remolcada de todos los toros11-20 conservadas.236tests/3866aserciones. No demuestra navegación universal tras salida: un toro puede volver a entrar en recintos abiertos con steering normal. No navegación global nueva ni equilibrio humano.
+- Capturas reales antes/después inspeccionadas; mismoID/firma, code218.

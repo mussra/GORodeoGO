@@ -224,9 +224,15 @@ func _on_pen_door_opened(pen_index: int) -> void:
 				linked_door.force_open()
 
 func _release_pen_bulls(pen_index: int) -> void:
-	var bull_indices: Array = _pens_data[pen_index].get("bull_indices", [])
+	var bull_indices: Array = _pens_data[pen_index].get("bull_indices", []).duplicate()
+	var exit_x: float = _puzzle_corrals[pen_index].layout["gate"].x
+	bull_indices.sort_custom(func(a, b): return absf(_active_bulls[a].global_position.x - exit_x) < absf(_active_bulls[b].global_position.x - exit_x))
+	var exit_order: int = 0
 	for index: int in bull_indices:
 		if index >= 0 and index < _active_bulls.size():
+			var layout: Dictionary = _puzzle_corrals[pen_index].layout
+			_active_bulls[index].guide_out_of_corral(layout["gate"], layout["inward"], exit_order * 1.25)
+			exit_order += 1
 			_active_bulls[index].begin_active()
 
 ## Applies persistent unlocks once at level start — these are player stats, not

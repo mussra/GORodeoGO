@@ -70,3 +70,18 @@ func test_chain_only_opens_configured_physical_corrals() -> void:
 	level._on_pen_door_opened(3)
 	for index in range(8):
 		assert_eq(level._puzzle_corrals[index].opened, index in [3, 6])
+
+func test_released_wild_bulls_naturally_exit_corrals_without_teleporting() -> void:
+	for number in [11, 13, 20]:
+		GameState.selected_level = number
+		var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+		add_child_autofree(level)
+		await wait_physics_frames(2)
+		level.player.global_position = Vector2(0, 50)
+		level.set_process(false)
+		for index in range(level._pens_data.size()): level._on_pen_door_opened(index)
+		await wait_physics_frames(720)
+		for bull in level._active_bulls:
+			assert_false(bull._leaving_corral, "level %d %s naturally cleared gate" % [number, bull.name])
+		level.queue_free()
+		await wait_physics_frames(2)

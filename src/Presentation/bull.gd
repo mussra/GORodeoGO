@@ -28,6 +28,11 @@ const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_di
 var controller: BullController
 var _distraction: BullDistraction = BullDistraction.new()
 var _stations: Array = []
+var _release_gate: Vector2 = Vector2.ZERO
+var _release_inward: float = 0.0
+var _leaving_corral: bool = false
+var _release_alignment_done: bool = false
+var _release_delay: float = 0.0
 var _player: Node2D = null
 var _touching_player: bool = false
 var _touch_grace_remaining: float = 0.0
@@ -48,6 +53,13 @@ signal chaser_blocked(bull: Node2D)
 var _effective_flee_speed: float = 0.0  ## real value set on entering ESCAPED, before first use — see _on_state_changed
 var _sprite_swap: SpriteSwap
 var _facing: SpriteFacing = SpriteFacing.new()  # stable sprite direction: no flicker near fences/corners
+
+func guide_out_of_corral(gate: Vector2, inward: float, delay: float = 0.0) -> void:
+	_release_delay = delay
+	_release_gate = gate
+	_release_inward = inward
+	_leaving_corral = true
+	_release_alignment_done = false
 
 func set_distraction_stations(stations: Array) -> void:
 	_stations = stations
@@ -112,6 +124,10 @@ func _physics_process(delta: float) -> void:
 				_blocked_detector.reset()
 				_sprite_swap.play("idle")
 				return
+			if _leaving_corral and _release_delay > 0:
+				_release_delay -= delta
+				velocity = Vector2.ZERO
+				return
 			var flee_direction: Vector2 = _compute_flee_direction()
 			velocity = flee_direction * _effective_flee_speed
 			var position_before: Vector2 = global_position
@@ -148,6 +164,21 @@ func _apply_tow_movement() -> void:
 ## Direction is computed by FleeSteering (Application, unit tested): away from the player,
 ## or toward it while this bull is the designated chaser or won its secondary chase roll.
 func _compute_flee_direction() -> Vector2:
+	if _leaving_corral:
+		var clearance_y: float = _release_gate.y + _release_inward * 30
+		if (global_position.y - _release_gate.y) * _release_inward >= 28:
+			# Keep early escapees moving along the clear aisle, not back into the
+			# next bull exiting. Stay above/below the goal's physical wild barrier.
+			if absf(global_position.x) < 55:
+				_leaving_corral = false
+			else:
+				return (Vector2(0, clearance_y) - global_position).normalized()
+		else:
+			if absf(global_position.x - _release_gate.x) < 30:
+				_release_alignment_done = true
+			if not _release_alignment_done:
+				return Vector2(signf(_release_gate.x - global_position.x), 0)
+			return Vector2(0, _release_inward)
 	return FleeSteering.compute_direction(
 		global_position, _player.global_position,
 		_is_chaser or _random_chase.is_active(),
@@ -264,6 +295,8 @@ func _compute_flee_speed_for_nerves() -> float:
 
 func _on_state_changed(new_state: BullState.State) -> void:
 	_distraction.cancel()
+	if controller.is_held():
+		_leaving_corral = false
 	_delivered = new_state == BullState.State.SAFE and _last_state == BullState.State.CONTROLLED
 	_last_state = new_state
 	if new_state == BullState.State.ESCAPED:

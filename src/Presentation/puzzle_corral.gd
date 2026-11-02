@@ -14,9 +14,9 @@ func _ready() -> void:
 	_wall(Rect2(rect.position.x - 4, rect.position.y - 4, 8, rect.size.y + 8))
 	_wall(Rect2(rect.end.x - 4, rect.position.y - 4, 8, rect.size.y + 8))
 	_wall(Rect2(rect.position.x, back_y - 4, rect.size.x, 8))
-	_wall(Rect2(rect.position.x, front_y - 4, rect.size.x / 2 - 35, 8))
-	_wall(Rect2(gate.x + 35, front_y - 4, rect.size.x / 2 - 35, 8))
-	_gate_body = _wall(Rect2(gate.x - 35, front_y - 4, 70, 8))
+	_wall(Rect2(rect.position.x, front_y - 4, rect.size.x / 2 - 60, 8))
+	_wall(Rect2(gate.x + 60, front_y - 4, rect.size.x / 2 - 60, 8))
+	_gate_body = _wall(Rect2(gate.x - 60, front_y - 4, 120, 8))
 func _wall(rect: Rect2) -> StaticBody2D:
 	var body := StaticBody2D.new()
 	body.collision_layer = CollisionLayers.FENCE
@@ -43,15 +43,15 @@ func _draw() -> void:
 	_rail(Vector2(rect.position.x, back), Vector2(rect.end.x, back))
 	_rail(rect.position, Vector2(rect.position.x, rect.end.y))
 	_rail(Vector2(rect.end.x, rect.position.y), rect.end)
-	_rail(Vector2(rect.position.x, front), gate - Vector2(35, 0))
-	_rail(gate + Vector2(35, 0), Vector2(rect.end.x, front))
+	_rail(Vector2(rect.position.x, front), gate - Vector2(60, 0))
+	_rail(gate + Vector2(60, 0), Vector2(rect.end.x, front))
 	if not opened:
-		_rail(gate - Vector2(35, 0), gate + Vector2(35, 0), Color("dcac57"))
-		for x in range(-28, 29, 14):
+		_rail(gate - Vector2(60, 0), gate + Vector2(60, 0), Color("dcac57"))
+		for x in range(-52, 53, 14):
 			draw_line(gate + Vector2(x, -10), gate + Vector2(x, 10), Color("dfb56b"), 5, true)
 	else:
-		draw_line(gate - Vector2(35, 0), gate - Vector2(50, layout["inward"] * 28), Color("dcac57"), 6, true)
-		draw_line(gate + Vector2(35, 0), gate + Vector2(50, layout["inward"] * 28), Color("dcac57"), 6, true)
+		draw_line(gate - Vector2(60, 0), gate - Vector2(75, layout["inward"] * 28), Color("dcac57"), 6, true)
+		draw_line(gate + Vector2(60, 0), gate + Vector2(75, layout["inward"] * 28), Color("dcac57"), 6, true)
 	draw_string(ThemeDB.fallback_font, Vector2(rect.position.x + 8, back + (18 if layout["inward"] > 0 else -10)), "RECINTO %d" % number, HORIZONTAL_ALIGNMENT_LEFT, 100, 12, Color("fff1cf"))
 func _rail(a: Vector2, b: Vector2, color: Color = Color("815638")) -> void:
 	draw_line(a + Vector2(2, 5), b + Vector2(2, 5), Color(0.2, 0.14, 0.1, 0.2), 8, true)

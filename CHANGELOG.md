@@ -146,3 +146,8 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Nuevo layout/spawns para puzzle, sustituye cajas anteriores;1-10 sin cambios.
 - Meta diferenciada, cierres exteriores pequeños y dependencias visibles despejando el destino.
 - versionCode217, misma identidad/firma de Rancho Prueba.
+
+## 0.21.8
+- Corrige atasco de salida AI inicial de corrales con gate120px, guía y escalonado.
+- Mantiene colisiones/posiciones físicas, captura cancela guía. Regresión liberación11/13/20.
+- versionCode218, misma firma/identidad.
