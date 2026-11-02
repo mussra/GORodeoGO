@@ -136,3 +136,11 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Nuevas comprobaciones físicas: timer de distracción congelado en pausa/fin, reanuda al continuar; captura cancela guía de salida; espera escalonada de salida congelada en pausa.
 -240tests/3881aserciones. Sin arte nuevo; continúa revisión visual solicitada como bloque separado.
 - MismoID/firmaPrueba, code220.
+
+## Decimotercer incremento (0.21.11)
+
+- Arte nuevo real: seis poses del toro bajando cabeza con volumen pintado, secuencia de10frames ping-pong a5fps para beber/comer. Conserva identidad toro oscuro/manta roja/dorada; no modelo3D. Mira horizontalmente hacia objeto.
+- Diagonal abajo caballo/vaquero rehecha con seis poses de marcha y sombras de forma, conservando personaje. Seis frames sustituyen seis existentes, no se multiplican por cambiarfps.
+- Total78dibujos únicos (72previos+6cabeza),82frames runtime por ping-pong. Otras direcciones conservan arte previo, por tanto no declarar todo el elenco renovado.
+- Motor real capturado en vídeo y sprite registrado96px, clipping cuernos detectado/corregido al normalizar con altura máxima para cabeza baja. Contacto exacto hocico/objeto aún aproximado, no simulación bebida3D.
+-241tests/3894aserciones pasan. Misma identidad/firmaPrueba,code221. Sin test de teléfono de nueva versión.

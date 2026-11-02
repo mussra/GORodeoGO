@@ -32,7 +32,7 @@ func _init(host: Node, placeholder: CanvasItem, art_root: String, animation_name
 			continue
 
 		frames.add_animation(anim_name)
-		frames.set_animation_speed(anim_name, 3.0 if anim_name == "idle" else fps)
+		frames.set_animation_speed(anim_name, 3.0 if anim_name == "idle" else (5.0 if anim_name == "drinking" else fps))
 		frames.set_animation_loop(anim_name, true)
 		for path in frame_paths:
 			var tex: Texture2D = load(path)

@@ -23,7 +23,7 @@ const CHASER_BLOCKED_PROGRESS_RATIO: float = 0.25  # moving < 25% of the intende
 const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
 const MIN_FLEE_SPEED_FACTOR: float = 0.15
 const ART_ROOT: String = "res://art/bull/"
-const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_diag_down", "flee_diag_up", "captured", "calming", "controlled"]
+const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_diag_down", "flee_diag_up", "captured", "calming", "controlled", "drinking"]
 
 var controller: BullController
 var _distraction: BullDistraction = BullDistraction.new()
@@ -118,11 +118,12 @@ func _physics_process(delta: float) -> void:
 				for station in _stations:
 					if global_position.distance_to(station.global_position) <= DistractionStation.TRIGGER_RADIUS:
 						if _distraction.try_start(controller.is_wild(), _is_chaser or _random_chase.is_active(), station.kind):
+							_sprite_swap.set_flip_h(station.global_position.x < global_position.x)
 							break
 			if _distraction.active():
 				velocity = Vector2.ZERO
 				_blocked_detector.reset()
-				_sprite_swap.play("idle")
+				_sprite_swap.play("drinking")
 				return
 			if _leaving_corral and _release_delay > 0:
 				_release_delay -= delta

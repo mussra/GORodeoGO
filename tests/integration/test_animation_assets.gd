@@ -31,3 +31,15 @@ func test_turn_preserves_gait_phase_instead_of_restarting_cycle() -> void:
 	swap.play("idle")
 	swap.set_motion_speed(0, 260)
 	assert_eq(swap._sprite.speed_scale, 1.0)
+
+func test_distraction_has_ten_frames_with_six_distinct_head_poses() -> void:
+	var host := Node2D.new()
+	add_child_autofree(host)
+	var placeholder := Polygon2D.new()
+	host.add_child(placeholder)
+	var swap := SpriteSwap.new(host, placeholder, "res://art/bull/", ["drinking"])
+	assert_true(swap.play("drinking"))
+	assert_eq(swap._frames.get_frame_count("drinking"), 10)
+	assert_eq(swap._frames.get_animation_speed("drinking"), 5.0)
+	for i in range(10):
+		assert_eq(swap._frames.get_frame_texture("drinking", i).get_size(), Vector2(96,96))

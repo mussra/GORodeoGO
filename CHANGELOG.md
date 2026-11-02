@@ -161,3 +161,8 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Toro distraído no agita al capturado cercano; recupera efecto al terminar.
 - Regresiones de pausa/fin/distracción y captura/espera de salida.
 - versionCode220, misma identidad/firma.
+
+## 0.21.11
+-6poses nuevas cabeza toro para beber/comer,10framesping-pong, volumen pintado.
+-6poses renovadas diagonalabajo caballo/vaquero, misma identidad.
+- Otrosángulosno renovados, sinmodelos3D;code221.
