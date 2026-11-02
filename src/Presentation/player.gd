@@ -58,6 +58,8 @@ func set_aim_joystick(aim_joystick: VirtualJoystick) -> void:
 	aim_joystick.released.connect(_on_aim_released)
 
 func _on_aim_pressed() -> void:
+	if _stun_time_remaining > 0.0 or not is_physics_processing():
+		return
 	_touch_aim_active = true
 	_aim_pressed_at_seconds = _now_seconds()
 	if not _is_charging and not _lasso_in_flight:
@@ -72,6 +74,8 @@ func _on_aim_pressed() -> void:
 ## one-frame staleness that was making the landing point slightly off from where you
 ## actually released, especially noticeable on fast drags.
 func _on_aim_released(input_vector: Vector2) -> void:
+	if not _touch_aim_active:
+		return
 	_touch_aim_active = false
 	var now: float = _now_seconds()
 	if LassoAim.is_tap(input_vector, now - _aim_pressed_at_seconds):
@@ -93,7 +97,7 @@ func stun(duration: float) -> void:
 	_stun_time_remaining = max(_stun_time_remaining, duration * stun_resistance_multiplier)
 	if not _sprite_swap.play("stunned"):
 		modulate = Color(1.0, 0.5, 0.5, 1.0)  # no art yet: fall back to a red tint
-	_cancel_charge()
+	cancel_input()
 
 func _physics_process(delta: float) -> void:
 	if _stun_time_remaining > 0.0:

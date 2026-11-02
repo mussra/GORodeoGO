@@ -61,7 +61,7 @@ func update_bull_count(returned: int, total: int) -> void:
 
 func set_level(number: int) -> void:
 	_level_label.text = "NIVEL %02d" % number
-	_hint_label.text = "Acércate a una puerta y quédate quieto para abrirla" if number >= 11 else "Laza un toro, espera a que se calme y llévalo al CORRAL"
+	_hint_label.text = "Puerta y toro comparten número · Quédate quieto para abrir · M abre todas" if number >= 11 else "Laza un toro, espera a que se calme y llévalo al CORRAL"
 
 func update_timer(seconds_remaining: float) -> void:
 	var whole_seconds: int = max(0, int(ceil(seconds_remaining)))
@@ -121,7 +121,7 @@ func _build_pause_panel() -> void:
 
 	var sound_button := CheckButton.new()
 	sound_button.text = "Sonido"
-	sound_button.button_pressed = true
+	sound_button.button_pressed = GameState.sound_enabled
 	sound_button.position = Vector2(185, 65)
 	sound_button.toggled.connect(func(value: bool): sound_toggled.emit(value))
 	_pause_panel.add_child(sound_button)

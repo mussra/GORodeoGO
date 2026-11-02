@@ -352,3 +352,42 @@ func test_keyboard_release_lands_at_charged_distance() -> void:
 	assert_signal_emitted(player, "lasso_thrown")
 	var params: Array = get_signal_parameters(player, "lasso_thrown")
 	assert_almost_eq((params[1] as Vector2).x - (params[0] as Vector2).x, -150.0, 0.1)
+
+func test_puzzle_bulls_and_gates_have_matching_numbers() -> void:
+	var level: Node = await _spawn_level(20)
+	var doors: Array = _doors(level)
+	for index in range(level._pens_data.size()):
+		assert_eq(doors[index].door_number, index + 1)
+		for bull_index: int in level._pens_data[index].get("bull_indices", []):
+			assert_eq(level._active_bulls[bull_index].pen_number, index + 1)
+	assert_true(doors[0].is_master)
+	assert_false(doors[1].is_master)
+
+func test_stunned_player_cannot_start_a_touch_throw() -> void:
+	var level: Node = await _spawn_level(1)
+	level.player.stun(1.0)
+	level.player._on_aim_pressed()
+	level.player._on_aim_released(Vector2.RIGHT)
+	assert_false(level.player._is_charging)
+	assert_false(level.player._lasso_in_flight)
+
+func test_release_from_before_pause_does_not_throw_after_resume() -> void:
+	var level: Node = await _spawn_level(1)
+	level.player._on_aim_pressed()
+	level.pause_game()
+	level.resume_game()
+	level.player._on_aim_released(Vector2.RIGHT)
+	assert_false(level.player._lasso_in_flight)
+	assert_false(level.player._is_charging)
+
+func test_sound_choice_survives_level_instances_in_this_session() -> void:
+	var original: bool = GameState.sound_enabled
+	var level: Node = await _spawn_level(1)
+	level._on_sound_toggled(false)
+	assert_false(GameState.sound_enabled)
+	assert_false(level._audio.enabled)
+	level.queue_free()
+	await wait_physics_frames(2)
+	level = await _spawn_level(2)
+	assert_false(level._audio.enabled)
+	GameState.sound_enabled = original

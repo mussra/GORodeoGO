@@ -13,8 +13,8 @@ extends Node2D
 ## An arrow disappears as soon as either end is opened: once the source is open its links
 ## are spent, and a target opened earlier can no longer be triggered.
 
-const LINK_COLOR: Color = Color(1.0, 0.41, 0.71, 1.0)  # pink
-const LINK_WIDTH: float = 3.0
+const LINK_COLOR: Color = Color(0.2, 0.37, 0.32, 0.55)  # pink
+const LINK_WIDTH: float = 2.0
 const ARROWHEAD_LENGTH: float = 16.0
 const ARROWHEAD_WIDTH: float = 8.0
 
@@ -22,6 +22,7 @@ var _pens: Array = []
 var _doors: Array = []  # PenDoor per pen index; entries may be freed instances, hence untyped
 
 func setup(pens: Array, doors: Array) -> void:
+	z_index = -1  # Links stay behind characters and gates.
 	_pens = pens
 	_doors = doors
 	queue_redraw()
@@ -47,7 +48,8 @@ func _draw_arrow(from: Vector2, to: Vector2) -> void:
 		return
 
 	var tip: Vector2 = to - direction * PenDoor.RADIUS
-	draw_line(from, tip, LINK_COLOR, LINK_WIDTH)
+	var start: Vector2 = from + direction * PenDoor.RADIUS
+	draw_dashed_line(start, tip, LINK_COLOR, LINK_WIDTH, 9.0, true)
 
 	var perpendicular: Vector2 = Vector2(-direction.y, direction.x)
 	var base_left: Vector2 = tip - direction * ARROWHEAD_LENGTH + perpendicular * ARROWHEAD_WIDTH

@@ -23,7 +23,9 @@ def import_sheet(source, destination):
                 if r>125 and b>110 and strength>65:
                     a=0 if strength>100 else int(a*(100-strength)/35)
                     pix[xx,yy]=(r,g,b,a)
-        bbox=cell.getbbox()
+        # Ignore almost-transparent generation noise for registration.
+        alpha=cell.getchannel('A').point(lambda a: 255 if a >= 96 else 0)
+        bbox=alpha.getbbox()
         if not bbox: raise ValueError('empty animation cell')
         cells.append((cell,bbox));heights.append(bbox[3]-bbox[1])
     scale=84/statistics.median(heights)

@@ -32,6 +32,7 @@ var _touch_grace_remaining: float = 0.0
 
 ## Set by Level0 when this bull is captured: higher = captured more recently (D038).
 var capture_order: int = 0
+var pen_number: int = 0
 var _peers: Array = []
 var _is_chaser: bool = false
 var _random_chase: RandomChaseRoller = RandomChaseRoller.new()
@@ -324,6 +325,9 @@ func _draw() -> void:
 	draw_set_transform(Vector2(0, 32), 0.0, Vector2(1.0, 0.32))
 	draw_circle(Vector2.ZERO, 26, Color(0.15, 0.12, 0.08, 0.18))
 	draw_set_transform(Vector2.ZERO)
+	if controller.current_state() == BullState.State.SAFE and not _delivered and pen_number > 0:
+		draw_circle(Vector2(0, -48), 10, Color("244b40"))
+		draw_string(ThemeDB.fallback_font, Vector2(-7, -43), str(pen_number), HORIZONTAL_ALIGNMENT_CENTER, 14, 13, Color("fff2d2"))
 	if controller.is_held() and is_instance_valid(_player):
 		var color: Color = Color("74c9a0") if controller.current_state() == BullState.State.CONTROLLED else Color("eec879")
 		draw_line(Vector2(0, 12), to_local(_player.global_position) + Vector2(0, 12), Color("86613e"), 3.0, true)

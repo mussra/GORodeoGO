@@ -36,7 +36,7 @@ Siete pruebas nuevas cubren carga de teclado/stick, cancelación en pausa, entre
 - No se ha jugado en un teléfono: multitáctil, tacto, pausa/segundo plano y rendimiento siguen pendientes de dispositivo real.
 - Se conservan las reglas/progresión y los 20 niveles. Tiempos de niveles siguen necesitando sesiones de juego, no se han retocado a ciegas.
 - Sin publicación, sin merge a main, sin cambios de identidad de paquete o servicios.
-- El APK existente no representa esta rama. Abrir `project.godot` con Godot 4.7.2 para probar el código.
+- El APK antiguo `BIN/Rancho.apk` del historial no representa esta rama. Se ha creado aparte `GO-Rodeo-GO-review.apk` desde f195add; ver segundo incremento. Abrir `project.godot` con Godot 4.7.2 para probar el código.
 
 ## Historial revisado
 
@@ -51,3 +51,15 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Icono de prueba basado en el personaje original. No cambia el identificador `com.example.rancho` ni prepara publicación.
 - Export Android excluye tests, GUT, herramientas, masters y documentación. APK debug arm64 generado y firma v2/v3 verificada. Sin prueba en teléfono.
 - 204 tests pasan. El vídeo de revisión usa Godot real con entradas y posiciones guionadas, no una partida humana. La captura fija de 30 fps no es una medición de rendimiento.
+
+## Tercer incremento
+
+- Prueba de ciclo completo para los 20 niveles: abrir/liberar, capturar, calmar, entregar mediante overlap físico y ganar. Posiciones controladas: no sustituye una partida humana ni prueba el equilibrio de dificultad.
+- Corregido idle que no comenzaba a reproducirse si la animación por defecto ya se llamaba `idle`.
+- Entrada táctil ignorada durante aturdimiento; una suelta arrastrada desde antes de pausar ya no dispara al volver.
+- Puertas/toros con números coincidentes, maestra marcada M; enlaces finos discontinuos detrás de personajes en vez de líneas rosas sobre sus caras.
+- Se mantienen las 20 geometrías, probabilidades y límites de tiempo originales.
+- 210 tests pasan en la última revisión, 3094 aserciones.
+
+- El ajuste de sonido se conserva al cambiar de nivel durante la sesión.
+- Registro del reposo del toro corregido usando alpha significativo, descartando ruido casi transparente.

@@ -17,6 +17,9 @@ const RADIUS: float = 40.0
 
 @export var hold_seconds: float = 1.2
 
+var door_number: int = 0
+var is_master: bool = false
+var linked_count: int = 0
 var _player: CharacterBody2D = null
 var _player_inside: bool = false
 var _hold_timer: float = 0.0
@@ -99,6 +102,10 @@ func _draw() -> void:
 		draw_line(Vector2(x, -23), Vector2(x, 23), Color("c39a61"), 9, true)
 	for y: float in [-14.0, 14.0]:
 		draw_line(Vector2(-25, y), Vector2(25, y), Color("e2bd7c"), 5, true)
+	var badge_color: Color = Color("ebbe62") if is_master else Color("244b40")
+	draw_circle(Vector2(0, -31), 14, badge_color)
+	var badge: String = "%dM" % door_number if is_master else str(door_number)
+	draw_string(ThemeDB.fallback_font, Vector2(-12, -25), badge, HORIZONTAL_ALIGNMENT_CENTER, 24, 14, Color("fff2d2"))
 	if _player_inside:
 		var fraction: float = clampf(_hold_timer / hold_seconds, 0, 1)
 		draw_arc(Vector2.ZERO, RADIUS + 5, -PI / 2, -PI / 2 + TAU * fraction, 48, Color("8fe5b6"), 5, true)

@@ -45,6 +45,7 @@ var _pen_released: Array = []  # bool per pen index — a pen's bulls are releas
 func _ready() -> void:
 	_audio = RanchAudio.new()
 	add_child(_audio)
+	_audio.enabled = GameState.sound_enabled
 	var level_data: LevelData = LevelCatalog.get_level(GameState.selected_level)
 	_upgrades = PlayerUpgrades.for_progress(SaveData.highest_level_completed)
 	_apply_unlocked_upgrades()
@@ -87,7 +88,7 @@ func _ready() -> void:
 	hud.hide_nerves_slot(1)
 	hud.restart_requested.connect(_on_restart_requested)
 	hud.next_requested.connect(_on_next_requested)
-	hud.sound_toggled.connect(func(value: bool): _audio.enabled = value)
+	hud.sound_toggled.connect(_on_sound_toggled)
 	player.lasso_released.connect(func(): _audio.play("throw"))
 	player.stunned.connect(func(): _audio.play("stun"))
 	hud.resume_requested.connect(resume_game)
@@ -164,6 +165,11 @@ func _spawn_pens(pens: Array) -> void:
 	for pen_index in range(pens.size()):
 		var pen_entry: Dictionary = pens[pen_index]
 		var door := PenDoor.new()
+		door.door_number = pen_index + 1
+		door.is_master = pen_entry.get("is_master", false)
+		door.linked_count = PenLinkResolver.get_linked_pen_indices(pens, pen_index).size()
+		for bull_index: int in pen_entry.get("bull_indices", []):
+			_active_bulls[bull_index].pen_number = pen_index + 1
 		door.position = pen_entry.get("door_position", Vector2.ZERO)
 		door.hold_seconds = pen_entry.get("door_hold_seconds", LevelCatalog.DEFAULT_DOOR_HOLD_SECONDS)
 		door.set_player(player)
@@ -422,3 +428,7 @@ func _on_bull_audio_state(state: BullState.State) -> void:
 		_audio.play("capture")
 	elif state == BullState.State.CONTROLLED:
 		_audio.play("calm")
+
+func _on_sound_toggled(value: bool) -> void:
+	_audio.enabled = value
+	GameState.sound_enabled = value

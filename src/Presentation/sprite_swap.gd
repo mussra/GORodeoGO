@@ -108,7 +108,7 @@ static func direction_suffix(dir: Vector2) -> Array:
 ## isn't available (caller should fall back to its own placeholder feedback).
 func play(anim_name: String) -> bool:
 	if _sprite != null and _frames.has_animation(anim_name):
-		if _sprite.animation != anim_name:
+		if _sprite.animation != anim_name or not _sprite.is_playing():
 			_sprite.play(anim_name)
 		return true
 	return false

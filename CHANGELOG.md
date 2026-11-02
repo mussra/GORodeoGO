@@ -114,3 +114,11 @@ Primera versión comprobada con Godot 4.7.2 + GUT 9.7.1 en headless: 138 tests (
 
 ## v0.21.0 - rama de revisión, no main
 Ver `REVIEW.md`: controles de teclado/pausa, entrega del toro calmado dentro del corral, fin de puertas, 60 frames de animación integrados, arena/HUD y feedback. 200 tests pasando en Godot 4.7.2. Android no probado en dispositivo.
+
+## v0.21.1 - revisión incremental, no main
+- Reposo comienza de verdad; test temporal de frame.
+- Campaña completa comprobada en 20 niveles con posiciones deterministas.
+- Controles protegidos frente a aturdimiento y sueltas obsoletas tras pausa.
+- Puertas y toros numerados, maestra 1M, enlaces detrás de personajes.
+- Mute conservado en la sesión y registro alpha de reposo corregido.
+- 210 tests, 3094 aserciones pasan. Pruebas en Linux, no en dispositivo Android.

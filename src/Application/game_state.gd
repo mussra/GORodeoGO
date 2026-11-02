@@ -4,3 +4,5 @@ extends Node
 ## so it survives get_tree().change_scene_to_file() calls between menu <-> level.
 
 var selected_level: int = 1
+
+var sound_enabled: bool = true
