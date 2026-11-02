@@ -37,11 +37,14 @@ var _chaser_index: int = ChaserDirector.NO_CHASER
 var _next_capture_order: int = 1
 var _upgrades: PlayerUpgrades
 var _paused_by_user_or_os: bool = false
+var _audio: RanchAudio
 var _pens_data: Array = []  # LevelData.pens for this level
 var _pen_doors: Array = []  # PenDoor per pen index; entries may be freed instances once opened, hence untyped
 var _pen_released: Array = []  # bool per pen index — a pen's bulls are released at most once
 
 func _ready() -> void:
+	_audio = RanchAudio.new()
+	add_child(_audio)
 	var level_data: LevelData = LevelCatalog.get_level(GameState.selected_level)
 	_upgrades = PlayerUpgrades.for_progress(SaveData.highest_level_completed)
 	_apply_unlocked_upgrades()
@@ -69,6 +72,7 @@ func _ready() -> void:
 		bull.set_peers(_active_bulls)
 		bull.chase_probability = level_data.chase_probability
 		bull.chaser_blocked.connect(_on_chaser_blocked)
+		bull.controller.state_changed.connect(_on_bull_audio_state)
 
 	_activate_bulls(level_data.pens)
 
@@ -82,6 +86,10 @@ func _ready() -> void:
 	hud.hide_nerves_slot(0)
 	hud.hide_nerves_slot(1)
 	hud.restart_requested.connect(_on_restart_requested)
+	hud.next_requested.connect(_on_next_requested)
+	hud.sound_toggled.connect(func(value: bool): _audio.enabled = value)
+	player.lasso_released.connect(func(): _audio.play("throw"))
+	player.stunned.connect(func(): _audio.play("stun"))
 	hud.resume_requested.connect(resume_game)
 	hud.pause_requested.connect(pause_game)
 	hud.quit_requested.connect(_on_quit_requested)
@@ -179,6 +187,7 @@ func _any_pen_has_links(pens: Array) -> bool:
 ## (PenLinkResolver — master opens all, chain opens specific pens, normal only itself).
 ## Each pen releases at most once, so a door already opened earlier is skipped.
 func _on_pen_door_opened(pen_index: int) -> void:
+	_audio.play("door")
 	for released_index: int in PenLinkResolver.get_released_pen_indices(_pens_data, pen_index):
 		if _pen_released[released_index]:
 			continue
@@ -326,6 +335,7 @@ func _on_tranquilizer_requested() -> void:
 		hud.set_tranquilizer_available(false)
 
 func _on_bull_returned(returned_bull: Node2D) -> void:
+	_audio.play("return")
 	_bulls_returned += 1
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
 	if _win_requires_all_bulls and _bulls_returned >= _active_bulls.size():
@@ -336,11 +346,13 @@ func _trigger_win() -> void:
 	_freeze_gameplay()
 	SaveData.record_level_completed(_level_number)
 	hud.show_win()
+	_audio.play("win")
 
 func _trigger_lose(reason: String) -> void:
 	_game_over = true
 	_freeze_gameplay()
 	hud.show_lose(reason)
+	_audio.play("lose")
 
 func _freeze_gameplay() -> void:
 	player.cancel_input()
@@ -351,6 +363,13 @@ func _freeze_gameplay() -> void:
 	for bull in _active_bulls:
 		bull.set_physics_process(false)
 	touch_controls.visible = false  # stop joysticks from eating touches meant for the end-game buttons
+
+func _on_next_requested() -> void:
+	if not _game_over or _level_number >= LevelCatalog.MAX_LEVEL:
+		return
+	GameState.selected_level = _level_number + 1
+	get_tree().paused = false
+	get_tree().reload_current_scene()
 
 func _on_restart_requested() -> void:
 	get_tree().paused = false
@@ -397,3 +416,9 @@ func resume_game() -> void:
 func _on_quit_requested() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn")
+
+func _on_bull_audio_state(state: BullState.State) -> void:
+	if state == BullState.State.CAPTURED:
+		_audio.play("capture")
+	elif state == BullState.State.CONTROLLED:
+		_audio.play("calm")

@@ -325,3 +325,30 @@ func test_end_of_game_stops_door_progress() -> void:
 	level._trigger_lose("test")
 	assert_false(door.is_processing())
 	assert_false(level.player._is_charging)
+
+func test_next_level_button_only_appears_after_winning_before_last_level() -> void:
+	var level: Node = await _spawn_level(1)
+	assert_false(level.hud._next_button.visible)
+	level.hud.show_win()
+	assert_true(level.hud._next_button.visible)
+	assert_false(level.hud.restart_button.visible)
+	level.queue_free()
+	await wait_physics_frames(2)
+	level = await _spawn_level(LevelCatalog.MAX_LEVEL)
+	level.hud.show_win()
+	assert_false(level.hud._next_button.visible)
+	assert_true(level.hud.restart_button.visible)
+
+func test_keyboard_release_lands_at_charged_distance() -> void:
+	var level: Node = await _spawn_level(1)
+	var player = level.player
+	watch_signals(player)
+	player.lasso_travel_time = 0.02
+	player.aim_direction = Vector2.LEFT
+	player._start_charging()
+	player._process_throw_input(0.5)
+	player._release_throw()
+	await wait_seconds(0.15)
+	assert_signal_emitted(player, "lasso_thrown")
+	var params: Array = get_signal_parameters(player, "lasso_thrown")
+	assert_almost_eq((params[1] as Vector2).x - (params[0] as Vector2).x, -150.0, 0.1)

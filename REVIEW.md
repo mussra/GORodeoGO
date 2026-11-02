@@ -42,3 +42,12 @@ Siete pruebas nuevas cubren carga de teclado/stick, cancelación en pausa, entre
 
 Los tres commits originales son `8d0e502` (inicio), `b3cc737` (vertical slice) y `7336ebb` (estabilidad de orientación). Se conserva SpriteFacing y sus tests para no reintroducir parpadeo cerca de vallas.
 La documentación original describía 184 tests y ausencia de arte: al comprobar el repo real había 193 tests y sprites estáticos. Esta revisión registra lo comprobado, no replica esas afirmaciones antiguas.
+
+## Segundo incremento (0.21.0)
+
+- Reposo animado (12 frames adicionales, total 72) y parpadeo.
+- Siguiente nivel tras victoria (salvo último nivel), conservando menú y reinicio.
+- 8 señales sonoras originales sintetizadas, volumen moderado y opción de silenciar en pausa.
+- Icono de prueba basado en el personaje original. No cambia el identificador `com.example.rancho` ni prepara publicación.
+- Export Android excluye tests, GUT, herramientas, masters y documentación. APK debug arm64 generado y firma v2/v3 verificada. Sin prueba en teléfono.
+- 204 tests pasan. El vídeo de revisión usa Godot real con entradas y posiciones guionadas, no una partida humana. La captura fija de 30 fps no es una medición de rendimiento.

@@ -9,6 +9,8 @@ extends CharacterBody2D
 
 signal lasso_thrown(throw_origin: Vector2, landing_point: Vector2)
 ## Double tap on the aim stick: the player wants to drop a captured bull (D038). Level0 decides which.
+signal lasso_released
+signal stunned
 signal release_requested
 
 const ART_ROOT: String = "res://art/player/"
@@ -86,6 +88,8 @@ func _on_aim_released(input_vector: Vector2) -> void:
 
 ## Called by an unroped, nervous bull on contact (GAMEPLAY_SPEC.md #Failure feedback).
 func stun(duration: float) -> void:
+	if _stun_time_remaining <= 0.0:
+		stunned.emit()
 	_stun_time_remaining = max(_stun_time_remaining, duration * stun_resistance_multiplier)
 	if not _sprite_swap.play("stunned"):
 		modulate = Color(1.0, 0.5, 0.5, 1.0)  # no art yet: fall back to a red tint
@@ -174,6 +178,7 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 	# Simulated flight time (GAMEPLAY_SPEC.md #Lanzamiento: "sensación de altura" — the rope
 	# travels before landing; the bull can move away in the meantime). The line animates in
 	# world space (not parented to the player) since the player keeps moving during the throw.
+	lasso_released.emit()
 	_lasso_in_flight = true
 	_animate_lasso_flight(throw_origin, landing_point)
 	await get_tree().create_timer(lasso_travel_time, false).timeout  # process_always=false: no landing while paused

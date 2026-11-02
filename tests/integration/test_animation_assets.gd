@@ -12,5 +12,5 @@ func test_all_movement_animations_have_six_registered_frames() -> void:
 				assert_eq(texture.get_size(), Vector2(96, 96), path)
 
 func test_idle_bull_matches_the_movement_canvas() -> void:
-	var texture: Texture2D = load("res://art/bull/idle/frame_0.png")
+	var texture: Texture2D = load("res://art/bull/idle/frame_00.png")
 	assert_eq(texture.get_size(), Vector2(96, 96))

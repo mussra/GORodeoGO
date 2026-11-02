@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+signal sound_toggled(enabled: bool)
+signal next_requested
 signal restart_requested
 signal quit_requested
 signal pause_requested
@@ -22,6 +24,7 @@ var _pause_panel: Panel
 var _hint_label: Label
 var _level_label: Label
 var _pause_button: Button
+var _next_button: Button
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS  # buttons must keep working while the tree is paused
@@ -68,6 +71,8 @@ func update_timer(seconds_remaining: float) -> void:
 func show_win() -> void:
 	_pause_button.hide()
 	_hint_label.hide()
+	_next_button.visible = GameState.selected_level < LevelCatalog.MAX_LEVEL
+	restart_button.visible = not _next_button.visible
 	end_label.text = "¡Rancho asegurado!\nTodos los toros en el corral."
 	end_panel.visible = true
 
@@ -114,6 +119,13 @@ func _build_pause_panel() -> void:
 	resume_button.pressed.connect(func(): resume_requested.emit())
 	_pause_panel.add_child(resume_button)
 
+	var sound_button := CheckButton.new()
+	sound_button.text = "Sonido"
+	sound_button.button_pressed = true
+	sound_button.position = Vector2(185, 65)
+	sound_button.toggled.connect(func(value: bool): sound_toggled.emit(value))
+	_pause_panel.add_child(sound_button)
+
 	var menu_button := Button.new()
 	menu_button.text = "Menú principal"
 	menu_button.offset_left = 272.0
@@ -127,6 +139,13 @@ func _build_pause_panel() -> void:
 
 func _apply_ranch_ui() -> void:
 	var ranch_theme: Theme = RanchTheme.create()
+	_next_button = Button.new()
+	_next_button.text = "Siguiente nivel"
+	_next_button.position = restart_button.position
+	_next_button.size = restart_button.size
+	_next_button.visible = false
+	_next_button.pressed.connect(func(): next_requested.emit())
+	end_panel.add_child(_next_button)
 	for child in get_children():
 		if child is Control:
 			child.theme = ranch_theme

@@ -32,7 +32,7 @@ func _init(host: Node, placeholder: CanvasItem, art_root: String, animation_name
 			continue
 
 		frames.add_animation(anim_name)
-		frames.set_animation_speed(anim_name, fps)
+		frames.set_animation_speed(anim_name, 3.0 if anim_name == "idle" else fps)
 		frames.set_animation_loop(anim_name, true)
 		for path in frame_paths:
 			var tex: Texture2D = load(path)
@@ -121,5 +121,8 @@ func stop_on_idle(fallback: String = "flee_down") -> void:
 	var animation: String = "idle" if _frames.has_animation("idle") else fallback
 	if _frames.has_animation(animation):
 		_sprite.animation = animation
-		_sprite.stop()
-		_sprite.frame = 0
+		if animation == "idle":
+			_sprite.play(animation)
+		else:
+			_sprite.stop()
+			_sprite.frame = 0

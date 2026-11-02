@@ -110,6 +110,7 @@ func _physics_process(delta: float) -> void:
 			_update_hold_visual()
 		BullState.State.CONTROLLED:
 			_apply_tow_movement()
+			_update_hold_visual()
 		_:
 			velocity = Vector2.ZERO
 
@@ -204,6 +205,12 @@ func try_capture(landing_point: Vector2) -> bool:
 ## boundaries, which is exactly the "indistinguishable until fully done" problem this
 ## feature exists to fix.
 func _update_hold_visual() -> void:
+	if velocity.length() > 5.0:
+		var direction: Array = SpriteSwap.direction_suffix(velocity)
+		if _sprite_swap.play("flee_" + direction[0]):
+			_sprite_swap.set_flip_h(direction[1])
+			modulate = Color.WHITE
+			return
 	var anim_name: String = _animation_name_for_state(controller.current_state())
 	if _sprite_swap.play(anim_name):
 		modulate = Color.WHITE
