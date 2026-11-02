@@ -26,6 +26,7 @@ var _hint_label: Label
 var _level_label: Label
 var _pause_button: Button
 var _next_button: Button
+var _level_number: int = 1
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS  # buttons must keep working while the tree is paused
@@ -61,6 +62,7 @@ func update_bull_count(returned: int, total: int) -> void:
 	bull_count_label.text = "Toros en el corral: %d/%d" % [returned, total]
 
 func set_level(number: int) -> void:
+	_level_number = number
 	_level_label.text = "NIVEL %02d" % number
 	_hint_label.text = "Puerta y toro comparten número · Quédate quieto para abrir · M abre todas" if number >= 11 else "Laza un toro, espera a que se calme y llévalo al CORRAL"
 
@@ -70,6 +72,9 @@ func update_timer(seconds_remaining: float) -> void:
 	timer_label.modulate = Color("ffbd85") if whole_seconds <= 15 else Color.WHITE
 
 func show_win() -> void:
+	tranquilizer_button.hide()
+	nerves_group.hide()
+	nerves_group_2.hide()
 	_pause_button.hide()
 	_hint_label.hide()
 	_next_button.visible = GameState.selected_level < LevelCatalog.MAX_LEVEL
@@ -78,6 +83,9 @@ func show_win() -> void:
 	end_panel.visible = true
 
 func show_lose(reason: String) -> void:
+	tranquilizer_button.hide()
+	nerves_group.hide()
+	nerves_group_2.hide()
 	_pause_button.hide()
 	_hint_label.hide()
 	end_label.text = "Nivel fallido.\n%s" % reason
@@ -209,3 +217,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and not event.is_echo():
 		pause_toggle_requested.emit()
 		get_viewport().set_input_as_handled()
+
+func update_guidance(held_count: int, ready_count: int, has_closed_doors: bool) -> void:
+	if ready_count > 0:
+		_hint_label.text = "¡Ya está calmado! Guíalo hasta el CORRAL marcado con ✓"
+	elif held_count > 0:
+		_hint_label.text = "Mantén la distancia con los toros sueltos mientras se calma"
+	elif _level_number >= 11 and has_closed_doors:
+		_hint_label.text = "Puerta y toro comparten número · Quédate quieto para abrir · M abre todas"
+	else:
+		_hint_label.text = "Laza un toro, espera a que se calme y llévalo al CORRAL"

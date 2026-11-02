@@ -277,6 +277,13 @@ func _update_nerves_hud() -> void:
 	var held: Array = _held_bulls()
 	player.set_active_capture_count(held.size())
 
+	var ready_count: int = 0
+	for bull in held:
+		if bull.controller.current_state() == BullState.State.CONTROLLED:
+			ready_count += 1
+	var closed_doors: bool = _pen_released.has(false)
+	hud.update_guidance(held.size(), ready_count, closed_doors)
+
 	var calming_bulls: Array = []
 	for bull in held:
 		var state: BullState.State = bull.controller.current_state()

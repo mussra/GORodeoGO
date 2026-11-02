@@ -64,7 +64,7 @@ func _build_menu() -> void:
 		button.pressed.connect(_on_level_selected.bind(level_number))
 		level_grid.add_child(button)
 	var help := Label.new()
-	help.text = "MÓVIL  Izquierda: mover  ·  Derecha: apuntar y soltar  ·  Doble toque: liberar\nTECLADO  Flechas: mover  ·  Mantén Espacio y suelta: lazo  ·  Esc: pausa"
+	help.text = "MÓVIL  Izquierda: mover  ·  Derecha: apuntar y soltar  ·  Doble toque: liberar\nTECLADO  Flechas: mover  ·  Espacio: cargar/soltar lazo  ·  R: liberar  ·  Esc: pausa"
 	help.add_theme_font_size_override("font_size", 16)
 	help.add_theme_color_override("font_color", Color("b6c9b0"))
 	column.add_child(help)

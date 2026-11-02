@@ -135,6 +135,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	global_position = global_position.clamp(world_bounds.position, world_bounds.end)
 
+	if Input.is_action_just_pressed("release_capture"):
+		release_requested.emit()
 	_process_throw_input(delta)
 
 func _process_throw_input(delta: float) -> void:

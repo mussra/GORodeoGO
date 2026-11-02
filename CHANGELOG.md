@@ -128,3 +128,6 @@ Reset de acciones nativas al pausar con dedos apoyados; harness multitáctil sin
 
 ## v0.21.3 - pausa y panel final
 Esc reanuda con HUD always-processing. Cancelación del lazo en vuelo al terminar. Tranquilizante bloqueado en pausa. Toques sintéticos de botones de pausa/derrota/victoria verificados en viewport real. 217 tests/3115 aserciones.
+
+## v0.21.4 - guía de captura y cierre coherente
+R para liberar en teclado, ayuda contextual por estado, controles de juego ocultos al finalizar. Victoria real con contador/estado reconciliados. Regresión lazo/pausa. 221tests/3132aserciones. PCM sin clipping comprobado, audio no evaluado por oído humano.

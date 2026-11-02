@@ -78,3 +78,12 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Pausa desactiva Pausa/Tranquilizante de la cabecera, y la lógica rechaza usar el objeto durante pausa.
 - Harness UI con toques en viewport real/Linux: Pausa, Continuar, Menú tras derrota y Siguiente tras victoria; todos recibidos. Esc pausa/reanuda comprobado. Posiciones son guionadas, no dedos de teléfono.
 - 217 tests pasan, 3115 aserciones. Los fallos nuevos se reprodujeron antes de corregirlos.
+
+## Sexto incremento (0.21.4)
+
+- R libera captura en teclado, igual que doble toque en stick; no cambia la regla de soltar el toro más reciente.
+- Ayuda contextual indica capturar, esperar mientras se calma o llevar al corral según estado real.
+- Panel final oculta barras/objeto/pausa. Victoria real capturada con contador1/1 y toro SAFE dentro del overlap del corral; no confundir con el harness UI que solo mostraba el panel para probar su botón.
+- Lazo en vuelo comprobado: se congela al pausar y aterriza al reanudar, pero se cancela si termina partida.
+- Señales sonoras generadas: PCM revisado sin clipping (picos <0.5 de escala), finales cero y volumen por voz -15dB. No hay evaluación auditiva humana: calidad y mezcla final pendientes de escuchar en el dispositivo.
+- 221 tests pasan, 3132 aserciones.

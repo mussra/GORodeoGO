@@ -434,3 +434,52 @@ func test_tranquilizer_cannot_be_used_behind_pause_overlay() -> void:
 	assert_true(level._tranquilizer_available)
 	assert_ne(bull.controller.current_state(), BullState.State.CONTROLLED)
 	level.resume_game()
+
+func test_guidance_changes_from_capture_to_calming_to_delivery() -> void:
+	var level: Node = await _spawn_level(1)
+	level._update_nerves_hud()
+	assert_string_contains(level.hud._hint_label.text, "Laza")
+	var bull = _capture(level, 0)
+	level._update_nerves_hud()
+	assert_string_contains(level.hud._hint_label.text, "mientras se calma")
+	bull.controller.use_tranquilizer()
+	level._update_nerves_hud()
+	assert_string_contains(level.hud._hint_label.text, "CORRAL")
+	assert_string_contains(level.hud._hint_label.text, "calmado")
+
+func test_keyboard_release_action_is_mapped_and_releases_a_bull() -> void:
+	var level: Node = await _spawn_level(1)
+	var bull = _capture(level, 0)
+	assert_true(InputMap.has_action("release_capture"))
+	var events: Array[InputEvent] = InputMap.action_get_events("release_capture")
+	assert_eq(events.size(), 1)
+	assert_eq(events[0].physical_keycode, KEY_R)
+	Input.action_press("release_capture")
+	await wait_physics_frames(2)
+	Input.action_release("release_capture")
+	assert_false(bull.controller.is_held())
+
+func test_end_panel_hides_gameplay_only_controls() -> void:
+	var level: Node = await _spawn_level(5)
+	level.hud.set_tranquilizer_available(true)
+	level.hud.update_nerves_slot(0, 50)
+	level.hud.show_lose("test")
+	assert_false(level.hud.tranquilizer_button.visible)
+	assert_false(level.hud.nerves_group.visible)
+	assert_false(level.hud._pause_button.visible)
+
+func test_lasso_in_flight_waits_through_pause_then_lands_on_resume() -> void:
+	var level: Node = await _spawn_level(1)
+	var player = level.player
+	watch_signals(player)
+	player.lasso_travel_time = 0.1
+	player._start_charging()
+	player._release_throw(Vector2.RIGHT)
+	level.pause_game()
+	await get_tree().create_timer(0.25, true).timeout
+	assert_signal_not_emitted(player, "lasso_thrown")
+	assert_true(player._lasso_in_flight)
+	level.resume_game()
+	await wait_seconds(0.25)
+	assert_signal_emitted(player, "lasso_thrown")
+	assert_false(player._lasso_in_flight)
