@@ -31,6 +31,9 @@ var world_bounds: Rect2 = Rect2(-480, -270, 960, 540)
 var _stun_time_remaining: float = 0.0
 var _is_charging: bool = false
 var _lasso_in_flight: bool = false
+var _flight_generation: int = 0
+var _flight_line: Line2D = null
+var _flight_tween: Tween = null
 var _aim_pressed_at_seconds: float = 0.0
 var _double_tap: DoubleTapDetector = DoubleTapDetector.new(LassoAim.DOUBLE_TAP_WINDOW_SECONDS)
 var _charge_distance: float = 0.0
@@ -184,12 +187,27 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 	# world space (not parented to the player) since the player keeps moving during the throw.
 	lasso_released.emit()
 	_lasso_in_flight = true
+	_flight_generation += 1
+	var generation: int = _flight_generation
 	_animate_lasso_flight(throw_origin, landing_point)
 	await get_tree().create_timer(lasso_travel_time, false).timeout  # process_always=false: no landing while paused
+	if generation != _flight_generation:
+		return
 	_lasso_in_flight = false
 
 	lasso_thrown.emit(throw_origin, landing_point)
 	_flash_landing_area(landing_point)
+
+func cancel_all_actions() -> void:
+	cancel_input()
+	_flight_generation += 1
+	_lasso_in_flight = false
+	if is_instance_valid(_flight_tween):
+		_flight_tween.kill()
+	if is_instance_valid(_flight_line):
+		_flight_line.queue_free()
+	_flight_line = null
+	_flight_tween = null
 
 func cancel_input() -> void:
 	_touch_aim_active = false
@@ -209,12 +227,14 @@ func _cancel_charge() -> void:
 ## space (parented to the level, not the player, so it stays put even as the player moves).
 func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> void:
 	var line := Line2D.new()
+	_flight_line = line
 	line.width = 3.0
 	line.default_color = Color(0.85, 0.65, 0.2, 1.0)
 	get_parent().add_child(line)  # the level; unlike current_scene it also works when the level is instanced inside another tree (tests)
 	line.points = PackedVector2Array([throw_origin, throw_origin])
 
 	var tween: Tween = create_tween()
+	_flight_tween = tween
 	tween.tween_method(
 		func(t: float): line.points = PackedVector2Array([throw_origin, throw_origin.lerp(landing_point, t)]),
 		0.0, 1.0, lasso_travel_time

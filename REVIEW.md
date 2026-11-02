@@ -70,3 +70,11 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Harness `tools/touch_review.gd`: mover con dedo0, apuntar/soltar con dedo1, interrumpir con pausa y comprobar ambos vectores a cero. Resultado true. Es prueba sintética, no validación con dedos en un teléfono.
 - Guardado probado en rutas temporales aisladas: roundtrip atómico, fichero corrupto/ausente y rechazo de niveles fuera de campaña. Ruta de producción sin cambios.
 - 214 tests pasan, 3106 aserciones.
+
+## Quinto incremento (0.21.3)
+
+- Esc vuelve a funcionar para reanudar: lo recibe HUD, que sigue procesando en pausa, no el nivel pausado.
+- El lazo ya en vuelo se cancela al terminar partida; antes emitía aterrizaje detrás del panel final.
+- Pausa desactiva Pausa/Tranquilizante de la cabecera, y la lógica rechaza usar el objeto durante pausa.
+- Harness UI con toques en viewport real/Linux: Pausa, Continuar, Menú tras derrota y Siguiente tras victoria; todos recibidos. Esc pausa/reanuda comprobado. Posiciones son guionadas, no dedos de teléfono.
+- 217 tests pasan, 3115 aserciones. Los fallos nuevos se reprodujeron antes de corregirlos.

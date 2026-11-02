@@ -93,6 +93,7 @@ func _ready() -> void:
 	player.stunned.connect(func(): _audio.play("stun"))
 	hud.resume_requested.connect(resume_game)
 	hud.pause_requested.connect(pause_game)
+	hud.pause_toggle_requested.connect(_toggle_pause)
 	hud.quit_requested.connect(_on_quit_requested)
 	hud.tranquilizer_requested.connect(_on_tranquilizer_requested)
 
@@ -328,7 +329,7 @@ func _on_release_requested() -> void:
 		latest.release_by_player()
 
 func _on_tranquilizer_requested() -> void:
-	if not _tranquilizer_available or _game_over:
+	if not _tranquilizer_available or _game_over or _paused_by_user_or_os:
 		return
 	var used: bool = false
 	for bull in _active_bulls:
@@ -361,7 +362,7 @@ func _trigger_lose(reason: String) -> void:
 	_audio.play("lose")
 
 func _freeze_gameplay() -> void:
-	player.cancel_input()
+	player.cancel_all_actions()
 	_reset_touch_controls()
 	player.set_physics_process(false)
 	for door in _pen_doors:
@@ -385,13 +386,11 @@ func _on_restart_requested() -> void:
 ## Android lifecycle (ANDROID_REQUIREMENTS.md): going to background / losing focus pauses the
 ## game (otherwise the countdown would jump on resume); the back button toggles the pause
 ## menu. WM_GO_BACK_REQUEST is only delivered because project.godot sets quit_on_go_back=false.
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		if _paused_by_user_or_os:
-			resume_game()
-		else:
-			pause_game()
-		get_viewport().set_input_as_handled()
+func _toggle_pause() -> void:
+	if _paused_by_user_or_os:
+		resume_game()
+	else:
+		pause_game()
 
 func _notification(what: int) -> void:
 	match what:

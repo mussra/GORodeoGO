@@ -400,3 +400,37 @@ func test_pause_clears_native_joystick_actions() -> void:
 	assert_false(Input.is_action_pressed("move_right"))
 	assert_false(Input.is_action_pressed("aim_up"))
 	level.resume_game()
+
+func test_escape_on_always_processing_hud_resumes_pause() -> void:
+	var level: Node = await _spawn_level(1)
+	level.pause_game()
+	assert_eq(level.hud.process_mode, Node.PROCESS_MODE_ALWAYS)
+	var event := InputEventKey.new()
+	event.keycode = KEY_ESCAPE
+	event.pressed = true
+	level.hud._unhandled_key_input(event)
+	assert_false(get_tree().paused)
+	assert_false(level.hud._pause_panel.visible)
+
+func test_end_game_cancels_a_lasso_already_in_flight() -> void:
+	var level: Node = await _spawn_level(1)
+	var player = level.player
+	watch_signals(player)
+	player.lasso_travel_time = 0.1
+	player._start_charging()
+	player._release_throw(Vector2.RIGHT)
+	assert_true(player._lasso_in_flight)
+	level._trigger_lose("test")
+	await wait_seconds(0.3)
+	assert_signal_not_emitted(player, "lasso_thrown")
+	assert_false(player._lasso_in_flight)
+
+func test_tranquilizer_cannot_be_used_behind_pause_overlay() -> void:
+	var level: Node = await _spawn_level(5)
+	var bull = _capture(level, 0)
+	level._tranquilizer_available = true
+	level.pause_game()
+	level._on_tranquilizer_requested()
+	assert_true(level._tranquilizer_available)
+	assert_ne(bull.controller.current_state(), BullState.State.CONTROLLED)
+	level.resume_game()

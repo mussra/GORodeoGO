@@ -125,3 +125,6 @@ Ver `REVIEW.md`: controles de teclado/pausa, entrega del toro calmado dentro del
 
 ## v0.21.2 - pausa táctil y persistencia
 Reset de acciones nativas al pausar con dedos apoyados; harness multitáctil sintético de Godot real. Regresiones de guardado en rutas aisladas. 214 tests/3106 aserciones. No probado en teléfono.
+
+## v0.21.3 - pausa y panel final
+Esc reanuda con HUD always-processing. Cancelación del lazo en vuelo al terminar. Tranquilizante bloqueado en pausa. Toques sintéticos de botones de pausa/derrota/victoria verificados en viewport real. 217 tests/3115 aserciones.

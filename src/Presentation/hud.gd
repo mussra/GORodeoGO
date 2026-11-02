@@ -1,5 +1,6 @@
 extends CanvasLayer
 
+signal pause_toggle_requested
 signal sound_toggled(enabled: bool)
 signal next_requested
 signal restart_requested
@@ -84,9 +85,13 @@ func show_lose(reason: String) -> void:
 
 func show_pause() -> void:
 	_pause_panel.visible = true
+	_pause_button.disabled = true
+	tranquilizer_button.disabled = true
 
 func hide_pause() -> void:
 	_pause_panel.visible = false
+	_pause_button.disabled = false
+	tranquilizer_button.disabled = false
 
 ## Built in code (like the level's obstacles/doors) to keep level_0.tscn untouched.
 func _build_pause_panel() -> void:
@@ -198,3 +203,9 @@ func _apply_ranch_ui() -> void:
 		bar.show_percentage = false
 	$NervesGroup/NervesLabel.text = "Calmando al toro..."
 	$NervesGroup2/NervesLabel.text = "Calmando al segundo..."
+
+## HUD keeps processing while paused; the level intentionally does not.
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and not event.is_echo():
+		pause_toggle_requested.emit()
+		get_viewport().set_input_as_handled()
