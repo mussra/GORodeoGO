@@ -42,7 +42,7 @@ func _draw() -> void:
 	draw_arc(pen_position, 22, 0, TAU, 32, Color("e8e4ad"), 2, true)
 	draw_polyline(PackedVector2Array([pen_position + Vector2(-10, 0), pen_position + Vector2(-2, 8), pen_position + Vector2(12, -9)]), Color("faf0bf"), 4, true)
 	var font: Font = ThemeDB.fallback_font
-	draw_string(font, pen_position + Vector2(-34, -49), "CORRAL", HORIZONTAL_ALIGNMENT_CENTER, 68, 15, Color("fff2cf"))
+	draw_string(font, pen_position + Vector2(-34, -49), "META", HORIZONTAL_ALIGNMENT_CENTER, 68, 15, Color("fff2cf"))
 	# Small grass clumps outside the playable fence.
 	for side: int in [-1, 1]:
 		for i in range(13):

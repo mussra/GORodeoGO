@@ -13,7 +13,7 @@ extends Node2D
 ## An arrow disappears as soon as either end is opened: once the source is open its links
 ## are spent, and a target opened earlier can no longer be triggered.
 
-const LINK_COLOR: Color = Color(0.2, 0.37, 0.32, 0.55)  # pink
+const LINK_COLOR: Color = Color(0.12, 0.29, 0.24, 0.8)  # pink
 const LINK_WIDTH: float = 2.0
 const ARROWHEAD_LENGTH: float = 16.0
 const ARROWHEAD_WIDTH: float = 8.0
@@ -22,7 +22,7 @@ var _pens: Array = []
 var _doors: Array = []  # PenDoor per pen index; entries may be freed instances, hence untyped
 
 func setup(pens: Array, doors: Array) -> void:
-	z_index = -1  # Links stay behind characters and gates.
+	z_index = -5  # Links stay behind characters and gates.
 	_pens = pens
 	_doors = doors
 	queue_redraw()
@@ -47,9 +47,16 @@ func _draw_arrow(from: Vector2, to: Vector2) -> void:
 	if direction == Vector2.ZERO:
 		return
 
-	var tip: Vector2 = to - direction * PenDoor.RADIUS
-	var start: Vector2 = from + direction * PenDoor.RADIUS
-	draw_dashed_line(start, tip, LINK_COLOR, LINK_WIDTH, 9.0, true)
+	var tip: Vector2 = to - direction * 25.0
+	var start: Vector2 = from + direction * 25.0
+	# Split links around the unique destination label/goal instead of crossing it.
+	var avoid := Rect2(-345, -68, 90, 116)
+	var previous: Vector2 = start
+	for step in range(1, 61):
+		var point: Vector2 = start.lerp(tip, float(step) / 60)
+		if not avoid.has_point(point) and not avoid.has_point(previous):
+			draw_line(previous, point, LINK_COLOR, LINK_WIDTH, true)
+		previous = point
 
 	var perpendicular: Vector2 = Vector2(-direction.y, direction.x)
 	var base_left: Vector2 = tip - direction * ARROWHEAD_LENGTH + perpendicular * ARROWHEAD_WIDTH

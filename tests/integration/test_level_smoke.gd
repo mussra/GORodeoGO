@@ -444,7 +444,7 @@ func test_guidance_changes_from_capture_to_calming_to_delivery() -> void:
 	assert_string_contains(level.hud._hint_label.text, "mientras se calma")
 	bull.controller.use_tranquilizer()
 	level._update_nerves_hud()
-	assert_string_contains(level.hud._hint_label.text, "CORRAL")
+	assert_string_contains(level.hud._hint_label.text, "META")
 	assert_string_contains(level.hud._hint_label.text, "calmado")
 
 func test_keyboard_release_action_is_mapped_and_releases_a_bull() -> void:

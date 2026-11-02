@@ -38,6 +38,7 @@ var _next_capture_order: int = 1
 var _upgrades: PlayerUpgrades
 var _paused_by_user_or_os: bool = false
 var _audio: RanchAudio
+var _puzzle_corrals: Array = []
 var _distraction_stations: Array = []
 var _pens_data: Array = []  # LevelData.pens for this level
 var _pen_doors: Array = []  # PenDoor per pen index; entries may be freed instances once opened, hence untyped
@@ -52,7 +53,7 @@ func _ready() -> void:
 	_apply_unlocked_upgrades()
 	_level_number = level_data.level_number
 	_time_remaining = level_data.time_limit_seconds
-	_obstacle_rects = level_data.obstacle_rects
+	_obstacle_rects = level_data.obstacle_rects if level_data.pens.is_empty() else []
 	_win_requires_all_bulls = level_data.win_requires_all_bulls
 	_spawn_obstacles(_obstacle_rects)
 	_setup_art()
@@ -162,7 +163,19 @@ func _activate_bulls(pens: Array) -> void:
 	_spawn_pens(pens)
 
 func _spawn_pens(pens: Array) -> void:
-	_pens_data = pens
+	_pens_data = pens.duplicate(true)
+	for index in range(_pens_data.size()):
+		var entry: Dictionary = _pens_data[index]
+		var layout: Dictionary = PuzzleCorralLayout.build(_pens_data.size(), index, entry["bull_indices"].size())
+		entry["door_position"] = layout["door"]
+		var corral := PuzzleCorral.new()
+		corral.layout = layout
+		corral.number = index + 1
+		add_child(corral)
+		_puzzle_corrals.append(corral)
+		for slot in range(entry["bull_indices"].size()):
+			_active_bulls[entry["bull_indices"][slot]].global_position = layout["slots"][slot]
+	pens = _pens_data
 	_pen_doors.clear()
 	_pen_released.clear()
 
@@ -202,6 +215,7 @@ func _on_pen_door_opened(pen_index: int) -> void:
 		if _pen_released[released_index]:
 			continue
 		_pen_released[released_index] = true
+		_puzzle_corrals[released_index].open_gate()
 		_release_pen_bulls(released_index)
 
 		if released_index != pen_index:
@@ -466,7 +480,10 @@ func _reset_touch_controls() -> void:
 func _spawn_distraction_stations() -> void:
 	if _level_number < 3:
 		return
-	for entry: Dictionary in [{"kind": "water", "position": Vector2(-350, -150)}, {"kind": "hay", "position": Vector2(400, 100)}]:
+	var entries: Array = [{"kind": "water", "position": Vector2(-350, -150)}, {"kind": "hay", "position": Vector2(400, 100)}]
+	if _level_number >= 11:
+		entries = [{"kind": "water", "position": Vector2(-150, 0)}, {"kind": "hay", "position": Vector2(180, 0)}]
+	for entry: Dictionary in entries:
 		var station := DistractionStation.new()
 		station.kind = entry["kind"]
 		station.position = entry["position"]

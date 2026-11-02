@@ -105,3 +105,12 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - 230tests/3430aserciones, incluyendo parada física, captura/cancelación, cooldown y ausencia de stun durante pausa de bebida. No equilibrio humano ni rendimiento.
 - Rancho Prueba conserva ID/firma de0.21.5; versionCode216. El usuario confirmó instalación0.21.5, no se extrapola a prueba de este nuevo binario.
 - Corrales cerrados y animación de mayor volumen siguen pendientes de siguiente incremento, no declarados implementados.
+
+## Noveno incremento (0.21.7, prototipo de corrales cerrados)
+
+- Solicitud del usuario20:30: recintos cerrados/dependencias visibles. Niveles11-20 ahora usan recintos físicos, spawns agrupados por pertenencia original, puerta real de70px y cierre exterior para abrir. Maestra/cadena abren exactamente las puertas físicas configuradas. Vallas permanecen al abrir.
+- Cambio deliberado: sustituye geometría/spawns y cajas de puzzle11-20; no afirmar20geometrías originales intactas desde esta versión. Niveles1-10, tiempos, probabilidades y pertenencias/enlaces no cambiaron. Nuevo equilibrio de puzzle sin sesiones humanas todavía.
+- Flechas oscuras bajo personajes, despejadas alrededor de META; recintos numerados vs destino único META. Cierre exterior deja de ser una puerta circular suelta; puerta amarilla está en la valla.
+- Agua/heno se colocan en pasillo central para puzzle; mantienen comportamiento0.21.6.
+- 235tests/3846aserciones pasan en revisión final. Incluyen contención/márgenes de spawns, no solapamiento, bloqueo físico antes de abrir, apertura por quietud real, salida remolcada de cada toro de11-20, maestra y cadena. Salidas son simulaciones controladas, no prueba de habilidad/dificultad ni rutas AI autónomas.
+- Rancho Prueba misma identidad/firma, versionCode217. Checkpoint0.21.6 preservado. Arte de mayor volumen/fluidez sigue pendiente; no pipeline3D supuesto.

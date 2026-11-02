@@ -95,19 +95,11 @@ func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 	return points
 
 func _draw() -> void:
-	draw_circle(Vector2(2, 5), RADIUS, Color(0.2, 0.12, 0.06, 0.18))
-	draw_circle(Vector2.ZERO, RADIUS, Color("8c6844"))
-	draw_arc(Vector2.ZERO, RADIUS - 3, 0, TAU, 48, Color("f0d093"), 3, true)
-	for x: float in [-18.0, 0.0, 18.0]:
-		draw_line(Vector2(x, -23), Vector2(x, 23), Color("c39a61"), 9, true)
-	for y: float in [-14.0, 14.0]:
-		draw_line(Vector2(-25, y), Vector2(25, y), Color("e2bd7c"), 5, true)
-	var badge_color: Color = Color("ebbe62") if is_master else Color("244b40")
-	draw_circle(Vector2(0, -31), 14, badge_color)
+	# Small outside latch: the actual gate is drawn and collides in the fence.
+	draw_style_box(RanchTheme.box(Color("8c6844"), Color("f0d093"), 5), Rect2(-20, -15, 40, 30))
 	var badge: String = "%dM" % door_number if is_master else str(door_number)
-	draw_string(ThemeDB.fallback_font, Vector2(-12, -25), badge, HORIZONTAL_ALIGNMENT_CENTER, 24, 14, Color("fff2d2"))
+	draw_string(ThemeDB.fallback_font, Vector2(-17, 6), badge, HORIZONTAL_ALIGNMENT_CENTER, 34, 17, Color("fff2d2"))
 	if _player_inside:
 		var fraction: float = clampf(_hold_timer / hold_seconds, 0, 1)
-		draw_arc(Vector2.ZERO, RADIUS + 5, -PI / 2, -PI / 2 + TAU * fraction, 48, Color("8fe5b6"), 5, true)
-		var font: Font = ThemeDB.fallback_font
-		draw_string(font, Vector2(-54, -53), "Quieto para abrir", HORIZONTAL_ALIGNMENT_CENTER, 108, 14, Color("fff2d2"))
+		draw_arc(Vector2.ZERO, 27, -PI / 2, -PI / 2 + TAU * fraction, 48, Color("8fe5b6"), 4, true)
+		draw_string(ThemeDB.fallback_font, Vector2(-54, 48), "Quieto para abrir", HORIZONTAL_ALIGNMENT_CENTER, 108, 14, Color("fff2d2"))

@@ -140,3 +140,9 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 ## 0.21.6
 - Prototipo funcional de abrevadero/heno para distraer perseguidores3s, cooldown y feedback.
 - Pruebas motor de parada física/captura sin stun; versionCode216.
+
+## 0.21.7
+- Prototipo de recintos físicos cerrados para11-20, puerta70px con apertura maestra/cadena.
+- Nuevo layout/spawns para puzzle, sustituye cajas anteriores;1-10 sin cambios.
+- Meta diferenciada, cierres exteriores pequeños y dependencias visibles despejando el destino.
+- versionCode217, misma identidad/firma de Rancho Prueba.
