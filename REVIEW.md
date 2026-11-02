@@ -129,3 +129,10 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - No se añadieron frames ni modelos3D: siguen72frames. Continuidad/profundidad mejoradas, arte de mayor volumen todavía pendiente y no comparado con calidadBrawlStars.
 -237tests/3870aserciones; incluye preservación de fase3.4 al girar y speed_scale0.5 a media velocidad. Sin rendimiento/multitáctil/tacto de dispositivo medidos.
 - MismoID/firmaPrueba, code219.
+
+## Duodécimo incremento (0.21.10)
+
+- Corrige interacción: el toro distraído comiendo/bebiendo ya no suma agitación por contacto a un toro retenido. Regresión falló antes de corregir, ahora vuelve a sumar tras distracción.
+- Nuevas comprobaciones físicas: timer de distracción congelado en pausa/fin, reanuda al continuar; captura cancela guía de salida; espera escalonada de salida congelada en pausa.
+-240tests/3881aserciones. Sin arte nuevo; continúa revisión visual solicitada como bloque separado.
+- MismoID/firmaPrueba, code220.

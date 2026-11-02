@@ -199,7 +199,7 @@ func _compute_disturbance() -> float:
 		if peer_controller == null:
 			continue
 		var contact_range: float = hit_radius + peer.hit_radius
-		if peer_controller.is_wild() and global_position.distance_to(peer.global_position) <= contact_range:
+		if peer_controller.is_wild() and not peer._distraction.active() and global_position.distance_to(peer.global_position) <= contact_range:
 			count += 1
 	return float(count)
 

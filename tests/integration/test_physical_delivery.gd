@@ -94,3 +94,37 @@ func test_distraction_stations_are_non_solid_and_clear_of_obstacles() -> void:
 		for point: Vector2 in [Vector2(-350, -150), Vector2(400, 100)]:
 			for obstacle: Rect2 in data.obstacle_rects:
 				assert_false(obstacle.grow(DistractionStation.TRIGGER_RADIUS).has_point(point), "station trigger not blocked at level %d" % number)
+
+func test_drinking_bull_does_not_disturb_a_nearby_held_bull() -> void:
+	GameState.selected_level = 3
+	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
+	await wait_physics_frames(2)
+	var held: Node2D = level._active_bulls[0]
+	var drinking: Node2D = level._active_bulls[1]
+	for bull in level._active_bulls: bull.set_physics_process(false)
+	held.try_capture(held.global_position)
+	drinking.global_position = held.global_position + Vector2(20, 0)
+	drinking._distraction.try_start(true, true, "water")
+	assert_eq(held._compute_disturbance(), 0.0, "distracted pursuer no longer agitates captured bull")
+	drinking._distraction.cancel()
+	assert_eq(held._compute_disturbance(), 1.0, "wild contact matters again after distraction")
+
+func test_distraction_timer_freezes_in_pause_and_at_game_end() -> void:
+	GameState.selected_level = 3
+	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
+	await wait_physics_frames(2)
+	var bull: Node2D = level._active_bulls[0]
+	bull._distraction.try_start(true, true, "hay")
+	level.pause_game()
+	var remaining: float = bull._distraction.remaining
+	await get_tree().create_timer(0.2, true).timeout
+	assert_eq(bull._distraction.remaining, remaining)
+	level.resume_game()
+	await wait_physics_frames(3)
+	assert_lt(bull._distraction.remaining, remaining)
+	level._trigger_lose("Test")
+	remaining = bull._distraction.remaining
+	await wait_physics_frames(4)
+	assert_eq(bull._distraction.remaining, remaining)

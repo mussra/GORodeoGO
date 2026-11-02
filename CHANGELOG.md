@@ -156,3 +156,8 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Conserva fase de marcha al girar; cadencia según velocidad física, reposo normal.
 - ProfundidadY al cruzarse toro/caballo; mismos72frames, sin promesa3D.
 - versionCode219, misma identidad/firma.
+
+## 0.21.10
+- Toro distraído no agita al capturado cercano; recupera efecto al terminar.
+- Regresiones de pausa/fin/distracción y captura/espera de salida.
+- versionCode220, misma identidad/firma.

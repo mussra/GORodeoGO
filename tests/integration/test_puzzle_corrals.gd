@@ -85,3 +85,23 @@ func test_released_wild_bulls_naturally_exit_corrals_without_teleporting() -> vo
 			assert_false(bull._leaving_corral, "level %d %s naturally cleared gate" % [number, bull.name])
 		level.queue_free()
 		await wait_physics_frames(2)
+
+func test_capture_cancels_release_guidance_and_pause_freezes_exit_delay() -> void:
+	GameState.selected_level = 11
+	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
+	await wait_physics_frames(2)
+	level._on_pen_door_opened(0)
+	var bull: Node2D = level._active_bulls[0]
+	assert_true(bull._leaving_corral)
+	assert_true(bull.try_capture(bull.global_position))
+	assert_false(bull._leaving_corral, "captured bull is controlled by rope, not release route")
+	var waiting: Node2D = level._active_bulls[2]
+	assert_gt(waiting._release_delay, 0.0)
+	level.pause_game()
+	var delay: float = waiting._release_delay
+	await get_tree().create_timer(0.2, true).timeout
+	assert_eq(waiting._release_delay, delay)
+	level.resume_game()
+	await wait_physics_frames(3)
+	assert_lt(waiting._release_delay, delay)
