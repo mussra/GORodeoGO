@@ -175,3 +175,10 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 -6poses trote diagonalabajo toro con volumen pintado, conservando identidad.
 - Registro máximo opcional de sheets para gestos de altura variable.
 - code223; sinmodelos3D, otrosángulosprevios.
+
+## 0.21.14 - two separate animated menu alternatives
+- Futurist lobby: staggered lateral button entrance, ranch horizon, animated rings/grid/particles, existing animated rider and bull, separate 20-level drawer.
+- Cartoon lobby: new high-resolution 2D rider illustration with stylized 3D volume, central podium, margin controls, thick rounded outlines and relief, yellow action button and scale/back-eased entrance. This is not an articulated 3D model or a new pose cycle.
+- Separate scenes preserved; default remains futurist. Return from a level remembers the menu used for this process only. Gameplay/save progression unchanged.
+- 243 tests / 3950 assertions pass. Actual engine movies and functional menu > level 11 > matching menu checks for both variants. No on-device Android or tactile/performance claim.
+- Both APK alternatives share com.example.rancho.review and signing identity, versionCode224: installing one replaces the other, not side-by-side. Do not uninstall or clear data to switch. Android normally preserves this app's data for a same-signature update; backup is still advisable. Main unchanged.

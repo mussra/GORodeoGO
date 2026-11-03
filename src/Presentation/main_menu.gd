@@ -1,82 +1,186 @@
 extends Control
 
-const GRID_COLUMNS: int = 5
 @onready var level_grid: GridContainer = $LevelGrid
 @onready var quit_button: Button = $QuitButton
+var _hero: Control
+var _drawer: Panel
+var _play: Button
+var _missions: Button
+var _caption: Label
+var _rider: AnimatedSprite2D
+var _bull: AnimatedSprite2D
+var _intro: Tween
+var _elapsed: float = 0.0
+var _transitioning: bool = false
+var _next_level: int = 1
 
 func _ready() -> void:
+	GameState.menu_scene = scene_file_path
 	theme = RanchTheme.create()
+	$Title.hide()
+	_next_level = mini(SaveData.highest_level_completed + 1, LevelCatalog.MAX_LEVEL)
 	_build_menu()
-	quit_button.pressed.connect(_on_quit_pressed)
+	resized.connect(_layout)
+	_layout()
+	call_deferred("_animate_intro")
+
+func _label(text: String, font_size: int, color: Color) -> Label:
+	var node := Label.new()
+	node.text = text
+	node.add_theme_font_size_override("font_size",font_size)
+	node.add_theme_color_override("font_color",color)
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return node
 
 func _build_menu() -> void:
-	var background := ColorRect.new()
-	background.color = Color("203e37")
-	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(background)
-	move_child(background, 0)
-	$Title.hide()
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 64)
-	margin.add_theme_constant_override("margin_right", 64)
-	margin.add_theme_constant_override("margin_top", 26)
-	margin.add_theme_constant_override("margin_bottom", 24)
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(margin)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 12)
-	margin.add_child(column)
-	var kicker := Label.new()
-	kicker.text = "EL RANCHO TE ESPERA"
-	kicker.add_theme_color_override("font_color", RanchTheme.GOLD)
-	kicker.add_theme_font_size_override("font_size", 15)
-	column.add_child(kicker)
-	var title := Label.new()
-	title.text = "GO Rodeo GO"
-	title.add_theme_font_size_override("font_size", 44)
-	column.add_child(title)
-	var description := Label.new()
-	description.text = "Apunta el lazo. Calma a tus toros. Guíalos al corral."
-	description.add_theme_font_size_override("font_size", 20)
-	column.add_child(description)
-	var status := Label.new()
-	status.text = "%d / %d niveles completados    ·    1-10 Rodeo    /    11-20 Puertas enlazadas" % [SaveData.highest_level_completed, LevelCatalog.MAX_LEVEL]
-	status.add_theme_color_override("font_color", Color("b6c9b0"))
-	column.add_child(status)
-	level_grid.reparent(column)
-	level_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	level_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	level_grid.columns = GRID_COLUMNS
-	level_grid.add_theme_constant_override("h_separation", 12)
-	level_grid.add_theme_constant_override("v_separation", 10)
-	for level_number in range(1, LevelCatalog.MAX_LEVEL + 1):
+	var bg := MenuBackdrop.new()
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(bg)
+	move_child(bg,0)
+	_hero = Control.new()
+	_hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_hero)
+	var tag := _label("RANCHO // FRONTERA 01",15,Color("7de1cc"))
+	tag.name = "Tag"
+	_hero.add_child(tag)
+	var title := _label("GO RODEO\nGO",74,Color("f8edce"))
+	title.name = "Logo"
+	title.add_theme_font_override("font",preload("res://art/ui/fonts/RodeoDisplay.ttf"))
+	title.add_theme_constant_override("line_spacing",-18)
+	_hero.add_child(title)
+	var desc := _label("DOMINA EL LAZO.\nASEGURA EL RANCHO.",19,Color("adc5c6"))
+	desc.name = "Description"
+	_hero.add_child(desc)
+	_play = Button.new()
+	_play.text = "JUGAR   >   NIVEL %02d" % _next_level
+	_play.add_theme_font_size_override("font_size",23)
+	_play.add_theme_font_override("font",preload("res://art/ui/fonts/RodeoDisplay.ttf"))
+	_play.add_theme_color_override("font_color",Color("10252d"))
+	_play.add_theme_stylebox_override("normal",RanchTheme.box(Color("8de8cf"),Color("b3f6df"),8))
+	_play.add_theme_stylebox_override("hover",RanchTheme.box(Color("c3ffe9"),Color("ffffff"),8))
+	_play.pressed.connect(_on_level_selected.bind(_next_level))
+	_hero.add_child(_play)
+	_missions = Button.new()
+	_missions.text = "EXPLORAR LOS 20 NIVELES"
+	_missions.add_theme_font_size_override("font_size",16)
+	_missions.pressed.connect(_show_levels)
+	_hero.add_child(_missions)
+	_caption = _label("%02d / 20 COMPLETADOS     ·     RODEO + CORRALES" % SaveData.highest_level_completed,14,Color("85a9ad"))
+	_hero.add_child(_caption)
+	var rider_host := Node2D.new()
+	_hero.add_child(rider_host)
+	var p := Polygon2D.new()
+	rider_host.add_child(p)
+	var swap := SpriteSwap.new(rider_host,p,"res://art/player/",["walk_diag_down"])
+	swap.play("walk_diag_down")
+	_rider = swap._sprite
+	rider_host.name = "Rider"
+	var bull_host := Node2D.new()
+	_hero.add_child(bull_host)
+	var b := Polygon2D.new()
+	bull_host.add_child(b)
+	var bull_swap := SpriteSwap.new(bull_host,b,"res://art/bull/",["flee_diag_down"])
+	bull_swap.play("flee_diag_down")
+	_bull = bull_swap._sprite
+	bull_host.name = "Bull"
+	var footer := _label("IZQUIERDA  MOVER    /    DERECHA  LAZO    /    DOBLE TOQUE  LIBERAR",13,Color("78979d"))
+	footer.name = "Footer"
+	add_child(footer)
+	quit_button.reparent(self)
+	quit_button.text = "SALIR"
+	quit_button.pressed.connect(_on_quit_pressed)
+	_drawer = Panel.new()
+	_drawer.theme = theme
+	_drawer.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252e"),Color("47727a"),14))
+	add_child(_drawer)
+	var heading := _label("ELIGE TU SIGUIENTE RETO",24,Color("f8edce"))
+	heading.position = Vector2(24,18)
+	_drawer.add_child(heading)
+	var close := Button.new()
+	close.text = "VOLVER"
+	close.position = Vector2(24,62)
+	close.size = Vector2(140,44)
+	close.pressed.connect(_hide_levels)
+	_drawer.add_child(close)
+	level_grid.reparent(_drawer)
+	level_grid.columns = 5
+	level_grid.add_theme_constant_override("h_separation",10)
+	level_grid.add_theme_constant_override("v_separation",10)
+	for number in range(1,21):
 		var button := Button.new()
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		button.custom_minimum_size = Vector2(0, 58)
-		var unlocked: bool = LevelProgression.is_unlocked(level_number, SaveData.highest_level_completed, OS.is_debug_build())
-		button.disabled = not unlocked
-		var marker: String = "COMPLETADO" if level_number <= SaveData.highest_level_completed else ("RODEO" if level_number <= 10 else "PUERTAS")
-		button.text = "%02d  ·  %s\n%s" % [level_number, "Nivel", marker] if unlocked else "%02d\nBLOQUEADO" % level_number
-		button.add_theme_font_size_override("font_size", 17)
-		button.pressed.connect(_on_level_selected.bind(level_number))
+		button.custom_minimum_size = Vector2(0,58)
+		button.disabled = not LevelProgression.is_unlocked(number,SaveData.highest_level_completed,OS.is_debug_build())
+		button.text = "%02d\n%s" % [number,"RODEO" if number <=10 else "CORRALES"]
+		button.pressed.connect(_on_level_selected.bind(number))
 		level_grid.add_child(button)
-	var help := Label.new()
-	help.text = "MÓVIL  Izquierda: mover  ·  Derecha: apuntar y soltar  ·  Doble toque: liberar\nTECLADO  Flechas: mover  ·  Espacio: cargar/soltar lazo  ·  R: liberar  ·  Esc: pausa"
-	help.add_theme_font_size_override("font_size", 16)
-	help.add_theme_color_override("font_color", Color("b6c9b0"))
-	column.add_child(help)
-	quit_button.move_to_front()
+	_drawer.hide()
+	_hero.modulate.a = 0
 
-func _on_level_selected(level_number: int) -> void:
-	GameState.selected_level = level_number
+func _layout() -> void:
+	if _hero == null: return
+	var k: float = minf(size.x/1280.0,size.y/720.0)
+	_hero.position = Vector2((size.x-1280*k)/2, (size.y-720*k)/2)
+	_hero.scale = Vector2.ONE*k
+	_hero.size = Vector2(1280,720)
+	_hero.get_node("Tag").position = Vector2(68,70)
+	_hero.get_node("Logo").position = Vector2(64,112)
+	_hero.get_node("Description").position = Vector2(70,310)
+	_play.position = Vector2(68,411)
+	_play.size = Vector2(418,70)
+	_missions.position = Vector2(68,498)
+	_missions.size = Vector2(418,54)
+	_caption.position = Vector2(70,580)
+	_hero.get_node("Rider").position = Vector2(902,320)
+	_hero.get_node("Rider").scale = Vector2(3.6,3.6)
+	_hero.get_node("Bull").position = Vector2(1056,466)
+	_hero.get_node("Bull").scale = Vector2(2.3,2.3)
+	var footer: Control = get_node("Footer")
+	footer.position = Vector2(32,size.y-35)
+	quit_button.position = Vector2(size.x-118,22)
+	quit_button.size = Vector2(90,44)
+	_drawer.position = Vector2(32,22)
+	_drawer.size = size-Vector2(64,68)
+	level_grid.position = Vector2(24,120)
+	level_grid.size = _drawer.size-Vector2(48,144)
+
+func _animate_intro() -> void:
+	_intro = create_tween().set_parallel(true)
+	_intro.tween_property(_hero,"modulate:a",1.0,.6)
+	var target: Vector2 = _hero.position
+	_hero.position.x -= 90
+	_intro.tween_property(_hero,"position",target,.85).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	for index in range(2):
+		var button: Button = _play if index == 0 else _missions
+		var final: Vector2 = button.position
+		button.position.x -= 200
+		button.modulate.a = 0
+		_intro.tween_property(button,"position",final,.65).set_delay(.25+index*.13).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_intro.tween_property(button,"modulate:a",1.0,.5).set_delay(.25+index*.13)
+
+func _process(delta: float) -> void:
+	_elapsed += delta
+	if is_instance_valid(_rider):
+		_rider.position.y = sin(_elapsed*2)*3
+	if is_instance_valid(_bull):
+		_bull.position.y = sin(_elapsed*2+.8)*2
+
+func _show_levels() -> void:
+	_drawer.show()
+	_drawer.modulate.a = 0
+	create_tween().tween_property(_drawer,"modulate:a",1.0,.22)
+	level_grid.get_child(0).grab_focus()
+func _hide_levels() -> void:
+	_drawer.hide()
+	_missions.grab_focus()
+func _on_level_selected(number: int) -> void:
+	if _transitioning: return
+	_transitioning = true
+	GameState.selected_level = number
 	get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn")
-
-func _on_quit_pressed() -> void:
-	get_tree().quit()
-
+func _on_quit_pressed() -> void: get_tree().quit()
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		_on_quit_pressed()
+		if is_instance_valid(_drawer) and _drawer.visible: _hide_levels()
+		else: _on_quit_pressed()

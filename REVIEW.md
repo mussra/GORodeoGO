@@ -158,3 +158,10 @@ La documentación original describía 184 tests y ausencia de arte: al comprobar
 - Comparación vieja/nueva inspeccionada a192px y ciclo real motor reimportado. Otros4ángulos de toro conservan arte previo, hay diferencia de acabado entre vistas; no declaración de renovación total ni3D.
 - Herramienta importer incorpora --registration max reproducible para gestos de altura variable; no cambia defaultmedian de marcha.
 -241tests/3895aserciones conservadas; misma identidad/firmaPrueba,code223. Prototipo artístico, no revisión humana de continuidad final.
+
+## 3 Nov 2026 menu comparison
+Two alternatives requested, not a merged style. Futurist preview received visual praise; no main acceptance inferred. Cartoon comparison remains separate. New scene `main_menu_cartoon.tscn` inherits common navigation, has its own backdrop/portrait/styles. `tools/export_menu_variants.py ENGINE OUTPUT_DIR` exports both while restoring project config in finally. Cartoon hero generated for this lobby from the existing cowboy/horse identity; 1254px RGBA illustration, no downloaded third-party character art. DejaVu font license is included in art/ui/fonts/LICENSE.txt.
+
+Reviewed 1280x720 PNGs and 6-second real-engine recordings for each. Cartoon focus contrast corrected after screenshot review. Intro and avatar scale are decorative, not a simulation of new 3D animation. Existing low-resolution sprites are visibly soft enlarged in futurist. Both preserve 20 level buttons and progression rules. Automated scene transition check emitted level11 then returned to the exact original variant for both. Actual phone touch and rendering speed remain unverified.
+
+Tests 243/243, assertions3950. Prior fallback0.21.13 unchanged. Both alternative APKs have code224, same review package and certificate: they replace each other, cannot coexist. No uninstall/data clear required for a same-signature update; never promise a backup or data recovery from GitHub. No main merge, new public audience, service purchase or store release.

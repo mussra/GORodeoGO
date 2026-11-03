@@ -462,7 +462,7 @@ func resume_game() -> void:
 
 func _on_quit_requested() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn")
+	get_tree().change_scene_to_file(GameState.menu_scene)
 
 func _on_bull_audio_state(state: BullState.State) -> void:
 	if state == BullState.State.CAPTURED:
