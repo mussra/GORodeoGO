@@ -12,13 +12,13 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	draw_ellipse_shadow()
 	if kind == "water":
-		draw_style_box(RanchTheme.box(Color("805f43"), Color("d4ad73"), 10), Rect2(-42, -24, 84, 46))
+		draw_style_box(RanchTheme.box(Color("173746"), Color("78b9bc"), 10), Rect2(-42, -24, 84, 46))
 		draw_style_box(RanchTheme.box(Color("4e98ac"), Color("badbd0"), 8), Rect2(-33, -17, 66, 28))
 		for i in range(3):
 			var y: float = -10 + i * 8 + sin(_time * 2 + i) * 2
 			draw_line(Vector2(-22, y), Vector2(21, y), Color("9bd8db"), 1.5, true)
 	else:
-		draw_style_box(RanchTheme.box(Color("c89c46"), Color("805e31"), 8), Rect2(-36, -25, 72, 47))
+		draw_style_box(RanchTheme.box(Color("806a3e"), Color("baad7c"), 8), Rect2(-36, -25, 72, 47))
 		for x in range(-29, 30, 7):
 			draw_line(Vector2(x, -20), Vector2(x + 3, 17), Color("e6c977"), 3, true)
 		for x: float in [-18, 18]: draw_line(Vector2(x, -24), Vector2(x, 22), Color("867343"), 4, true)

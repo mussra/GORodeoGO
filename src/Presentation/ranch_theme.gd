@@ -1,7 +1,7 @@
 class_name RanchTheme
 extends RefCounted
 
-const INK: Color = Color("332b28")
+const INK: Color = Color("10252d")
 const CREAM: Color = Color("fff1d2")
 const GOLD: Color = Color("efb950")
 const TEAL: Color = Color("35695f")
@@ -26,13 +26,13 @@ static func create() -> Theme:
 	theme.set_color("font_hover_color", "Button", Color.WHITE)
 	theme.set_color("font_pressed_color", "Button", INK)
 	theme.set_color("font_disabled_color", "Button", Color("8b8f89"))
-	theme.set_stylebox("normal", "Button", box(Color("395b53"), Color("698579")))
-	theme.set_stylebox("hover", "Button", box(Color("48776b"), GOLD))
+	theme.set_stylebox("normal", "Button", box(Color("204651"), Color("5c929a")))
+	theme.set_stylebox("hover", "Button", box(Color("31616b"), GOLD))
 	theme.set_stylebox("pressed", "Button", box(GOLD, CREAM))
-	theme.set_stylebox("disabled", "Button", box(Color("293d39"), Color("3b4c45")))
+	theme.set_stylebox("disabled", "Button", box(Color("17333d"), Color("35545e")))
 	theme.set_stylebox("focus", "Button", box(Color(1, 1, 1, 0.04), GOLD))
-	theme.set_stylebox("panel", "Panel", box(Color("223e38"), Color("8b9a75"), 18))
-	theme.set_stylebox("panel", "PanelContainer", box(Color("223e38"), Color("6c8070"), 18))
-	theme.set_stylebox("background", "ProgressBar", box(Color("1d302c"), Color.TRANSPARENT, 6))
+	theme.set_stylebox("panel", "Panel", box(Color("112d3b"), Color("547e86"), 18))
+	theme.set_stylebox("panel", "PanelContainer", box(Color("112d3b"), Color("496f7c"), 18))
+	theme.set_stylebox("background", "ProgressBar", box(Color("102733"), Color.TRANSPARENT, 6))
 	theme.set_stylebox("fill", "ProgressBar", box(GOLD, Color.TRANSPARENT, 6))
 	return theme

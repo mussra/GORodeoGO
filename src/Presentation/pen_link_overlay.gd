@@ -21,7 +21,7 @@ func _draw() -> void:
 				var count: int = maxi(1,int(a.distance_to(b)/12))
 				for step in range(count+1):
 					var p: Vector2 = a.lerp(b,float(step)/count)
-					draw_circle(p,12,Color(.58,.38,.19,.085))
+					draw_circle(p,10,Color(.78,.68,.43,.19))
 					var side: Vector2 = (b-a).normalized().orthogonal()*4
-					draw_arc(p+side,2.2,0,PI,6,Color(.35,.24,.13,.21),1.3,true)
-					draw_arc(p-side,2.2,0,PI,6,Color(.35,.24,.13,.21),1.3,true)
+					draw_arc(p+side,2.2,0,PI,6,Color(.94,.85,.57,.62),1.3,true)
+					draw_arc(p-side,2.2,0,PI,6,Color(.94,.85,.57,.62),1.3,true)

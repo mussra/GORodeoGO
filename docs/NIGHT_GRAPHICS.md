@@ -19,3 +19,11 @@ Godot/Linux renders and automated physics checks do not verify Android touch fee
 273 tests / 4153 assertions pass in split runs (unit180; core integration50; remaining integration31; physical corrals6; courier3; bullet time3). Split runs avoid the single-command120second limit. Warnings: seven deprecated GUT calls and two leaked ObjectDB instances on some scene tests. No script/parser errors in the rendered iteration.
 
 Visual inspection: menu silhouette and text at1280x720, third movie, bright Z preview, ground-track placement above the stations, enlarged gait poses. The mesh idle has tiny upper-body motion; no claim of a full new HD walking animation. New single-source intermediate gait poses are a retained experiment, with no doubled hoof blend visible in inspected crops. Full native-device frame-by-frame review remains outstanding.
+
+## Checkpoint 23:53 CET
+- The old futurist and cartoon labels only selected different menus, both loaded the same beige arena. The overnight branch now carries that futurist palette through the gameplay floor, corral steelwork, latches, stations and HUD. Cowboy/horse/bull identities and collision geometry remain unchanged.
+- Ground hoofprints are more visible against the muted blue floor; the actual route stays above/below stations.
+- Added y-sorted foreground corral rail to improve fence occlusion, rather than treating a collision pass as a visual pass.
+- A new event test passes touches through the native joystick into the player, tests drawing at0.24x and restores1x on lift.4bullet-time tests14assertions pass in windowed Linux rendering; this is not Android-device verification.
+- Interior-to-gate alignment prevents a courier starting off-centre from cutting diagonally into a wall. That fix exposed a new master-route blockage; the previous sidestep heuristic was insufficient. A local collision-aware grid detour now walks around actual walls/herd bodies, keeping normal collision masks and no teleport.4courier tests20assertions pass, including master route and simultaneous couriers/manual target retirement. The physics-query detour is only rebuilt on stalled progress, but Android cost remains unmeasured.
+- Physical-corral regression tests were rerun separately because a batched82s+41s run exceeded the120s command budget.

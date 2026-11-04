@@ -68,6 +68,7 @@ signal courier_interrupted(bull: Node2D)
 var _courier_path: Array[Vector2] = []
 var _courier_active: bool = false
 var _courier_blocked: float = 0.0
+var _courier_best_distance: float = INF
 var _effective_flee_speed: float = 0.0  ## real value set on entering ESCAPED, before first use — see _on_state_changed
 var _sprite_swap: SpriteSwap
 var _facing: SpriteFacing = SpriteFacing.new()  # stable sprite direction: no flicker near fences/corners
@@ -482,6 +483,8 @@ func _draw() -> void:
 
 func follow_corral_track(points: PackedVector2Array) -> void:
 	_courier_path.assign(points)
+	_courier_best_distance=INF
+	_courier_blocked=0.0
 	_leaving_corral = false
 	_courier_active = not _courier_path.is_empty()
 
@@ -495,20 +498,48 @@ func _move_courier(delta: float) -> void:
 		return
 	var offset: Vector2 = _courier_path[0]-global_position
 	velocity = offset.normalized()*minf(flee_speed,offset.length()/delta)
-	var before: Vector2 = global_position
 	move_and_slide()
-	if global_position.distance_to(before) < flee_speed*delta*.2:
-		_courier_blocked += delta
+	var remaining: float = global_position.distance_to(_courier_path[0])
+	if remaining < _courier_best_distance-2.0:
+		_courier_best_distance=remaining
+		_courier_blocked=0.0
 	else:
-		_courier_blocked = 0.0
-	if _courier_blocked > .35:
-		# Pass a head-on herd collision on the right, then return to the worn track.
-		var detour: Vector2 = global_position + Vector2(0,64.0 if global_position.y<0 else -64.0)
-		if world_bounds.grow(-35).has_point(detour):
-			_courier_path.push_front(detour)
-		_courier_blocked = 0.0
+		_courier_blocked+=delta
+	if _courier_blocked > .8:
+		var detour: PackedVector2Array = _courier_detour(_courier_path[0])
+		for i in range(detour.size()-1,-1,-1): _courier_path.push_front(detour[i])
+		_courier_blocked=0.0
+		_courier_best_distance=INF
 	_update_flee_animation(offset.normalized(),delta)
 	_sprite_swap.set_motion_speed(velocity.length(),flee_speed)
 	if global_position.distance_to(_courier_path[0])<8:
 		_courier_path.pop_front()
+		_courier_best_distance=INF
 	_check_player_contact()
+
+## Small local grid detour around real walls and nearby herd bodies. It never
+## changes collision masks or moves the body directly.
+func _courier_detour(target: Vector2) -> PackedVector2Array:
+	var grid := AStarGrid2D.new()
+	grid.region=Rect2i(-30,-16,61,33)
+	grid.cell_size=Vector2(16,16)
+	grid.diagonal_mode=AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+	grid.update()
+	var start := Vector2i(roundi(global_position.x/16),roundi(global_position.y/16))
+	var finish := Vector2i(roundi(target.x/16),roundi(target.y/16))
+	for y in range(-16,17):
+		for x in range(-30,31):
+			var cell:=Vector2i(x,y)
+			var at:=Vector2(cell)*16
+			if cell==start or cell==finish: continue
+			var query:=PhysicsShapeQueryParameters2D.new()
+			query.shape=$CollisionShape2D.shape
+			query.transform=Transform2D(0,at)
+			query.collision_mask=collision_mask
+			query.exclude=[get_rid()]
+			if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():
+				grid.set_point_solid(cell,true)
+	if not grid.is_in_boundsv(start) or not grid.is_in_boundsv(finish): return PackedVector2Array()
+	var result: PackedVector2Array=grid.get_point_path(start,finish)
+	if not result.is_empty(): result.remove_at(0)
+	return result

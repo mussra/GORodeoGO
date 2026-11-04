@@ -41,3 +41,19 @@ func test_master_courier_physically_visits_every_latch_without_recursive_jobs() 
 	await wait_physics_frames(2400)
 	for i in range(8): assert_true(level._pen_released[i],"master route delivered latch %d" % i)
 	assert_true(level._courier_jobs.is_empty(),"arrival does not recursively launch target jobs")
+
+func test_two_converging_couriers_do_not_deadlock_and_manual_target_retires_jobs() -> void:
+	SaveData.dual_lasso_intro_shown = true
+	GameState.selected_level = 20
+	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
+	await wait_physics_frames(2)
+	level.player.global_position=Vector2(0,220)
+	level._on_pen_door_opened(1)
+	level._on_pen_door_opened(4)
+	await wait_physics_frames(1800)
+	assert_true(level._courier_jobs.is_empty(),"both physical routes finish")
+	level._on_pen_door_opened(0)
+	for i in range(8): level._on_pen_door_opened(i)
+	await wait_physics_frames(2)
+	assert_true(level._courier_jobs.is_empty(),"manual destinations retire every obsolete errand")

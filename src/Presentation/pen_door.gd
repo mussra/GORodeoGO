@@ -96,7 +96,7 @@ func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 
 func _draw() -> void:
 	# Small outside latch: the actual gate is drawn and collides in the fence.
-	draw_style_box(RanchTheme.box(Color("8c6844"), Color("f0d093"), 5), Rect2(-20, -15, 40, 30))
+	draw_style_box(RanchTheme.box(Color("173c4a"), Color("a9e9d8"), 5), Rect2(-20, -15, 40, 30))
 	var badge: String = "%dM" % door_number if is_master else str(door_number)
 	draw_string(ThemeDB.fallback_font, Vector2(-17, 6), badge, HORIZONTAL_ALIGNMENT_CENTER, 34, 17, Color("fff2d2"))
 	if _player_inside:

@@ -259,8 +259,11 @@ func _send_courier(bull: Node) -> void:
 		_courier_jobs.erase(bull)
 		return
 	var route: PackedVector2Array = CorralRoute.build(_puzzle_corrals[job["from"]].layout,_puzzle_corrals[job["targets"][0]].layout)
-	if bull.global_position.distance_to(_puzzle_corrals[job["from"]].layout["door"]) < 12:
+	var source_layout: Dictionary = _puzzle_corrals[job["from"]].layout
+	if bull.global_position.distance_to(source_layout["door"]) < 12:
 		route.remove_at(0)
+	elif source_layout["rect"].has_point(bull.global_position):
+		route.insert(0,Vector2(source_layout["gate"].x,bull.global_position.y))
 	bull.follow_corral_track(route)
 
 func _on_courier_arrived(bull: Node) -> void:
