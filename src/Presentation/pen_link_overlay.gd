@@ -36,7 +36,9 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	for source_index in range(_pens.size()):
 		var source = _doors[source_index]
-		if focus_player != null and source.position.distance_to(focus_player.global_position) > 260:
+		if not _is_door_closed(source):
+			continue
+		if is_instance_valid(focus_player) and source.position.distance_to(focus_player.global_position) > 260:
 			continue  # large maps reveal only nearby door connections, not a web across the arena
 		if not _is_door_closed(source):
 			continue
