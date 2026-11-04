@@ -1,5 +1,11 @@
 # CHANGELOG — GO Rodeo GO
 
+## v0.21.16 - Seguimiento por detrás
+- El toro enlazado recorre el camino del vaquero con separación, incluidos giros y regates, en vez de copiar velocidad en paralelo. Sin teletransporte; la incorporación desde una captura por delante sigue siendo gradual.
+- Misma firma y paquete que 0.21.15: instalar encima, sin desinstalar. Dos variantes de menú con idéntica lógica.
+- 267 tests / 4062 aserciones pasan; preview real en Godot aprobado. Sin prueba en teléfono de esta corrección.
+- Sin mapas ampliados ni cambios a IA libre o regla golpe-suelta.
+
 ## v0.21.15 - Prueba: regate libre y banjo
 - Regate por dibujo libre: toque breve en movimiento, segundo toque mantenido para dibujar, soltar para recorrer. Recarga visible de 2,5 s; no hay invulnerabilidad. Forma libre, longitud limitada a 260 px, hasta 120 puntos; las vallas detienen el regate.
 - Frenada final breve y suave (0,18 s), sin la larga deriva inicial. El movimiento normal recupera el control.
