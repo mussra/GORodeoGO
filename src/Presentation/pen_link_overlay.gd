@@ -18,6 +18,9 @@ const LINK_WIDTH: float = 2.0
 const ARROWHEAD_LENGTH: float = 16.0
 const ARROWHEAD_WIDTH: float = 8.0
 
+var focus_player: Node2D
+var goal_position: Vector2 = Vector2(-300,0)
+
 var _pens: Array = []
 var _doors: Array = []  # PenDoor per pen index; entries may be freed instances, hence untyped
 
@@ -33,6 +36,8 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	for source_index in range(_pens.size()):
 		var source = _doors[source_index]
+		if focus_player != null and source.position.distance_to(focus_player.global_position) > 260:
+			continue  # large maps reveal only nearby door connections, not a web across the arena
 		if not _is_door_closed(source):
 			continue
 		for target_index: int in PenLinkResolver.get_linked_pen_indices(_pens, source_index):
@@ -50,7 +55,7 @@ func _draw_arrow(from: Vector2, to: Vector2) -> void:
 	var tip: Vector2 = to - direction * 25.0
 	var start: Vector2 = from + direction * 25.0
 	# Split links around the unique destination label/goal instead of crossing it.
-	var avoid := Rect2(-345, -68, 90, 116)
+	var avoid := Rect2(goal_position - Vector2(45,68), Vector2(90,116))
 	var previous: Vector2 = start
 	for step in range(1, 61):
 		var point: Vector2 = start.lerp(tip, float(step) / 60)
