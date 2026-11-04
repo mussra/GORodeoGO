@@ -9,7 +9,7 @@
 - Capacidad del lazo bloquea lanzamientos sin hueco; doble toque de apuntado libera. Explicación animada del lazo doble y entrada progresiva Zumbel.
 - Contacto sigue aturdiendo y soltando captura. Sin impulso20% de comida ni multijugador ni firma sonora Zumbel.
 - 265 tests / 4049 aserciones pasan. Probado con Godot Linux y eventos táctiles simulados, no en teléfono real. Queda aviso de dos recursos de audio sin liberar al cerrar la suite, sin fallo durante partida.
-- Dos menús con la misma lógica, mismo identificador y firma: se sustituyen al instalar; no desinstalar para cambiar de menú.
+- Dos menús con la misma lógica, mismo identificador y firma: se sustituyen entre sí. Cambio de firma respecto a 0.21.14: hay que desinstalar la anterior, perdiendo su progreso local, aceptado por Antonio el 4 de noviembre a las 21:31. Las futuras actualizaciones deben conservar la nueva firma guardada.
 
 ## v0.20.0 — "Lazo Sin Muros" (esta versión)
 184 tests (unitarios + integración) en verde; el test del obstáculo se comprobó con una mutación (fallaba al restaurar el bloqueo). NO se ha probado con el dedo. Incluye todo lo de 0.17.0 a 0.19.0.

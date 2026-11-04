@@ -15,3 +15,7 @@ Quedan por explorar las reglas, el equilibrio, las recompensas y la viabilidad d
 ## Separación con la versión actual
 
 La versión actual es de un jugador. El regate del caballo por dibujo libre se prueba ahora; los toros controlados por jugadores, los disfraces y las recompensas entre bandos quedan para una fase futura.
+
+## Desbloqueo progresivo de niveles
+
+Antonio señaló el 4 de noviembre, a las 21:31, que los APK de prueba muestran todos los niveles habilitados. Corregirlo en una versión futura para que se desbloqueen al avanzar. No se cambia en el APK 0.21.15: mantiene el acceso de prueba actual.
