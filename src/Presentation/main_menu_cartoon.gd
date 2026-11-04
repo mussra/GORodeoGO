@@ -80,5 +80,7 @@ func _layout() -> void:
 func _animate_intro() -> void:
 	super._animate_intro()
 	_portrait.pivot_offset = _portrait.size*.5
+	_portrait.modulate.a = 0.0
+	create_tween().tween_property(_portrait,"modulate:a",1.0,.65).set_delay(.18)
 	_portrait.scale = Vector2(.82,.82)
 	create_tween().tween_property(_portrait,"scale",Vector2.ONE,.75).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

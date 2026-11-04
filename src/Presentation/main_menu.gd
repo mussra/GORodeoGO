@@ -22,7 +22,35 @@ func _ready() -> void:
 	_build_menu()
 	resized.connect(_layout)
 	_layout()
-	call_deferred("_animate_intro")
+	call_deferred("_begin_brand_intro")
+
+## The logo reveal precedes the existing staggered menu entrance once per process.
+func _begin_brand_intro() -> void:
+	if GameState.brand_intro_played:
+		_animate_intro()
+		return
+	GameState.brand_intro_played = true
+	var cover := ColorRect.new()
+	cover.color = Color("14284b")
+	cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(cover)
+	var image := TextureRect.new()
+	image.texture = preload("res://brand/zumbel_splash.png")
+	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	image.offset_left = size.x * .2
+	image.offset_right = -size.x * .2
+	image.offset_top = size.y * .18
+	image.offset_bottom = -size.y * .18
+	image.modulate.a = 0.0
+	cover.add_child(image)
+	var reveal := create_tween()
+	reveal.tween_property(image, "modulate:a", 1.0, .65)
+	reveal.tween_interval(.35)
+	reveal.tween_property(cover, "modulate:a", 0.0, .3)
+	reveal.tween_callback(cover.queue_free)
+	reveal.tween_callback(_animate_intro)
 
 func _label(text: String, font_size: int, color: Color) -> Label:
 	var node := Label.new()
@@ -151,6 +179,10 @@ func _animate_intro() -> void:
 	var target: Vector2 = _hero.position
 	_hero.position.x -= 90
 	_intro.tween_property(_hero,"position",target,.85).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	for index in range(2):
+		var animal: Node2D = _hero.get_node("Rider" if index == 0 else "Bull")
+		animal.modulate.a = 0.0
+		_intro.tween_property(animal, "modulate:a", 1.0, .55).set_delay(.2 + index * .18)
 	for index in range(2):
 		var button: Button = _play if index == 0 else _missions
 		var final: Vector2 = button.position

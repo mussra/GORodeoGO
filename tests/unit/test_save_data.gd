@@ -38,6 +38,26 @@ func test_atomic_save_roundtrip_on_an_isolated_path() -> void:
 	DirAccess.remove_absolute(path)
 	sut.free()
 
+func test_dual_lasso_intro_flag_roundtrip_on_an_isolated_path() -> void:
+	var path: String = "user://qa_dual_lasso_roundtrip.dat"
+	var sut: Node = load("res://src/Application/save_data.gd").new()
+	sut.save_path = path
+	assert_false(sut.dual_lasso_intro_shown)
+	sut.mark_dual_lasso_intro_shown()
+	assert_true(sut.dual_lasso_intro_shown)
+	sut.dual_lasso_intro_shown = false
+	sut.load_progress()
+	assert_true(sut.dual_lasso_intro_shown, "flag persists across save/load")
+	DirAccess.remove_absolute(path)
+	sut.free()
+
+func test_dual_lasso_intro_flag_defaults_false_without_save_file() -> void:
+	var sut: Node = load("res://src/Application/save_data.gd").new()
+	sut.save_path = "user://qa_dual_lasso_missing.dat"
+	sut.load_progress()
+	assert_false(sut.dual_lasso_intro_shown)
+	sut.free()
+
 func test_corrupt_or_missing_save_resets_only_the_test_instance() -> void:
 	var path: String = "user://qa_progress_corrupt.dat"
 	var sut: Node = load("res://src/Application/save_data.gd").new()

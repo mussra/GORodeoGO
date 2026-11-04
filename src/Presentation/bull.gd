@@ -22,6 +22,7 @@ const CHASER_BLOCKED_SECONDS: float = 1.0  # stuck this long -> pass the baton (
 const CHASER_BLOCKED_PROGRESS_RATIO: float = 0.25  # moving < 25% of the intended step counts as blocked
 const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
 const MIN_FLEE_SPEED_FACTOR: float = 0.15
+const TOW_CATCHUP_MARGIN: float = 80.0  # extra speed over the player's own while closing the leash gap
 const ART_ROOT: String = "res://art/bull/"
 const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_diag_down", "flee_diag_up", "captured", "calming", "controlled", "drinking"]
 
@@ -156,15 +157,22 @@ func _physics_process(delta: float) -> void:
 
 ## The lasso tows the bull: it follows the player at leash_distance rather than being pushed.
 ## Rope-break (rope_distance > max_rope_distance) is still enforced inside BullController.update_hold.
+##
+## Keep-pace rule (Ant, 4-nov: "que corra a la misma velocidad a la que corro yo y que me siga
+## siempre desde cerca"): outside the leash the bull runs at LEAST the player's current speed
+## plus a catch-up margin, so a sprinting rider no longer drags it back within the herd's
+## reach; inside the leash it moves WITH the player (same velocity), staying close the whole
+## ride instead of the old stop-and-go trailing that let wild bulls catch it.
 func _apply_tow_movement() -> void:
 	var to_player: Vector2 = _player.global_position - global_position
 	var distance: float = to_player.length()
 	var leash: float = controller.tuning().leash_distance
+	var player_velocity: Vector2 = _player.velocity if _player is CharacterBody2D else Vector2.ZERO
 
 	if distance > leash:
-		velocity = to_player.normalized() * controller.tuning().tow_speed
+		velocity = to_player.normalized() * maxf(controller.tuning().tow_speed, player_velocity.length() + TOW_CATCHUP_MARGIN)
 	else:
-		velocity = Vector2.ZERO
+		velocity = player_velocity
 
 	move_and_slide()
 

@@ -276,7 +276,13 @@ func test_a_bull_released_on_purpose_cannot_stun_the_player_right_away() -> void
 	await wait_physics_frames(5)
 	assert_eq(level.player._stun_time_remaining, 0.0, "grace period after a deliberate release")
 
+var _intro_shown: bool
+func before_each() -> void:
+	_intro_shown = SaveData.dual_lasso_intro_shown
+	SaveData.dual_lasso_intro_shown = true  # smoke wiring tests, not the one-shot intro
+
 func after_each() -> void:
+	SaveData.dual_lasso_intro_shown = _intro_shown
 	get_tree().paused = false
 
 func test_keyboard_charge_increases_range_without_a_touch_stick() -> void:

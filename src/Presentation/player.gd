@@ -12,6 +12,9 @@ signal lasso_thrown(throw_origin: Vector2, landing_point: Vector2)
 signal lasso_released
 signal stunned
 signal release_requested
+## The player tried to throw with every lasso slot occupied (Ant, 4-nov: no lanzar sin hueco).
+## Level0 surfaces it as a HUD hint; the throw itself is simply refused.
+signal throw_blocked
 
 const ART_ROOT: String = "res://art/player/"
 const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "stunned"]
@@ -40,6 +43,7 @@ var _charge_distance: float = 0.0
 var _charge_visual: Line2D = null
 var _sprite_swap: SpriteSwap
 var _active_capture_count: int = 0
+var _max_captures: int = 1
 var _touch_aim_active: bool = false
 
 func _ready() -> void:
@@ -50,6 +54,16 @@ func _ready() -> void:
 ## a stronger horse trades speed for pulling two at once).
 func set_active_capture_count(count: int) -> void:
 	_active_capture_count = count
+
+## Called once by Level0 after applying unlocks: how many bulls may be held at once —
+## 1 normally, 2 with the dual lasso (PlayerUpgrades.max_simultaneous_captures).
+func set_max_captures(value: int) -> void:
+	_max_captures = maxi(1, value)
+
+## A throw is only possible with a free slot: full hands mean releasing first
+## (double tap on the aim stick, D038) before throwing again.
+func _has_free_lasso_slot() -> bool:
+	return _active_capture_count < _max_captures
 
 ## Wires the aim/throw stick (Godot 4.7 native VirtualJoystick, JOYSTICK_FOLLOWING mode —
 ## appears where touched and its base follows the finger, so you never have to drag back
@@ -66,7 +80,10 @@ func _on_aim_pressed() -> void:
 	_touch_aim_active = true
 	_aim_pressed_at_seconds = _now_seconds()
 	if not _is_charging and not _lasso_in_flight:
-		_start_charging()
+		if _has_free_lasso_slot():
+			_start_charging()
+		else:
+			throw_blocked.emit()
 
 ## Two quick taps (press+release near the centre) emit release_requested instead (D038).
 ## Releasing with the stick (almost) back at its centre CANCELS the throw instead of dropping
@@ -155,7 +172,10 @@ func _process_throw_input(delta: float) -> void:
 		return
 
 	if not _lasso_in_flight and Input.is_action_just_pressed("throw_lasso"):
-		_start_charging()
+		if _has_free_lasso_slot():
+			_start_charging()
+		else:
+			throw_blocked.emit()
 
 func _now_seconds() -> float:
 	return Time.get_ticks_msec() / 1000.0
@@ -177,6 +197,10 @@ func _update_charge_visual() -> void:
 ## directly (fixes the one-frame staleness noted above). Empty/zero means "use whatever
 ## aim_direction/_charge_distance were last set" — the keyboard/mouse fallback path.
 func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
+	if not _has_free_lasso_slot():
+		_cancel_charge()
+		throw_blocked.emit()
+		return
 	if final_vector.length() > 0.0:
 		aim_direction = final_vector.normalized()
 		_charge_distance = LassoAim.throw_distance(final_vector, max_throw_distance)

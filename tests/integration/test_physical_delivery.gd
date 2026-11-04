@@ -2,11 +2,15 @@ extends GutTest
 
 ## Scripted engine checks, not a human playthrough or difficulty measurement.
 var _progress: int
+var _intro_shown: bool
 func before_each() -> void:
 	_progress = SaveData.highest_level_completed
 	SaveData.highest_level_completed = LevelCatalog.MAX_LEVEL
+	_intro_shown = SaveData.dual_lasso_intro_shown
+	SaveData.dual_lasso_intro_shown = true  # these tests exercise gameplay, not the one-shot intro
 func after_each() -> void:
 	SaveData.highest_level_completed = _progress
+	SaveData.dual_lasso_intro_shown = _intro_shown
 	for action in ["move_left", "move_right", "move_up", "move_down"]:
 		Input.action_release(action)
 	get_tree().paused = false

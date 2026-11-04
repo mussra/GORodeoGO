@@ -9,3 +9,5 @@ var sound_enabled: bool = true
 
 # Menu variant persists only for this process, never changes saved progress.
 var menu_scene: String = "res://src/Presentation/main_menu.tscn"
+
+var brand_intro_played: bool = false

@@ -1,5 +1,10 @@
 extends GutTest
+var _intro_shown: bool
+func before_each() -> void:
+	_intro_shown = SaveData.dual_lasso_intro_shown
+	SaveData.dual_lasso_intro_shown = true  # door/tow physics tests, not the one-shot intro
 func after_each() -> void:
+	SaveData.dual_lasso_intro_shown = _intro_shown
 	get_tree().paused = false
 func test_physical_gate_blocks_then_opens_and_towed_bull_exits() -> void:
 	GameState.selected_level = 11

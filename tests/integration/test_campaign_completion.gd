@@ -3,14 +3,18 @@ extends GutTest
 ## Full level loop against real scenes/physics. Deterministic placement is intentional:
 ## this proves completion wiring, not a human player's ability or mobile game feel.
 var _original_progress: int = 0
+var _intro_shown: bool
 
 func before_each() -> void:
 	_original_progress = SaveData.highest_level_completed
 	# Prevent any disk writes from the real victory handler.
 	SaveData.highest_level_completed = LevelCatalog.MAX_LEVEL
+	_intro_shown = SaveData.dual_lasso_intro_shown
+	SaveData.dual_lasso_intro_shown = true  # campaign loop must not stop at the one-shot intro
 
 func after_each() -> void:
 	SaveData.highest_level_completed = _original_progress
+	SaveData.dual_lasso_intro_shown = _intro_shown
 	get_tree().paused = false
 
 func test_every_level_can_release_capture_calm_deliver_and_win() -> void:

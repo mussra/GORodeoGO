@@ -182,3 +182,11 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Separate scenes preserved; default remains futurist. Return from a level remembers the menu used for this process only. Gameplay/save progression unchanged.
 - 243 tests / 3950 assertions pass. Actual engine movies and functional menu > level 11 > matching menu checks for both variants. No on-device Android or tactile/performance claim.
 - Both APK alternatives share com.example.rancho.review and signing identity, versionCode224: installing one replaces the other, not side-by-side. Do not uninstall or clear data to switch. Android normally preserves this app's data for a same-signature update; backup is still advisable. Main unchanged.
+
+## Review candidate - 2026-11-04 (not an APK release)
+- Keep captured bulls close while matching rider movement, with catch-up speed outside the leash.
+- Refuse throws when all capture slots are occupied; double-tap release frees the latest capture.
+- One-time animated dual-lasso unlock explanation, paused while reading, persisted compatibly.
+- Progressive Zumbel reveal before both menu variants, plus staggered animal entrance. No new audio approved or included.
+- Rider contact still stuns and drops captures, explicitly retained by Antonio on 4 November.
+- Verified existing next-level/menu navigation, including final level without level 21.

@@ -37,6 +37,7 @@ var _chaser_index: int = ChaserDirector.NO_CHASER
 var _next_capture_order: int = 1
 var _upgrades: PlayerUpgrades
 var _paused_by_user_or_os: bool = false
+var _intro_overlay_active: bool = false  # one-shot dual-lasso celebration: tree paused, HUD interactive
 var _audio: RanchAudio
 var _puzzle_corrals: Array = []
 var _distraction_stations: Array = []
@@ -83,6 +84,7 @@ func _ready() -> void:
 
 	player.lasso_thrown.connect(_on_lasso_thrown)
 	player.release_requested.connect(_on_release_requested)
+	player.throw_blocked.connect(_on_throw_blocked)
 	pen.bull_returned.connect(_on_bull_returned)
 
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
@@ -103,6 +105,11 @@ func _ready() -> void:
 
 	_tranquilizer_available = _upgrades.tranquilizer_available
 	hud.set_tranquilizer_available(_tranquilizer_available)
+
+	# First level played with the dual lasso unlocked: celebrate and explain it once,
+	# before the action starts (Ant, 4-nov).
+	if _upgrades.max_simultaneous_captures >= 2 and not SaveData.dual_lasso_intro_shown:
+		_show_dual_lasso_intro()
 
 ## Spawns each obstacle as a StaticBody2D on the fence's collision layer (4) — reuses the
 ## exact same "solid to Player/Bull, invisible to Pen detection" setup, no new layer needed.
@@ -243,6 +250,7 @@ func _apply_unlocked_upgrades() -> void:
 	player.lasso_travel_time *= _upgrades.lasso_travel_time_multiplier
 	player.max_throw_distance *= _upgrades.throw_distance_multiplier
 	_max_simultaneous_captures = _upgrades.max_simultaneous_captures
+	player.set_max_captures(_max_simultaneous_captures)
 
 func _process(delta: float) -> void:
 	if _game_over:
@@ -336,6 +344,7 @@ func _on_lasso_thrown(throw_origin: Vector2, landing_point: Vector2) -> void:
 		if bull.try_capture(landing_point):
 			bull.capture_order = _next_capture_order
 			_next_capture_order += 1
+			player.set_active_capture_count(_held_bulls().size())
 			return
 		if OS.is_debug_build():
 			# DIAGNOSTIC (reinstated — capture precision still reported as inconsistent):
@@ -345,6 +354,30 @@ func _on_lasso_thrown(throw_origin: Vector2, landing_point: Vector2) -> void:
 				landing_point.distance_to(bull.global_position),
 				bull.hit_radius + bull.capture_tolerance
 			])
+
+## The player tried to throw with no free lasso slot (Ant, 4-nov: throws are limited to
+## the available slots — 1 normally, 2 with the dual lasso). The throw is refused in
+## player.gd; here we explain why and how to free a slot.
+func _on_throw_blocked() -> void:
+	hud.flash_hint("Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar", 1.8)
+
+## One-shot dual-lasso unlock celebration: pause the action, show the animated overlay,
+## remember it so it never nags again on later levels or replays.
+func _show_dual_lasso_intro() -> void:
+	_intro_overlay_active = true
+	player.cancel_input()
+	_reset_touch_controls()
+	touch_controls.visible = false
+	get_tree().paused = true
+	hud.dual_lasso_intro_accepted.connect(_on_dual_lasso_intro_accepted, CONNECT_ONE_SHOT)
+	hud.show_dual_lasso_intro()
+	_audio.play("win")
+
+func _on_dual_lasso_intro_accepted() -> void:
+	SaveData.mark_dual_lasso_intro_shown()
+	get_tree().paused = false
+	touch_controls.visible = true
+	_intro_overlay_active = false
 
 ## Double tap on the aim stick drops the most recently captured bull (D038). One bull per
 ## gesture, so with dual capture the player keeps control of which one stays.
@@ -357,6 +390,7 @@ func _on_release_requested() -> void:
 			latest = bull
 	if latest != null:
 		latest.release_by_player()
+		player.set_active_capture_count(_held_bulls().size())
 
 func _on_tranquilizer_requested() -> void:
 	if not _tranquilizer_available or _game_over or _paused_by_user_or_os:
@@ -427,6 +461,8 @@ func _on_restart_requested() -> void:
 ## game (otherwise the countdown would jump on resume); the back button toggles the pause
 ## menu. WM_GO_BACK_REQUEST is only delivered because project.godot sets quit_on_go_back=false.
 func _toggle_pause() -> void:
+	if _intro_overlay_active:
+		return
 	if _paused_by_user_or_os:
 		resume_game()
 	else:
@@ -443,7 +479,7 @@ func _notification(what: int) -> void:
 				pause_game()
 
 func pause_game() -> void:
-	if _game_over or _paused_by_user_or_os:
+	if _game_over or _paused_by_user_or_os or _intro_overlay_active:
 		return
 	_paused_by_user_or_os = true
 	player.cancel_input()

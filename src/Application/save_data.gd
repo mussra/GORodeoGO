@@ -10,6 +10,9 @@ const SAVE_PATH: String = "user://save.dat"
 const SAVE_VERSION: int = 1  ## bump when the file layout changes, to allow migrations
 
 var highest_level_completed: int = 0
+## One-shot flag: the "¡Has conseguido el doble lazo!" intro plays the first time the
+## upgrade applies (entering a level with dual capture unlocked), never again after.
+var dual_lasso_intro_shown: bool = false
 # Overridden only by isolated persistence tests; production retains its original path.
 var save_path: String = SAVE_PATH
 
@@ -26,10 +29,17 @@ func record_level_completed(level_number: int) -> void:
 func is_new_record(level_number: int) -> bool:
 	return level_number >= 1 and level_number <= LevelCatalog.MAX_LEVEL and level_number > highest_level_completed
 
+func mark_dual_lasso_intro_shown() -> void:
+	if dual_lasso_intro_shown:
+		return
+	dual_lasso_intro_shown = true
+	save_progress()
+
 func save_progress() -> bool:
 	var config := ConfigFile.new()
 	config.set_value("meta", "version", SAVE_VERSION)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
+	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
 	var temp_path: String = save_path + ".tmp"
 	var err: Error = config.save(temp_path)
 	if err == OK:
@@ -43,8 +53,10 @@ func load_progress() -> void:
 	var config := ConfigFile.new()
 	var err: Error = config.load(save_path)
 	if err != OK:
+		dual_lasso_intro_shown = false
 		highest_level_completed = 0  # first run (no file) or unreadable file
 		return
 	highest_level_completed = LevelProgression.sanitize_highest_completed(
 		config.get_value("progress", "highest_level_completed", 0)
 	)
+	dual_lasso_intro_shown = config.get_value("progress", "dual_lasso_intro_shown", false)

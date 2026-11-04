@@ -8,6 +8,8 @@ signal quit_requested
 signal pause_requested
 signal resume_requested
 signal tranquilizer_requested
+## The player acknowledged the one-shot "¡Has conseguido el doble lazo!" intro overlay.
+signal dual_lasso_intro_accepted
 
 @onready var bull_count_label: Label = $BullCountLabel
 @onready var timer_label: Label = $TimerLabel
@@ -22,6 +24,8 @@ signal tranquilizer_requested
 @onready var tranquilizer_button: Button = $TranquilizerButton
 
 var _pause_panel: Panel
+var _dual_lasso_panel: Panel
+var _flash_hint_until_seconds: float = 0.0
 var _hint_label: Label
 var _level_label: Label
 var _pause_button: Button
@@ -212,13 +216,104 @@ func _apply_ranch_ui() -> void:
 	$NervesGroup/NervesLabel.text = "Calmando al toro..."
 	$NervesGroup2/NervesLabel.text = "Calmando al segundo..."
 
+## One-shot unlock celebration (Ant, 4-nov: "que se vea una animación chula diciendo has
+## conseguido el doble lazo y que te explique cómo usarlo"). Shown by Level0 with the tree
+## paused; this CanvasLayer is PROCESS_MODE_ALWAYS, so the entrance tween still plays.
+func show_dual_lasso_intro() -> void:
+	if _dual_lasso_panel == null:
+		_build_dual_lasso_panel()
+	_dual_lasso_panel.visible = true
+	_dual_lasso_panel.pivot_offset = _dual_lasso_panel.size / 2.0
+	_dual_lasso_panel.scale = Vector2.ZERO
+	_dual_lasso_panel.rotation = -0.12
+	var tween: Tween = create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_dual_lasso_panel, "scale", Vector2.ONE, 0.5)
+	tween.tween_property(_dual_lasso_panel, "rotation", 0.0, 0.5)
+
+func _build_dual_lasso_panel() -> void:
+	_dual_lasso_panel = Panel.new()
+	_dual_lasso_panel.theme = RanchTheme.create()
+	_dual_lasso_panel.anchor_left = 0.5
+	_dual_lasso_panel.anchor_right = 0.5
+	_dual_lasso_panel.anchor_top = 0.5
+	_dual_lasso_panel.anchor_bottom = 0.5
+	_dual_lasso_panel.offset_left = -280.0
+	_dual_lasso_panel.offset_right = 280.0
+	_dual_lasso_panel.offset_top = -190.0
+	_dual_lasso_panel.offset_bottom = 190.0
+	_dual_lasso_panel.visible = false
+
+	var icon := Control.new()
+	icon.position = Vector2(230, 18)
+	icon.size = Vector2(100, 70)
+	icon.draw.connect(_draw_dual_lasso_icon.bind(icon))
+	_dual_lasso_panel.add_child(icon)
+	# Gentle golden pulse on the loops so the reward reads "chula" without new art.
+	var pulse: Tween = create_tween().set_loops()
+	pulse.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	pulse.tween_property(icon, "modulate", Color(1.25, 1.15, 0.9), 0.6)
+	pulse.tween_property(icon, "modulate", Color.WHITE, 0.6)
+
+	var title := Label.new()
+	title.text = "¡HAS CONSEGUIDO EL DOBLE LAZO!"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.offset_left = 20.0
+	title.offset_right = 540.0
+	title.offset_top = 92.0
+	title.offset_bottom = 132.0
+	title.add_theme_font_size_override("font_size", 24)
+	title.add_theme_color_override("font_color", RanchTheme.GOLD)
+	_dual_lasso_panel.add_child(title)
+
+	var explanation := Label.new()
+	explanation.text = "Ahora puedes enlazar DOS toros a la vez:\nlanza un segundo lazo mientras llevas uno cogido.\nPara soltar uno, doble toque rápido en el stick del lazo."
+	explanation.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	explanation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	explanation.offset_left = 40.0
+	explanation.offset_right = 520.0
+	explanation.offset_top = 140.0
+	explanation.offset_bottom = 260.0
+	_dual_lasso_panel.add_child(explanation)
+
+	var accept_button := Button.new()
+	accept_button.text = "¡Vamos!"
+	accept_button.offset_left = 180.0
+	accept_button.offset_right = 380.0
+	accept_button.offset_top = 300.0
+	accept_button.offset_bottom = 350.0
+	accept_button.pressed.connect(_on_dual_lasso_accept_pressed)
+	_dual_lasso_panel.add_child(accept_button)
+
+	add_child(_dual_lasso_panel)
+
+## Two crossed lasso loops in the ranch gold — pure HUD vector drawing, no art dependency.
+func _draw_dual_lasso_icon(icon: Control) -> void:
+	icon.draw_arc(Vector2(32, 36), 22, 0.0, TAU, 40, RanchTheme.GOLD, 5.0, true)
+	icon.draw_arc(Vector2(68, 36), 22, 0.0, TAU, 40, RanchTheme.CREAM, 5.0, true)
+	icon.draw_line(Vector2(32, 14), Vector2(24, 2), RanchTheme.GOLD, 4.0, true)
+	icon.draw_line(Vector2(68, 14), Vector2(76, 2), RanchTheme.CREAM, 4.0, true)
+
+func _on_dual_lasso_accept_pressed() -> void:
+	_dual_lasso_panel.visible = false
+	dual_lasso_intro_accepted.emit()
+
 ## HUD keeps processing while paused; the level intentionally does not.
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and not event.is_echo():
 		pause_toggle_requested.emit()
 		get_viewport().set_input_as_handled()
 
+## Transient override for update_guidance (which refreshes every frame): a blocked lasso
+## throw explains itself here instead of failing silently.
+func flash_hint(text: String, seconds: float = 1.8) -> void:
+	_hint_label.text = text
+	_flash_hint_until_seconds = Time.get_ticks_msec() / 1000.0 + seconds
+
 func update_guidance(held_count: int, ready_count: int, has_closed_doors: bool) -> void:
+	if Time.get_ticks_msec() / 1000.0 < _flash_hint_until_seconds:
+		return
 	if ready_count > 0:
 		_hint_label.text = "¡Ya está calmado! Guíalo hasta la META marcada con ✓"
 	elif held_count > 0:
