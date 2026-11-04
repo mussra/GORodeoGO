@@ -46,6 +46,9 @@ var _pen_doors: Array = []  # PenDoor per pen index; entries may be freed instan
 var _pen_released: Array = []  # bool per pen index — a pen's bulls are released at most once
 
 func _ready() -> void:
+	RanchMusic.set_paused(false)
+	RanchMusic.set_enabled(GameState.sound_enabled)
+	RanchMusic.play_context("gameplay")
 	_audio = RanchAudio.new()
 	add_child(_audio)
 	_audio.enabled = GameState.sound_enabled
@@ -68,6 +71,9 @@ func _ready() -> void:
 
 	player.world_bounds = world_bounds
 	player.set_aim_joystick(aim_joystick)
+	player.set_move_joystick($TouchControls/MoveJoystick)
+	player.dodge_started.connect(func(): _audio.play("dodge"))
+	player.dodge_finished.connect(func(): _audio.play("skid"))
 	var pen_zone_rect: Rect2 = Rect2(pen.global_position - Vector2(40, 40), Vector2(80, 80))
 	for bull in _active_bulls:
 		bull.world_bounds = world_bounds
@@ -368,6 +374,7 @@ func _show_dual_lasso_intro() -> void:
 	player.cancel_input()
 	_reset_touch_controls()
 	touch_controls.visible = false
+	RanchMusic.set_paused(true)
 	get_tree().paused = true
 	hud.dual_lasso_intro_accepted.connect(_on_dual_lasso_intro_accepted, CONNECT_ONE_SHOT)
 	hud.show_dual_lasso_intro()
@@ -375,6 +382,7 @@ func _show_dual_lasso_intro() -> void:
 
 func _on_dual_lasso_intro_accepted() -> void:
 	SaveData.mark_dual_lasso_intro_shown()
+	RanchMusic.set_paused(false)
 	get_tree().paused = false
 	touch_controls.visible = true
 	_intro_overlay_active = false
@@ -450,10 +458,12 @@ func _on_next_requested() -> void:
 	if not _game_over or _level_number >= LevelCatalog.MAX_LEVEL:
 		return
 	GameState.selected_level = _level_number + 1
+	RanchMusic.set_paused(false)
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func _on_restart_requested() -> void:
+	RanchMusic.set_paused(false)
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
@@ -485,6 +495,7 @@ func pause_game() -> void:
 	player.cancel_input()
 	_reset_touch_controls()
 	touch_controls.visible = false
+	RanchMusic.set_paused(true)
 	get_tree().paused = true
 	hud.show_pause()
 
@@ -492,11 +503,13 @@ func resume_game() -> void:
 	if not _paused_by_user_or_os:
 		return
 	_paused_by_user_or_os = false
+	RanchMusic.set_paused(false)
 	get_tree().paused = false
 	hud.hide_pause()
 	touch_controls.visible = true
 
 func _on_quit_requested() -> void:
+	RanchMusic.set_paused(false)
 	get_tree().paused = false
 	get_tree().change_scene_to_file(GameState.menu_scene)
 
@@ -507,6 +520,7 @@ func _on_bull_audio_state(state: BullState.State) -> void:
 		_audio.play("calm")
 
 func _on_sound_toggled(value: bool) -> void:
+	RanchMusic.set_enabled(value)
 	_audio.enabled = value
 	GameState.sound_enabled = value
 

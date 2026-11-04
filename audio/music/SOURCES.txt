@@ -1,0 +1,9 @@
+Composiciones Rancho02: secuenciación original de notas individuales, sin usar melodía/audio referencia.
+Instrumento Ganjo, SX6 cuerdas grabado por itsclipping. https://github.com/sfzinstruments/ganjo
+Commit fuente ccff5cd5cd3b513873a48994c07724d9d3c39e1c
+Licencia CC0-1.0: https://github.com/sfzinstruments/ganjo/blob/main/LICENSE.md
+Permite uso/adaptación/distribución comercial; no exige crédito. Licencia conservada adjunta para trazabilidad. Sin garantía de derechos terceros por parte del licenciante.
+MP3 para escucha, WAV48kHz para loops. Ver métricas JSON.
+No auditivamente certificado; aprobación usuario pendiente.
+
+Implementation approval: Antonio, 2026-11-04 20:36 CET, both Rancho02 tracks. Zumbel signature not included.

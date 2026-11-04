@@ -17,12 +17,14 @@ boot_splash/use_filter=true
 
 config/name="Rancho"
 config/icon="res://art/icon.png"
-config/version="0.21.14"
+config/version="0.21.15"
 run/main_scene="res://src/Presentation/main_menu.tscn"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.7")
 
 [autoload]
+
+RanchMusic="*res://src/Application/ranch_music.gd"
 
 GameState="*res://src/Application/game_state.gd"
 SaveData="*res://src/Application/save_data.gd"

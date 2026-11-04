@@ -13,6 +13,14 @@ var pen_rect: Rect2 = Rect2()  # set by Level0 — steered around the same way a
 var chase_probability: float = 0.1  # set by Level0 from LevelData — see RandomChaseRoller
 var capture_held: bool = false  # set by Level0 every frame — true while the player holds ≥1 capture
 
+const CHASE_LOOKAHEAD_SECONDS: float = .24
+const CHASE_REACTION_SECONDS: float = .22
+const CHASE_TURN_RATE: float = 4.0
+var _chase_reaction: float = 0.0
+var _chase_heading: Vector2 = Vector2.ZERO
+var _chase_target: Vector2 = Vector2.ZERO
+var _chase_skidding: bool = false
+
 const PLAYER_TOUCH_RADIUS: float = 18.0
 ## Floor on the nerves->speed factor (see _compute_flee_speed_for_nerves) so a bull let go
 ## at ~0 nerves still visibly creeps away rather than freezing solid (CONTROLLED forced to
@@ -136,6 +144,22 @@ func _physics_process(delta: float) -> void:
 				velocity = Vector2.ZERO
 				return
 			var flee_direction: Vector2 = _compute_flee_direction()
+			_chase_skidding = false
+			if not _leaving_corral and (_is_chaser or _random_chase.is_active()):
+				_chase_reaction -= delta
+				if _chase_reaction <= 0.0:
+					var player_velocity: Vector2 = _player.velocity if _player is CharacterBody2D else Vector2.ZERO
+					_chase_target = _player.global_position + player_velocity * CHASE_LOOKAHEAD_SECONDS
+					_chase_reaction = CHASE_REACTION_SECONDS
+				var desired: Vector2 = FleeSteering.compute_direction(global_position, _chase_target, true, world_bounds, obstacles, pen_rect, boundary_avoid_margin)
+				if _chase_heading.is_zero_approx():
+					_chase_heading = desired
+				_chase_skidding = _chase_heading.dot(desired) < .75
+				_chase_heading = _chase_heading.rotated(clampf(_chase_heading.angle_to(desired), -CHASE_TURN_RATE * delta, CHASE_TURN_RATE * delta))
+				flee_direction = _chase_heading
+			else:
+				_chase_heading = Vector2.ZERO
+				_chase_reaction = 0.0
 			velocity = flee_direction * _effective_flee_speed
 			var position_before: Vector2 = global_position
 			move_and_slide()
@@ -315,6 +339,9 @@ func _on_state_changed(new_state: BullState.State) -> void:
 	_distraction.cancel()
 	if controller.is_held():
 		_leaving_corral = false
+		_chase_heading = Vector2.ZERO
+		_chase_reaction = 0.0
+		_chase_skidding = false
 	_delivered = new_state == BullState.State.SAFE and _last_state == BullState.State.CONTROLLED
 	_last_state = new_state
 	if new_state == BullState.State.ESCAPED:
@@ -388,6 +415,9 @@ func _color_for_nerves(state: BullState.State) -> Color:
 
 ## Readable state cues do not recolor the entire character or depend on missing art.
 func _draw() -> void:
+	if _chase_skidding and controller != null and controller.is_wild():
+		for i in range(3):
+			draw_circle(-_chase_heading * (26 + i * 12) + Vector2(0, 25), 7 - i, Color(.72, .57, .32, .45 - i * .1))
 	if controller == null:
 		return
 	draw_set_transform(Vector2(0, 32), 0.0, Vector2(1.0, 0.32))

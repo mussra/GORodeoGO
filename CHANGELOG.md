@@ -1,5 +1,16 @@
 # CHANGELOG — GO Rodeo GO
 
+## v0.21.15 - Prueba: regate libre y banjo
+- Regate por dibujo libre: toque breve en movimiento, segundo toque mantenido para dibujar, soltar para recorrer. Recarga visible de 2,5 s; no hay invulnerabilidad. Forma libre, longitud limitada a 260 px, hasta 120 puntos; las vallas detienen el regate.
+- Frenada final breve y suave (0,18 s), sin la larga deriva inicial. El movimiento normal recupera el control.
+- Cascos/tierra y derrape sintetizados originales, con el mismo interruptor Sonido.
+- Música banjo02 aprobada: bucles menú/partida, transición, continuidad entre niveles, pausa y silencio.
+- Perseguidores salvajes anticipan movimiento y corrigen con retraso e inercia. Los enlazados mantienen seguimiento cercano.
+- Capacidad del lazo bloquea lanzamientos sin hueco; doble toque de apuntado libera. Explicación animada del lazo doble y entrada progresiva Zumbel.
+- Contacto sigue aturdiendo y soltando captura. Sin impulso20% de comida ni multijugador ni firma sonora Zumbel.
+- 265 tests / 4049 aserciones pasan. Probado con Godot Linux y eventos táctiles simulados, no en teléfono real. Queda aviso de dos recursos de audio sin liberar al cerrar la suite, sin fallo durante partida.
+- Dos menús con la misma lógica, mismo identificador y firma: se sustituyen al instalar; no desinstalar para cambiar de menú.
+
 ## v0.20.0 — "Lazo Sin Muros" (esta versión)
 184 tests (unitarios + integración) en verde; el test del obstáculo se comprobó con una mutación (fallaba al restaurar el bloqueo). NO se ha probado con el dedo. Incluye todo lo de 0.17.0 a 0.19.0.
 - Los obstáculos ya no bloquean el lazo: lanzar sobre un toro lo captura aunque haya algo en medio (D038, revoca esa parte de D012).

@@ -15,6 +15,9 @@ var _transitioning: bool = false
 var _next_level: int = 1
 
 func _ready() -> void:
+	RanchMusic.set_paused(false)
+	RanchMusic.set_enabled(GameState.sound_enabled)
+	RanchMusic.play_context("menu")
 	GameState.menu_scene = scene_file_path
 	theme = RanchTheme.create()
 	$Title.hide()

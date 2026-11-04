@@ -1,0 +1,141 @@
+extends GutTest
+func after_each() -> void:
+	get_tree().paused = false
+func test_double_movement_gesture_dodges_without_releasing_capture() -> void:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	await wait_physics_frames(1)
+	watch_signals(player)
+	assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO, Vector2(40, 0), Vector2(20, 30), Vector2(60, 30)])))
+	assert_gt(player._dodge_remaining, 0.0)
+	var start: Vector2 = player.global_position
+	await wait_physics_frames(4)
+	assert_gt(player.global_position.x, start.x + 5)
+	assert_signal_not_emitted(player, "release_requested")
+	assert_false(player.request_dodge(Vector2.LEFT), "recharge prevents chaining dodges")
+	player.stun(1.0)
+	assert_eq(player._dodge_remaining, 0.0, "a hit still interrupts dodge, no immunity")
+	assert_false(player.request_dodge(Vector2.LEFT), "cannot dodge while stunned")
+
+func test_double_tap_then_drag_records_path_but_normal_drag_does_not() -> void:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	await wait_physics_frames(1)
+	var touch := InputEventScreenTouch.new()
+	touch.pressed = true
+	touch.position = Vector2(100,300)
+	touch.index = 0
+	player._input(touch)
+	player._on_move_pressed()
+	var drag := InputEventScreenDrag.new()
+	drag.position = Vector2(160,300)
+	drag.index = 0
+	player._input(drag)
+	assert_false(player._drawing_dodge, "single ordinary drag remains normal movement")
+	player._on_move_released(Vector2.RIGHT)
+	player._input(touch)
+	player._on_move_pressed()
+	assert_true(player._drawing_dodge)
+	player._input(drag)
+	drag.position = Vector2(110,350)
+	player._input(drag)
+	drag.position = Vector2(170,350)
+	player._input(drag)
+	assert_eq(player._draw_points.size(), 4, "Z is recorded, not reduced to one direction")
+	drag.index = 1
+	drag.position = Vector2(900,100)
+	player._input(drag)
+	assert_eq(player._draw_points.size(), 4, "other finger on lasso cannot distort movement trace")
+	player._on_move_released(Vector2.RIGHT)
+	assert_eq(player._dodge_path.size(), 3)
+
+func test_trace_has_short_bounded_soft_stop_without_long_sprint_coast() -> void:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	await wait_physics_frames(1)
+	var start: Vector2 = player.global_position
+	assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO, Vector2(40, 0), Vector2(20, 30), Vector2(60, 30)])))
+	await wait_physics_frames(40)
+	assert_gt(player.global_position.x, start.x + 65, "small soft stop after Z")
+	assert_lt(player.global_position.x, start.x + 85, "coast remains below 25px, not old long sprint")
+	assert_almost_eq(player.global_position.y, start.y + 30, .1)
+	assert_eq(player.velocity, Vector2.ZERO)
+	var endpoint: Vector2 = player.global_position
+	Input.action_press("move_left")
+	await wait_physics_frames(5)
+	Input.action_release("move_left")
+	assert_lt(player.global_position.x, endpoint.x - 1, "normal held movement resumes after trace")
+
+func test_closed_trace_returns_to_origin_then_has_bounded_soft_stop() -> void:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	await wait_physics_frames(1)
+	var start: Vector2 = player.global_position
+	var circle := PackedVector2Array([Vector2.ZERO])
+	for i in range(1,25):
+		var a: float = TAU * i / 24.0
+		circle.append(Vector2(sin(a),1-cos(a)) * 37)
+	assert_true(player.request_dodge_path(circle))
+	await wait_physics_frames(60)
+	assert_gt(player.global_position.distance_to(start), 5.0, "soft stop follows final circle tangent")
+	assert_lt(player.global_position.distance_to(start), 25.0, "circle follow-through is bounded")
+	assert_eq(player.velocity, Vector2.ZERO)
+
+func test_trace_hits_obstacle_instead_of_crossing_it() -> void:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	player.global_position = Vector2.ZERO
+	var wall := StaticBody2D.new()
+	wall.collision_layer = 4
+	wall.position = Vector2(45,0)
+	var shape := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+	rectangle.size = Vector2(10,150)
+	shape.shape = rectangle
+	wall.add_child(shape)
+	add_child_autofree(wall)
+	await wait_physics_frames(2)
+	assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO, Vector2(180,0)])))
+	await wait_physics_frames(40)
+	assert_lt(player.global_position.x, 45.0, "solid fence stops trace")
+	assert_true(player._dodge_path.is_empty())
+	assert_eq(player.velocity, Vector2.ZERO, "no sprint coast after a collision either")
+
+func test_long_normal_drag_does_not_arm_next_touch_as_double_tap() -> void:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	await wait_physics_frames(1)
+	player._on_move_pressed()
+	player._move_pressed_at -= .4
+	player._on_move_released(Vector2.RIGHT)
+	player._on_move_pressed()
+	assert_false(player._drawing_dodge, "ordinary long movement gesture does not arm special")
+
+func test_freeform_s_retains_all_waypoints_and_stun_cancels_soft_stop() -> void:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	await wait_physics_frames(1)
+	var start: Vector2 = player.global_position
+	var points := PackedVector2Array([Vector2.ZERO, Vector2(30,-20),Vector2(55,0),Vector2(15,30),Vector2(45,50),Vector2(70,40)])
+	assert_true(player.request_dodge_path(points))
+	assert_eq(player._dodge_path.size(),5, "freeform S is not replaced by named pattern")
+	for i in range(5):
+		assert_eq(player._dodge_path[i],start+points[i+1])
+	await wait_physics_frames(30)
+	player._dodge_coast_remaining = .1
+	player.stun(.5)
+	assert_eq(player._dodge_coast_remaining,0.0)

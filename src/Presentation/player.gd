@@ -15,6 +15,30 @@ signal release_requested
 ## The player tried to throw with every lasso slot occupied (Ant, 4-nov: no lanzar sin hueco).
 ## Level0 surfaces it as a HUD hint; the throw itself is simply refused.
 signal throw_blocked
+signal dodge_started
+signal dodge_finished
+
+const DODGE_RECHARGE_SECONDS: float = 2.5  # provisional feel setting, preview before APK
+var _dodge_cooldown: float = 0.0
+
+const DODGE_SECONDS: float = .18
+const DODGE_SPEED_FACTOR: float = 2.2
+const DODGE_COAST_SECONDS: float = .18  # short soft stop, preview tuning
+const DODGE_COAST_SPEED_FACTOR: float = .8
+var _dodge_coast_remaining: float = 0.0
+var _move_tap: DoubleTapDetector = DoubleTapDetector.new(.3)
+var _drawing_dodge: bool = false
+var _draw_screen_start: Vector2 = Vector2.ZERO
+var _last_touch_index: int = -1
+var _draw_touch_index: int = -1
+var _skid_trail: Array[Vector2] = []
+var _trail_fade: float = 0.0
+var _last_pointer: Vector2 = Vector2.ZERO
+var _draw_points: PackedVector2Array = PackedVector2Array()
+var _dodge_path: Array[Vector2] = []
+var _move_pressed_at: float = 0.0
+var _dodge_remaining: float = 0.0
+var _dodge_direction: Vector2 = Vector2.ZERO
 
 const ART_ROOT: String = "res://art/player/"
 const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "stunned"]
@@ -74,6 +98,71 @@ func set_aim_joystick(aim_joystick: VirtualJoystick) -> void:
 	aim_joystick.pressed.connect(_on_aim_pressed)
 	aim_joystick.released.connect(_on_aim_released)
 
+## Movement and lasso gestures have independent detectors.
+func set_move_joystick(stick: VirtualJoystick) -> void:
+	stick.pressed.connect(_on_move_pressed)
+	stick.released.connect(_on_move_released)
+
+func _on_move_pressed() -> void:
+	_move_pressed_at = _now_seconds()
+	if _move_tap.register_tap(_move_pressed_at) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
+		_drawing_dodge = true
+		_draw_touch_index = _last_touch_index
+		_draw_screen_start = _last_pointer
+		_draw_points = PackedVector2Array([Vector2.ZERO])
+		velocity = Vector2.ZERO
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and event.pressed:
+		_last_pointer = event.position
+		_last_touch_index = event.index
+	elif event is InputEventScreenDrag:
+		_last_pointer = event.position
+		if _drawing_dodge and event.index == _draw_touch_index:
+			var zoom: float = get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d() != null else 1.0
+			var point: Vector2 = (event.position - _draw_screen_start) / zoom
+			if _draw_points[-1].distance_to(point) > 5.0 and _draw_points.size() < 120:
+				_draw_points.append(point)
+			queue_redraw()
+
+func _on_move_released(_direction: Vector2) -> void:
+	if _drawing_dodge:
+		_drawing_dodge = false
+		request_dodge_path(_draw_points)
+		_draw_points = PackedVector2Array()
+		_move_tap.reset()
+	elif _now_seconds() - _move_pressed_at > .22:
+		_move_tap.reset()
+
+func request_dodge_path(points: PackedVector2Array) -> bool:
+	if _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
+		return false
+	var length: float = 0.0
+	for i in range(1, points.size()):
+		length += points[i].distance_to(points[i - 1])
+	if length < 15.0:
+		return false
+	var factor: float = minf(1.0, 260.0 / length)
+	_dodge_path.clear()
+	_dodge_coast_remaining = 0.0
+	_skid_trail.clear()
+	_skid_trail.append(global_position)
+	_trail_fade = .7
+	for i in range(1, points.size()):
+		_dodge_path.append(global_position + (points[i] - points[0]) * factor)
+	_dodge_cooldown = DODGE_RECHARGE_SECONDS
+	_dodge_remaining = 1.0
+	dodge_started.emit()
+	return true
+
+func request_dodge(direction: Vector2) -> bool:
+	if _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
+		return false
+	_dodge_direction = direction.normalized()
+	_dodge_remaining = DODGE_SECONDS
+	_dodge_cooldown = DODGE_RECHARGE_SECONDS
+	return true
+
 func _on_aim_pressed() -> void:
 	if _stun_time_remaining > 0.0 or not is_physics_processing():
 		return
@@ -120,6 +209,9 @@ func stun(duration: float) -> void:
 	cancel_input()
 
 func _physics_process(delta: float) -> void:
+	_dodge_cooldown = maxf(0.0, _dodge_cooldown - delta)
+	if _dodge_path.is_empty():
+		_trail_fade = maxf(0.0, _trail_fade - delta)
 	if _stun_time_remaining > 0.0:
 		_stun_time_remaining -= delta
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
@@ -129,6 +221,73 @@ func _physics_process(delta: float) -> void:
 			modulate = Color.WHITE
 		return
 
+	if _drawing_dodge:
+		velocity = Vector2.ZERO
+		queue_redraw()
+		return
+	if not _dodge_path.is_empty():
+		var budget: float = max_speed * DODGE_SPEED_FACTOR * delta
+		if _active_capture_count >= 2:
+			budget *= dual_capture_speed_multiplier
+		var collision_free: bool = true
+		while budget > .01 and not _dodge_path.is_empty():
+			var offset: Vector2 = _dodge_path[0] - global_position
+			var step: Vector2 = offset.limit_length(budget)
+			_dodge_direction = offset.normalized()
+			var collision: KinematicCollision2D = move_and_collide(step)
+			_skid_trail.append(global_position)
+			budget -= step.length()
+			if collision != null:
+				collision_free = false
+				_dodge_path.clear()
+				break
+			if offset.length() <= step.length() + .1:
+				_dodge_path.pop_front()
+		# Only a bounded soft stop follows the trace, never the old full sprint
+		# velocity decaying through ordinary movement friction.
+		if _dodge_path.is_empty():
+			dodge_finished.emit()
+			_dodge_coast_remaining = DODGE_COAST_SECONDS if collision_free else 0.0
+			velocity = _dodge_direction * max_speed * DODGE_COAST_SPEED_FACTOR if collision_free else Vector2.ZERO
+		else:
+			velocity = _dodge_direction * max_speed * DODGE_SPEED_FACTOR
+		var facing: Array = SpriteSwap.direction_suffix(_dodge_direction)
+		_sprite_swap.play("walk_" + facing[0])
+		_sprite_swap.set_flip_h(facing[1])
+		_sprite_swap.set_motion_speed(velocity.length(), 260.0)
+		global_position = global_position.clamp(world_bounds.position, world_bounds.end)
+		_dodge_remaining = 0.0 if _dodge_path.is_empty() else 1.0
+		queue_redraw()
+		return
+	if _dodge_coast_remaining > 0.0:
+		if not Input.get_vector("move_left", "move_right", "move_up", "move_down").is_zero_approx():
+			_dodge_coast_remaining = 0.0
+			velocity = Vector2.ZERO  # fresh input takes control without automatic coast
+		else:
+			var coast_step: float = minf(delta, _dodge_coast_remaining)
+			var next_remaining: float = maxf(0.0, _dodge_coast_remaining - coast_step)
+			var average_speed: float = max_speed * DODGE_COAST_SPEED_FACTOR * (_dodge_coast_remaining + next_remaining) / (2.0 * DODGE_COAST_SECONDS)
+			var hit: KinematicCollision2D = move_and_collide(_dodge_direction * average_speed * coast_step)
+			_dodge_coast_remaining = next_remaining if hit == null else 0.0
+			velocity = _dodge_direction * max_speed * DODGE_COAST_SPEED_FACTOR * _dodge_coast_remaining / DODGE_COAST_SECONDS
+			global_position = global_position.clamp(world_bounds.position, world_bounds.end)
+			queue_redraw()
+			return
+	if _dodge_remaining > 0.0:
+		_dodge_remaining = maxf(0.0, _dodge_remaining - delta)
+		var speed: float = max_speed * DODGE_SPEED_FACTOR
+		if _active_capture_count >= 2:
+			speed *= dual_capture_speed_multiplier
+		velocity = _dodge_direction * speed
+		move_and_slide()
+		global_position = global_position.clamp(world_bounds.position, world_bounds.end)
+		var direction: Array = SpriteSwap.direction_suffix(_dodge_direction)
+		_sprite_swap.play("walk_" + direction[0])
+		_sprite_swap.set_flip_h(direction[1])
+		_sprite_swap.set_motion_speed(velocity.length(), 260.0)
+		queue_redraw()
+		return
+	queue_redraw()
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var is_moving: bool = input_dir.length() > 0.0
 
@@ -237,6 +396,12 @@ func cancel_all_actions() -> void:
 	_flight_tween = null
 
 func cancel_input() -> void:
+	_dodge_coast_remaining = 0.0
+	_dodge_remaining = 0.0
+	_dodge_path.clear()
+	_drawing_dodge = false
+	_draw_points = PackedVector2Array()
+	_move_tap.reset()
 	_touch_aim_active = false
 	_double_tap.reset()
 	_cancel_charge()
@@ -288,6 +453,24 @@ func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 
 ## Ring matches the forgiving capture area, not the bull's collision shape.
 func _draw() -> void:
+	if _skid_trail.size() > 1 and _trail_fade > 0.0:
+		var local_trail := PackedVector2Array()
+		for point in _skid_trail:
+			local_trail.append(to_local(point) + Vector2(0, 27))
+		draw_polyline(local_trail, Color(.37,.24,.12,_trail_fade * .7), 5.0, true)
+	if _drawing_dodge and _draw_points.size() > 1:
+		draw_polyline(_draw_points, Color("77dbd5"), 3.0, true)
+	var recharge: float = 1.0 - _dodge_cooldown / DODGE_RECHARGE_SECONDS
+	draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
+	draw_line(Vector2(-22, -59), Vector2(-22 + 44 * recharge, -59), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
+	if _dodge_remaining > 0.0:
+		var back: Vector2 = -_dodge_direction
+		var side: Vector2 = _dodge_direction.orthogonal()
+		for i in range(4):
+			var dust: Vector2 = back * (24.0 + i * 13.0) + Vector2(0, 28)
+			draw_circle(dust + side * (8 if i % 2 else -8), 9.0 - i, Color(.85, .69, .42, .55 - i * .1))
+		for side_sign in [-1, 1]:
+			draw_line(back * 12 + side * side_sign * 13 + Vector2(0, 28), back * 54 + side * side_sign * 13 + Vector2(0, 28), Color(.35, .24, .13, .6), 3.0, true)
 	draw_set_transform(Vector2(0, 33), 0.0, Vector2(1.0, 0.3))
 	draw_circle(Vector2.ZERO, 27, Color(0.15, 0.12, 0.08, 0.2))
 	draw_set_transform(Vector2.ZERO)

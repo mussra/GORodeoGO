@@ -1,0 +1,24 @@
+{
+  "menu": {
+    "bpm": 100,
+    "bars": 16,
+    "duration": 38.4,
+    "loop_start": 0,
+    "loop_end_exclusive": 1843200,
+    "sample_rate": 48000,
+    "peak_dbfs": -2.498774732165999,
+    "boundary_delta": 0.0,
+    "clipped": 0
+  },
+  "partida": {
+    "bpm": 148,
+    "bars": 16,
+    "duration": 25.9459375,
+    "loop_start": 0,
+    "loop_end_exclusive": 1245405,
+    "sample_rate": 48000,
+    "peak_dbfs": -2.498774732165999,
+    "boundary_delta": 0.0,
+    "clipped": 0
+  }
+}

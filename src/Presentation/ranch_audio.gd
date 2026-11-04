@@ -15,6 +15,8 @@ func _ready() -> void:
 		voice.volume_db = -15.0
 		add_child(voice)
 		_voices.append(voice)
+	_sounds["dodge"] = _make_dirt_cue(false)
+	_sounds["skid"] = _make_dirt_cue(true)
 	_sounds["throw"] = _make_cue([540.0, 360.0], 0.05)
 	_sounds["capture"] = _make_cue([440.0, 660.0], 0.075)
 	_sounds["calm"] = _make_cue([523.25, 659.25, 783.99], 0.08)
@@ -49,5 +51,30 @@ func _make_cue(notes: Array, note_seconds: float) -> AudioStreamWAV:
 	sound.format = AudioStreamWAV.FORMAT_16_BITS
 	sound.mix_rate = SAMPLE_RATE
 	sound.stereo = false
+	sound.data = data
+	return sound
+
+## Original deterministic dirt/hoof textures. Local noise and low hoof impacts,
+## no downloaded recording; tucked under the banjo by the existing SFX bus level.
+func _make_dirt_cue(skid: bool) -> AudioStreamWAV:
+	var duration: float = .20 if skid else .24
+	var count: int = int(SAMPLE_RATE * duration)
+	var data := PackedByteArray()
+	data.resize(count * 2)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 14671 if skid else 7921
+	var filtered: float = 0.0
+	for sample in range(count):
+		var t: float = float(sample) / SAMPLE_RATE
+		var p: float = float(sample) / count
+		filtered = lerpf(filtered, rng.randf_range(-1.0, 1.0), .28)
+		var envelope: float = minf(p * 28.0, 1.0) * pow(1.0 - p, 1.8)
+		var hoof_phase: float = fmod(t, .065)
+		var hoof: float = sin(TAU * 105.0 * hoof_phase) * exp(-hoof_phase * 90.0)
+		var value: float = filtered * (.75 if skid else .40) + hoof * (.06 if skid else .35)
+		data.encode_s16(sample * 2, int(clampf(value * envelope, -.8, .8) * 32767))
+	var sound := AudioStreamWAV.new()
+	sound.format = AudioStreamWAV.FORMAT_16_BITS
+	sound.mix_rate = SAMPLE_RATE
 	sound.data = data
 	return sound
