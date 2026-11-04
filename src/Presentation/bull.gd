@@ -48,6 +48,9 @@ var _touching_player: bool = false
 var _touch_grace_remaining: float = 0.0
 
 ## Set by Level0 when this bull is captured: higher = captured more recently (D038).
+var _tow_path: Array[Vector2] = []
+var _tow_last_sample: Vector2 = Vector2.ZERO
+
 var capture_order: int = 0
 var pen_number: int = 0
 var _peers: Array = []
@@ -179,26 +182,39 @@ func _physics_process(delta: float) -> void:
 		_:
 			velocity = Vector2.ZERO
 
-## The lasso tows the bull: it follows the player at leash_distance rather than being pushed.
-## Rope-break (rope_distance > max_rope_distance) is still enforced inside BullController.update_hold.
-##
-## Keep-pace rule (Ant, 4-nov: "que corra a la misma velocidad a la que corro yo y que me siga
-## siempre desde cerca"): outside the leash the bull runs at LEAST the player's current speed
-## plus a catch-up margin, so a sprinting rider no longer drags it back within the herd's
-## reach; inside the leash it moves WITH the player (same velocity), staying close the whole
-## ride instead of the old stop-and-go trailing that let wild bulls catch it.
+## Follow the rider's travelled path, leaving a spatial leash behind, rather
+## than copying velocity at an arbitrary side/front offset or cutting corners.
 func _apply_tow_movement() -> void:
-	var to_player: Vector2 = _player.global_position - global_position
-	var distance: float = to_player.length()
-	var leash: float = controller.tuning().leash_distance
-	var player_velocity: Vector2 = _player.velocity if _player is CharacterBody2D else Vector2.ZERO
-
-	if distance > leash:
-		velocity = to_player.normalized() * maxf(controller.tuning().tow_speed, player_velocity.length() + TOW_CATCHUP_MARGIN)
-	else:
-		velocity = player_velocity
-
-	move_and_slide()
+	var delta: float = get_physics_process_delta_time()
+	var player_position: Vector2 = _player.global_position
+	if _tow_path.is_empty():
+		_tow_path.append(player_position)
+		_tow_last_sample = player_position
+	elif player_position.distance_to(_tow_last_sample) > .5:
+		_tow_path.append(player_position)
+		_tow_last_sample = player_position
+	var remaining: float = global_position.distance_to(_tow_path[0])
+	for i in range(1,_tow_path.size()):
+		remaining += _tow_path[i-1].distance_to(_tow_path[i])
+	var excess: float = maxf(0.0,remaining-controller.tuning().leash_distance)
+	var player_speed: float = _player.velocity.length() if _player is CharacterBody2D else 0.0
+	var speed: float = player_speed + minf(TOW_CATCHUP_MARGIN,excess*4)
+	if player_speed < 1.0: speed = minf(controller.tuning().tow_speed,excess*8)
+	var budget: float = minf(excess,speed*delta)
+	var before: Vector2 = global_position
+	while budget > .01 and not _tow_path.is_empty():
+		var offset: Vector2 = _tow_path[0]-global_position
+		if offset.length() < .1:
+			if _tow_path.size() == 1: break
+			_tow_path.pop_front()
+			continue
+		var step: Vector2 = offset.limit_length(budget)
+		var collision: KinematicCollision2D = move_and_collide(step)
+		budget -= step.length()
+		if collision != null: break
+		if offset.length() <= step.length()+.1 and _tow_path.size()>1:
+			_tow_path.pop_front()
+	velocity = (global_position-before)/delta
 
 ## Direction is computed by FleeSteering (Application, unit tested): away from the player,
 ## or toward it while this bull is the designated chaser or won its secondary chase roll.
@@ -337,6 +353,8 @@ func _compute_flee_speed_for_nerves() -> float:
 
 func _on_state_changed(new_state: BullState.State) -> void:
 	_distraction.cancel()
+	if new_state == BullState.State.CAPTURED or not controller.is_held():
+		_tow_path.clear()
 	if controller.is_held():
 		_leaving_corral = false
 		_chase_heading = Vector2.ZERO
