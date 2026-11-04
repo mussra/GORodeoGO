@@ -68,7 +68,7 @@ func update_bull_count(returned: int, total: int) -> void:
 func set_level(number: int) -> void:
 	_level_number = number
 	_level_label.text = "NIVEL %02d" % number
-	_hint_label.text = "Corrales numerados · Quieto junto al cierre · Flecha: abre el destino · M: todos" if number >= 11 else "Laza un toro, espera a que se calme y llévalo a la META"
+	_hint_label.text = "Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes" if number >= 11 else "Laza un toro, espera a que se calme y llévalo a la META"
 
 func update_timer(seconds_remaining: float) -> void:
 	var whole_seconds: int = max(0, int(ceil(seconds_remaining)))
@@ -319,7 +319,7 @@ func update_guidance(held_count: int, ready_count: int, has_closed_doors: bool) 
 	elif held_count > 0:
 		_hint_label.text = "Mantén la distancia con los toros sueltos mientras se calma"
 	elif _level_number >= 11 and has_closed_doors:
-		_hint_label.text = "Corrales numerados · Quieto junto al cierre · Flecha: abre el destino · M: todos"
+		_hint_label.text = "Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes"
 	elif _level_number >= 3:
 		_hint_label.text = "Laza y calma · Lleva a los perseguidores al AGUA o HENO para distraerlos"
 	else:

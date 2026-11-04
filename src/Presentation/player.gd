@@ -27,6 +27,9 @@ const DODGE_COAST_SECONDS: float = .18  # short soft stop, preview tuning
 const DODGE_COAST_SPEED_FACTOR: float = .8
 var _dodge_coast_remaining: float = 0.0
 var _move_tap: DoubleTapDetector = DoubleTapDetector.new(.3)
+const DRAW_TIME_SCALE: float = .24
+var dodge_path_limit: float = 260.0
+var _drawing_real_started: float = 0.0
 var _drawing_dodge: bool = false
 var _draw_screen_start: Vector2 = Vector2.ZERO
 var _last_touch_index: int = -1
@@ -107,6 +110,8 @@ func _on_move_pressed() -> void:
 	_move_pressed_at = _now_seconds()
 	if _move_tap.register_tap(_move_pressed_at) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
 		_drawing_dodge = true
+		_drawing_real_started = _now_seconds()
+		Engine.time_scale = DRAW_TIME_SCALE
 		_draw_touch_index = _last_touch_index
 		_draw_screen_start = _last_pointer
 		_draw_points = PackedVector2Array([Vector2.ZERO])
@@ -128,6 +133,7 @@ func _input(event: InputEvent) -> void:
 func _on_move_released(_direction: Vector2) -> void:
 	if _drawing_dodge:
 		_drawing_dodge = false
+		Engine.time_scale = 1.0
 		request_dodge_path(_draw_points)
 		_draw_points = PackedVector2Array()
 		_move_tap.reset()
@@ -142,7 +148,7 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 		length += points[i].distance_to(points[i - 1])
 	if length < 15.0:
 		return false
-	var factor: float = minf(1.0, 260.0 / length)
+	var factor: float = minf(1.0, dodge_path_limit / length)
 	_dodge_path.clear()
 	_dodge_coast_remaining = 0.0
 	_skid_trail.clear()
@@ -222,6 +228,8 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if _drawing_dodge:
+		if _now_seconds()-_drawing_real_started > 2.0:
+			_on_move_released(Vector2.ZERO)
 		velocity = Vector2.ZERO
 		queue_redraw()
 		return
@@ -396,6 +404,7 @@ func cancel_all_actions() -> void:
 	_flight_tween = null
 
 func cancel_input() -> void:
+	Engine.time_scale = 1.0
 	_dodge_coast_remaining = 0.0
 	_dodge_remaining = 0.0
 	_dodge_path.clear()
@@ -457,9 +466,10 @@ func _draw() -> void:
 		var local_trail := PackedVector2Array()
 		for point in _skid_trail:
 			local_trail.append(to_local(point) + Vector2(0, 27))
-		draw_polyline(local_trail, Color(.37,.24,.12,_trail_fade * .7), 5.0, true)
+		_draw_flash_path(local_trail, _trail_fade / .7)
 	if _drawing_dodge and _draw_points.size() > 1:
-		draw_polyline(_draw_points, Color("77dbd5"), 3.0, true)
+		_draw_flash_path(_draw_points, 1.0)
+		draw_string(ThemeDB.fallback_font,Vector2(-64,-78),"TIEMPO BALA",HORIZONTAL_ALIGNMENT_LEFT,150,15,Color("a7fff0"))
 	var recharge: float = 1.0 - _dodge_cooldown / DODGE_RECHARGE_SECONDS
 	draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
 	draw_line(Vector2(-22, -59), Vector2(-22 + 44 * recharge, -59), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
@@ -479,3 +489,32 @@ func _draw() -> void:
 		draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
 		draw_arc(target, capture_area_visual_radius, 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
 		draw_circle(target, 3.0, Color(1.0, 0.92, 0.7))
+
+## Layered light ribbon with moving star glints, never a plain solid line.
+func _draw_flash_path(points: PackedVector2Array, alpha: float) -> void:
+	if points.size() < 2: return
+	draw_polyline(points, Color(.15,.95,.92,.07*alpha), 22.0, true)
+	draw_polyline(points, Color(.25,1.0,.95,.16*alpha), 12.0, true)
+	draw_polyline(points, Color(.50,1.0,.95,.55*alpha), 5.0, true)
+	draw_polyline(points, Color(.94,1.0,.85,.95*alpha), 1.7, true)
+	var clock: float = Time.get_ticks_msec()/1000.0
+	var distance: float = 0.0
+	for segment in range(1,points.size()):
+		var a: Vector2 = points[segment-1]
+		var b: Vector2 = points[segment]
+		var direction: Vector2 = (b-a).normalized()
+		var side: Vector2 = direction.orthogonal()
+		var length: float = a.distance_to(b)
+		var steps: int = maxi(1,int(length/13.0))
+		for j in range(steps):
+			var p: Vector2 = a.lerp(b,float(j)/steps)
+			var pulse: float = .5+.5*sin(clock*18.0+distance*.11)
+			var spread: float = 2.0+pulse*5.0
+			var shard: Vector2 = p+side*spread*(1.0 if j%2==0 else -1.0)
+			draw_line(shard-direction*3,shard+direction*(4+pulse*5),Color(.7,1.0,.94,alpha*pulse*.8),1.3,true)
+			if j%4==0:
+				draw_circle(p,2+pulse*2,Color(.96,1.0,.84,alpha*.8))
+			distance += length/steps
+
+func _exit_tree() -> void:
+	Engine.time_scale = 1.0

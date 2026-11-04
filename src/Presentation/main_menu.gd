@@ -7,6 +7,7 @@ var _drawer: Panel
 var _play: Button
 var _missions: Button
 var _caption: Label
+var _hd_rider: HDRiderIdle
 var _rider: AnimatedSprite2D
 var _bull: AnimatedSprite2D
 var _intro: Tween
@@ -98,6 +99,8 @@ func _build_menu() -> void:
 	_hero.add_child(_missions)
 	_caption = _label("%02d / 20 COMPLETADOS     ·     RODEO + CORRALES" % SaveData.highest_level_completed,14,Color("85a9ad"))
 	_hero.add_child(_caption)
+	if SaveData.highest_level_completed >= PlayerUpgrades.LONG_DODGE_UNLOCK_LEVEL:
+		_caption.text += "   ·   REGATE LARGO"
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
 	var p := Polygon2D.new()
@@ -106,6 +109,12 @@ func _build_menu() -> void:
 	swap.play("walk_diag_down")
 	_rider = swap._sprite
 	rider_host.name = "Rider"
+	_rider.hide()
+	_hd_rider = HDRiderIdle.new()
+	_hd_rider.texture = preload("res://art/ui/hero/rider_hd.png")
+	_hd_rider.position = Vector2(0,0)
+	_hd_rider.scale = Vector2.ONE * .51
+	rider_host.add_child(_hd_rider)
 	var bull_host := Node2D.new()
 	_hero.add_child(bull_host)
 	var b := Polygon2D.new()
@@ -113,6 +122,7 @@ func _build_menu() -> void:
 	var bull_swap := SpriteSwap.new(bull_host,b,"res://art/bull/",["flee_diag_down"])
 	bull_swap.play("flee_diag_down")
 	_bull = bull_swap._sprite
+	bull_host.hide()
 	bull_host.name = "Bull"
 	var footer := _label("IZQUIERDA  MOVER    /    DERECHA  LAZO    /    DOBLE TOQUE  LIBERAR",13,Color("78979d"))
 	footer.name = "Footer"
@@ -163,8 +173,8 @@ func _layout() -> void:
 	_missions.position = Vector2(68,498)
 	_missions.size = Vector2(418,54)
 	_caption.position = Vector2(70,580)
-	_hero.get_node("Rider").position = Vector2(902,320)
-	_hero.get_node("Rider").scale = Vector2(3.6,3.6)
+	_hero.get_node("Rider").position = Vector2(912,355)
+	_hero.get_node("Rider").scale = Vector2.ONE
 	_hero.get_node("Bull").position = Vector2(1056,466)
 	_hero.get_node("Bull").scale = Vector2(2.3,2.3)
 	var footer: Control = get_node("Footer")
@@ -196,8 +206,6 @@ func _animate_intro() -> void:
 
 func _process(delta: float) -> void:
 	_elapsed += delta
-	if is_instance_valid(_rider):
-		_rider.position.y = sin(_elapsed*2)*3
 	if is_instance_valid(_bull):
 		_bull.position.y = sin(_elapsed*2+.8)*2
 

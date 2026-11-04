@@ -50,7 +50,8 @@ func test_linked_door_releases_its_targets_only() -> void:
 	var level: Node = await _spawn_level(15)  # NE door (pen 0) also opens NW (pen 1)
 	level._on_pen_door_opened(0)
 	assert_true(level._pen_released[0])
-	assert_true(level._pen_released[1])
+	assert_false(level._pen_released[1],"linked target waits for real courier arrival")
+	assert_eq(level._courier_jobs.values()[0]["targets"],[1])
 	assert_false(level._pen_released[2])
 	assert_false(level._pen_released[3])
 

@@ -63,6 +63,11 @@ var _last_state: BullState.State = BullState.State.SAFE
 ## Emitted when the designated chaser has been unable to advance for CHASER_BLOCKED_SECONDS
 ## (stuck behind an obstacle/bull/corner). Level0 then passes the baton to another bull (D036).
 signal chaser_blocked(bull: Node2D)
+signal courier_arrived(bull: Node2D)
+signal courier_interrupted(bull: Node2D)
+var _courier_path: Array[Vector2] = []
+var _courier_active: bool = false
+var _courier_blocked: float = 0.0
 var _effective_flee_speed: float = 0.0  ## real value set on entering ESCAPED, before first use — see _on_state_changed
 var _sprite_swap: SpriteSwap
 var _facing: SpriteFacing = SpriteFacing.new()  # stable sprite direction: no flicker near fences/corners
@@ -124,6 +129,9 @@ func _physics_process(delta: float) -> void:
 	if _player == null:
 		return
 
+	if _courier_active and controller.is_wild():
+		_move_courier(delta)
+		return
 	match controller.current_state():
 		BullState.State.ESCAPED, BullState.State.PURSUED:
 			_random_chase.update(delta, _is_chaser, capture_held, chase_probability)
@@ -224,7 +232,7 @@ func _compute_flee_direction() -> Vector2:
 		if (global_position.y - _release_gate.y) * _release_inward >= 28:
 			# Keep early escapees moving along the clear aisle, not back into the
 			# next bull exiting. Stay above/below the goal's physical wild barrier.
-			if absf(global_position.x) < 55:
+			if absf(global_position.x) < 95:
 				_leaving_corral = false
 			else:
 				return (Vector2(0, clearance_y) - global_position).normalized()
@@ -356,6 +364,10 @@ func _on_state_changed(new_state: BullState.State) -> void:
 	if new_state == BullState.State.CAPTURED or not controller.is_held():
 		_tow_path.clear()
 	if controller.is_held():
+		if _courier_active:
+			courier_interrupted.emit(self)
+		_courier_active = false
+		_courier_path.clear()
 		_leaving_corral = false
 		_chase_heading = Vector2.ZERO
 		_chase_reaction = 0.0
@@ -433,6 +445,11 @@ func _color_for_nerves(state: BullState.State) -> Color:
 
 ## Readable state cues do not recolor the entire character or depend on missing art.
 func _draw() -> void:
+	if _courier_active:
+		draw_circle(Vector2(0,-65),10,Color("b98a40"))
+		draw_arc(Vector2(-2,-67),3,0,TAU,12,Color("fff2be"),2,true)
+		draw_line(Vector2(0,-65),Vector2(5,-60),Color("fff2be"),2,true)
+		draw_line(Vector2(3,-62),Vector2(6,-65),Color("fff2be"),2,true)
 	if _chase_skidding and controller != null and controller.is_wild():
 		for i in range(3):
 			draw_circle(-_chase_heading * (26 + i * 12) + Vector2(0, 25), 7 - i, Color(.72, .57, .32, .45 - i * .1))
@@ -462,3 +479,36 @@ func _draw() -> void:
 		draw_circle(Vector2(0, -54), 10, Color("aa4535"))
 		draw_line(Vector2(0, -59), Vector2(0, -54), Color("fff1d2"), 2)
 		draw_circle(Vector2(0, -50), 1.5, Color("fff1d2"))
+
+func follow_corral_track(points: PackedVector2Array) -> void:
+	_courier_path.assign(points)
+	_leaving_corral = false
+	_courier_active = not _courier_path.is_empty()
+
+func _move_courier(delta: float) -> void:
+	if _release_delay > 0:
+		_release_delay = maxf(0.0,_release_delay-delta)
+		return
+	if _courier_path.is_empty():
+		_courier_active = false
+		courier_arrived.emit(self)
+		return
+	var offset: Vector2 = _courier_path[0]-global_position
+	velocity = offset.normalized()*minf(flee_speed,offset.length()/delta)
+	var before: Vector2 = global_position
+	move_and_slide()
+	if global_position.distance_to(before) < flee_speed*delta*.2:
+		_courier_blocked += delta
+	else:
+		_courier_blocked = 0.0
+	if _courier_blocked > .35:
+		# Pass a head-on herd collision on the right, then return to the worn track.
+		var detour: Vector2 = global_position + Vector2(0,64.0 if global_position.y<0 else -64.0)
+		if world_bounds.grow(-35).has_point(detour):
+			_courier_path.push_front(detour)
+		_courier_blocked = 0.0
+	_update_flee_animation(offset.normalized(),delta)
+	_sprite_swap.set_motion_speed(velocity.length(),flee_speed)
+	if global_position.distance_to(_courier_path[0])<8:
+		_courier_path.pop_front()
+	_check_player_contact()

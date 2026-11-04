@@ -1,0 +1,21 @@
+# Overnight graphics iteration, 4-5 November 2026
+
+Separate experimental branch `improve/night-graphics`, based on delivered 0.21.16. Main and scrolling-map prototype are not merged.
+
+## Current changes
+- HD cowboy and horse on the futurist menu. A mesh-based continuous idle moves the upper silhouette with anchored hooves. This is a breathing/neck idle, not a newly drawn walking cycle.
+- Gait experiment: six original key poses plus six single-source warped intermediate poses per direction, at twice the frame rate to preserve cycle duration. An earlier blended optical-flow experiment was rejected because it doubled hooves. This retained experiment still needs device review and does not establish anatomically perfect footwork.
+- Dodge preview and trace use a light ribbon, short sparks and glow rather than the former simple line.
+- Drawing a dodge slows world time to 0.24x for at most two real seconds. Releasing, cancelling, pausing, losing focus, leaving the player scene and game end restore normal time. Music remains unpitched.
+- Long dodge is a free progress upgrade after completing level10, increasing the drawn path cap from260 to420world pixels. Provisional tuning, not demonstrated balance.
+- Linked corrals show worn tracks/hoofprints. A released bull carries a small key marker and physically travels to the target latch before opening it. Master routes visit all configured targets without recursively triggering those targets' own links.
+- Capture interrupts the courier job. Remaining latches can always be opened by the rider manually, so interruption does not lock progression.
+- Head-on herd blockage causes a small inward sidestep, with ordinary collision physics retained. No teleport and no collision immunity.
+
+## Verification limits
+Godot/Linux renders and automated physics checks do not verify Android touch feel, device performance, anatomical quality or game balance. Native Android testing remains necessary. Original art is preserved by git history; 0.21.16 remains the stable fallback.
+
+## Checkpoint 23:04 CET
+273 tests / 4153 assertions pass in split runs (unit180; core integration50; remaining integration31; physical corrals6; courier3; bullet time3). Split runs avoid the single-command120second limit. Warnings: seven deprecated GUT calls and two leaked ObjectDB instances on some scene tests. No script/parser errors in the rendered iteration.
+
+Visual inspection: menu silhouette and text at1280x720, third movie, bright Z preview, ground-track placement above the stations, enlarged gait poses. The mesh idle has tiny upper-body motion; no claim of a full new HD walking animation. New single-source intermediate gait poses are a retained experiment, with no doubled hoof blend visible in inspected crops. Full native-device frame-by-frame review remains outstanding.

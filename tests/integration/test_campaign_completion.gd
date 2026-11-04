@@ -50,7 +50,7 @@ func test_loaded_sprite_animation_advances_and_idle_loops() -> void:
 	add_child_autofree(level)
 	await wait_physics_frames(2)
 	var sprite: AnimatedSprite2D = level.player._sprite_swap._sprite
-	assert_eq(sprite.sprite_frames.get_frame_count("walk_diag_down"), 6)
+	assert_eq(sprite.sprite_frames.get_frame_count("walk_diag_down"), 12)
 	assert_true(sprite.is_playing())
 	var first_frame: int = sprite.frame
 	await wait_seconds(0.4)

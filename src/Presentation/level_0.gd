@@ -43,6 +43,8 @@ var _puzzle_corrals: Array = []
 var _distraction_stations: Array = []
 var _pens_data: Array = []  # LevelData.pens for this level
 var _pen_doors: Array = []  # PenDoor per pen index; entries may be freed instances once opened, hence untyped
+var _courier_jobs: Dictionary = {}
+var _link_overlay: PenLinkOverlay
 var _pen_released: Array = []  # bool per pen index — a pen's bulls are released at most once
 
 func _ready() -> void:
@@ -210,6 +212,8 @@ func _spawn_pens(pens: Array) -> void:
 
 	if _any_pen_has_links(pens):
 		var overlay := PenLinkOverlay.new()
+		_link_overlay = overlay
+		overlay.layouts = _puzzle_corrals.map(func(c): return c.layout)
 		overlay.setup(pens, _pen_doors)
 		add_child(overlay)
 
@@ -219,22 +223,54 @@ func _any_pen_has_links(pens: Array) -> bool:
 			return true
 	return false
 
-## The player opened door pen_index: release its own pen plus every pen its links open
-## (PenLinkResolver — master opens all, chain opens specific pens, normal only itself).
-## Each pen releases at most once, so a door already opened earlier is skipped.
+## Open this corral now. Its courier physically visits the configured linked latches.
+## Capture interrupts the errand; the remaining doors still open manually.
+## Arrival never recursively launches a destination corral's own links.
 func _on_pen_door_opened(pen_index: int) -> void:
 	_audio.play("door")
-	for released_index: int in PenLinkResolver.get_released_pen_indices(_pens_data, pen_index):
-		if _pen_released[released_index]:
-			continue
-		_pen_released[released_index] = true
-		_puzzle_corrals[released_index].open_gate()
-		_release_pen_bulls(released_index)
+	_release_one_pen(pen_index)
+	var targets: Array = PenLinkResolver.get_linked_pen_indices(_pens_data,pen_index).filter(func(i): return not _pen_released[i])
+	if targets.is_empty(): return
+	var indices: Array = _pens_data[pen_index]["bull_indices"]
+	var bull: Node = _active_bulls[indices[0]]
+	_courier_jobs[bull] = {"from":pen_index,"targets":targets}
+	if not bull.courier_arrived.is_connected(_on_courier_arrived):
+		bull.courier_arrived.connect(_on_courier_arrived)
+	if not bull.courier_interrupted.is_connected(_on_courier_interrupted):
+		bull.courier_interrupted.connect(_on_courier_interrupted)
+	_send_courier(bull)
 
-		if released_index != pen_index:
-			var linked_door = _pen_doors[released_index]
-			if is_instance_valid(linked_door):
-				linked_door.force_open()
+func _on_courier_interrupted(bull: Node) -> void:
+	_courier_jobs.erase(bull)
+
+func _release_one_pen(index: int) -> void:
+	if _pen_released[index]: return
+	_pen_released[index] = true
+	_puzzle_corrals[index].open_gate()
+	_release_pen_bulls(index)
+	var door = _pen_doors[index]
+	if is_instance_valid(door): door.force_open()
+
+func _send_courier(bull: Node) -> void:
+	var job: Dictionary = _courier_jobs[bull]
+	while not job["targets"].is_empty() and _pen_released[job["targets"][0]]:
+		job["targets"].pop_front()
+	if job["targets"].is_empty():
+		_courier_jobs.erase(bull)
+		return
+	var route: PackedVector2Array = CorralRoute.build(_puzzle_corrals[job["from"]].layout,_puzzle_corrals[job["targets"][0]].layout)
+	if bull.global_position.distance_to(_puzzle_corrals[job["from"]].layout["door"]) < 12:
+		route.remove_at(0)
+	bull.follow_corral_track(route)
+
+func _on_courier_arrived(bull: Node) -> void:
+	if not _courier_jobs.has(bull): return
+	var job: Dictionary = _courier_jobs[bull]
+	var target: int = job["targets"].pop_front()
+	_release_one_pen(target)
+	_audio.play("door")
+	job["from"] = target
+	_send_courier(bull)
 
 func _release_pen_bulls(pen_index: int) -> void:
 	var bull_indices: Array = _pens_data[pen_index].get("bull_indices", []).duplicate()
@@ -251,6 +287,7 @@ func _release_pen_bulls(pen_index: int) -> void:
 ## Applies persistent unlocks once at level start — these are player stats, not
 ## continuously-recalculated level rules. Schedule/numbers: PlayerUpgrades.
 func _apply_unlocked_upgrades() -> void:
+	player.dodge_path_limit = _upgrades.dodge_path_limit
 	player.max_speed *= _upgrades.speed_multiplier
 	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier
 	player.lasso_travel_time *= _upgrades.lasso_travel_time_multiplier
@@ -262,6 +299,13 @@ func _process(delta: float) -> void:
 	if _game_over:
 		return
 
+	# Manually opened destinations retire obsolete errands immediately.
+	for bull in _courier_jobs.keys():
+		var job: Dictionary = _courier_jobs[bull]
+		if job["targets"].all(func(i): return _pen_released[i]):
+			bull._courier_active = false
+			bull._courier_path.clear()
+			_courier_jobs.erase(bull)
 	_time_remaining -= delta
 	hud.update_timer(_time_remaining)
 	_update_nerves_hud()
