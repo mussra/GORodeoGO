@@ -40,6 +40,7 @@ func test_bull_follows_z_dodge_in_order_without_shortcut_or_release() -> void:
 	await wait_physics_frames(30)
 	Input.action_release("move_right")
 	var start: Vector2 = level.player.global_position
+	level.player.dodge_available=true
 	assert_true(level.player.request_dodge_path(PackedVector2Array([Vector2.ZERO,Vector2(80,0),Vector2(0,60),Vector2(80,60)])))
 	await wait_physics_frames(10)
 	assert_gt(bull._tow_path.size(),2,"bull remembers rapid trace rather than velocity copy")

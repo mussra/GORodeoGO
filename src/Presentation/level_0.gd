@@ -327,7 +327,9 @@ func _release_pen_bulls(pen_index: int) -> void:
 ## Applies persistent unlocks once at level start — these are player stats, not
 ## continuously-recalculated level rules. Schedule/numbers: PlayerUpgrades.
 func _apply_unlocked_upgrades() -> void:
-	player.dodge_path_limit = _upgrades.dodge_path_limit
+	var reach:float=SaveData.equipped_whip_reach()
+	player.dodge_available=reach>0
+	player.dodge_path_limit=reach if reach>0 else 260.0
 	player.max_speed *= _upgrades.speed_multiplier
 	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier
 	player.lasso_travel_time *= _upgrades.lasso_travel_time_multiplier
@@ -519,8 +521,9 @@ func _trigger_win() -> void:
 		return
 	_game_over = true
 	_freeze_gameplay()
-	SaveData.record_level_completed(_level_number)
+	var reward:int=SaveData.record_victory(_level_number)
 	hud.show_win()
+	hud.end_label.text += "\n+%d puntos · Saldo: %d\nEquipo y precios en prueba" % [reward,SaveData.equipment_points]
 	_audio.play("win")
 
 func _trigger_lose(reason: String) -> void:

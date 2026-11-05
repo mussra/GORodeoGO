@@ -248,3 +248,11 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Frontal/rear/diagonal motion is a perspective interpretation of the lateral guide, not an exact multi-view reference.
 - Existing game rules, bull art, stun animation, phase-preserving steering and speed scaling unchanged.
 - Five focused asset/transition tests, 231 assertions. Scripted desktop visual review, not Android device validation.
+
+## 0.21.29 - Points, whips and continuous dodge exit (trial)
+- Victory points repeatable, growing by level; provisional curve anchored on 10/200/1000 for levels1/5/10.
+- Equipment menu: basic whip1000 enables260px dodge, improved whip2000 needs basic and equips420px. Buy/equip separate. No real money.
+- One-time points for deducible first wins in prior saves; progress/intro retained. No guessed historic repeats.
+- Dodge hands off immediately to normal running/current joystick, preserves collision/stun and tow penalty.
+- Sequential level selection in debug/release, no save reset. No cosmetic/new horse/animal catalogue yet.
+- 48focused tests343asserts. Native-touch desktop handoff and full points/purchase/equip/persistence flow checked; no physicalAndroid/balance certification.

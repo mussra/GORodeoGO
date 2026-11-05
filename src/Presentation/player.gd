@@ -31,6 +31,7 @@ var _dodge_coast_remaining: float = 0.0
 var _move_tap: DoubleTapDetector = DoubleTapDetector.new(.3)
 const DRAW_TIME_SCALE: float = .24
 var _run_after_dodge: Vector2 = Vector2.ZERO
+var dodge_available: bool = true
 var dodge_path_limit: float = 260.0
 var _drawing_real_started: float = 0.0
 var _drawing_dodge: bool = false
@@ -125,7 +126,7 @@ func set_move_joystick(stick: VirtualJoystick) -> void:
 
 func _on_move_pressed() -> void:
 	_move_pressed_at = _now_seconds()
-	if _move_tap.register_tap(_move_pressed_at) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
+	if dodge_available and _move_tap.register_tap(_move_pressed_at) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
 		_drawing_dodge = true
 		_drawing_real_started = _now_seconds()
 		Engine.time_scale = DRAW_TIME_SCALE
@@ -189,7 +190,7 @@ func _on_move_released(_direction: Vector2) -> void:
 		_move_tap.reset()
 
 func request_dodge_path(points: PackedVector2Array) -> bool:
-	if _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
+	if not dodge_available or _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
 		return false
 	var preview: PackedVector2Array = dodge_preview_points(points)
 	if preview.size()<2: return false
@@ -207,7 +208,7 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 	return true
 
 func request_dodge(direction: Vector2) -> bool:
-	if _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
+	if not dodge_available or _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
 		return false
 	_dodge_direction = direction.normalized()
 	_dodge_remaining = DODGE_SECONDS
@@ -533,8 +534,8 @@ func _draw() -> void:
 		_draw_flash_path(dodge_preview_points(_draw_points), 1.0)
 		draw_string(ThemeDB.fallback_font,Vector2(-64,-78),"TIEMPO BALA",HORIZONTAL_ALIGNMENT_LEFT,150,15,Color("a7fff0"))
 	var recharge: float = 1.0 - _dodge_cooldown / DODGE_RECHARGE_SECONDS
-	draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
-	draw_line(Vector2(-22, -59), Vector2(-22 + 44 * recharge, -59), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
+	if dodge_available: draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
+	if dodge_available: draw_line(Vector2(-22, -59), Vector2(-22 + 44 * recharge, -59), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
 	if _dodge_remaining > 0.0:
 		var back: Vector2 = -_dodge_direction
 		var side: Vector2 = _dodge_direction.orthogonal()

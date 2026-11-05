@@ -24,6 +24,7 @@ var save_path: String = SAVE_PATH
 
 func _ready() -> void:
 	load_progress()
+	apply_legacy_points_credit(EquipmentCatalog.REWARDS)
 
 func record_level_completed(level_number: int) -> void:
 	if is_new_record(level_number):
@@ -104,3 +105,49 @@ func apply_legacy_points_credit(rewards:Dictionary)->bool:
 	equipment_points=before
 	points_legacy_credit_applied=false
 	return false
+
+func equipment_state()->EquipmentPoints:
+	var state:=EquipmentPoints.new()
+	state.balance=equipment_points
+	state.owned.assign(equipment_owned)
+	state.equipped=equipment_equipped.duplicate()
+	return state
+
+func buy_equipment(item_id:String)->bool:
+	var state:=equipment_state()
+	if not state.buy(item_id,EquipmentCatalog.ITEMS):return false
+	var before:int=equipment_points
+	var before_owned:Array[String]=equipment_owned.duplicate()
+	equipment_points=state.balance
+	equipment_owned.assign(state.owned)
+	if save_progress():return true
+	equipment_points=before
+	equipment_owned=before_owned
+	return false
+
+func equip_item(item_id:String)->bool:
+	var state:=equipment_state()
+	if not state.equip(item_id,EquipmentCatalog.ITEMS):return false
+	var before:Dictionary=equipment_equipped.duplicate()
+	equipment_equipped=state.equipped
+	if save_progress():return true
+	equipment_equipped=before
+	return false
+
+func equipped_whip_reach()->float:
+	var item_id:String=equipment_equipped.get("whip","")
+	if not equipment_owned.has(item_id) or not EquipmentCatalog.ITEMS.has(item_id):return 0.0
+	return float(EquipmentCatalog.ITEMS[item_id].get("reach",0.0))
+
+func record_victory(level_number:int)->int:
+	if level_number<1 or level_number>LevelCatalog.MAX_LEVEL:return 0
+	if not apply_legacy_points_credit(EquipmentCatalog.REWARDS):return 0
+	var reward:int=int(EquipmentCatalog.REWARDS.get(level_number,0))
+	var before_highest:int=highest_level_completed
+	var before_points:int=equipment_points
+	highest_level_completed=maxi(highest_level_completed,level_number)
+	equipment_points+=reward
+	if save_progress():return reward
+	highest_level_completed=before_highest
+	equipment_points=before_points
+	return 0

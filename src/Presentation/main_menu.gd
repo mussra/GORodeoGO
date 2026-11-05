@@ -5,6 +5,8 @@ extends Control
 var _hero: Control
 var _drawer: Panel
 var _play: Button
+var _equipment_button:Button
+var _equipment_panel:EquipmentPanel
 var _missions: Button
 var _caption: Label
 var _hd_rider: HDRiderIdle
@@ -99,8 +101,15 @@ func _build_menu() -> void:
 	_hero.add_child(_missions)
 	_caption = _label("%02d / 20 COMPLETADOS     ·     RODEO + CORRALES" % SaveData.highest_level_completed,14,Color("85a9ad"))
 	_hero.add_child(_caption)
-	if SaveData.highest_level_completed >= PlayerUpgrades.LONG_DODGE_UNLOCK_LEVEL:
-		_caption.text += "   ·   REGATE LARGO"
+	_equipment_button=Button.new()
+	_equipment_button.text="EQUIPO"
+	_equipment_button.pressed.connect(_show_equipment)
+	_hero.add_child(_equipment_button)
+	_equipment_panel=EquipmentPanel.new()
+	_equipment_panel.visible=false
+	add_child(_equipment_panel)
+	_equipment_panel.closed.connect(_refresh_points_caption)
+	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
 	var p := Polygon2D.new()
@@ -171,7 +180,10 @@ func _layout() -> void:
 	_play.position = Vector2(68,411)
 	_play.size = Vector2(418,70)
 	_missions.position = Vector2(68,498)
-	_missions.size = Vector2(418,54)
+	_missions.size = Vector2(270,54)
+	_missions.add_theme_font_size_override("font_size",13)
+	_equipment_button.position=Vector2(350,498)
+	_equipment_button.size=Vector2(136,54)
 	_caption.position = Vector2(70,580)
 	_hero.get_node("Rider").position = Vector2(912,355)
 	_hero.get_node("Rider").scale = Vector2.ONE
@@ -227,3 +239,10 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if is_instance_valid(_drawer) and _drawer.visible: _hide_levels()
 		else: _on_quit_pressed()
+
+func _refresh_points_caption()->void:
+	_caption.text="%02d / 20 COMPLETADOS · %d PUNTOS\nEquipo y recompensas en prueba" % [SaveData.highest_level_completed,SaveData.equipment_points]
+
+func _show_equipment()->void:
+	_equipment_panel.refresh()
+	_equipment_panel.show()
