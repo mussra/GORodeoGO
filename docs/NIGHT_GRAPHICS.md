@@ -32,3 +32,10 @@ Visual inspection: menu silhouette and text at1280x720, third movie, bright Z pr
 Final16:9 movie and rail occlusion inspected.20:9 menu/gameplay inspected in previous pass. Local collision-query object reused to avoid thousands of allocations on a detour; no changed collision masks. Master and simultaneous courier tests rerun after this optimization,4/20pass. No real Android performance measurement is available.
 
 Candidate APK: com.example.rancho.review, version0.21.17/code227, signed with the saved stable46bdcb... certificate used in0.21.15/16.16KB alignment verifies. APK contains HD art and imported gait assets. Android-device install/play still untested, no device connected.
+
+## Final follow-through 04:49 CET
+Four additional boundary tests /13 assertions pass against the released gameplay source:420px actual long-path cap, recharge cannot be bypassed, stun interrupts the path, stun during drawing restores1x, bullet time does not pitch music, pause/unpause restores both time and music independently. Total279tests/4173assertions across bounded runs. New tests/documentation only, no post-release gameplay edit.
+
+One local stalled-route detour measured1.941ms on this Linux environment (27path points). This is a single sample, not a worst-case bound or an Android performance claim. Real phone performance/touch feel and player balance remain untested.
+
+Rechecked live release: public prerelease0.21.17 retains oneFuturistAPK36,035,647bytes. Remote main remains7336ebb; published branch5d0974b. The local final test commit does not change the APK's gameplay. Final menu idle comparison inspected: upper silhouette moves subtly without moving planted hooves; this remains a limited idle rather than a new articulated HD walking cycle. Final trace screenshot inspected against the futurist arena. The game sprites remain the established stylized cowboy/horse/bulls, not replacements matching the more realistic HD menu.
