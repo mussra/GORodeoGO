@@ -15,6 +15,8 @@ signal release_requested
 ## The player tried to throw with every lasso slot occupied (Ant, 4-nov: no lanzar sin hueco).
 ## Level0 surfaces it as a HUD hint; the throw itself is simply refused.
 signal throw_blocked
+signal dodge_drawing_started
+signal dodge_drawing_finished
 signal dodge_started
 signal dodge_finished
 
@@ -112,6 +114,7 @@ func _on_move_pressed() -> void:
 		_drawing_dodge = true
 		_drawing_real_started = _now_seconds()
 		Engine.time_scale = DRAW_TIME_SCALE
+		dodge_drawing_started.emit()
 		_draw_touch_index = _last_touch_index
 		_draw_screen_start = _last_pointer
 		_draw_points = PackedVector2Array([Vector2.ZERO])
@@ -134,6 +137,7 @@ func _on_move_released(_direction: Vector2) -> void:
 	if _drawing_dodge:
 		_drawing_dodge = false
 		Engine.time_scale = 1.0
+		dodge_drawing_finished.emit()
 		request_dodge_path(_draw_points)
 		_draw_points = PackedVector2Array()
 		_move_tap.reset()
@@ -143,19 +147,15 @@ func _on_move_released(_direction: Vector2) -> void:
 func request_dodge_path(points: PackedVector2Array) -> bool:
 	if _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
 		return false
-	var length: float = 0.0
-	for i in range(1, points.size()):
-		length += points[i].distance_to(points[i - 1])
-	if length < 15.0:
-		return false
-	var factor: float = minf(1.0, dodge_path_limit / length)
+	var preview: PackedVector2Array = dodge_preview_points(points)
+	if preview.size()<2: return false
 	_dodge_path.clear()
 	_dodge_coast_remaining = 0.0
 	_skid_trail.clear()
 	_skid_trail.append(global_position)
 	_trail_fade = .7
-	for i in range(1, points.size()):
-		_dodge_path.append(global_position + (points[i] - points[0]) * factor)
+	for i in range(1, preview.size()):
+		_dodge_path.append(global_position + preview[i])
 	_dodge_cooldown = DODGE_RECHARGE_SECONDS
 	_dodge_remaining = 1.0
 	dodge_started.emit()
@@ -234,7 +234,10 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 		return
 	if not _dodge_path.is_empty():
-		var budget: float = max_speed * DODGE_SPEED_FACTOR * delta
+		var distance_left:float=global_position.distance_to(_dodge_path[0])
+		for i in range(1,_dodge_path.size()): distance_left+=_dodge_path[i-1].distance_to(_dodge_path[i])
+		# Ease down inside the promised path, never coast beyond its endpoint.
+		var budget: float = minf(max_speed*DODGE_SPEED_FACTOR,maxf(25.0,distance_left*14.0))*delta
 		if _active_capture_count >= 2:
 			budget *= dual_capture_speed_multiplier
 		var collision_free: bool = true
@@ -255,8 +258,8 @@ func _physics_process(delta: float) -> void:
 		# velocity decaying through ordinary movement friction.
 		if _dodge_path.is_empty():
 			dodge_finished.emit()
-			_dodge_coast_remaining = DODGE_COAST_SECONDS if collision_free else 0.0
-			velocity = _dodge_direction * max_speed * DODGE_COAST_SPEED_FACTOR if collision_free else Vector2.ZERO
+			_dodge_coast_remaining = 0.0
+			velocity = Vector2.ZERO
 		else:
 			velocity = _dodge_direction * max_speed * DODGE_SPEED_FACTOR
 		var facing: Array = SpriteSwap.direction_suffix(_dodge_direction)
@@ -404,6 +407,7 @@ func cancel_all_actions() -> void:
 	_flight_tween = null
 
 func cancel_input() -> void:
+	if _drawing_dodge: dodge_drawing_finished.emit()
 	Engine.time_scale = 1.0
 	_dodge_coast_remaining = 0.0
 	_dodge_remaining = 0.0
@@ -468,7 +472,7 @@ func _draw() -> void:
 			local_trail.append(to_local(point) + Vector2(0, 27))
 		_draw_flash_path(local_trail, _trail_fade / .7)
 	if _drawing_dodge and _draw_points.size() > 1:
-		_draw_flash_path(_draw_points, 1.0)
+		_draw_flash_path(dodge_preview_points(_draw_points), 1.0)
 		draw_string(ThemeDB.fallback_font,Vector2(-64,-78),"TIEMPO BALA",HORIZONTAL_ALIGNMENT_LEFT,150,15,Color("a7fff0"))
 	var recharge: float = 1.0 - _dodge_cooldown / DODGE_RECHARGE_SECONDS
 	draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
@@ -518,3 +522,13 @@ func _draw_flash_path(points: PackedVector2Array, alpha: float) -> void:
 
 func _exit_tree() -> void:
 	Engine.time_scale = 1.0
+
+## One projection shared by drawing and execution: never show unscaled reach.
+func dodge_preview_points(points: PackedVector2Array) -> PackedVector2Array:
+	var length: float=0.0
+	for i in range(1,points.size()): length+=points[i].distance_to(points[i-1])
+	if length<15.0: return PackedVector2Array()
+	var factor: float=minf(1.0,dodge_path_limit/length)
+	var result:=PackedVector2Array()
+	for p in points: result.append((p-points[0])*factor)
+	return result

@@ -6,3 +6,6 @@ Fix: after0.2seconds of blocked movement, choose a later breadcrumb at least64px
 20focused tests/347assertions pass: original follow-behind, orderedZ, capture, real delivery, physical corrals, two newly reproduced collisions. New checks assert continuous progress while alongside outer edge, return to50px leash, retained capture, per-physics-frame bounded displacement and no overlap with inflated test obstacle. Preview9seconds inspected for edge and obstacle recovery. Synthetic Linux test/render, not Android-device proof. Grid remains fixed to existing arena bounds; enlarged-map prototype is separate.
 
 Menu correction is separate fix/menu-hd-style3ab24f3, design approved user07:30. Candidate may incorporate it after recovery review. No main changes.
+
+## Combined candidate0.21.18
+Also addresses07:35 feedback: preview and execution share one reach projection for260/420px, including Z and curves. Ease-out occurs inside the path, down to25px/s minimum final step, with no unshown coast beyond the endpoint. Obstacles can still cut a path short by normal collision. Original synthesized70/90ms bullet-time cues at-25dB, dodge/skid at-20dB, respect mute and leave music pitch unchanged. No loop or voice. Visual sample inspected and sent through main before APK; audio levels/duration checked, Android listening remains untested. Menu design approved07:30 incorporated.

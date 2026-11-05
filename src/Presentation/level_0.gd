@@ -74,6 +74,8 @@ func _ready() -> void:
 	player.world_bounds = world_bounds
 	player.set_aim_joystick(aim_joystick)
 	player.set_move_joystick($TouchControls/MoveJoystick)
+	player.dodge_drawing_started.connect(func(): _audio.play("bullet_in"))
+	player.dodge_drawing_finished.connect(func(): _audio.play("bullet_out"))
 	player.dodge_started.connect(func(): _audio.play("dodge"))
 	player.dodge_finished.connect(func(): _audio.play("skid"))
 	var pen_zone_rect: Rect2 = Rect2(pen.global_position - Vector2(40, 40), Vector2(80, 80))

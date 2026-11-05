@@ -15,6 +15,8 @@ func _ready() -> void:
 		voice.volume_db = -15.0
 		add_child(voice)
 		_voices.append(voice)
+	_sounds["bullet_in"] = _make_cue([330.0,220.0],.045)
+	_sounds["bullet_out"] = _make_cue([220.0,330.0],.035)
 	_sounds["dodge"] = _make_dirt_cue(false)
 	_sounds["skid"] = _make_dirt_cue(true)
 	_sounds["throw"] = _make_cue([540.0, 360.0], 0.05)
@@ -31,6 +33,7 @@ func play(cue: String) -> void:
 		return
 	var voice: AudioStreamPlayer = _voices[_next_voice]
 	_next_voice = (_next_voice + 1) % _voices.size()
+	voice.volume_db = -25.0 if cue.begins_with("bullet_") else (-20.0 if cue in ["dodge","skid"] else -15.0)
 	voice.stream = _sounds[cue]
 	voice.play()
 

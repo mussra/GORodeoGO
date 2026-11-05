@@ -62,8 +62,8 @@ func test_trace_has_short_bounded_soft_stop_without_long_sprint_coast() -> void:
 	var start: Vector2 = player.global_position
 	assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO, Vector2(40, 0), Vector2(20, 30), Vector2(60, 30)])))
 	await wait_physics_frames(40)
-	assert_gt(player.global_position.x, start.x + 65, "small soft stop after Z")
-	assert_lt(player.global_position.x, start.x + 85, "coast remains below 25px, not old long sprint")
+	assert_gt(player.global_position.x, start.x + 59, "ease down ends at the preview Z endpoint")
+	assert_lt(player.global_position.x, start.x + 61, "no motion beyond preview endpoint")
 	assert_almost_eq(player.global_position.y, start.y + 30, .1)
 	assert_eq(player.velocity, Vector2.ZERO)
 	var endpoint: Vector2 = player.global_position
@@ -85,7 +85,7 @@ func test_closed_trace_returns_to_origin_then_has_bounded_soft_stop() -> void:
 		circle.append(Vector2(sin(a),1-cos(a)) * 37)
 	assert_true(player.request_dodge_path(circle))
 	await wait_physics_frames(60)
-	assert_gt(player.global_position.distance_to(start), 5.0, "soft stop follows final circle tangent")
+	assert_lt(player.global_position.distance_to(start), 1.0, "closed trace ends at displayed origin, no extra coast")
 	assert_lt(player.global_position.distance_to(start), 25.0, "circle follow-through is bounded")
 	assert_eq(player.velocity, Vector2.ZERO)
 
