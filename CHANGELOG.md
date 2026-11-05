@@ -219,3 +219,9 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Same total10bulls and clocks.11-14unchanged after physical goal/latch accessibility repro;20keeps0.21.23.
 - Live-herd input/capture/evasion/calming/delivery checks, no frozen pursuers or forced nerves. First-bull delivery is not complete human balance certification.
 - Full309tests302pass7fail; clock/input tests covered real-window; existing11-14proximity warnings documented. No main merge.
+
+##0.21.25 - Sequence puzzle and persistent opener
+-Level20:2/3/5with small→large consequence, same10bulls/450s; expandedmapshowscountsandlinks.
+-Capture pauses opener task; release resumes physical route from actual position. Manual opening/secure delivery retire it.
+-Released wild bulls keep partial calm but ordinary full speed, no nerve reset/global speed increase.
+-15-19preserved. Logo proposal not included while awaiting aesthetic feedback. No main merge.

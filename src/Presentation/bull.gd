@@ -22,14 +22,9 @@ var _chase_target: Vector2 = Vector2.ZERO
 var _chase_skidding: bool = false
 
 const PLAYER_TOUCH_RADIUS: float = 18.0
-## Floor on the nerves->speed factor (see _compute_flee_speed_for_nerves) so a bull let go
-## at ~0 nerves still visibly creeps away rather than freezing solid (CONTROLLED forced to
-## ESCAPED via _release_any_held_peer is the one path that can hit exactly 0). Tune to 0.0
-## for a literal stop instead, if that reads better in playtesting.
 const CHASER_BLOCKED_SECONDS: float = 1.0  # stuck this long -> pass the baton (D036)
 const CHASER_BLOCKED_PROGRESS_RATIO: float = 0.25  # moving < 25% of the intended step counts as blocked
 const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
-const MIN_FLEE_SPEED_FACTOR: float = 0.15
 const TOW_CATCHUP_MARGIN: float = 80.0  # extra speed over the player's own while closing the leash gap
 const ART_ROOT: String = "res://art/bull/"
 const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_diag_down", "flee_diag_up", "captured", "calming", "controlled", "drinking"]
@@ -366,15 +361,9 @@ func _update_flee_animation(flee_direction: Vector2, delta: float) -> void:
 		_sprite_swap.stop_on_idle()
 		modulate = Color.WHITE if _sprite_swap.has_sprite() else _color_for_nerves(controller.current_state())
 
-## Requirement: a bull that broke free at low nerves (almost calm, or fully CONTROLLED —
-## see _release_any_held_peer's force_escape) should flee slower, so it's easier to tell
-## apart from a fresh, fully wild bull and easier to recapture. At full nerves (the normal
-## first-release case, and the only case before this feature existed) this is exactly
-## flee_speed — unchanged max speed, as required. MIN_FLEE_SPEED_FACTOR floors it above
-## zero so a ~0-nerves escapee still visibly creeps rather than freezing solid.
+## Calmness remains in controller/visuals, but never slows a released wild bull.
 func _compute_flee_speed_for_nerves() -> float:
-	var nerves_fraction: float = controller.current_nerves() / NervesValue.MAX_VALUE
-	return flee_speed * max(nerves_fraction, MIN_FLEE_SPEED_FACTOR)
+	return flee_speed
 
 func _on_state_changed(new_state: BullState.State) -> void:
 	_distraction.cancel()

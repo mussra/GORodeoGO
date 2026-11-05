@@ -366,7 +366,7 @@ func test_puzzle_bulls_and_gates_have_matching_numbers() -> void:
 		assert_eq(doors[index].door_number, index + 1)
 		for bull_index: int in level._pens_data[index].get("bull_indices", []):
 			assert_eq(level._active_bulls[bull_index].pen_number, index + 1)
-	assert_true(doors[0].is_master)
+	assert_eq(doors[0].linked_count,1)
 	assert_false(doors[1].is_master)
 
 func test_stunned_player_cannot_start_a_touch_throw() -> void:

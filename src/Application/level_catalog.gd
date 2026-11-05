@@ -178,16 +178,13 @@ static func get_level(level_number: int) -> LevelData:
 			# Mirrored approaches relative to20, while leaving central route clear.
 			for entry:Dictionary in data.pens:entry["layout_mirror_x"] = true
 		20:
-			# Fewer, meaningful releases: dual capture cannot empty any enclosure.
-			# The master sends one courier, leaving three companions to pressure the rider.
+			# Sequence puzzle: the tempting small herd sends a persistent opener
+			# to the largest herd. Clearing medium/large first neutralises that consequence.
 			data.bull_count = 10
 			data.time_limit_seconds = 450.0
 			data.obstacle_rects = []
-			data.pens = [
-				{"bull_indices": [0, 1, 5, 8], "door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS, "is_master": true},
-				{"bull_indices": [2, 4, 9], "door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS},
-				{"bull_indices": [3, 6, 7], "door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS},
-			]
+			data.pens = _herd_pens([[0,1],[2,3,4],[5,6,7,8,9]])
+			data.pens[0]["opens_pen_indices"] = [2]
 		_:
 			data.time_limit_seconds = 150.0
 			data.obstacle_rects = []

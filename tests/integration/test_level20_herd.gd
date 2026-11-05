@@ -14,15 +14,17 @@ func _level()->Node:
 	var level:Node=load("res://src/Presentation/level_0.tscn").instantiate()
 	add_child_autofree(level)
 	return level
-func test_every_opening_leaves_a_threat_beyond_two_lasso_slots()->void:
+func test_medium_and_large_keep_pressure_but_small_is_deliberate_lure()->void:
 	var data:LevelData=LevelCatalog.get_level(20)
 	assert_eq(data.bull_count,10)
 	assert_eq(data.pens.size(),3)
-	for i in range(data.pens.size()):
-		var messengers:int=0 if PenLinkResolver.get_linked_pen_indices(data.pens,i).is_empty() else 1
+	for i in [1,2]:
+		var messengers:int=0
 		assert_gte(data.pens[i]["bull_indices"].size()-messengers-2,1,"a pair cannot empty release %d"%i)
 func test_courier_never_consumes_chaser_even_if_nearest()->void:
-	var level:Node=_level()
+	GameState.selected_level=19
+	var level:Node=load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
 	await wait_physics_frames(2)
 	level._on_pen_door_opened(0)
 	var courier:Node=level._active_bulls[0]
@@ -74,7 +76,9 @@ func test_live_herd_pair_capture_still_creates_real_pursuit()->void:
 	assert_lt(threat.global_position.distance_to(level.player.global_position),distance,"pursuit closes real separation")
 	print("HERD20 pursuit: ",distance," -> ",threat.global_position.distance_to(level.player.global_position)," held=",level._held_bulls().size())
 func test_master_errand_and_companion_pursuit_run_together()->void:
-	var level:Node=_level()
+	GameState.selected_level=19
+	var level:Node=load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
 	await wait_physics_frames(2)
 	level.player.global_position=Vector2(-100,0)
 	level._on_pen_door_opened(0)

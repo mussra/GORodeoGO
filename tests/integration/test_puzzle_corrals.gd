@@ -30,7 +30,7 @@ func test_physical_gate_blocks_then_opens_and_towed_bull_exits() -> void:
 	await wait_physics_frames(70)
 	assert_gt(bull.global_position.y, gate.y + 30, "held bull exits through real open gate")
 func test_master_courier_has_all_targets_and_manual_doors_still_open() -> void:
-	GameState.selected_level = 20
+	GameState.selected_level = 19
 	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	add_child_autofree(level)
 	await wait_physics_frames(2)

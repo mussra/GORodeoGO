@@ -123,7 +123,7 @@ func test_door_type_counts_per_level_fifteen_to_twenty() -> void:
 		17: {"master": 0, "chain": 2, "normal": 0},
 		18: {"master": 0, "chain": 1, "normal": 2},  # 3 mutually-linked pairs: every door has an outgoing link
 		19: {"master": 1, "chain": 0, "normal": 2},  # same 3 pairs as 18, plus pen 0 is also a master
-		20: {"master": 1, "chain": 0, "normal": 2},
+		20: {"master": 0, "chain": 1, "normal": 2},
 	}
 	for level_number: int in expected.keys():
 		var data: LevelData = LevelCatalog.get_level(level_number)
@@ -138,7 +138,7 @@ func test_all_door_link_indices_are_valid_and_never_self() -> void:
 				assert_ne(target, pen_index, "level %d pen %d links to itself" % [level_number, pen_index])
 
 func test_master_doors_in_levels_nineteen_and_twenty_release_every_bull() -> void:
-	for level_number in [19, 20]:
+	for level_number in [19]:
 		var data: LevelData = LevelCatalog.get_level(level_number)
 		var master_index: int = -1
 		for pen_index in range(data.pens.size()):

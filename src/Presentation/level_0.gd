@@ -246,7 +246,7 @@ func _any_pen_has_links(pens: Array) -> bool:
 	return false
 
 ## Open this corral now. Its courier physically visits the configured linked latches.
-## Capture interrupts the errand; the remaining doors still open manually.
+## Capture pauses the errand; release resumes it. Manual doors remain available.
 ## Arrival never recursively launches a destination corral's own links.
 func _on_pen_door_opened(pen_index: int) -> void:
 	_audio.play("door")
@@ -262,8 +262,8 @@ func _on_pen_door_opened(pen_index: int) -> void:
 		bull.courier_interrupted.connect(_on_courier_interrupted)
 	_send_courier(bull)
 
-func _on_courier_interrupted(bull: Node) -> void:
-	_courier_jobs.erase(bull)
+func _on_courier_interrupted(_bull: Node) -> void:
+	# The designated opener keeps its pending destination while held.
 	_refresh_trail()
 
 func _release_one_pen(index: int) -> void:
@@ -288,6 +288,18 @@ func _send_courier(bull: Node) -> void:
 		route.remove_at(0)
 	elif source_layout["rect"].has_point(bull.global_position):
 		route.insert(0,Vector2(source_layout["gate"].x,bull.global_position.y))
+	bull.follow_corral_track(route)
+	_refresh_trail()
+
+## Resume from the bull's actual position, not its old source corral.
+func _resume_courier(bull: Node) -> void:
+	var job:Dictionary=_courier_jobs[bull]
+	while not job["targets"].is_empty() and _pen_released[job["targets"][0]]:job["targets"].pop_front()
+	if job["targets"].is_empty():return
+	var destination:Vector2=_puzzle_corrals[job["targets"][0]].layout["door"]
+	var route:PackedVector2Array=bull._courier_detour(destination,PenDoor.RADIUS)
+	if route.is_empty():return # still blocked: retry rather than teleport or forget task
+	route.append(destination)
 	bull.follow_corral_track(route)
 	_refresh_trail()
 
@@ -331,11 +343,15 @@ func _process(delta: float) -> void:
 	# Manually opened destinations retire obsolete errands immediately.
 	for bull in _courier_jobs.keys():
 		var job: Dictionary = _courier_jobs[bull]
+		job["retry"]=maxf(0.0,float(job.get("retry",0.0))-delta)
 		if job["targets"].all(func(i): return _pen_released[i]):
 			bull._courier_active = false
 			bull._courier_path.clear()
 			_courier_jobs.erase(bull)
 			_refresh_trail()
+		elif bull.controller.is_wild() and not bull._courier_active and job["retry"]<=0:
+			_resume_courier(bull)
+			job["retry"]=.35
 	_time_remaining -= delta
 	hud.update_timer(_time_remaining)
 	_update_nerves_hud()
@@ -364,7 +380,7 @@ func _wild_distances() -> Dictionary:
 	var wild_distances: Dictionary = {}
 	for i in range(_active_bulls.size()):
 		var bull = _active_bulls[i]
-		if bull.controller.is_wild() and not bull._courier_active and not bull._leaving_corral:
+		if bull.controller.is_wild() and not _courier_jobs.has(bull) and not bull._leaving_corral:
 			wild_distances[i] = bull.global_position.distance_to(player.global_position)
 	return wild_distances
 
@@ -490,6 +506,8 @@ func _on_tranquilizer_requested() -> void:
 func _on_bull_returned(returned_bull: Node2D) -> void:
 	if _game_over:
 		return
+	_courier_jobs.erase(returned_bull) # permanently secured, not a released wild opener
+	_refresh_trail()
 	_audio.play("return")
 	_bulls_returned += 1
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
