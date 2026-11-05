@@ -35,6 +35,8 @@ var _win_requires_all_bulls: bool = true
 var _chaser_director: ChaserDirector = ChaserDirector.new(CHASER_ENGAGE_DELAY_SECONDS)
 var _chaser_index: int = ChaserDirector.NO_CHASER
 var _next_capture_order: int = 1
+var _arena_scale:float=1.0
+var _edge_indicators:EdgeIndicators
 var _upgrades: PlayerUpgrades
 var _paused_by_user_or_os: bool = false
 var _intro_overlay_active: bool = false  # one-shot dual-lasso celebration: tree paused, HUD interactive
@@ -58,6 +60,9 @@ func _ready() -> void:
 	_upgrades = PlayerUpgrades.for_progress(SaveData.highest_level_completed)
 	_apply_unlocked_upgrades()
 	_level_number = level_data.level_number
+	_arena_scale=ArenaLayout.scale_for_level(_level_number)
+	world_bounds=ArenaLayout.bounds_for_level(_level_number)
+	if _arena_scale>1.0:_expand_arena()
 	_time_remaining = level_data.time_limit_seconds
 	_obstacle_rects = level_data.obstacle_rects if level_data.pens.is_empty() else []
 	_win_requires_all_bulls = level_data.win_requires_all_bulls
@@ -125,6 +130,7 @@ func _ready() -> void:
 ## exact same "solid to Player/Bull, invisible to Pen detection" setup, no new layer needed.
 func _setup_art() -> void:
 	var art := ArenaArt.new()
+	art.world_bounds=world_bounds
 	art.obstacle_rects = _obstacle_rects
 	art.pen_position = pen.position
 	add_child(art)
@@ -132,6 +138,19 @@ func _setup_art() -> void:
 		get_node(fence_name + "/Polygon2D").hide()
 	get_viewport().size_changed.connect(_fit_camera)
 	_fit_camera()
+	if _arena_scale>1.0:
+		var layer:=CanvasLayer.new()
+		layer.layer=5
+		add_child(layer)
+		_edge_indicators=EdgeIndicators.new()
+		_edge_indicators.level=self
+		layer.add_child(_edge_indicators)
+		var map_layer:=CanvasLayer.new()
+		map_layer.layer=15
+		add_child(map_layer)
+		var minimap:=ArenaMinimap.new()
+		minimap.level=self
+		map_layer.add_child(minimap)
 
 func _fit_camera() -> void:
 	var size: Vector2 = get_viewport_rect().size
@@ -183,7 +202,7 @@ func _spawn_pens(pens: Array) -> void:
 	_pens_data = pens.duplicate(true)
 	for index in range(_pens_data.size()):
 		var entry: Dictionary = _pens_data[index]
-		var layout: Dictionary = PuzzleCorralLayout.build(_pens_data.size(), index, entry["bull_indices"].size())
+		var layout: Dictionary = ArenaLayout.spread_corral(PuzzleCorralLayout.build(_pens_data.size(), index, entry["bull_indices"].size()),_arena_scale)
 		entry["door_position"] = layout["door"]
 		var corral := PuzzleCorral.new()
 		corral.layout = layout
@@ -305,6 +324,7 @@ func _apply_unlocked_upgrades() -> void:
 	player.set_max_captures(_max_simultaneous_captures)
 
 func _process(delta: float) -> void:
+	if _arena_scale>1.0:_update_follow_camera()
 	if _game_over:
 		return
 
@@ -596,7 +616,7 @@ func _spawn_distraction_stations() -> void:
 	for entry: Dictionary in entries:
 		var station := DistractionStation.new()
 		station.kind = entry["kind"]
-		station.position = entry["position"]
+		station.position = entry["position"] * _arena_scale
 		add_child(station)
 		_distraction_stations.append(station)
 
@@ -609,3 +629,27 @@ func _refresh_trail() -> void:
 		if not job["targets"].is_empty():
 			_link_overlay.active_from=job["from"]
 			_link_overlay.active_to=job["targets"][0]
+
+func _expand_arena() -> void:
+	pen.position *= _arena_scale
+	$PenBarrier.position *= _arena_scale
+	for pair in [["FenceTop",true,-1],["FenceBottom",true,1],["FenceLeft",false,-1],["FenceRight",false,1]]:
+		var fence: StaticBody2D = get_node(pair[0])
+		var shape: CollisionShape2D = fence.get_node("CollisionShape2D")
+		shape.shape = shape.shape.duplicate()
+		if pair[1]:
+			fence.position.y = pair[2] * (world_bounds.size.y / 2 + 10)
+			shape.shape.size = Vector2(world_bounds.size.x + 40,20)
+		else:
+			fence.position.x = pair[2] * (world_bounds.size.x / 2 + 10)
+			shape.shape.size = Vector2(20,world_bounds.size.y + 40)
+
+func _update_follow_camera() -> void:
+	var camera: Camera2D = $Camera2D
+	var half: Vector2 = get_viewport_rect().size / (camera.zoom * 2)
+	var border: Rect2 = world_bounds.grow(55)
+	var center: Vector2 = player.global_position
+	center.x = clampf(center.x,border.position.x+half.x,border.end.x-half.x)
+	center.y = clampf(center.y,border.position.y+half.y,border.end.y-half.y)
+	camera.position = center - camera.offset
+	camera.force_update_scroll()

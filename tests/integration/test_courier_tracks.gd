@@ -38,7 +38,7 @@ func test_master_courier_physically_visits_every_latch_without_recursive_jobs() 
 	await wait_physics_frames(2)
 	level.player.global_position = Vector2(0,220)
 	level._on_pen_door_opened(0)
-	await wait_physics_frames(2400)
+	await wait_physics_frames(4800)
 	for i in range(8): assert_true(level._pen_released[i],"master route delivered latch %d" % i)
 	assert_true(level._courier_jobs.is_empty(),"arrival does not recursively launch target jobs")
 

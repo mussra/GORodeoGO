@@ -3,6 +3,7 @@ extends Node2D
 
 ## Decorative layer only. Collision and level geometry remain owned by the scene/catalog.
 var obstacle_rects: Array = []
+var world_bounds:Rect2=Rect2(-480,-270,960,540)
 var pen_position: Vector2 = Vector2(-300, 0)
 
 func _ready() -> void:
@@ -11,31 +12,31 @@ func _ready() -> void:
 
 func _draw() -> void:
 	# Grass apron, inset dirt arena and a deliberately quiet centre for gameplay.
-	draw_rect(Rect2(-760, -480, 1520, 960), Color("091b27"))
-	draw_style_box(RanchTheme.box(Color("102c38"), Color("27505e"), 24), Rect2(-523, -313, 1046, 626))
-	draw_style_box(RanchTheme.box(Color("27444c"), Color("54b9b1"), 18), Rect2(-495, -285, 990, 570))
-	draw_style_box(RanchTheme.box(Color("34575c"), Color.TRANSPARENT, 12), Rect2(-474, -264, 948, 528))
+	draw_rect(world_bounds.grow(350), Color("091b27"))
+	draw_style_box(RanchTheme.box(Color("102c38"), Color("27505e"), 24), world_bounds.grow(43))
+	draw_style_box(RanchTheme.box(Color("27444c"), Color("54b9b1"), 18), world_bounds.grow(15))
+	draw_style_box(RanchTheme.box(Color("34575c"), Color.TRANSPARENT, 12), world_bounds.grow(-6))
 	# Embedded ranch-floor panels, quiet enough to keep silhouettes legible.
-	for x in range(-440,450,80):
-		draw_line(Vector2(x,-258),Vector2(x,258),Color(.3,.6,.64,.075),1,true)
-	for y in range(-240,250,80):
-		draw_line(Vector2(-468,y),Vector2(468,y),Color(.3,.6,.64,.075),1,true)
+	for x in range(int(world_bounds.position.x+40),int(world_bounds.end.x),80):
+		draw_line(Vector2(x,world_bounds.position.y+12),Vector2(x,world_bounds.end.y-12),Color(.3,.6,.64,.075),1,true)
+	for y in range(int(world_bounds.position.y+30),int(world_bounds.end.y),80):
+		draw_line(Vector2(world_bounds.position.x+12,y),Vector2(world_bounds.end.x-12,y),Color(.3,.6,.64,.075),1,true)
 	var random := RandomNumberGenerator.new()
 	random.seed = 93842
 	for i in range(430):
-		var point := Vector2(random.randf_range(-468, 468), random.randf_range(-258, 258))
+		var point := Vector2(random.randf_range(world_bounds.position.x+12,world_bounds.end.x-12),random.randf_range(world_bounds.position.y+12,world_bounds.end.y-12))
 		draw_line(point, point + Vector2(random.randf_range(1, 5), 0), Color(.55,.78,.78,.10), 1.0)
 	# Rail fence is drawn over the original perimeter collision shapes.
-	for y: float in [-280.0, 280.0]:
-		draw_line(Vector2(-492, y + 6), Vector2(492, y + 6), Color(0.22, 0.16, 0.1, 0.23), 10)
+	for y: float in [world_bounds.position.y-10,world_bounds.end.y+10]:
+		draw_line(Vector2(world_bounds.position.x-12, y + 6), Vector2(world_bounds.end.x+12, y + 6), Color(0.22, 0.16, 0.1, 0.23), 10)
 		for offset: float in [-5.0, 4.0]:
-			draw_line(Vector2(-492, y + offset), Vector2(492, y + offset), Color("81b4bb"), 5)
-		for x in range(-490, 491, 49):
+			draw_line(Vector2(world_bounds.position.x-12, y + offset), Vector2(world_bounds.end.x+12, y + offset), Color("81b4bb"), 5)
+		for x in range(int(world_bounds.position.x-10),int(world_bounds.end.x+11),49):
 			_post(Vector2(x, y))
-	for x: float in [-490.0, 490.0]:
+	for x: float in [world_bounds.position.x-10,world_bounds.end.x+10]:
 		for offset: float in [-4.0, 4.0]:
-			draw_line(Vector2(x + offset, -280), Vector2(x + offset, 280), Color("81b4bb"), 5)
-		for y in range(-245, 246, 49):
+			draw_line(Vector2(x + offset, world_bounds.position.y-10), Vector2(x + offset, world_bounds.end.y+10), Color("81b4bb"), 5)
+		for y in range(int(world_bounds.position.y+25),int(world_bounds.end.y-24),49):
 			_post(Vector2(x, y))
 	for rect: Rect2 in obstacle_rects:
 		_crates(rect)
@@ -51,7 +52,7 @@ func _draw() -> void:
 	# Small grass clumps outside the playable fence.
 	for side: int in [-1, 1]:
 		for i in range(13):
-			var p := Vector2(side * random.randf_range(535, 650), random.randf_range(-330, 330))
+			var p := Vector2(side * random.randf_range(world_bounds.size.x/2+55,world_bounds.size.x/2+170), random.randf_range(world_bounds.position.y-60,world_bounds.end.y+60))
 			for j in range(3):
 				draw_line(p + Vector2(j * 4, 0), p + Vector2(j * 5 - 3, -10 - j * 2), Color("1e4655"), 3, true)
 
