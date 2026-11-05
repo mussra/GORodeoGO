@@ -215,6 +215,7 @@ func _spawn_pens(pens: Array) -> void:
 	if _any_pen_has_links(pens):
 		var overlay := PenLinkOverlay.new()
 		_link_overlay = overlay
+		overlay.focus_player = player
 		overlay.layouts = _puzzle_corrals.map(func(c): return c.layout)
 		overlay.setup(pens, _pen_doors)
 		add_child(overlay)
@@ -244,6 +245,7 @@ func _on_pen_door_opened(pen_index: int) -> void:
 
 func _on_courier_interrupted(bull: Node) -> void:
 	_courier_jobs.erase(bull)
+	_refresh_trail()
 
 func _release_one_pen(index: int) -> void:
 	if _pen_released[index]: return
@@ -259,6 +261,7 @@ func _send_courier(bull: Node) -> void:
 		job["targets"].pop_front()
 	if job["targets"].is_empty():
 		_courier_jobs.erase(bull)
+		_refresh_trail()
 		return
 	var route: PackedVector2Array = CorralRoute.build(_puzzle_corrals[job["from"]].layout,_puzzle_corrals[job["targets"][0]].layout)
 	var source_layout: Dictionary = _puzzle_corrals[job["from"]].layout
@@ -267,6 +270,9 @@ func _send_courier(bull: Node) -> void:
 	elif source_layout["rect"].has_point(bull.global_position):
 		route.insert(0,Vector2(source_layout["gate"].x,bull.global_position.y))
 	bull.follow_corral_track(route)
+	if is_instance_valid(_link_overlay):
+		_link_overlay.active_from=job["from"]
+		_link_overlay.active_to=job["targets"][0]
 
 func _on_courier_arrived(bull: Node) -> void:
 	if not _courier_jobs.has(bull): return
@@ -285,7 +291,7 @@ func _release_pen_bulls(pen_index: int) -> void:
 	for index: int in bull_indices:
 		if index >= 0 and index < _active_bulls.size():
 			var layout: Dictionary = _puzzle_corrals[pen_index].layout
-			_active_bulls[index].guide_out_of_corral(layout["gate"], layout["inward"], exit_order * 1.25)
+			_active_bulls[index].guide_out_of_corral(layout["gate"], layout["inward"], 0.75 + exit_order * 1.25)
 			exit_order += 1
 			_active_bulls[index].begin_active()
 
@@ -311,6 +317,7 @@ func _process(delta: float) -> void:
 			bull._courier_active = false
 			bull._courier_path.clear()
 			_courier_jobs.erase(bull)
+			_refresh_trail()
 	_time_remaining -= delta
 	hud.update_timer(_time_remaining)
 	_update_nerves_hud()
@@ -594,3 +601,13 @@ func _spawn_distraction_stations() -> void:
 		station.position = entry["position"]
 		add_child(station)
 		_distraction_stations.append(station)
+
+func _refresh_trail() -> void:
+	if not is_instance_valid(_link_overlay):return
+	_link_overlay.active_from=-1
+	_link_overlay.active_to=-1
+	if not _courier_jobs.is_empty():
+		var job:Dictionary=_courier_jobs.values()[0]
+		if not job["targets"].is_empty():
+			_link_overlay.active_from=job["from"]
+			_link_overlay.active_to=job["targets"][0]

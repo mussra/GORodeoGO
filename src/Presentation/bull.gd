@@ -454,6 +454,8 @@ func _color_for_nerves(state: BullState.State) -> Color:
 
 ## Readable state cues do not recolor the entire character or depend on missing art.
 func _draw() -> void:
+	if _release_delay>0 and controller.is_wild():
+		draw_arc(Vector2(0,-57),9,-PI/2,-PI/2+TAU*clampf(_release_delay/.75,0,1),20,Color("f5d090"),2,true)
 	if _courier_active:
 		draw_circle(Vector2(0,-65),10,Color("b98a40"))
 		draw_arc(Vector2(-2,-67),3,0,TAU,12,Color("fff2be"),2,true)

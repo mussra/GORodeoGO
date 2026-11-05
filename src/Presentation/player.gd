@@ -53,7 +53,7 @@ const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_di
 @export var friction: float = 700.0
 @export var max_throw_distance: float = 220.0
 @export var charge_speed: float = 300.0  # units/sec the lasso reaches out while charging (keyboard fallback)
-@export var lasso_travel_time: float = 1.0  # seconds between release and actual capture resolution
+@export var lasso_travel_time: float = .8  # seconds between release and actual capture resolution
 @export var stun_resistance_multiplier: float = 1.0  # applied to incoming stun duration; upgrade lowers this
 @export var dual_capture_speed_multiplier: float = 0.6  # applied to max_speed while towing 2+ bulls at once (Level 10 unlock)
 @export var capture_area_visual_radius: float = 58.0  # visual only — roughly matches a bull's hit_radius + capture_tolerance defaults; not read from any specific bull, since which bull (if any) gets hit isn't known until resolution
@@ -64,7 +64,7 @@ var _stun_time_remaining: float = 0.0
 var _is_charging: bool = false
 var _lasso_in_flight: bool = false
 var _flight_generation: int = 0
-var _flight_line: Line2D = null
+var _flight_line: Node2D = null
 var _flight_tween: Tween = null
 var _aim_pressed_at_seconds: float = 0.0
 var _double_tap: DoubleTapDetector = DoubleTapDetector.new(LassoAim.DOUBLE_TAP_WINDOW_SECONDS)
@@ -431,20 +431,16 @@ func _cancel_charge() -> void:
 ## Animates a line from throw_origin to landing_point over lasso_travel_time, in world
 ## space (parented to the level, not the player, so it stays put even as the player moves).
 func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> void:
-	var line := Line2D.new()
-	_flight_line = line
-	line.width = 3.0
-	line.default_color = Color(0.85, 0.65, 0.2, 1.0)
-	get_parent().add_child(line)  # the level; unlike current_scene it also works when the level is instanced inside another tree (tests)
-	line.points = PackedVector2Array([throw_origin, throw_origin])
-
-	var tween: Tween = create_tween()
-	_flight_tween = tween
-	tween.tween_method(
-		func(t: float): line.points = PackedVector2Array([throw_origin, throw_origin.lerp(landing_point, t)]),
-		0.0, 1.0, lasso_travel_time
-	)
-	tween.tween_callback(line.queue_free)
+	var rope:=LassoRope.new()
+	_flight_line=rope
+	rope.rider=self
+	rope.start=throw_origin
+	rope.landing=landing_point
+	get_parent().add_child(rope)
+	var tween:Tween=create_tween()
+	_flight_tween=tween
+	tween.tween_property(rope,"progress",1.0,lasso_travel_time)
+	tween.tween_callback(rope.queue_free)
 
 ## Shows the lasso's effective capture area as a translucent circle where it lands, fading out.
 func _flash_landing_area(landing_point: Vector2) -> void:
