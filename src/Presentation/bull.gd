@@ -50,6 +50,7 @@ var _touch_grace_remaining: float = 0.0
 ## Set by Level0 when this bull is captured: higher = captured more recently (D038).
 var _tow_path: Array[Vector2] = []
 var _tow_last_sample: Vector2 = Vector2.ZERO
+var _tow_blocked_seconds: float = 0.0
 
 var capture_order: int = 0
 var pen_number: int = 0
@@ -220,7 +221,13 @@ func _apply_tow_movement() -> void:
 		var step: Vector2 = offset.limit_length(budget)
 		var collision: KinematicCollision2D = move_and_collide(step)
 		budget -= step.length()
-		if collision != null: break
+		if collision != null:
+			_tow_blocked_seconds += delta
+			if _tow_blocked_seconds >= .2:
+				_recover_tow_route()
+				_tow_blocked_seconds=0.0
+			break
+		_tow_blocked_seconds=0.0
 		if offset.length() <= step.length()+.1 and _tow_path.size()>1:
 			_tow_path.pop_front()
 	velocity = (global_position-before)/delta
@@ -364,6 +371,7 @@ func _on_state_changed(new_state: BullState.State) -> void:
 	_distraction.cancel()
 	if new_state == BullState.State.CAPTURED or not controller.is_held():
 		_tow_path.clear()
+		_tow_blocked_seconds=0.0
 	if controller.is_held():
 		if _courier_active:
 			courier_interrupted.emit(self)
@@ -543,3 +551,36 @@ func _courier_detour(target: Vector2) -> PackedVector2Array:
 	var result: PackedVector2Array=grid.get_point_path(start,finish)
 	if not result.is_empty(): result.remove_at(0)
 	return result
+
+## Player rectangle fits closer to fences/corners than the bull's circle.
+## Rejoin the earliest later clear breadcrumb through a collision-aware route;
+## never erase the whole history to chase the player's current position.
+func _recover_tow_route() -> void:
+	var query:=PhysicsShapeQueryParameters2D.new()
+	query.shape=$CollisionShape2D.shape
+	query.collision_mask=collision_mask
+	query.exclude=[get_rid()]
+	for i in range(_tow_path.size()):
+		var target: Vector2=_tow_path[i]
+		if global_position.distance_to(target)<64: continue
+		# Grid endpoints must themselves fit the larger bull footprint.
+		var cell_target: Vector2=Vector2(round(target.x/16),round(target.y/16))*16
+		query.transform=Transform2D(0,cell_target)
+		if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():
+			var best: Vector2=Vector2.INF
+			var best_distance: float=INF
+			for dy in range(-3,4):
+				for dx in range(-3,4):
+					var candidate: Vector2=cell_target+Vector2(dx,dy)*16
+					if candidate.distance_to(target)>=best_distance: continue
+					query.transform=Transform2D(0,candidate)
+					if get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():
+						best=candidate
+						best_distance=candidate.distance_to(target)
+			if best==Vector2.INF: continue
+			cell_target=best
+		var route: PackedVector2Array=_courier_detour(cell_target)
+		if route.is_empty(): continue
+		for old in range(i+1): _tow_path.pop_front()
+		for step in range(route.size()-1,-1,-1): _tow_path.push_front(route[step])
+		return
