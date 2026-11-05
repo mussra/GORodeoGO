@@ -4,9 +4,14 @@ var rider:Node2D
 var start:Vector2
 var landing:Vector2
 var progress:float=0.0
+var landing_radius:float=58.0
 func _process(_delta:float) -> void:queue_redraw()
 func _draw() -> void:
 	if not is_instance_valid(rider):return
+	# Keep the true ground landing target visible while the rope travels above it.
+	draw_circle(landing,landing_radius,Color(1,.84,.5,.055))
+	draw_arc(landing,landing_radius,0,TAU,48,Color(.95,.79,.5,.48),1.5,true)
+	draw_circle(landing,3,Color(.95,.79,.5,.7))
 	var origin:Vector2=rider.global_position+Vector2(8,-12)
 	var tip:Vector2=start.lerp(landing,progress)+Vector2(0,-sin(progress*PI)*45)
 	var points:=PackedVector2Array()

@@ -516,20 +516,23 @@ func _move_courier(delta: float) -> void:
 	else:
 		_courier_blocked+=delta
 	if _courier_blocked > .8:
-		var detour: PackedVector2Array = _courier_detour(_courier_path[0])
+		var detour: PackedVector2Array = _courier_detour(_courier_path[0], PenDoor.RADIUS if _courier_path.size()==1 else 0.0)
 		for i in range(detour.size()-1,-1,-1): _courier_path.push_front(detour[i])
 		_courier_blocked=0.0
 		_courier_best_distance=INF
 	_update_flee_animation(offset.normalized(),delta)
 	_sprite_swap.set_motion_speed(velocity.length(),flee_speed)
-	if global_position.distance_to(_courier_path[0])<8:
+	# A courier uses the same physical latch interaction area as the rider.
+	# The exact latch centre can be blocked by a bull behind the closed fence.
+	var arrival_radius:float=PenDoor.RADIUS if _courier_path.size()==1 else 8.0
+	if global_position.distance_to(_courier_path[0])<arrival_radius:
 		_courier_path.pop_front()
 		_courier_best_distance=INF
 	_check_player_contact()
 
 ## Small local grid detour around real walls and nearby herd bodies. It never
 ## changes collision masks or moves the body directly.
-func _courier_detour(target: Vector2) -> PackedVector2Array:
+func _courier_detour(target: Vector2, interaction_radius:float=0.0) -> PackedVector2Array:
 	var grid := AStarGrid2D.new()
 	grid.region=Rect2i(-30,-16,61,33)
 	grid.cell_size=Vector2(16,16)
@@ -545,11 +548,27 @@ func _courier_detour(target: Vector2) -> PackedVector2Array:
 		for x in range(-30,31):
 			var cell:=Vector2i(x,y)
 			var at:=Vector2(cell)*16
-			if cell==start or cell==finish: continue
+			if cell==start or (cell==finish and interaction_radius==0): continue
 			query.transform=Transform2D(0,at)
 			if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():
 				grid.set_point_solid(cell,true)
 	if not grid.is_in_boundsv(start) or not grid.is_in_boundsv(finish): return PackedVector2Array()
+	if interaction_radius>0:
+		# Closed-latch centre may overlap a penned bull. Reach a physically clear
+		# point within its interaction area rather than pathfinding into its body.
+		var candidates:Array[Vector2i]=[]
+		for dy in range(-3,4):
+			for dx in range(-3,4):
+				var candidate:Vector2i=finish+Vector2i(dx,dy)
+				if grid.is_in_boundsv(candidate) and not grid.is_point_solid(candidate) and (Vector2(candidate)*16).distance_to(target)<interaction_radius:
+					candidates.append(candidate)
+		candidates.sort_custom(func(a,b):return (Vector2(a)*16).distance_to(target)<(Vector2(b)*16).distance_to(target))
+		for candidate in candidates:
+			var approach:PackedVector2Array=grid.get_point_path(start,candidate)
+			if not approach.is_empty():
+				approach.remove_at(0)
+				return approach
+		return PackedVector2Array()
 	var result: PackedVector2Array=grid.get_point_path(start,finish)
 	if not result.is_empty(): result.remove_at(0)
 	return result

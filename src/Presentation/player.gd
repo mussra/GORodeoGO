@@ -381,7 +381,7 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 
 	# Simulated flight time (GAMEPLAY_SPEC.md #Lanzamiento: "sensación de altura" — the rope
 	# travels before landing; the bull can move away in the meantime). The line animates in
-	# world space (not parented to the player) since the player keeps moving during the throw.
+	# world space: destination stays fixed but the rope origin follows the rider.
 	lasso_released.emit()
 	_lasso_in_flight = true
 	_flight_generation += 1
@@ -429,13 +429,14 @@ func _cancel_charge() -> void:
 	queue_redraw()
 
 ## Animates a line from throw_origin to landing_point over lasso_travel_time, in world
-## space (parented to the level, not the player, so it stays put even as the player moves).
+## space: landing stays fixed, rope origin follows the moving rider.
 func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> void:
 	var rope:=LassoRope.new()
 	_flight_line=rope
 	rope.rider=self
 	rope.start=throw_origin
 	rope.landing=landing_point
+	rope.landing_radius=capture_area_visual_radius
 	get_parent().add_child(rope)
 	var tween:Tween=create_tween()
 	_flight_tween=tween

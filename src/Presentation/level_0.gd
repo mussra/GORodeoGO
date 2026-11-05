@@ -270,9 +270,7 @@ func _send_courier(bull: Node) -> void:
 	elif source_layout["rect"].has_point(bull.global_position):
 		route.insert(0,Vector2(source_layout["gate"].x,bull.global_position.y))
 	bull.follow_corral_track(route)
-	if is_instance_valid(_link_overlay):
-		_link_overlay.active_from=job["from"]
-		_link_overlay.active_to=job["targets"][0]
+	_refresh_trail()
 
 func _on_courier_arrived(bull: Node) -> void:
 	if not _courier_jobs.has(bull): return

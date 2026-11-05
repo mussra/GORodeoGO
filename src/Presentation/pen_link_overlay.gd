@@ -7,7 +7,6 @@ var _pens:Array=[]
 var _doors:Array=[]
 var layouts:Array=[]
 var focus_player:Node2D
-var active_route:PackedVector2Array=PackedVector2Array()
 var active_from:int=-1
 var active_to:int=-1
 var _shown_from:int=-2
@@ -25,7 +24,7 @@ func _process(_delta:float) -> void:
 	elif is_instance_valid(focus_player):
 		var nearest:float=160.0
 		for i in range(layouts.size()):
-			if i>=_doors.size() or not is_instance_valid(_doors[i]):continue
+			if i>=_doors.size() or not is_instance_valid(_doors[i]) or _doors[i].is_opened():continue
 			var linked:Array=PenLinkResolver.get_linked_pen_indices(_pens,i)
 			var distance:float=focus_player.global_position.distance_to(layouts[i]["door"])
 			if not linked.is_empty() and distance<nearest:

@@ -20,3 +20,20 @@ func test_player_opening_real_latch_has_space_beside_initial_exit() -> void:
 	bull.global_position=level.player.global_position
 	bull._check_player_contact()
 	assert_gt(level.player._stun_time_remaining,0.0)
+
+func test_actual_hold_opens_door_then_normal_movement_can_escape()->void:
+	SaveData.dual_lasso_intro_shown=true
+	GameState.selected_level=11
+	var level:Node=load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
+	await wait_physics_frames(2)
+	level.player.global_position=level._puzzle_corrals[0].layout["door"]
+	var door:Node=level._pen_doors[0]
+	for i in range(120):
+		await wait_physics_frames(1)
+		if not is_instance_valid(door):break
+	assert_true(level._pen_released[0],"stationary hold really opens gate")
+	Input.action_press("move_right")
+	await wait_physics_frames(36)
+	Input.action_release("move_right")
+	assert_lte(level.player._stun_time_remaining,0.0,"normal rider speed exits warning lane")
