@@ -39,6 +39,9 @@ var _draw_virtual:Vector2=Vector2.ZERO
 var _draw_heading:Vector2=Vector2.ZERO
 const DRAW_EDGE_MARGIN:float=28.0
 const DRAW_EDGE_SPEED:float=300.0
+const DRAW_EDGE_DWELL:float=.18
+var _draw_edge_elapsed:float=0.0
+var _draw_edge_active:bool=false
 var _last_touch_index: int = -1
 var _draw_touch_index: int = -1
 var _skid_trail: Array[Vector2] = []
@@ -82,6 +85,12 @@ var _touch_aim_active: bool = false
 
 func _ready() -> void:
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, ART_ROOT, ANIM_NAMES)
+	var cue_layer:=CanvasLayer.new()
+	cue_layer.layer=16
+	add_child(cue_layer)
+	var cue:=DodgeEdgeCue.new()
+	cue.player=self
+	cue_layer.add_child(cue)
 
 ## Called every frame by Level0 — how many bulls this player currently has captured/calming/
 ## controlled, so movement speed can be penalized while towing more than one (per design:
@@ -125,6 +134,8 @@ func _on_move_pressed() -> void:
 		_draw_pointer_previous=_last_pointer
 		_draw_virtual=Vector2.ZERO
 		_draw_heading=Vector2.ZERO
+		_draw_edge_elapsed=0.0
+		_draw_edge_active=false
 		_draw_points = PackedVector2Array([Vector2.ZERO])
 		velocity = Vector2.ZERO
 
@@ -133,8 +144,8 @@ func _input(event: InputEvent) -> void:
 		_last_pointer = event.position
 		_last_touch_index = event.index
 	elif event is InputEventScreenDrag:
-		_last_pointer = event.position
 		if _drawing_dodge and event.index == _draw_touch_index:
+			_last_pointer=event.position
 			var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
 			var delta:Vector2=event.position-_draw_pointer_previous
 			_draw_pointer_previous=event.position
@@ -150,16 +161,18 @@ func _append_draw_point()->void:
 
 func _extend_drawing_at_edge(real_delta:float)->void:
 	var size:Vector2=get_viewport_rect().size
-	var edge:Vector2=Vector2.ZERO
-	if _last_pointer.x<DRAW_EDGE_MARGIN and _draw_heading.x<-.1:edge.x=_draw_heading.x
-	if _last_pointer.x>size.x-DRAW_EDGE_MARGIN and _draw_heading.x>.1:edge.x=_draw_heading.x
-	if _last_pointer.y<DRAW_EDGE_MARGIN+65 and _draw_heading.y<-.1:edge.y=_draw_heading.y
-	if _last_pointer.y>size.y-DRAW_EDGE_MARGIN and _draw_heading.y>.1:edge.y=_draw_heading.y
-	if edge.is_zero_approx():return
+	var outward:bool=(_last_pointer.x<DRAW_EDGE_MARGIN and _draw_heading.x<-.1) or (_last_pointer.x>size.x-DRAW_EDGE_MARGIN and _draw_heading.x>.1) or (_last_pointer.y<DRAW_EDGE_MARGIN and _draw_heading.y<-.1) or (_last_pointer.y>size.y-DRAW_EDGE_MARGIN and _draw_heading.y>.1)
+	if not outward or _draw_heading.is_zero_approx():
+		_draw_edge_elapsed=0.0
+		_draw_edge_active=false
+		return
+	_draw_edge_elapsed+=minf(real_delta,.05)
+	_draw_edge_active=_draw_edge_elapsed>=DRAW_EDGE_DWELL
+	if not _draw_edge_active:return
 	var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
-	# Continue only an outward gesture at the physical screen edge. Moving back
-	# changes heading immediately; accumulated virtual offset never jumps back.
-	_draw_virtual+=edge.normalized()*DRAW_EDGE_SPEED*minf(real_delta,.05)/zoom
+	# Preserve full latest heading, including diagonals at a single edge/corner.
+	# Inward drag stops continuation without snapping accumulated virtual offset.
+	_draw_virtual+=_draw_heading*DRAW_EDGE_SPEED*minf(real_delta,.05)/zoom
 	_append_draw_point()
 
 func _on_move_released(_direction: Vector2) -> void:

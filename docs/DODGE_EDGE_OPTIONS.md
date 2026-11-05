@@ -12,3 +12,8 @@ https://docs.unity3d.com/Packages/com.unity.inputsystem%406.7/manual/create-on-s
 https://developer.apple.com/videos/play/wwdc2024/10085/ recommends broad input areas, safe areas, visible feedback and physical device testing. Neither specifies this custom dodge or proves preferred design.
 
 Await parent/user choice; preserve maps/minimap approved system. NoAPK/main effects.
+
+## Implemented after user choice5Nov11:57
+User chose edge-only continuation on all edges, including corners. Latest code adds deliberate0.18s dwell and visible ring/arrow/text, preserves full latest outward heading (diagonal on single edge included). Inward movement stops extension without resetting accumulated virtual offset. Stationary centre does not extend. Other finger cannot redirect. Max260/420,2real seconds and shared preview/execution unchanged. Real-time delta compensates bullet time so extension feels consistent. Top boundary is actual screen edge, not the HUD line.
+
+Windowed native-touch test passes: double-tap, drag to edge, hold, release/exact preview endpoint, other finger isolation. Edge cases seven directions/locations including top/bottom/corners, dwell/inward/no centre growth.2tests36assertions. Existing preview2/71,dodge7/35,minimap2/13pass. Bullet/audio/lasso groups run separately; visual PNG/video inspected and delivered parent before APK. No physicalAndroid test, implementation remains candidate. Maps/minimap unchanged. Supersedes earlier pending choice wording above.
