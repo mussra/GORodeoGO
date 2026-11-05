@@ -29,3 +29,14 @@ A source needs at least4bulls to leave one wild companion after a courier and tw
 Early latch/goal warning repro: levels11-14 rider can move from goal centre to northern latch, wait and open it. Physical position(-300,-88), latch(-320,-75). Interaction circles overlap but do not block movement. No reason for incidental geometry edits now. Test1/8passed.
 
 New candidate20directed live-herd tests pass, but not human balance certification. Need comparable input-driven opening/capture/tow attempts on15-19, reproducible routes and threat time; keep all bulls live. Inspect complete-map and playing-scale visuals. Changes remain reversible before publishing another release. Do not call all campaign design finished merely because20is shipped.
+
+## Implemented second candidate0.21.24
+The five variants15-19above are now integrated as a reversible candidate.19mirrors approaches horizontally; no new walls.11-14unchanged.20preserves0.21.23. Same10bulls, clocks, rules, map scales, minimap, dodge and destination styling. No claim these five levels now form a perfectly monotonic human difficulty curve: lessons and risk choices are distinct, need user feedback.
+
+Physical courier routes with live herd15→19complete in4.97/9.42/6.62/5.45/10.65s. Membership invariant sources4+normal3+passes all. Catalog/courier/corrals/geometry37tests606asserts before adding comparative attempts; after pair tests38/661.
+
+Input-driven live-herd capture/evasion/tow test uses no bull teleport/frozen physics/forced nerves/invulnerability. Only initial rider setup, release trigger and scripted in-range lasso impacts. Normal input, existing dodge, actual capture/calming/contact/goal. One bull delivered per15→19in15.75/11.15/11.12/8.18/13.13s after3/2/2/2/2stuns. Recapture after contact is necessary. Does not prove all10completion, human aiming, touch comfort or final balance.30fpsvideo19takes17.23swith2stunsand1physicaldelivery; variation not hidden.
+
+Full accelerated309tests302pass7fail. One test exposes5existing11-14interaction-proximity warnings, not blocked geometry (physical approach repro1test8asserts passes). Six clock/native-input failures covered separately by real-window/real-clock54tests269asserts. No single all-green/full-campaign-playthrough claim. Test updates remove obsolete6/8door indices and check actual arena bounds rather than old unscaled layout metadata. Shared resource warnings at shutdown persist.
+
+Previews: overall15-19layout and real19live-herd tow video inspected and delivered beforeAPK. Android performance and human balancing still await feedback. No main merge. Follow-up should respond to actual play patterns, not hide unknowns behind more population or automatically reduce timers.

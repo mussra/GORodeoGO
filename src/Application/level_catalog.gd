@@ -140,121 +140,43 @@ static func get_level(level_number: int) -> LevelData:
 				}
 			]
 		15:
-			# Redefined (was 3 pens/10 bulls): 4 doors, one near each corner of the play area —
-			# same 10 fixed bull spawn points, regrouped by nearest corner. Two doors are linked
-			# unidirectionally: opening NE also opens NW, but not the other way round. SW and SE
-			# are unlinked. PenLinkOverlay draws this as a pink arrow pointing NE -> NW.
+			# One-way courier lesson: source keeps three companions, destination six.
 			data.bull_count = 10
 			data.time_limit_seconds = 320.0
-			data.obstacle_rects = [Rect2(-160, -180, 120, 50), Rect2(-160, 70, 120, 50), Rect2(40, -180, 80, 50), Rect2(40, 130, 80, 50)]
-			data.pens = [
-				{
-					"bull_indices": [0, 1, 5],  # NE corner
-					"door_position": Vector2(380, -190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-					"opens_pen_indices": [1],  # unidirectional: NE also opens NW
-				},
-				{
-					"bull_indices": [4, 8],  # NW corner
-					"door_position": Vector2(-380, -190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [2, 6],  # SW corner
-					"door_position": Vector2(-380, 190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [3, 7, 9],  # SE corner
-					"door_position": Vector2(380, 190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				}
-			]
+			data.obstacle_rects = []
+			data.pens = _herd_pens([[0,1,5,8],[2,3,4,6,7,9]])
+			data.pens[0]["opens_pen_indices"] = [1]
 		16:
-			# Same 4 corner pens/positions as level 15 (only the link config changes): one door
-			# (NE) is now related to TWO others unidirectionally — opening it also opens NW and
-			# SW, but SE stays untouched.
+			# Fork: courier visits two destinations, both with a remaining threat.
 			data.bull_count = 10
 			data.time_limit_seconds = 340.0
 			data.obstacle_rects = []
-			data.pens = [
-				{
-					"bull_indices": [0, 1, 5],  # NE corner
-					"door_position": Vector2(380, -190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-					"opens_pen_indices": [1, 2],  # unidirectional: NE also opens NW and SW
-				},
-				{
-					"bull_indices": [4, 8],  # NW corner
-					"door_position": Vector2(-380, -190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [2, 6],  # SW corner
-					"door_position": Vector2(-380, 190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [3, 7, 9],  # SE corner
-					"door_position": Vector2(380, 190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				}
-			]
+			data.pens = _herd_pens([[0,1,5,8],[2,4,9],[3,6,7]])
+			data.pens[0]["opens_pen_indices"] = [1,2]
 		17:
-			# 5 doors: the same 4 corners (2 bulls each now, not 2-3) plus a new one in the
-			# centre of the map. The centre door is related to 3 of the 4 corners (all but SE),
-			# unidirectionally — SE stays fully independent.
+			# Two substantial groups: either side can send a physical courier.
 			data.bull_count = 10
 			data.time_limit_seconds = 360.0
 			data.obstacle_rects = []
-			data.pens = [
-				{
-					"bull_indices": [0, 5],  # NE corner
-					"door_position": Vector2(380, -190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [4, 8],  # NW corner
-					"door_position": Vector2(-380, -190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [2, 6],  # SW corner
-					"door_position": Vector2(-380, 190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [7, 9],  # SE corner
-					"door_position": Vector2(380, 190),
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [1, 3],  # centre
-					"door_position": Vector2(0, -60),  # UNVERIFIED: clear of player spawn (0,0) and the pen (-300,0)
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-					"opens_pen_indices": [0, 1, 2],  # centre unidirectionally opens NE, NW, SW — not SE
-				}
-			]
+			data.pens = _herd_pens([[0,1,4,5,8],[2,3,6,7,9]])
+			data.pens[0]["opens_pen_indices"] = [1]
+			data.pens[1]["opens_pen_indices"] = [0]
 		18:
-			# 6 doors, positioned scattered around the level rather than any corner/centre
-			# pattern. Related two-by-two: 3 independent pairs, each pair opens the other door
-			# in the pair (so unlike every level above, these pairs are NOT one-directional —
-			# opening either door of a pair opens its partner too; PenLinkOverlay draws that as
-			# two opposing arrowheads on the same line).
+			# Linked pair plus an independent group: choose simultaneous or staged risk.
 			data.bull_count = 10
 			data.time_limit_seconds = 390.0
 			data.obstacle_rects = []
-			data.pens = _scattered_pairs_pens()
+			data.pens = _herd_pens([[0,1,5,8],[2,4,9],[3,6,7]])
+			data.pens[0]["opens_pen_indices"] = [1]
 		19:
-			# Same 6 doors/positions/pairs as level 18, plus: pen 0's door is ALSO a master —
-			# opening it releases every pen at once (its pair link is dropped: the master
-			# already covers it).
+			# First full-herd master. Placement differs from20; no smaller pockets.
 			data.bull_count = 10
 			data.time_limit_seconds = 410.0
 			data.obstacle_rects = []
-			data.pens = _scattered_pairs_pens()
-			data.pens[0].erase("opens_pen_indices")  # master supersedes the pair link
+			data.pens = _herd_pens([[0,1,5,8],[2,4,9],[3,6,7]])
 			data.pens[0]["is_master"] = true
+			# Mirrored approaches relative to20, while leaving central route clear.
+			for entry:Dictionary in data.pens:entry["layout_mirror_x"] = true
 		20:
 			# Fewer, meaningful releases: dual capture cannot empty any enclosure.
 			# The master sends one courier, leaving three companions to pressure the rider.
@@ -272,45 +194,9 @@ static func get_level(level_number: int) -> LevelData:
 
 	return data
 
-## The 6 scattered doors shared by levels 18 and 19 (3 mutual pairs). Built fresh on every call
-## so level 19 can modify its copy without touching level 18's.
-static func _scattered_pairs_pens() -> Array:
-	return [
-		{
-			"bull_indices": [0, 5],
-			"door_position": Vector2(250, -220),  # UNVERIFIED: scattered placement, not play-tested
-			"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-			"opens_pen_indices": [1],
-		},
-		{
-			"bull_indices": [1, 9],
-			"door_position": Vector2(-60, 240),  # UNVERIFIED: scattered placement, not play-tested
-			"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-			"opens_pen_indices": [0],
-		},
-		{
-			"bull_indices": [4, 8],
-			"door_position": Vector2(-420, 60),  # UNVERIFIED: scattered placement, not play-tested
-			"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-			"opens_pen_indices": [3],
-		},
-		{
-			"bull_indices": [2, 6],
-			"door_position": Vector2(150, 140),  # UNVERIFIED: scattered placement, not play-tested
-			"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-			"opens_pen_indices": [2],
-		},
-		{
-			"bull_indices": [3],
-			"door_position": Vector2(-250, -230),  # UNVERIFIED: scattered placement, not play-tested
-			"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-			"opens_pen_indices": [5],
-		},
-		{
-			"bull_indices": [7],
-			"door_position": Vector2(420, -40),  # UNVERIFIED: scattered placement, not play-tested
-			"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-			"opens_pen_indices": [4],
-		}
-	]
-
+## Explicit memberships; positions are owned by the physical layout builder.
+static func _herd_pens(groups:Array)->Array:
+	var result:Array=[]
+	for group:Array in groups:
+		result.append({"bull_indices":group,"door_hold_seconds":DEFAULT_DOOR_HOLD_SECONDS})
+	return result

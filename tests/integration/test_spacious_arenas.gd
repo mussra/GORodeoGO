@@ -9,7 +9,7 @@ func test_density_scope_and_all_gaps_allow_two_bull_widths()->void:
 		var scale:float=ArenaLayout.scale_for_level(n)
 		var rects:Array[Rect2]=[]
 		for i in range(data.pens.size()):
-			var layout:Dictionary=ArenaLayout.spread_corral(PuzzleCorralLayout.build(data.pens.size(),i,data.pens[i]["bull_indices"].size()),scale)
+			var layout:Dictionary=ArenaLayout.spread_corral(PuzzleCorralLayout.build(data.pens.size(),i,data.pens[i]["bull_indices"].size(),data.pens[i].get("layout_mirror_x",false)),scale)
 			var rect:Rect2=layout["rect"]
 			assert_eq(rect.size.y,136.0)
 			assert_true(ArenaLayout.bounds_for_level(n).encloses(rect.grow(35)),"usable outside perimeter path")

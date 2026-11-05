@@ -213,3 +213,9 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Couriers and exiting bulls no longer consume designated pursuit role. Courier visits other latches while free companions can chase captures.
 - Destination corral gets ranch wood/gold horseshoe styling, unchanged80x80delivery physics.
 - Directed live-herd and courier tests plus preview. Levels11-19balance remains a separate pass; no main merge.
+
+## 0.21.24 - Grouped herd progression15-19
+-15one-way4/6;16fork4/3/3;17reciprocal5/5;18linkedpair+independent4/3/3;19master4/3/3mirrored.
+- Same total10bulls and clocks.11-14unchanged after physical goal/latch accessibility repro;20keeps0.21.23.
+- Live-herd input/capture/evasion/calming/delivery checks, no frozen pursuers or forced nerves. First-bull delivery is not complete human balance certification.
+- Full309tests302pass7fail; clock/input tests covered real-window; existing11-14proximity warnings documented. No main merge.

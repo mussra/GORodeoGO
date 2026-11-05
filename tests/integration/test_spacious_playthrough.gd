@@ -21,13 +21,13 @@ func test_real_player_reaches_latch_and_tows_back_inside_level18_budget()->void:
 	await wait_physics_frames(2)
 	# Isolate geometry/timing, not live-herd balance; other bulls frozen explicitly.
 	for b in level._active_bulls:b.set_physics_process(false)
-	var target:Vector2=level._puzzle_corrals[3].layout["door"]
+	var target:Vector2=level._puzzle_corrals[2].layout["door"]
 	var frames:int=await _walk(level.player,Vector2(target.x,0),400)
 	frames+=await _walk(level.player,target,300)
 	assert_lt(level.player.global_position.distance_to(target),15.0)
 	await wait_physics_frames(90);frames+=90
-	assert_true(level._pen_released[3],"real latch hold")
-	var bull:Node=level._active_bulls[level._pens_data[3]["bull_indices"][0]]
+	assert_true(level._pen_released[2],"real latch hold")
+	var bull:Node=level._active_bulls[level._pens_data[2]["bull_indices"][0]]
 	# Start capture outside opened gate, then movement and delivery are physical.
 	bull.global_position=level.player.global_position+Vector2(0,45)
 	bull.try_capture(bull.global_position)

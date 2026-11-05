@@ -60,8 +60,8 @@ func test_recaptured_bull_physically_exits_expanded_corral_side_passage()->void:
 	level.set_process(false)
 	for other in level._active_bulls:other.set_physics_process(false)
 	var bull:Node=level._active_bulls[0]
-	var left:Rect2=level._puzzle_corrals[2].layout["rect"]
-	var right:Rect2=level._puzzle_corrals[3].layout["rect"]
+	var left:Rect2=level._puzzle_corrals[0].layout["rect"]
+	var right:Rect2=level._puzzle_corrals[1].layout["rect"]
 	var x:float=(left.end.x+right.position.x)/2
 	bull.global_position=Vector2(x,left.get_center().y)
 	bull.begin_active();bull.try_capture(bull.global_position)

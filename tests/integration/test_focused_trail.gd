@@ -13,8 +13,8 @@ func test_nearby_latch_then_one_stable_courier_leg_and_manual_cleanup()->void:
 	level.player.global_position=Vector2(0,220)
 	level._on_pen_door_opened(0)
 	var first_from:int=overlay.active_from
-	level._on_pen_door_opened(3)
-	assert_eq(overlay.active_from,first_from,"second courier does not flicker/overwrite selected first leg")
+	level._on_pen_door_opened(2)
+	assert_eq(overlay.active_from,first_from,"opening unrelated normal pen does not overwrite courier leg")
 	assert_eq(level._courier_jobs.size(),1)
 	for i in range(level._pens_data.size()):level._release_one_pen(i)
 	level._process(0)

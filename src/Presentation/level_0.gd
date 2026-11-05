@@ -202,7 +202,7 @@ func _spawn_pens(pens: Array) -> void:
 	_pens_data = pens.duplicate(true)
 	for index in range(_pens_data.size()):
 		var entry: Dictionary = _pens_data[index]
-		var layout: Dictionary = ArenaLayout.spread_corral(PuzzleCorralLayout.build(_pens_data.size(), index, entry["bull_indices"].size()),_arena_scale)
+		var layout: Dictionary = ArenaLayout.spread_corral(PuzzleCorralLayout.build(_pens_data.size(), index, entry["bull_indices"].size(),entry.get("layout_mirror_x",false)),_arena_scale)
 		entry["door_position"] = layout["door"]
 		var corral := PuzzleCorral.new()
 		corral.layout = layout

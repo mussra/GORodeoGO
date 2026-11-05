@@ -92,6 +92,6 @@ func test_all_doors_bulls_and_goal_have_connected_clearance_routes() -> void:
 func _physical_pens(data:LevelData)->Array:
 	var pens:Array=data.pens.duplicate(true)
 	for i in range(pens.size()):
-		var layout:Dictionary=ArenaLayout.spread_corral(PuzzleCorralLayout.build(pens.size(),i,pens[i]["bull_indices"].size()),ArenaLayout.scale_for_level(data.level_number))
+		var layout:Dictionary=ArenaLayout.spread_corral(PuzzleCorralLayout.build(pens.size(),i,pens[i]["bull_indices"].size(),pens[i].get("layout_mirror_x",false)),ArenaLayout.scale_for_level(data.level_number))
 		pens[i]["door_position"]=layout["door"]
 	return pens

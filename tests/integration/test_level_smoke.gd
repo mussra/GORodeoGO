@@ -52,8 +52,7 @@ func test_linked_door_releases_its_targets_only() -> void:
 	assert_true(level._pen_released[0])
 	assert_false(level._pen_released[1],"linked target waits for real courier arrival")
 	assert_eq(level._courier_jobs.values()[0]["targets"],[1])
-	assert_false(level._pen_released[2])
-	assert_false(level._pen_released[3])
+	assert_eq(level._pen_released.size(),2)
 
 func test_pause_and_resume_toggle_the_tree_and_hud() -> void:
 	var level: Node = await _spawn_level(1)
