@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-boot_splash/bg_color=Color(0.0235294, 0.0823529, 0.207843, 1)
+boot_splash/bg_color=Color(0.0156863, 0.0980392, 0.2509804, 1)
 boot_splash/image="res://brand/zumbel_boot.png"
 boot_splash/fullsize=false
 boot_splash/use_filter=true

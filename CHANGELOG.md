@@ -231,3 +231,7 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Original source retained in brand/zumbel_source.png. Only empty background edges feathered for the splash; artwork and words unchanged.
 - Boot image scaled to fit landscape; reveal hold extended to 1.8 seconds for subtitle reading.
 - Gameplay, campaign and controls unchanged from 0.21.25. No main merge.
+
+## Source update after 0.21.26 - Shared splash asset (next build)
+- Uses common 1080 square splash supplied for all four games, full text intact, with #041940 background.
+- Landscape layout keeps subtitle readable. Gameplay unchanged.
