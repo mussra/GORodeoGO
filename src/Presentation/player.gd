@@ -34,6 +34,11 @@ var dodge_path_limit: float = 260.0
 var _drawing_real_started: float = 0.0
 var _drawing_dodge: bool = false
 var _draw_screen_start: Vector2 = Vector2.ZERO
+var _draw_pointer_previous:Vector2=Vector2.ZERO
+var _draw_virtual:Vector2=Vector2.ZERO
+var _draw_heading:Vector2=Vector2.ZERO
+const DRAW_EDGE_MARGIN:float=28.0
+const DRAW_EDGE_SPEED:float=300.0
 var _last_touch_index: int = -1
 var _draw_touch_index: int = -1
 var _skid_trail: Array[Vector2] = []
@@ -117,6 +122,9 @@ func _on_move_pressed() -> void:
 		dodge_drawing_started.emit()
 		_draw_touch_index = _last_touch_index
 		_draw_screen_start = _last_pointer
+		_draw_pointer_previous=_last_pointer
+		_draw_virtual=Vector2.ZERO
+		_draw_heading=Vector2.ZERO
 		_draw_points = PackedVector2Array([Vector2.ZERO])
 		velocity = Vector2.ZERO
 
@@ -127,11 +135,32 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		_last_pointer = event.position
 		if _drawing_dodge and event.index == _draw_touch_index:
-			var zoom: float = get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d() != null else 1.0
-			var point: Vector2 = (event.position - _draw_screen_start) / zoom
-			if _draw_points[-1].distance_to(point) > 5.0 and _draw_points.size() < 120:
-				_draw_points.append(point)
-			queue_redraw()
+			var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
+			var delta:Vector2=event.position-_draw_pointer_previous
+			_draw_pointer_previous=event.position
+			if delta.length()>1:_draw_heading=delta.normalized()
+			_draw_virtual+=delta/zoom
+			_append_draw_point()
+
+func _append_draw_point()->void:
+	if _draw_points.is_empty():return
+	if _draw_points[-1].distance_to(_draw_virtual)>5 and _draw_points.size()<120:
+		_draw_points.append(_draw_virtual)
+	queue_redraw()
+
+func _extend_drawing_at_edge(real_delta:float)->void:
+	var size:Vector2=get_viewport_rect().size
+	var edge:Vector2=Vector2.ZERO
+	if _last_pointer.x<DRAW_EDGE_MARGIN and _draw_heading.x<-.1:edge.x=_draw_heading.x
+	if _last_pointer.x>size.x-DRAW_EDGE_MARGIN and _draw_heading.x>.1:edge.x=_draw_heading.x
+	if _last_pointer.y<DRAW_EDGE_MARGIN+65 and _draw_heading.y<-.1:edge.y=_draw_heading.y
+	if _last_pointer.y>size.y-DRAW_EDGE_MARGIN and _draw_heading.y>.1:edge.y=_draw_heading.y
+	if edge.is_zero_approx():return
+	var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
+	# Continue only an outward gesture at the physical screen edge. Moving back
+	# changes heading immediately; accumulated virtual offset never jumps back.
+	_draw_virtual+=edge.normalized()*DRAW_EDGE_SPEED*minf(real_delta,.05)/zoom
+	_append_draw_point()
 
 func _on_move_released(_direction: Vector2) -> void:
 	if _drawing_dodge:
@@ -228,6 +257,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if _drawing_dodge:
+		_extend_drawing_at_edge(delta/maxf(Engine.time_scale,.01))
 		if _now_seconds()-_drawing_real_started > 2.0:
 			_on_move_released(Vector2.ZERO)
 		velocity = Vector2.ZERO
