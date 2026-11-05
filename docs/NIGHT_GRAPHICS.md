@@ -27,3 +27,8 @@ Visual inspection: menu silhouette and text at1280x720, third movie, bright Z pr
 - A new event test passes touches through the native joystick into the player, tests drawing at0.24x and restores1x on lift.4bullet-time tests14assertions pass in windowed Linux rendering; this is not Android-device verification.
 - Interior-to-gate alignment prevents a courier starting off-centre from cutting diagonally into a wall. That fix exposed a new master-route blockage; the previous sidestep heuristic was insufficient. A local collision-aware grid detour now walks around actual walls/herd bodies, keeping normal collision masks and no teleport.4courier tests20assertions pass, including master route and simultaneous couriers/manual target retirement. The physics-query detour is only rebuilt on stalled progress, but Android cost remains unmeasured.
 - Physical-corral regression tests were rerun separately because a batched82s+41s run exceeded the120s command budget.
+
+## Checkpoint 01:46 CET - candidate0.21.17
+Final16:9 movie and rail occlusion inspected.20:9 menu/gameplay inspected in previous pass. Local collision-query object reused to avoid thousands of allocations on a detour; no changed collision masks. Master and simultaneous courier tests rerun after this optimization,4/20pass. No real Android performance measurement is available.
+
+Candidate APK: com.example.rancho.review, version0.21.17/code227, signed with the saved stable46bdcb... certificate used in0.21.15/16.16KB alignment verifies. APK contains HD art and imported gait assets. Android-device install/play still untested, no device connected.

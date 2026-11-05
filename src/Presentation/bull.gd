@@ -527,16 +527,16 @@ func _courier_detour(target: Vector2) -> PackedVector2Array:
 	grid.update()
 	var start := Vector2i(roundi(global_position.x/16),roundi(global_position.y/16))
 	var finish := Vector2i(roundi(target.x/16),roundi(target.y/16))
+	var query:=PhysicsShapeQueryParameters2D.new()
+	query.shape=$CollisionShape2D.shape
+	query.collision_mask=collision_mask
+	query.exclude=[get_rid()]
 	for y in range(-16,17):
 		for x in range(-30,31):
 			var cell:=Vector2i(x,y)
 			var at:=Vector2(cell)*16
 			if cell==start or cell==finish: continue
-			var query:=PhysicsShapeQueryParameters2D.new()
-			query.shape=$CollisionShape2D.shape
 			query.transform=Transform2D(0,at)
-			query.collision_mask=collision_mask
-			query.exclude=[get_rid()]
 			if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():
 				grid.set_point_solid(cell,true)
 	if not grid.is_in_boundsv(start) or not grid.is_in_boundsv(finish): return PackedVector2Array()
