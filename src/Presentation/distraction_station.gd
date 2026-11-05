@@ -15,8 +15,8 @@ func _draw() -> void:
 	draw_texture_rect(texture,Rect2(-53,-57,106,93),false)
 	if kind=="water":
 		for i in range(2):
-			var y:float=-19+i*7+sin(_time*1.8+i)*1.2
-			draw_arc(Vector2(-7+i*15,y),9,0.1,2.5,14,Color(.7,.95,.93,.5+sin(_time*2+i)*.15),1.2,true)
+			var y:float=-25+i*3+sin(_time*1.8+i)*.7
+			draw_arc(Vector2(-13+i*25,y),5,0.1,2.5,14,Color(.7,.95,.93,.5+sin(_time*2+i)*.15),1.2,true)
 	var label: String = "AGUA" if kind == "water" else "HENO"
 	draw_string(ThemeDB.fallback_font, Vector2(-36, -62), label, HORIZONTAL_ALIGNMENT_CENTER, 72, 12, Color("fff1cd"))
 func draw_ellipse_shadow() -> void:
