@@ -30,6 +30,7 @@ const DODGE_COAST_SPEED_FACTOR: float = .8
 var _dodge_coast_remaining: float = 0.0
 var _move_tap: DoubleTapDetector = DoubleTapDetector.new(.3)
 const DRAW_TIME_SCALE: float = .24
+var _run_after_dodge: Vector2 = Vector2.ZERO
 var dodge_path_limit: float = 260.0
 var _drawing_real_started: float = 0.0
 var _drawing_dodge: bool = false
@@ -176,6 +177,7 @@ func _extend_drawing_at_edge(real_delta:float)->void:
 	_append_draw_point()
 
 func _on_move_released(_direction: Vector2) -> void:
+	_run_after_dodge = Vector2.ZERO
 	if _drawing_dodge:
 		_drawing_dodge = false
 		Engine.time_scale = 1.0
@@ -192,6 +194,7 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 	var preview: PackedVector2Array = dodge_preview_points(points)
 	if preview.size()<2: return false
 	_dodge_path.clear()
+	_run_after_dodge = Vector2.ZERO
 	_dodge_coast_remaining = 0.0
 	_skid_trail.clear()
 	_skid_trail.append(global_position)
@@ -279,15 +282,15 @@ func _physics_process(delta: float) -> void:
 	if not _dodge_path.is_empty():
 		var distance_left:float=global_position.distance_to(_dodge_path[0])
 		for i in range(1,_dodge_path.size()): distance_left+=_dodge_path[i-1].distance_to(_dodge_path[i])
-		# Ease down inside the promised path, never coast beyond its endpoint.
-		var budget: float = minf(max_speed*DODGE_SPEED_FACTOR,maxf(25.0,distance_left*14.0))*delta
+		# Ease to running speed, not to a standstill, at the traced endpoint.
+		var budget: float = minf(max_speed*DODGE_SPEED_FACTOR,maxf(max_speed,distance_left*14.0))*delta
 		if _active_capture_count >= 2:
 			budget *= dual_capture_speed_multiplier
 		var collision_free: bool = true
 		while budget > .01 and not _dodge_path.is_empty():
 			var offset: Vector2 = _dodge_path[0] - global_position
 			var step: Vector2 = offset.limit_length(budget)
-			_dodge_direction = offset.normalized()
+			if not offset.is_zero_approx(): _dodge_direction = offset.normalized()
 			var collision: KinematicCollision2D = move_and_collide(step)
 			_skid_trail.append(global_position)
 			budget -= step.length()
@@ -297,15 +300,18 @@ func _physics_process(delta: float) -> void:
 				break
 			if offset.length() <= step.length() + .1:
 				_dodge_path.pop_front()
-		# Only a bounded soft stop follows the trace, never the old full sprint
-		# velocity decaying through ordinary movement friction.
+		# The special trace ends here; ordinary running immediately takes over.
 		if _dodge_path.is_empty():
 			dodge_finished.emit()
 			_dodge_coast_remaining = 0.0
-			velocity = Vector2.ZERO
+			if collision_free:
+				_resume_running_after_dodge()
+			else:
+				_run_after_dodge = Vector2.ZERO
+				velocity = Vector2.ZERO
 		else:
 			velocity = _dodge_direction * max_speed * DODGE_SPEED_FACTOR
-		var facing: Array = SpriteSwap.direction_suffix(_dodge_direction)
+		var facing: Array = SpriteSwap.direction_suffix(velocity if not velocity.is_zero_approx() else _dodge_direction)
 		_sprite_swap.play("walk_" + facing[0])
 		_sprite_swap.set_flip_h(facing[1])
 		_sprite_swap.set_motion_speed(velocity.length(), 260.0)
@@ -335,6 +341,7 @@ func _physics_process(delta: float) -> void:
 		velocity = _dodge_direction * speed
 		move_and_slide()
 		global_position = global_position.clamp(world_bounds.position, world_bounds.end)
+		if _dodge_remaining <= 0.0: _resume_running_after_dodge()
 		var direction: Array = SpriteSwap.direction_suffix(_dodge_direction)
 		_sprite_swap.play("walk_" + direction[0])
 		_sprite_swap.set_flip_h(direction[1])
@@ -343,6 +350,10 @@ func _physics_process(delta: float) -> void:
 		return
 	queue_redraw()
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if not input_dir.is_zero_approx():
+		_run_after_dodge = Vector2.ZERO
+	elif not _run_after_dodge.is_zero_approx():
+		input_dir = _run_after_dodge
 	var is_moving: bool = input_dir.length() > 0.0
 
 	if is_moving:
@@ -369,6 +380,12 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("release_capture"):
 		release_requested.emit()
 	_process_throw_input(delta)
+
+func _resume_running_after_dodge() -> void:
+	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	_run_after_dodge = _dodge_direction if input_dir.is_zero_approx() else input_dir.normalized()
+	var speed: float = max_speed * (dual_capture_speed_multiplier if _active_capture_count >= 2 else 1.0)
+	velocity = _run_after_dodge * speed
 
 func _process_throw_input(delta: float) -> void:
 	if _is_charging:
@@ -450,6 +467,7 @@ func cancel_all_actions() -> void:
 	_flight_tween = null
 
 func cancel_input() -> void:
+	_run_after_dodge = Vector2.ZERO
 	if _drawing_dodge: dodge_drawing_finished.emit()
 	Engine.time_scale = 1.0
 	_dodge_coast_remaining = 0.0

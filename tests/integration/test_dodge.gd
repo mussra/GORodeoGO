@@ -53,41 +53,45 @@ func test_double_tap_then_drag_records_path_but_normal_drag_does_not() -> void:
 	player._on_move_released(Vector2.RIGHT)
 	assert_eq(player._dodge_path.size(), 3)
 
-func test_trace_has_short_bounded_soft_stop_without_long_sprint_coast() -> void:
+func test_trace_transitions_immediately_to_normal_running() -> void:
 	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	var player: Node = source.get_node("Player").duplicate()
 	source.free()
 	add_child_autofree(player)
-	await wait_physics_frames(1)
+	player.set_physics_process(false)
 	var start: Vector2 = player.global_position
-	assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO, Vector2(40, 0), Vector2(20, 30), Vector2(60, 30)])))
-	await wait_physics_frames(40)
-	assert_gt(player.global_position.x, start.x + 59, "ease down ends at the preview Z endpoint")
-	assert_lt(player.global_position.x, start.x + 61, "no motion beyond preview endpoint")
-	assert_almost_eq(player.global_position.y, start.y + 30, .1)
-	assert_eq(player.velocity, Vector2.ZERO)
-	var endpoint: Vector2 = player.global_position
-	Input.action_press("move_left")
-	await wait_physics_frames(5)
-	Input.action_release("move_left")
-	assert_lt(player.global_position.x, endpoint.x - 1, "normal held movement resumes after trace")
+	assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO,Vector2(60,0)])))
+	for i in range(60):
+		player._physics_process(1.0/60)
+		if player._dodge_path.is_empty():break
+	assert_almost_eq(player.global_position.x,start.x+60,.2,"trace ends at preview, running begins after it")
+	assert_almost_eq(player.velocity.length(),player.max_speed,.1,"no stationary transition frame")
+	player._physics_process(1.0/60)
+	assert_gt(player.global_position.x,start.x+60,"keeps running without held input")
+	Input.action_press("move_up")
+	player._physics_process(.1)
+	assert_lt(player.velocity.y,0.0,"fresh joystick steers running")
+	Input.action_release("move_up")
+	player.cancel_input()
+	assert_eq(player._run_after_dodge,Vector2.ZERO,"pause/stun can stop continuation")
 
-func test_closed_trace_returns_to_origin_then_has_bounded_soft_stop() -> void:
+func test_finish_uses_current_input_and_dual_capture_speed() -> void:
 	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	var player: Node = source.get_node("Player").duplicate()
 	source.free()
 	add_child_autofree(player)
-	await wait_physics_frames(1)
-	var start: Vector2 = player.global_position
-	var circle := PackedVector2Array([Vector2.ZERO])
-	for i in range(1,25):
-		var a: float = TAU * i / 24.0
-		circle.append(Vector2(sin(a),1-cos(a)) * 37)
-	assert_true(player.request_dodge_path(circle))
-	await wait_physics_frames(60)
-	assert_lt(player.global_position.distance_to(start), 1.0, "closed trace ends at displayed origin, no extra coast")
-	assert_lt(player.global_position.distance_to(start), 25.0, "circle follow-through is bounded")
-	assert_eq(player.velocity, Vector2.ZERO)
+	player.set_physics_process(false)
+	player.set_active_capture_count(2)
+	assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO,Vector2(30,0)])))
+	Input.action_press("move_down")
+	for i in range(60):
+		player._physics_process(1.0/60)
+		if player._dodge_path.is_empty():break
+	assert_almost_eq(player.velocity.x,0.0,.01)
+	assert_almost_eq(player.velocity.y,player.max_speed*player.dual_capture_speed_multiplier,.1)
+	Input.action_release("move_down")
+	player._on_move_released(Vector2.DOWN)
+	assert_eq(player._run_after_dodge,Vector2.ZERO,"normal joystick release still stops running")
 
 func test_trace_hits_obstacle_instead_of_crossing_it() -> void:
 	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
@@ -139,3 +143,24 @@ func test_freeform_s_retains_all_waypoints_and_stun_cancels_soft_stop() -> void:
 	player._dodge_coast_remaining = .1
 	player.stun(.5)
 	assert_eq(player._dodge_coast_remaining,0.0)
+
+func test_handoff_has_no_stationary_frame_at_30_60_120_fps() -> void:
+	for fps in [30,60,120]:
+		var source:Node=load("res://src/Presentation/level_0.tscn").instantiate()
+		var player:Node=source.get_node("Player").duplicate()
+		source.free()
+		add_child_autofree(player)
+		player.set_physics_process(false)
+		player.global_position=Vector2.ZERO
+		assert_true(player.request_dodge_path(PackedVector2Array([Vector2.ZERO,Vector2(35,15),Vector2(65,0)])))
+		for i in range(fps):
+			player._physics_process(1.0/fps)
+			if player._dodge_path.is_empty():break
+		assert_true(player._dodge_path.is_empty())
+		assert_almost_eq(player.velocity.length(),player.max_speed,.1)
+		var endpoint:Vector2=player.global_position
+		player._physics_process(1.0/fps)
+		assert_gt(player.global_position.distance_to(endpoint),0.1,"manual transition advances; move_and_slide uses engine tick, not injected delta")
+		player.stun(.5)
+		assert_eq(player._run_after_dodge,Vector2.ZERO,"contact cancels continued running")
+		assert_eq(player.velocity,Vector2.ZERO)

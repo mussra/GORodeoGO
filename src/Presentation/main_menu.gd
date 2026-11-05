@@ -93,7 +93,7 @@ func _build_menu() -> void:
 	_play.pressed.connect(_on_level_selected.bind(_next_level))
 	_hero.add_child(_play)
 	_missions = Button.new()
-	_missions.text = "EXPLORAR LOS 20 NIVELES"
+	_missions.text = "NIVELES · AVANZA UNO A UNO"
 	_missions.add_theme_font_size_override("font_size",16)
 	_missions.pressed.connect(_show_levels)
 	_hero.add_child(_missions)
@@ -152,8 +152,8 @@ func _build_menu() -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size = Vector2(0,58)
-		button.disabled = not LevelProgression.is_unlocked(number,SaveData.highest_level_completed,OS.is_debug_build())
-		button.text = "%02d\n%s" % [number,"RODEO" if number <=10 else "CORRALES"]
+		button.disabled = not LevelProgression.is_unlocked(number,SaveData.highest_level_completed)
+		button.text = "%02d\n%s" % [number,("BLOQUEADO" if button.disabled else ("RODEO" if number <=10 else "CORRALES"))]
 		button.pressed.connect(_on_level_selected.bind(number))
 		level_grid.add_child(button)
 	_drawer.hide()
@@ -218,7 +218,7 @@ func _hide_levels() -> void:
 	_drawer.hide()
 	_missions.grab_focus()
 func _on_level_selected(number: int) -> void:
-	if _transitioning: return
+	if _transitioning or not LevelProgression.is_unlocked(number, SaveData.highest_level_completed): return
 	_transitioning = true
 	GameState.selected_level = number
 	get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn")
