@@ -35,7 +35,7 @@ func _begin_brand_intro() -> void:
 		return
 	GameState.brand_intro_played = true
 	var cover := ColorRect.new()
-	cover.color = Color("14284b")
+	cover.color = Color("061535")
 	cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(cover)
 	var image := TextureRect.new()
@@ -51,7 +51,7 @@ func _begin_brand_intro() -> void:
 	cover.add_child(image)
 	var reveal := create_tween()
 	reveal.tween_property(image, "modulate:a", 1.0, .65)
-	reveal.tween_interval(.35)
+	reveal.tween_interval(1.8)
 	reveal.tween_property(cover, "modulate:a", 0.0, .3)
 	reveal.tween_callback(cover.queue_free)
 	reveal.tween_callback(_animate_intro)

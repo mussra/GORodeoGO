@@ -225,3 +225,9 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 -Capture pauses opener task; release resumes physical route from actual position. Manual opening/secure delivery retire it.
 -Released wild bulls keep partial calm but ordinary full speed, no nerve reset/global speed increase.
 -15-19preserved. Logo proposal not included while awaiting aesthetic feedback. No main merge.
+
+## 0.21.26 - Selected flat Zumbel splash
+- Uses the second supplied Zumbel logo with its full text, selected on 2026-11-05.
+- Original source retained in brand/zumbel_source.png. Only empty background edges feathered for the splash; artwork and words unchanged.
+- Boot image scaled to fit landscape; reveal hold extended to 1.8 seconds for subtitle reading.
+- Gameplay, campaign and controls unchanged from 0.21.25. No main merge.

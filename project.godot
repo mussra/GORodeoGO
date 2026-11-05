@@ -10,14 +10,14 @@ config_version=5
 
 [application]
 
-boot_splash/bg_color=Color(0.0784314, 0.156863, 0.294118, 1)
-boot_splash/image="res://brand/zumbel_splash.png"
+boot_splash/bg_color=Color(0.0235294, 0.0823529, 0.207843, 1)
+boot_splash/image="res://brand/zumbel_boot.png"
 boot_splash/fullsize=false
 boot_splash/use_filter=true
 
 config/name="Rancho"
 config/icon="res://art/icon.png"
-config/version="0.21.25"
+config/version="0.21.26"
 run/main_scene="res://src/Presentation/main_menu.tscn"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.7")
