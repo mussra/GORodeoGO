@@ -4,9 +4,9 @@ func test_all_layouts_contain_bulls_and_clear_goal_spawn_each_other() -> void:
 		var pens: Array = LevelCatalog.get_level(number).pens
 		var rects: Array = []
 		for i in range(pens.size()):
-			var layout: Dictionary = PuzzleCorralLayout.build(pens.size(), i, pens[i]["bull_indices"].size())
+			var layout: Dictionary = ArenaLayout.spread_corral(PuzzleCorralLayout.build(pens.size(), i, pens[i]["bull_indices"].size(),pens[i].get("layout_mirror_x",false)),ArenaLayout.scale_for_level(number))
 			var rect: Rect2 = layout["rect"]
-			assert_true(Rect2(-480, -270, 960, 540).encloses(rect.grow(4)))
+			assert_true(ArenaLayout.bounds_for_level(number).encloses(rect.grow(4)))
 			assert_false(rect.grow(24).has_point(Vector2.ZERO))
 			assert_false(rect.grow(24).intersects(Rect2(-340, -40, 80, 80)))
 			for slot: Vector2 in layout["slots"]:

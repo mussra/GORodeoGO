@@ -39,6 +39,7 @@ func test_detour_cost_is_reported_not_android_certification() -> void:
 	await wait_physics_frames(2)
 	level._on_pen_door_opened(0)
 	var bull: Node=level._active_bulls[0]
+	await wait_physics_frames(500)
 	var begin: int=Time.get_ticks_usec()
 	var path: PackedVector2Array=bull._courier_detour(Vector2(0,-75))
 	var elapsed: float=(Time.get_ticks_usec()-begin)/1000.0

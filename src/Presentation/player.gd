@@ -34,6 +34,14 @@ var dodge_path_limit: float = 260.0
 var _drawing_real_started: float = 0.0
 var _drawing_dodge: bool = false
 var _draw_screen_start: Vector2 = Vector2.ZERO
+var _draw_pointer_previous:Vector2=Vector2.ZERO
+var _draw_virtual:Vector2=Vector2.ZERO
+var _draw_heading:Vector2=Vector2.ZERO
+const DRAW_EDGE_MARGIN:float=28.0
+const DRAW_EDGE_SPEED:float=300.0
+const DRAW_EDGE_DWELL:float=.18
+var _draw_edge_elapsed:float=0.0
+var _draw_edge_active:bool=false
 var _last_touch_index: int = -1
 var _draw_touch_index: int = -1
 var _skid_trail: Array[Vector2] = []
@@ -53,7 +61,7 @@ const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_di
 @export var friction: float = 700.0
 @export var max_throw_distance: float = 220.0
 @export var charge_speed: float = 300.0  # units/sec the lasso reaches out while charging (keyboard fallback)
-@export var lasso_travel_time: float = 1.0  # seconds between release and actual capture resolution
+@export var lasso_travel_time: float = .8  # seconds between release and actual capture resolution
 @export var stun_resistance_multiplier: float = 1.0  # applied to incoming stun duration; upgrade lowers this
 @export var dual_capture_speed_multiplier: float = 0.6  # applied to max_speed while towing 2+ bulls at once (Level 10 unlock)
 @export var capture_area_visual_radius: float = 58.0  # visual only — roughly matches a bull's hit_radius + capture_tolerance defaults; not read from any specific bull, since which bull (if any) gets hit isn't known until resolution
@@ -64,7 +72,7 @@ var _stun_time_remaining: float = 0.0
 var _is_charging: bool = false
 var _lasso_in_flight: bool = false
 var _flight_generation: int = 0
-var _flight_line: Line2D = null
+var _flight_line: Node2D = null
 var _flight_tween: Tween = null
 var _aim_pressed_at_seconds: float = 0.0
 var _double_tap: DoubleTapDetector = DoubleTapDetector.new(LassoAim.DOUBLE_TAP_WINDOW_SECONDS)
@@ -77,6 +85,12 @@ var _touch_aim_active: bool = false
 
 func _ready() -> void:
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, ART_ROOT, ANIM_NAMES)
+	var cue_layer:=CanvasLayer.new()
+	cue_layer.layer=16
+	add_child(cue_layer)
+	var cue:=DodgeEdgeCue.new()
+	cue.player=self
+	cue_layer.add_child(cue)
 
 ## Called every frame by Level0 — how many bulls this player currently has captured/calming/
 ## controlled, so movement speed can be penalized while towing more than one (per design:
@@ -117,6 +131,11 @@ func _on_move_pressed() -> void:
 		dodge_drawing_started.emit()
 		_draw_touch_index = _last_touch_index
 		_draw_screen_start = _last_pointer
+		_draw_pointer_previous=_last_pointer
+		_draw_virtual=Vector2.ZERO
+		_draw_heading=Vector2.ZERO
+		_draw_edge_elapsed=0.0
+		_draw_edge_active=false
 		_draw_points = PackedVector2Array([Vector2.ZERO])
 		velocity = Vector2.ZERO
 
@@ -125,13 +144,36 @@ func _input(event: InputEvent) -> void:
 		_last_pointer = event.position
 		_last_touch_index = event.index
 	elif event is InputEventScreenDrag:
-		_last_pointer = event.position
 		if _drawing_dodge and event.index == _draw_touch_index:
-			var zoom: float = get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d() != null else 1.0
-			var point: Vector2 = (event.position - _draw_screen_start) / zoom
-			if _draw_points[-1].distance_to(point) > 5.0 and _draw_points.size() < 120:
-				_draw_points.append(point)
-			queue_redraw()
+			_last_pointer=event.position
+			var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
+			var delta:Vector2=event.position-_draw_pointer_previous
+			_draw_pointer_previous=event.position
+			if delta.length()>1:_draw_heading=delta.normalized()
+			_draw_virtual+=delta/zoom
+			_append_draw_point()
+
+func _append_draw_point()->void:
+	if _draw_points.is_empty():return
+	if _draw_points[-1].distance_to(_draw_virtual)>5 and _draw_points.size()<120:
+		_draw_points.append(_draw_virtual)
+	queue_redraw()
+
+func _extend_drawing_at_edge(real_delta:float)->void:
+	var size:Vector2=get_viewport_rect().size
+	var outward:bool=(_last_pointer.x<DRAW_EDGE_MARGIN and _draw_heading.x<-.1) or (_last_pointer.x>size.x-DRAW_EDGE_MARGIN and _draw_heading.x>.1) or (_last_pointer.y<DRAW_EDGE_MARGIN and _draw_heading.y<-.1) or (_last_pointer.y>size.y-DRAW_EDGE_MARGIN and _draw_heading.y>.1)
+	if not outward or _draw_heading.is_zero_approx():
+		_draw_edge_elapsed=0.0
+		_draw_edge_active=false
+		return
+	_draw_edge_elapsed+=minf(real_delta,.05)
+	_draw_edge_active=_draw_edge_elapsed>=DRAW_EDGE_DWELL
+	if not _draw_edge_active:return
+	var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
+	# Preserve full latest heading, including diagonals at a single edge/corner.
+	# Inward drag stops continuation without snapping accumulated virtual offset.
+	_draw_virtual+=_draw_heading*DRAW_EDGE_SPEED*minf(real_delta,.05)/zoom
+	_append_draw_point()
 
 func _on_move_released(_direction: Vector2) -> void:
 	if _drawing_dodge:
@@ -228,6 +270,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if _drawing_dodge:
+		_extend_drawing_at_edge(delta/maxf(Engine.time_scale,.01))
 		if _now_seconds()-_drawing_real_started > 2.0:
 			_on_move_released(Vector2.ZERO)
 		velocity = Vector2.ZERO
@@ -381,7 +424,7 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 
 	# Simulated flight time (GAMEPLAY_SPEC.md #Lanzamiento: "sensación de altura" — the rope
 	# travels before landing; the bull can move away in the meantime). The line animates in
-	# world space (not parented to the player) since the player keeps moving during the throw.
+	# world space: destination stays fixed but the rope origin follows the rider.
 	lasso_released.emit()
 	_lasso_in_flight = true
 	_flight_generation += 1
@@ -429,22 +472,19 @@ func _cancel_charge() -> void:
 	queue_redraw()
 
 ## Animates a line from throw_origin to landing_point over lasso_travel_time, in world
-## space (parented to the level, not the player, so it stays put even as the player moves).
+## space: landing stays fixed, rope origin follows the moving rider.
 func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> void:
-	var line := Line2D.new()
-	_flight_line = line
-	line.width = 3.0
-	line.default_color = Color(0.85, 0.65, 0.2, 1.0)
-	get_parent().add_child(line)  # the level; unlike current_scene it also works when the level is instanced inside another tree (tests)
-	line.points = PackedVector2Array([throw_origin, throw_origin])
-
-	var tween: Tween = create_tween()
-	_flight_tween = tween
-	tween.tween_method(
-		func(t: float): line.points = PackedVector2Array([throw_origin, throw_origin.lerp(landing_point, t)]),
-		0.0, 1.0, lasso_travel_time
-	)
-	tween.tween_callback(line.queue_free)
+	var rope:=LassoRope.new()
+	_flight_line=rope
+	rope.rider=self
+	rope.start=throw_origin
+	rope.landing=landing_point
+	rope.landing_radius=capture_area_visual_radius
+	get_parent().add_child(rope)
+	var tween:Tween=create_tween()
+	_flight_tween=tween
+	tween.tween_property(rope,"progress",1.0,lasso_travel_time)
+	tween.tween_callback(rope.queue_free)
 
 ## Shows the lasso's effective capture area as a translucent circle where it lands, fading out.
 func _flash_landing_area(landing_point: Vector2) -> void:

@@ -207,3 +207,31 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Progressive Zumbel reveal before both menu variants, plus staggered animal entrance. No new audio approved or included.
 - Rider contact still stuns and drops captures, explicitly retained by Antonio on 4 November.
 - Verified existing next-level/menu navigation, including final level without level 21.
+
+## 0.21.23 - Level20 grouped herd and destination corral
+- Level20: ten bulls grouped4/3/3 in three corrals instead of eight small pockets. Same timer/map size/count.
+- Couriers and exiting bulls no longer consume designated pursuit role. Courier visits other latches while free companions can chase captures.
+- Destination corral gets ranch wood/gold horseshoe styling, unchanged80x80delivery physics.
+- Directed live-herd and courier tests plus preview. Levels11-19balance remains a separate pass; no main merge.
+
+## 0.21.24 - Grouped herd progression15-19
+-15one-way4/6;16fork4/3/3;17reciprocal5/5;18linkedpair+independent4/3/3;19master4/3/3mirrored.
+- Same total10bulls and clocks.11-14unchanged after physical goal/latch accessibility repro;20keeps0.21.23.
+- Live-herd input/capture/evasion/calming/delivery checks, no frozen pursuers or forced nerves. First-bull delivery is not complete human balance certification.
+- Full309tests302pass7fail; clock/input tests covered real-window; existing11-14proximity warnings documented. No main merge.
+
+##0.21.25 - Sequence puzzle and persistent opener
+-Level20:2/3/5with small→large consequence, same10bulls/450s; expandedmapshowscountsandlinks.
+-Capture pauses opener task; release resumes physical route from actual position. Manual opening/secure delivery retire it.
+-Released wild bulls keep partial calm but ordinary full speed, no nerve reset/global speed increase.
+-15-19preserved. Logo proposal not included while awaiting aesthetic feedback. No main merge.
+
+## 0.21.26 - Selected flat Zumbel splash
+- Uses the second supplied Zumbel logo with its full text, selected on 2026-11-05.
+- Original source retained in brand/zumbel_source.png. Only empty background edges feathered for the splash; artwork and words unchanged.
+- Boot image scaled to fit landscape; reveal hold extended to 1.8 seconds for subtitle reading.
+- Gameplay, campaign and controls unchanged from 0.21.25. No main merge.
+
+## Source update after 0.21.26 - Shared splash asset (next build)
+- Uses common 1080 square splash supplied for all four games, full text intact, with #041940 background.
+- Landscape layout keeps subtitle readable. Gameplay unchanged.

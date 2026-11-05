@@ -22,14 +22,9 @@ var _chase_target: Vector2 = Vector2.ZERO
 var _chase_skidding: bool = false
 
 const PLAYER_TOUCH_RADIUS: float = 18.0
-## Floor on the nerves->speed factor (see _compute_flee_speed_for_nerves) so a bull let go
-## at ~0 nerves still visibly creeps away rather than freezing solid (CONTROLLED forced to
-## ESCAPED via _release_any_held_peer is the one path that can hit exactly 0). Tune to 0.0
-## for a literal stop instead, if that reads better in playtesting.
 const CHASER_BLOCKED_SECONDS: float = 1.0  # stuck this long -> pass the baton (D036)
 const CHASER_BLOCKED_PROGRESS_RATIO: float = 0.25  # moving < 25% of the intended step counts as blocked
 const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
-const MIN_FLEE_SPEED_FACTOR: float = 0.15
 const TOW_CATCHUP_MARGIN: float = 80.0  # extra speed over the player's own while closing the leash gap
 const ART_ROOT: String = "res://art/bull/"
 const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_diag_down", "flee_diag_up", "captured", "calming", "controlled", "drinking"]
@@ -42,6 +37,7 @@ var _release_gate: Vector2 = Vector2.ZERO
 var _release_inward: float = 0.0
 var _leaving_corral: bool = false
 var _release_alignment_done: bool = false
+var _release_overlap_peers:Array[Node2D]=[]
 var _release_delay: float = 0.0
 var _player: Node2D = null
 var _touching_player: bool = false
@@ -126,6 +122,7 @@ func set_player(player: Node2D) -> void:
 
 func _physics_process(delta: float) -> void:
 	queue_redraw()
+	_update_release_overlaps()
 	_distraction.update(delta)
 	_touch_grace_remaining = maxf(_touch_grace_remaining - delta, 0.0)
 	if _player == null:
@@ -173,6 +170,13 @@ func _physics_process(delta: float) -> void:
 			else:
 				_chase_heading = Vector2.ZERO
 				_chase_reaction = 0.0
+			if not _release_overlap_peers.is_empty():
+				var separation:Vector2=Vector2.ZERO
+				for peer in _release_overlap_peers:
+					var away:Vector2=global_position-peer.global_position
+					if away.length()<1:away=Vector2.RIGHT if get_instance_id()<peer.get_instance_id() else Vector2.LEFT
+					separation+=away.normalized()
+				flee_direction=(flee_direction+separation*1.4).normalized()
 			velocity = flee_direction * _effective_flee_speed
 			var position_before: Vector2 = global_position
 			move_and_slide()
@@ -357,15 +361,9 @@ func _update_flee_animation(flee_direction: Vector2, delta: float) -> void:
 		_sprite_swap.stop_on_idle()
 		modulate = Color.WHITE if _sprite_swap.has_sprite() else _color_for_nerves(controller.current_state())
 
-## Requirement: a bull that broke free at low nerves (almost calm, or fully CONTROLLED —
-## see _release_any_held_peer's force_escape) should flee slower, so it's easier to tell
-## apart from a fresh, fully wild bull and easier to recapture. At full nerves (the normal
-## first-release case, and the only case before this feature existed) this is exactly
-## flee_speed — unchanged max speed, as required. MIN_FLEE_SPEED_FACTOR floors it above
-## zero so a ~0-nerves escapee still visibly creeps rather than freezing solid.
+## Calmness remains in controller/visuals, but never slows a released wild bull.
 func _compute_flee_speed_for_nerves() -> float:
-	var nerves_fraction: float = controller.current_nerves() / NervesValue.MAX_VALUE
-	return flee_speed * max(nerves_fraction, MIN_FLEE_SPEED_FACTOR)
+	return flee_speed
 
 func _on_state_changed(new_state: BullState.State) -> void:
 	_distraction.cancel()
@@ -387,6 +385,15 @@ func _on_state_changed(new_state: BullState.State) -> void:
 		_random_chase.reset()
 		_facing.reset()
 		_effective_flee_speed = _compute_flee_speed_for_nerves()
+	# Held bulls may overlap by design. Re-enabling peer collision inside another
+	# body makes the engine depenetrate abruptly across a nearby fence corner.
+	# Keep fence collision, separate by ordinary movement, then restore peer collision.
+	if new_state==BullState.State.ESCAPED:
+		for peer in _peers:
+			if peer!=self and is_instance_valid(peer) and global_position.distance_to(peer.global_position)<48.5:
+				if not _release_overlap_peers.has(peer):
+					_release_overlap_peers.append(peer)
+					add_collision_exception_with(peer)
 	_update_collision(new_state)
 	var anim_name: String = _animation_name_for_state(new_state)
 	if _sprite_swap.play(anim_name):
@@ -454,6 +461,8 @@ func _color_for_nerves(state: BullState.State) -> Color:
 
 ## Readable state cues do not recolor the entire character or depend on missing art.
 func _draw() -> void:
+	if _release_delay>0 and controller.is_wild():
+		draw_arc(Vector2(0,-57),9,-PI/2,-PI/2+TAU*clampf(_release_delay/.75,0,1),20,Color("f5d090"),2,true)
 	if _courier_active:
 		draw_circle(Vector2(0,-65),10,Color("b98a40"))
 		draw_arc(Vector2(-2,-67),3,0,TAU,12,Color("fff2be"),2,true)
@@ -514,22 +523,27 @@ func _move_courier(delta: float) -> void:
 	else:
 		_courier_blocked+=delta
 	if _courier_blocked > .8:
-		var detour: PackedVector2Array = _courier_detour(_courier_path[0])
+		var detour: PackedVector2Array = _courier_detour(_courier_path[0], PenDoor.RADIUS if _courier_path.size()==1 else 0.0)
 		for i in range(detour.size()-1,-1,-1): _courier_path.push_front(detour[i])
 		_courier_blocked=0.0
 		_courier_best_distance=INF
 	_update_flee_animation(offset.normalized(),delta)
 	_sprite_swap.set_motion_speed(velocity.length(),flee_speed)
-	if global_position.distance_to(_courier_path[0])<8:
+	# A courier uses the same physical latch interaction area as the rider.
+	# The exact latch centre can be blocked by a bull behind the closed fence.
+	var arrival_radius:float=PenDoor.RADIUS if _courier_path.size()==1 else 8.0
+	if global_position.distance_to(_courier_path[0])<arrival_radius:
 		_courier_path.pop_front()
 		_courier_best_distance=INF
 	_check_player_contact()
 
 ## Small local grid detour around real walls and nearby herd bodies. It never
 ## changes collision masks or moves the body directly.
-func _courier_detour(target: Vector2) -> PackedVector2Array:
+func _courier_detour(target: Vector2, interaction_radius:float=0.0) -> PackedVector2Array:
 	var grid := AStarGrid2D.new()
-	grid.region=Rect2i(-30,-16,61,33)
+	var first:=Vector2i(floori(world_bounds.position.x/16),floori(world_bounds.position.y/16))
+	var last:=Vector2i(ceili(world_bounds.end.x/16),ceili(world_bounds.end.y/16))
+	grid.region=Rect2i(first,last-first+Vector2i.ONE)
 	grid.cell_size=Vector2(16,16)
 	grid.diagonal_mode=AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
 	grid.update()
@@ -539,15 +553,31 @@ func _courier_detour(target: Vector2) -> PackedVector2Array:
 	query.shape=$CollisionShape2D.shape
 	query.collision_mask=collision_mask
 	query.exclude=[get_rid()]
-	for y in range(-16,17):
-		for x in range(-30,31):
+	for y in range(first.y,last.y+1):
+		for x in range(first.x,last.x+1):
 			var cell:=Vector2i(x,y)
 			var at:=Vector2(cell)*16
-			if cell==start or cell==finish: continue
+			if cell==start or (cell==finish and interaction_radius==0): continue
 			query.transform=Transform2D(0,at)
 			if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():
 				grid.set_point_solid(cell,true)
 	if not grid.is_in_boundsv(start) or not grid.is_in_boundsv(finish): return PackedVector2Array()
+	if interaction_radius>0:
+		# Closed-latch centre may overlap a penned bull. Reach a physically clear
+		# point within its interaction area rather than pathfinding into its body.
+		var candidates:Array[Vector2i]=[]
+		for dy in range(-3,4):
+			for dx in range(-3,4):
+				var candidate:Vector2i=finish+Vector2i(dx,dy)
+				if grid.is_in_boundsv(candidate) and not grid.is_point_solid(candidate) and (Vector2(candidate)*16).distance_to(target)<interaction_radius:
+					candidates.append(candidate)
+		candidates.sort_custom(func(a,b):return (Vector2(a)*16).distance_to(target)<(Vector2(b)*16).distance_to(target))
+		for candidate in candidates:
+			var approach:PackedVector2Array=grid.get_point_path(start,candidate)
+			if not approach.is_empty():
+				approach.remove_at(0)
+				return approach
+		return PackedVector2Array()
 	var result: PackedVector2Array=grid.get_point_path(start,finish)
 	if not result.is_empty(): result.remove_at(0)
 	return result
@@ -584,3 +614,11 @@ func _recover_tow_route() -> void:
 		for old in range(i+1): _tow_path.pop_front()
 		for step in range(route.size()-1,-1,-1): _tow_path.push_front(route[step])
 		return
+
+func _update_release_overlaps()->void:
+	for peer in _release_overlap_peers.duplicate():
+		if not is_instance_valid(peer):
+			_release_overlap_peers.erase(peer)
+		elif global_position.distance_to(peer.global_position)>=50.0:
+			remove_collision_exception_with(peer)
+			_release_overlap_peers.erase(peer)

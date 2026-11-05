@@ -35,6 +35,8 @@ var _win_requires_all_bulls: bool = true
 var _chaser_director: ChaserDirector = ChaserDirector.new(CHASER_ENGAGE_DELAY_SECONDS)
 var _chaser_index: int = ChaserDirector.NO_CHASER
 var _next_capture_order: int = 1
+var _arena_scale:float=1.0
+var _edge_indicators:EdgeIndicators
 var _upgrades: PlayerUpgrades
 var _paused_by_user_or_os: bool = false
 var _intro_overlay_active: bool = false  # one-shot dual-lasso celebration: tree paused, HUD interactive
@@ -58,6 +60,9 @@ func _ready() -> void:
 	_upgrades = PlayerUpgrades.for_progress(SaveData.highest_level_completed)
 	_apply_unlocked_upgrades()
 	_level_number = level_data.level_number
+	_arena_scale=ArenaLayout.scale_for_level(_level_number)
+	world_bounds=ArenaLayout.bounds_for_level(_level_number)
+	if _arena_scale>1.0:_expand_arena()
 	_time_remaining = level_data.time_limit_seconds
 	_obstacle_rects = level_data.obstacle_rects if level_data.pens.is_empty() else []
 	_win_requires_all_bulls = level_data.win_requires_all_bulls
@@ -125,6 +130,7 @@ func _ready() -> void:
 ## exact same "solid to Player/Bull, invisible to Pen detection" setup, no new layer needed.
 func _setup_art() -> void:
 	var art := ArenaArt.new()
+	art.world_bounds=world_bounds
 	art.obstacle_rects = _obstacle_rects
 	art.pen_position = pen.position
 	add_child(art)
@@ -132,6 +138,19 @@ func _setup_art() -> void:
 		get_node(fence_name + "/Polygon2D").hide()
 	get_viewport().size_changed.connect(_fit_camera)
 	_fit_camera()
+	if _arena_scale>1.0:
+		var layer:=CanvasLayer.new()
+		layer.layer=5
+		add_child(layer)
+		_edge_indicators=EdgeIndicators.new()
+		_edge_indicators.level=self
+		layer.add_child(_edge_indicators)
+		var map_layer:=CanvasLayer.new()
+		map_layer.layer=15
+		add_child(map_layer)
+		var minimap:=ArenaMinimap.new()
+		minimap.level=self
+		map_layer.add_child(minimap)
 
 func _fit_camera() -> void:
 	var size: Vector2 = get_viewport_rect().size
@@ -183,7 +202,7 @@ func _spawn_pens(pens: Array) -> void:
 	_pens_data = pens.duplicate(true)
 	for index in range(_pens_data.size()):
 		var entry: Dictionary = _pens_data[index]
-		var layout: Dictionary = PuzzleCorralLayout.build(_pens_data.size(), index, entry["bull_indices"].size())
+		var layout: Dictionary = ArenaLayout.spread_corral(PuzzleCorralLayout.build(_pens_data.size(), index, entry["bull_indices"].size(),entry.get("layout_mirror_x",false)),_arena_scale)
 		entry["door_position"] = layout["door"]
 		var corral := PuzzleCorral.new()
 		corral.layout = layout
@@ -215,6 +234,7 @@ func _spawn_pens(pens: Array) -> void:
 	if _any_pen_has_links(pens):
 		var overlay := PenLinkOverlay.new()
 		_link_overlay = overlay
+		overlay.focus_player = player
 		overlay.layouts = _puzzle_corrals.map(func(c): return c.layout)
 		overlay.setup(pens, _pen_doors)
 		add_child(overlay)
@@ -226,7 +246,7 @@ func _any_pen_has_links(pens: Array) -> bool:
 	return false
 
 ## Open this corral now. Its courier physically visits the configured linked latches.
-## Capture interrupts the errand; the remaining doors still open manually.
+## Capture pauses the errand; release resumes it. Manual doors remain available.
 ## Arrival never recursively launches a destination corral's own links.
 func _on_pen_door_opened(pen_index: int) -> void:
 	_audio.play("door")
@@ -242,8 +262,9 @@ func _on_pen_door_opened(pen_index: int) -> void:
 		bull.courier_interrupted.connect(_on_courier_interrupted)
 	_send_courier(bull)
 
-func _on_courier_interrupted(bull: Node) -> void:
-	_courier_jobs.erase(bull)
+func _on_courier_interrupted(_bull: Node) -> void:
+	# The designated opener keeps its pending destination while held.
+	_refresh_trail()
 
 func _release_one_pen(index: int) -> void:
 	if _pen_released[index]: return
@@ -259,6 +280,7 @@ func _send_courier(bull: Node) -> void:
 		job["targets"].pop_front()
 	if job["targets"].is_empty():
 		_courier_jobs.erase(bull)
+		_refresh_trail()
 		return
 	var route: PackedVector2Array = CorralRoute.build(_puzzle_corrals[job["from"]].layout,_puzzle_corrals[job["targets"][0]].layout)
 	var source_layout: Dictionary = _puzzle_corrals[job["from"]].layout
@@ -267,6 +289,19 @@ func _send_courier(bull: Node) -> void:
 	elif source_layout["rect"].has_point(bull.global_position):
 		route.insert(0,Vector2(source_layout["gate"].x,bull.global_position.y))
 	bull.follow_corral_track(route)
+	_refresh_trail()
+
+## Resume from the bull's actual position, not its old source corral.
+func _resume_courier(bull: Node) -> void:
+	var job:Dictionary=_courier_jobs[bull]
+	while not job["targets"].is_empty() and _pen_released[job["targets"][0]]:job["targets"].pop_front()
+	if job["targets"].is_empty():return
+	var destination:Vector2=_puzzle_corrals[job["targets"][0]].layout["door"]
+	var route:PackedVector2Array=bull._courier_detour(destination,PenDoor.RADIUS)
+	if route.is_empty():return # still blocked: retry rather than teleport or forget task
+	route.append(destination)
+	bull.follow_corral_track(route)
+	_refresh_trail()
 
 func _on_courier_arrived(bull: Node) -> void:
 	if not _courier_jobs.has(bull): return
@@ -285,7 +320,7 @@ func _release_pen_bulls(pen_index: int) -> void:
 	for index: int in bull_indices:
 		if index >= 0 and index < _active_bulls.size():
 			var layout: Dictionary = _puzzle_corrals[pen_index].layout
-			_active_bulls[index].guide_out_of_corral(layout["gate"], layout["inward"], exit_order * 1.25)
+			_active_bulls[index].guide_out_of_corral(layout["gate"], layout["inward"], 0.75 + exit_order * 1.25)
 			exit_order += 1
 			_active_bulls[index].begin_active()
 
@@ -301,16 +336,22 @@ func _apply_unlocked_upgrades() -> void:
 	player.set_max_captures(_max_simultaneous_captures)
 
 func _process(delta: float) -> void:
+	if _arena_scale>1.0:_update_follow_camera()
 	if _game_over:
 		return
 
 	# Manually opened destinations retire obsolete errands immediately.
 	for bull in _courier_jobs.keys():
 		var job: Dictionary = _courier_jobs[bull]
+		job["retry"]=maxf(0.0,float(job.get("retry",0.0))-delta)
 		if job["targets"].all(func(i): return _pen_released[i]):
 			bull._courier_active = false
 			bull._courier_path.clear()
 			_courier_jobs.erase(bull)
+			_refresh_trail()
+		elif bull.controller.is_wild() and not bull._courier_active and job["retry"]<=0:
+			_resume_courier(bull)
+			job["retry"]=.35
 	_time_remaining -= delta
 	hud.update_timer(_time_remaining)
 	_update_nerves_hud()
@@ -334,12 +375,12 @@ func _update_chaser(delta: float) -> void:
 		bull.capture_held = holding_something
 	_apply_chaser(_chaser_director.update(delta, holding_something, _wild_distances()))
 
-## {bull index -> distance to player} for every bull that is currently wild.
+## Only free, exited wild bulls may chase. A courier never consumes the chaser role.
 func _wild_distances() -> Dictionary:
 	var wild_distances: Dictionary = {}
 	for i in range(_active_bulls.size()):
 		var bull = _active_bulls[i]
-		if bull.controller.is_wild():
+		if bull.controller.is_wild() and not _courier_jobs.has(bull) and not bull._leaving_corral:
 			wild_distances[i] = bull.global_position.distance_to(player.global_position)
 	return wild_distances
 
@@ -465,6 +506,8 @@ func _on_tranquilizer_requested() -> void:
 func _on_bull_returned(returned_bull: Node2D) -> void:
 	if _game_over:
 		return
+	_courier_jobs.erase(returned_bull) # permanently secured, not a released wild opener
+	_refresh_trail()
 	_audio.play("return")
 	_bulls_returned += 1
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
@@ -591,6 +634,40 @@ func _spawn_distraction_stations() -> void:
 	for entry: Dictionary in entries:
 		var station := DistractionStation.new()
 		station.kind = entry["kind"]
-		station.position = entry["position"]
+		station.position = entry["position"] * _arena_scale
 		add_child(station)
 		_distraction_stations.append(station)
+
+func _refresh_trail() -> void:
+	if not is_instance_valid(_link_overlay):return
+	_link_overlay.active_from=-1
+	_link_overlay.active_to=-1
+	if not _courier_jobs.is_empty():
+		var job:Dictionary=_courier_jobs.values()[0]
+		if not job["targets"].is_empty():
+			_link_overlay.active_from=job["from"]
+			_link_overlay.active_to=job["targets"][0]
+
+func _expand_arena() -> void:
+	pen.position *= _arena_scale
+	$PenBarrier.position *= _arena_scale
+	for pair in [["FenceTop",true,-1],["FenceBottom",true,1],["FenceLeft",false,-1],["FenceRight",false,1]]:
+		var fence: StaticBody2D = get_node(pair[0])
+		var shape: CollisionShape2D = fence.get_node("CollisionShape2D")
+		shape.shape = shape.shape.duplicate()
+		if pair[1]:
+			fence.position.y = pair[2] * (world_bounds.size.y / 2 + 10)
+			shape.shape.size = Vector2(world_bounds.size.x + 40,20)
+		else:
+			fence.position.x = pair[2] * (world_bounds.size.x / 2 + 10)
+			shape.shape.size = Vector2(20,world_bounds.size.y + 40)
+
+func _update_follow_camera() -> void:
+	var camera: Camera2D = $Camera2D
+	var half: Vector2 = get_viewport_rect().size / (camera.zoom * 2)
+	var border: Rect2 = world_bounds.grow(55)
+	var center: Vector2 = player.global_position
+	center.x = clampf(center.x,border.position.x+half.x,border.end.x-half.x)
+	center.y = clampf(center.y,border.position.y+half.y,border.end.y-half.y)
+	camera.position = center - camera.offset
+	camera.force_update_scroll()

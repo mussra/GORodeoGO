@@ -52,8 +52,7 @@ func test_linked_door_releases_its_targets_only() -> void:
 	assert_true(level._pen_released[0])
 	assert_false(level._pen_released[1],"linked target waits for real courier arrival")
 	assert_eq(level._courier_jobs.values()[0]["targets"],[1])
-	assert_false(level._pen_released[2])
-	assert_false(level._pen_released[3])
+	assert_eq(level._pen_released.size(),2)
 
 func test_pause_and_resume_toggle_the_tree_and_hud() -> void:
 	var level: Node = await _spawn_level(1)
@@ -367,7 +366,7 @@ func test_puzzle_bulls_and_gates_have_matching_numbers() -> void:
 		assert_eq(doors[index].door_number, index + 1)
 		for bull_index: int in level._pens_data[index].get("bull_indices", []):
 			assert_eq(level._active_bulls[bull_index].pen_number, index + 1)
-	assert_true(doors[0].is_master)
+	assert_eq(doors[0].linked_count,1)
 	assert_false(doors[1].is_master)
 
 func test_stunned_player_cannot_start_a_touch_throw() -> void:

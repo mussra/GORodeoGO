@@ -30,15 +30,15 @@ func test_physical_gate_blocks_then_opens_and_towed_bull_exits() -> void:
 	await wait_physics_frames(70)
 	assert_gt(bull.global_position.y, gate.y + 30, "held bull exits through real open gate")
 func test_master_courier_has_all_targets_and_manual_doors_still_open() -> void:
-	GameState.selected_level = 20
+	GameState.selected_level = 19
 	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	add_child_autofree(level)
 	await wait_physics_frames(2)
 	level._on_pen_door_opened(0)
 	assert_eq(level._courier_jobs.size(),1)
 	var job: Dictionary = level._courier_jobs.values()[0]
-	assert_eq(job["targets"].size(),7)
-	for index in range(1,8): level._on_pen_door_opened(index)
+	assert_eq(job["targets"].size(),level._pens_data.size()-1)
+	for index in range(1,level._pens_data.size()): level._on_pen_door_opened(index)
 	for corral in level._puzzle_corrals:
 		assert_true(corral.opened)
 		assert_eq(corral._gate_body.collision_layer, 0)
@@ -72,14 +72,14 @@ func test_every_puzzle_spawn_can_exit_its_own_gate_with_a_held_bull() -> void:
 		await wait_physics_frames(2)
 
 func test_chain_only_queues_configured_physical_corrals() -> void:
-	GameState.selected_level = 20
+	GameState.selected_level = 15
 	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	add_child_autofree(level)
 	await wait_physics_frames(2)
-	level._on_pen_door_opened(3)
-	for index in range(8):
-		assert_eq(level._puzzle_corrals[index].opened, index == 3)
-	assert_eq(level._courier_jobs.values()[0]["targets"],[6])
+	level._on_pen_door_opened(0)
+	for index in range(level._pens_data.size()):
+		assert_eq(level._puzzle_corrals[index].opened, index == 0)
+	assert_eq(level._courier_jobs.values()[0]["targets"],[1])
 
 func test_released_wild_bulls_naturally_exit_corrals_without_teleporting() -> void:
 	for number in [11, 13, 20]:

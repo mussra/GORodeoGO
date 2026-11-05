@@ -74,8 +74,8 @@ func test_pen_puzzle_levels_bull_counts() -> void:
 		assert_eq(data.bull_count, expected_bull_counts[level_number], "level %d" % level_number)
 
 func test_pen_puzzle_levels_door_counts() -> void:
-	# The door (pen) count IS the puzzle-complexity dial from level 15 on (D026): 4, 4, 5, 6, 6, 8.
-	var expected_pen_counts: Dictionary = {11: 1, 12: 2, 13: 2, 14: 3, 15: 4, 16: 4, 17: 5, 18: 6, 19: 6, 20: 8}
+	# Level20 now groups the herd into three releases rather than eight isolated pockets.
+	var expected_pen_counts: Dictionary = {11: 1, 12: 2, 13: 2, 14: 3, 15: 2, 16: 3, 17: 2, 18: 3, 19: 3, 20: 3}
 	for level_number: int in expected_pen_counts.keys():
 		var data: LevelData = LevelCatalog.get_level(level_number)
 		assert_eq(data.pens.size(), expected_pen_counts[level_number], "level %d" % level_number)
@@ -118,12 +118,12 @@ func test_levels_eleven_to_fourteen_have_no_door_links_at_all() -> void:
 
 func test_door_type_counts_per_level_fifteen_to_twenty() -> void:
 	var expected: Dictionary = {
-		15: {"master": 0, "chain": 1, "normal": 3},
-		16: {"master": 0, "chain": 1, "normal": 3},
-		17: {"master": 0, "chain": 1, "normal": 4},
-		18: {"master": 0, "chain": 6, "normal": 0},  # 3 mutually-linked pairs: every door has an outgoing link
-		19: {"master": 1, "chain": 5, "normal": 0},  # same 3 pairs as 18, plus pen 0 is also a master
-		20: {"master": 1, "chain": 2, "normal": 5},
+		15: {"master": 0, "chain": 1, "normal": 1},
+		16: {"master": 0, "chain": 1, "normal": 2},
+		17: {"master": 0, "chain": 2, "normal": 0},
+		18: {"master": 0, "chain": 1, "normal": 2},  # 3 mutually-linked pairs: every door has an outgoing link
+		19: {"master": 1, "chain": 0, "normal": 2},  # same 3 pairs as 18, plus pen 0 is also a master
+		20: {"master": 0, "chain": 1, "normal": 2},
 	}
 	for level_number: int in expected.keys():
 		var data: LevelData = LevelCatalog.get_level(level_number)
@@ -138,7 +138,7 @@ func test_all_door_link_indices_are_valid_and_never_self() -> void:
 				assert_ne(target, pen_index, "level %d pen %d links to itself" % [level_number, pen_index])
 
 func test_master_doors_in_levels_nineteen_and_twenty_release_every_bull() -> void:
-	for level_number in [19, 20]:
+	for level_number in [19]:
 		var data: LevelData = LevelCatalog.get_level(level_number)
 		var master_index: int = -1
 		for pen_index in range(data.pens.size()):
@@ -158,21 +158,16 @@ func test_level_sixteen_chain_door_opens_exactly_two_extra_pens() -> void:
 	var data: LevelData = LevelCatalog.get_level(16)
 	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 0), [0, 1, 2])
 
-func test_level_seventeen_centre_door_opens_three_corners_but_not_the_fourth() -> void:
-	var data: LevelData = LevelCatalog.get_level(17)
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 4), [0, 1, 2, 4])
+func test_level_seventeen_either_group_opens_its_partner() -> void:
+	var data:LevelData=LevelCatalog.get_level(17)
+	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens,0),[0,1])
+	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens,1),[0,1])
+func test_level_eighteen_keeps_an_independent_group() -> void:
+	var data:LevelData=LevelCatalog.get_level(18)
+	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens,0),[0,1])
+	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens,2),[2])
 
-func test_level_eighteen_pairs_are_symmetric() -> void:
-	var data: LevelData = LevelCatalog.get_level(18)
-	# Opening either door of a pair releases both — checked for all 3 pairs, both directions.
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 0), [0, 1])
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 1), [0, 1])
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 2), [2, 3])
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 3), [2, 3])
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 4), [4, 5])
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 5), [4, 5])
-
-func test_level_twenty_chain_doors_open_their_specific_targets_only() -> void:
+func test_level_twenty_companion_pens_do_not_launch_more_couriers() -> void:
 	var data: LevelData = LevelCatalog.get_level(20)
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 3), [3, 6])
-	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 5), [1, 2, 5])
+	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 1), [1])
+	assert_eq(PenLinkResolver.get_released_pen_indices(data.pens, 2), [2])
