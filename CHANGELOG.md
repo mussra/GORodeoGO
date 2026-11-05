@@ -241,3 +241,10 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Tests cover exact thresholds, epsilon offsets, corners and 30/60/120 FPS.
 - Controlled visual repro: ±1.5 px border oscillation, old rule toggles rapidly, fixed rule stays stable.
 - Includes shared square splash normalization already committed to main. No gameplay motion/speed changes.
+
+## 0.21.28 - Cowboy gallop trial
+- Uses the approved lateral painted rig with moderately longer leg chains.
+- Twelve phases in all five base movement views, mirrored to eight directions.
+- Frontal/rear/diagonal motion is a perspective interpretation of the lateral guide, not an exact multi-view reference.
+- Existing game rules, bull art, stun animation, phase-preserving steering and speed scaling unchanged.
+- Five focused asset/transition tests, 231 assertions. Scripted desktop visual review, not Android device validation.
