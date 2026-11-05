@@ -235,3 +235,9 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 ## Source update after 0.21.26 - Shared splash asset (next build)
 - Uses common 1080 square splash supplied for all four games, full text intact, with #041940 background.
 - Landscape layout keeps subtitle readable. Gameplay unchanged.
+
+## 0.21.27 - Stable offscreen indicators
+- Per-target visibility hysteresis and dwell prevent rapid boundary flicker.
+- Tests cover exact thresholds, epsilon offsets, corners and 30/60/120 FPS.
+- Controlled visual repro: ±1.5 px border oscillation, old rule toggles rapidly, fixed rule stays stable.
+- Includes shared square splash normalization already committed to main. No gameplay motion/speed changes.
