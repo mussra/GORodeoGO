@@ -359,12 +359,12 @@ func _update_chaser(delta: float) -> void:
 		bull.capture_held = holding_something
 	_apply_chaser(_chaser_director.update(delta, holding_something, _wild_distances()))
 
-## {bull index -> distance to player} for every bull that is currently wild.
+## Only free, exited wild bulls may chase. A courier never consumes the chaser role.
 func _wild_distances() -> Dictionary:
 	var wild_distances: Dictionary = {}
 	for i in range(_active_bulls.size()):
 		var bull = _active_bulls[i]
-		if bull.controller.is_wild():
+		if bull.controller.is_wild() and not bull._courier_active and not bull._leaving_corral:
 			wild_distances[i] = bull.global_position.distance_to(player.global_position)
 	return wild_distances
 

@@ -256,57 +256,15 @@ static func get_level(level_number: int) -> LevelData:
 			data.pens[0].erase("opens_pen_indices")  # master supersedes the pair link
 			data.pens[0]["is_master"] = true
 		20:
-			# 8 doors, fully scattered, "aleatorio" as requested — a deliberately messy mix of
-			# all three door types: pen 0 is a MASTER (opens all 7 others); pen 3 is a CHAIN to
-			# pen 6; pen 5 is a CHAIN to both pen 1 and pen 2; pens 1, 2, 4, 6, 7 are NORMAL
-			# (targets only, no outgoing link of their own).
+			# Fewer, meaningful releases: dual capture cannot empty any enclosure.
+			# The master sends one courier, leaving three companions to pressure the rider.
 			data.bull_count = 10
 			data.time_limit_seconds = 450.0
 			data.obstacle_rects = []
 			data.pens = [
-				{
-					"bull_indices": [0, 5],
-					"door_position": Vector2(300, -230),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-					"is_master": true,
-				},
-				{
-					"bull_indices": [1],
-					"door_position": Vector2(-420, -220),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [9],
-					"door_position": Vector2(0, 230),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [4, 8],
-					"door_position": Vector2(-200, -60),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-					"opens_pen_indices": [6],
-				},
-				{
-					"bull_indices": [2],
-					"door_position": Vector2(420, 60),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [6],
-					"door_position": Vector2(-420, 220),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-					"opens_pen_indices": [1, 2],
-				},
-				{
-					"bull_indices": [3],
-					"door_position": Vector2(150, -60),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				},
-				{
-					"bull_indices": [7],
-					"door_position": Vector2(-60, -220),  # UNVERIFIED: scattered placement, not play-tested
-					"door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS,
-				}
+				{"bull_indices": [0, 1, 5, 8], "door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS, "is_master": true},
+				{"bull_indices": [2, 4, 9], "door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS},
+				{"bull_indices": [3, 6, 7], "door_hold_seconds": DEFAULT_DOOR_HOLD_SECONDS},
 			]
 		_:
 			data.time_limit_seconds = 150.0

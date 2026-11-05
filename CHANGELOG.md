@@ -207,3 +207,9 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Progressive Zumbel reveal before both menu variants, plus staggered animal entrance. No new audio approved or included.
 - Rider contact still stuns and drops captures, explicitly retained by Antonio on 4 November.
 - Verified existing next-level/menu navigation, including final level without level 21.
+
+## 0.21.23 - Level20 grouped herd and destination corral
+- Level20: ten bulls grouped4/3/3 in three corrals instead of eight small pockets. Same timer/map size/count.
+- Couriers and exiting bulls no longer consume designated pursuit role. Courier visits other latches while free companions can chase captures.
+- Destination corral gets ranch wood/gold horseshoe styling, unchanged80x80delivery physics.
+- Directed live-herd and courier tests plus preview. Levels11-19balance remains a separate pass; no main merge.
