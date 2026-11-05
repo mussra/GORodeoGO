@@ -86,7 +86,7 @@ var _max_captures: int = 1
 var _touch_aim_active: bool = false
 
 func _ready() -> void:
-	_sprite_swap = SpriteSwap.new(self, $Polygon2D, ART_ROOT, ANIM_NAMES)
+	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), ANIM_NAMES)
 	var cue_layer:=CanvasLayer.new()
 	cue_layer.layer=16
 	add_child(cue_layer)

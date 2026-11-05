@@ -6,6 +6,7 @@ var _balance:Label
 var _state:Label
 var _buy:Dictionary={}
 var _equip:Dictionary={}
+var _hats:HatPanel
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  z_index=50
@@ -31,7 +32,12 @@ func _ready()->void:
    SaveData.equip_item(id)
    refresh())
  _state=_label("",Vector2(40,510),24)
- _label("Recompensas y precios provisionales para probar el equilibrio. Sin dinero real.\nNivel 1: 10 puntos · Nivel 5: 200 · Nivel 10: 1.000\nSombreros, caballos y ropa todavía no están incluidos. Conservas tu vaquero y caballo.",Vector2(40,580),20)
+ var hats_button:=_button("SOMBREROS · PROBAR",Vector2(840,125),func():
+  if _hats==null:
+   _hats=HatPanel.new();add_child(_hats)
+  else:_hats.show();_hats.refresh())
+ hats_button.size=Vector2(360,52)
+ _label("Recompensas y precios provisionales para probar el equilibrio. Sin dinero real.\nNivel 1: 10 puntos · Nivel 5: 200 · Nivel 10: 1.000\nSombreros: prueba de color sin coste. Caballos y ropa nuevos todavía no incluidos.",Vector2(40,580),20)
  resized.connect(_layout);_layout();refresh()
 func _label(text:String,pos:Vector2,font:int)->Label:
  var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);_canvas.add_child(l);return l
@@ -44,7 +50,7 @@ func _layout()->void:
 func refresh()->void:
  if _balance==null:return
  _balance.text="SALDO: %d PUNTOS" % SaveData.equipment_points
- var state:=SaveData.equipment_state()
+ var state:EquipmentPoints=SaveData.equipment_state()
  for id in _buy:
   var item:Dictionary=EquipmentCatalog.ITEMS[id]
   _buy[id].text="CONSEGUIDA" if state.owned.has(id) else "CONSEGUIR · %d"%item["price"]

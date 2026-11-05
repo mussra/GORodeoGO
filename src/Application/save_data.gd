@@ -9,6 +9,7 @@ extends Node
 const SAVE_PATH: String = "user://save.dat"
 const SAVE_VERSION: int = 2  ## bump when the file layout changes, to allow migrations
 
+var hat_color: String = "original"
 var highest_level_completed: int = 0
 var equipment_points: int = 0
 var equipment_owned: Array[String] = []
@@ -47,6 +48,7 @@ func save_progress() -> bool:
 	config.set_value("meta", "version", SAVE_VERSION)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
 	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
+	config.set_value("appearance", "hat_color", hat_color)
 	config.set_value("equipment", "points", equipment_points)
 	config.set_value("equipment", "owned", equipment_owned)
 	config.set_value("equipment", "equipped", equipment_equipped)
@@ -61,6 +63,7 @@ func save_progress() -> bool:
 	return true
 
 func load_progress() -> void:
+	hat_color = "original"
 	equipment_points = 0
 	equipment_owned.clear()
 	equipment_equipped.clear()
@@ -71,6 +74,7 @@ func load_progress() -> void:
 		dual_lasso_intro_shown = false
 		highest_level_completed = 0  # first run (no file) or unreadable file
 		return
+	hat_color = HatAppearance.sanitize(config.get_value("appearance", "hat_color", "original"))
 	highest_level_completed = LevelProgression.sanitize_highest_completed(
 		config.get_value("progress", "highest_level_completed", 0)
 	)
@@ -151,3 +155,12 @@ func record_victory(level_number:int)->int:
 	highest_level_completed=before_highest
 	equipment_points=before_points
 	return 0
+
+## Cosmetic selection is independent of points and functional equipment.
+func select_hat(value:String)->bool:
+	if not HatAppearance.OPTIONS.has(value):return false
+	var before:String=hat_color
+	hat_color=value
+	if save_progress():return true
+	hat_color=before
+	return false
