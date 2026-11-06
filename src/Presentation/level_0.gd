@@ -330,6 +330,11 @@ func _apply_unlocked_upgrades() -> void:
 	var reach:float=SaveData.equipped_whip_reach()
 	player.dodge_available=reach>0
 	player.dodge_path_limit=reach if reach>0 else 260.0
+	var horse_stats:Dictionary=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected))
+	player.max_speed=horse_stats.speed
+	player.acceleration=horse_stats.handling
+	player.dual_capture_speed_multiplier=horse_stats.power
+	if reach>0:player.dodge_path_limit=reach*horse_stats.dodge
 	player.max_speed *= _upgrades.speed_multiplier
 	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier
 	player.lasso_travel_time *= _upgrades.lasso_travel_time_multiplier

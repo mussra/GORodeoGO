@@ -9,6 +9,7 @@ extends Node
 const SAVE_PATH: String = "user://save.dat"
 const SAVE_VERSION: int = 2  ## bump when the file layout changes, to allow migrations
 
+var horse_collection:HorseCollection = HorseCollection.new()
 var hat_color: String = "original"
 var highest_level_completed: int = 0
 var equipment_points: int = 0
@@ -49,6 +50,7 @@ func save_progress() -> bool:
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
 	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
 	config.set_value("appearance", "hat_color", hat_color)
+	config.set_value("horses_trial", "state", horse_collection.export_state())
 	config.set_value("equipment", "points", equipment_points)
 	config.set_value("equipment", "owned", equipment_owned)
 	config.set_value("equipment", "equipped", equipment_equipped)
@@ -63,6 +65,8 @@ func save_progress() -> bool:
 	return true
 
 func load_progress() -> void:
+	horse_collection=HorseCollection.new()
+	horse_collection.seed_trial()
 	hat_color = "original"
 	equipment_points = 0
 	equipment_owned.clear()
@@ -74,6 +78,7 @@ func load_progress() -> void:
 		dual_lasso_intro_shown = false
 		highest_level_completed = 0  # first run (no file) or unreadable file
 		return
+	horse_collection.restore(config.get_value("horses_trial","state",{}))
 	hat_color = HatAppearance.sanitize(config.get_value("appearance", "hat_color", "original"))
 	highest_level_completed = LevelProgression.sanitize_highest_completed(
 		config.get_value("progress", "highest_level_completed", 0)
@@ -147,11 +152,14 @@ func record_victory(level_number:int)->int:
 	if level_number<1 or level_number>LevelCatalog.MAX_LEVEL:return 0
 	if not apply_legacy_points_credit(EquipmentCatalog.REWARDS):return 0
 	var reward:int=int(EquipmentCatalog.REWARDS.get(level_number,0))
+	var before_horses:Dictionary=horse_collection.export_state()
 	var before_highest:int=highest_level_completed
 	var before_points:int=equipment_points
+	if level_number>highest_level_completed:horse_collection.grant_achievement(level_number)
 	highest_level_completed=maxi(highest_level_completed,level_number)
 	equipment_points+=reward
 	if save_progress():return reward
+	horse_collection.restore(before_horses)
 	highest_level_completed=before_highest
 	equipment_points=before_points
 	return 0
@@ -163,4 +171,20 @@ func select_hat(value:String)->bool:
 	hat_color=value
 	if save_progress():return true
 	hat_color=before
+	return false
+
+## Trial only: no point charges, no consumed parents. Atomic save rollback.
+func breed_horses(a:String,b:String,choices:Dictionary)->Dictionary:
+	var before:Dictionary=horse_collection.export_state()
+	var child:Dictionary=horse_collection.breed(a,b,choices)
+	if child.is_empty():return {}
+	if save_progress():return child
+	horse_collection.restore(before)
+	return {}
+func select_horse(id:String)->bool:
+	if horse_collection.find(id).is_empty():return false
+	var before:String=horse_collection.selected
+	horse_collection.selected=id
+	if save_progress():return true
+	horse_collection.selected=before
 	return false

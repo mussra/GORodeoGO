@@ -6,6 +6,7 @@ var _balance:Label
 var _state:Label
 var _buy:Dictionary={}
 var _equip:Dictionary={}
+var _horses:HorsePanel
 var _hats:HatPanel
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -37,7 +38,12 @@ func _ready()->void:
    _hats=HatPanel.new();add_child(_hats)
   else:_hats.show();_hats.refresh())
  hats_button.size=Vector2(360,52)
- _label("Recompensas y precios provisionales para probar el equilibrio. Sin dinero real.\nNivel 1: 10 puntos · Nivel 5: 200 · Nivel 10: 1.000\nSombreros: prueba de color sin coste. Caballos y ropa nuevos todavía no incluidos.",Vector2(40,580),20)
+ var horse_button:=_button("CABALLERIZA · CRÍA",Vector2(430,125),func():
+  if _horses==null:
+   _horses=HorsePanel.new();add_child(_horses)
+  else:_horses.show();_horses.refresh())
+ horse_button.size=Vector2(360,52)
+ _label("Recompensas y precios provisionales para probar el equilibrio. Sin dinero real.\nNivel 1: 10 puntos · Nivel 5: 200 · Nivel 10: 1.000\nSombreros: prueba de color sin coste. Cría: prototipo separado, sin economía definitiva.",Vector2(40,580),20)
  resized.connect(_layout);_layout();refresh()
 func _label(text:String,pos:Vector2,font:int)->Label:
  var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);_canvas.add_child(l);return l
