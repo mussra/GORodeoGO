@@ -14,6 +14,15 @@ func seed_trial()->void:
 func add_trial_parents()->void:
  if not find("trial_a").is_empty():return
  horses.append_array([{ "id":"trial_a","name":"Azul de prueba","parents":[],"stats":{"speed":280.0,"handling":900.0,"power":0.6,"dodge":0.85},"traits":{"coat":3,"pattern":1,"mane":2,"finish":"normal"}}, {"id":"trial_b","name":"Arcoíris de prueba","parents":[],"stats":{"speed":260.0,"handling":1250.0,"power":0.8,"dodge":1.0},"traits":{"coat":6,"pattern":0,"mane":5,"finish":"normal"}}])
+func add_random_trial_pair()->Array[Dictionary]:
+ var rng:=RandomNumberGenerator.new();rng.randomize()
+ var added:Array[Dictionary]=[]
+ for i in range(2):
+  var n:int=horses.size()+1
+  while not find("random_trial_%d"%n).is_empty():n+=1
+  var h:Dictionary={"id":"random_trial_%d"%n,"name":"Prueba aleatoria %d"%n,"parents":[],"stage":"adult","traits":{"coat":rng.randi_range(0,COATS.size()-1),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,MANES.size()-1),"finish":"normal"}}
+  horses.append(h);added.append(h)
+ return added
 func grant_achievement(level:int)->Dictionary:
  var id:String="achievement_%d"%level
  if not find(id).is_empty():return {}

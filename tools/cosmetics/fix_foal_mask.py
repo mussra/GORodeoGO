@@ -35,13 +35,9 @@ cream=(ss<.52)&(vv>.30)&mane_area&(a[:,:,3]>8)
 m=np.maximum(m,cream.astype(float))
 # Mane polygon must follow cream hair, never brown ears or skin underneath.
 m *= (((a[:,:,0].astype(float)<a[:,:,1]*1.40)&(ss<.60)) | (y>145)).astype(float)
-# Keep rump skin out of tail mask and include the slim cream edge of neck mane.
-m[(x>132)&(x<200)&(y>350)&(y<505)&(a[:,:,0].astype(float)>a[:,:,1]*1.35)]=0
-mane_edge=(x>237)&(x<310)&(y>188)&(y<362)&(ss<.64)&(a[:,:,0].astype(float)<a[:,:,1]*1.46)
-m=np.maximum(m,mane_edge.astype(float))
-# Trace the actual tail/body seam; dark outline pixels are not hair either.
-seam=np.interp(y,[350,375,400,425,450,480,505],[194,181,166,155,148,144,132])
-m[(y>350)&(y<510)&(x>seam)&(x<205)]=0
+# Organic tail seam traced on source, no rectangular clipping.
+tail=poly([[(0,490),(10,472),(27,471),(37,443),(36,408),(45,387),(74,363),(96,349),(127,338),(151,338),(172,350),(185,366),(188,374),(176,389),(166,407),(154,435),(147,462),(143,486),(133,507),(112,526),(89,536),(62,542),(35,537),(17,527),(2,516)]])
+m[(x<220)&(y>320)&(y<560)]=np.array(tail).astype(float)[(x<220)&(y>320)&(y<560)]/255.
 # The neck mane curls back over the coat at its lower edge.
 neck_edge=poly([[(295,173),(304,190),(307,220),(307,253),(311,279),(318,302),(320,330),(312,351),(298,365),(279,375),(263,373),(281,349),(294,320),(301,288),(301,252),(301,215)]])
 m=np.maximum(m,np.array(neck_edge)/255.)

@@ -32,3 +32,12 @@ func test_foal_cannot_equip_or_breed_until_trial_training()->void:
  var d:=HorseCollection.new();assert_true(d.restore(SaveData.horse_collection.export_state()));assert_false(d.is_adult(h.id))
  assert_true(SaveData.mature_horse_trial(h.id));assert_true(SaveData.select_horse(h.id));assert_true(SaveData.horse_collection.is_adult(h.id))
  SaveData.horse_collection.restore(original);SaveData.save_path=path;DirAccess.remove_absolute("user://qa_foal_test.dat")
+func test_repeated_random_pairs_after_breeding_have_unique_ids()->void:
+ var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents()
+ c.breed("trial_a","trial_b",{})
+ var ids:Dictionary={}
+ for j in range(30):
+  var before:int=c.horses.size();var added:=c.add_random_trial_pair();assert_eq(added.size(),2);assert_eq(c.horses.size(),before+2)
+  for h in added:
+   assert_false(ids.has(h.id));ids[h.id]=true;assert_true(c.valid_traits(h.traits));assert_true(c.is_adult(h.id))
+ var d:=HorseCollection.new();assert_true(d.restore(c.export_state()));assert_eq(d.horses.size(),64)
