@@ -56,6 +56,6 @@ func restore(v:Variant)->bool:
  if clean.is_empty() or not ids.has("original"):return false
  horses=clean;selected=str(v.get("selected","original"))
  if not ids.has(selected):selected="original"
- next_id=maxi(int(v.get("next_id",1)),horses.size()+1)
+ next_id=maxi(int(v.get("next_id",1)),1)
  while ids.has("child_%d"%next_id):next_id+=1
  return true

@@ -21,4 +21,5 @@ func test_save_failure_rollback()->void:
  var before:Dictionary=SaveData.horse_collection.export_state()
  assert_true(SaveData.breed_horses("trial_a","trial_b",{}).is_empty());assert_eq(SaveData.horse_collection.export_state(),before)
  assert_false(SaveData.select_horse("trial_a"));assert_eq(SaveData.horse_collection.selected,"original")
+ assert_push_error_count(2)
  SaveData.horse_collection.restore(original);SaveData.save_path=path
