@@ -50,10 +50,10 @@ for view,cfg in C.items():
    if view.startswith('diag'):target=root+np.column_stack([-delta[:,0]*.72,delta[:,1]*1.25+delta[:,0]*(.22 if view=='diag_down' else -.22)])
    else:target=root+np.column_stack([delta[:,0]*.05,delta[:,1]*1.25+delta[:,0]*(.32 if view=='down' else -.32)])
    a,b=target[:2];v=b-a;length=np.linalg.norm(v);unit=v/length;normal=np.array([-unit[1],unit[0]])
-   yy,xx=np.mgrid[:src.height,:src.width].astype(float);along=(xx/S-a[0])*unit[0]+(yy/S-a[1])*unit[1];across=(xx/S-a[0])*normal[0]+(yy/S-a[1])*normal[1];t=np.clip(along/(length*.67),0,1);width=4.0*(1-t)+1.9*t
-   coverage=np.clip((width-abs(across))/.8,0,1)*np.clip((along+3)/2,0,1)*np.clip((length*.67-along)/2,0,1)
+   yy,xx=np.mgrid[:src.height,:src.width].astype(float);along=(xx/S-a[0])*unit[0]+(yy/S-a[1])*unit[1];across=(xx/S-a[0])*normal[0]+(yy/S-a[1])*normal[1];t=np.clip(along/(length*.78),0,1);width=4.8*(1-t)+2.2*t
+   coverage=np.clip((width-abs(across))/.8,0,1)*np.clip((along+6)/3,0,1)*np.clip((length*.78-along)/2,0,1)
    source=np.array(body);anchor=cfg['chains'][j][0];mapx=(anchor[0]+across*.65)*S;mapy=(anchor[1]-5+np.clip(along,-2,4)*.4)*S
-   paint=cv2.remap(source,mapx.astype(np.float32),mapy.astype(np.float32),cv2.INTER_CUBIC);paint[:,:,3]=(coverage*.62*paint[:,:,3]).astype(np.uint8);im.alpha_composite(Image.fromarray(paint))
+   paint=cv2.remap(source,mapx.astype(np.float32),mapy.astype(np.float32),cv2.INTER_CUBIC);shade=1.0-.10*np.clip(along/(length*.78),0,1)-.06*np.clip(abs(across)/np.maximum(width,1),0,1)**2;paint[:,:,:3]=np.clip(paint[:,:,:3].astype(float)*shade[:,:,None],0,255).astype(np.uint8);orange=(paint[:,:,0].astype(float)>paint[:,:,1]*1.16)&(paint[:,:,1].astype(float)>paint[:,:,2]*1.25);paint[:,:,3]=(coverage*.9*paint[:,:,3]*orange).astype(np.uint8);im.alpha_composite(Image.fromarray(paint))
   # Torso masks the root only, leaving flexion readable below it.
   cap=body.copy();ar=np.array(cap);yy,xx=np.mgrid[0:src.height,0:src.width];ar[:,:,3]=(ar[:,:,3]*np.clip((66-yy/S)/5,0,1)).astype(np.uint8);im.alpha_composite(Image.fromarray(ar))
   if tail is not None:im.alpha_composite(tail)

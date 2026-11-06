@@ -71,7 +71,10 @@ yy,xx=np.mgrid[:src.height,:src.width].astype(float);along=(xx/S-a[0])*u[0]+(yy/
 width=6.2*(1-t)+2.8*t;coverage=np.clip((width-abs(across))/.8,0,1)*np.clip((along+8)/3,0,1)*np.clip((length*.82-along)/2,0,1)
 # Sample the same painted orange haunch, avoiding a new flat color.
 source=np.array(body);mapx=(64+across*.7)*S;mapy=(54+np.clip(along,-5,7)*.35)*S
-paint=cv2.remap(source,mapx.astype(np.float32),mapy.astype(np.float32),cv2.INTER_CUBIC);paint[:,:,3]=(coverage*paint[:,:,3]).astype(np.uint8)
+paint=cv2.remap(source,mapx.astype(np.float32),mapy.astype(np.float32),cv2.INTER_CUBIC);# Keep a soft upper highlight and darker taper rather than a flat orange bridge.
+shade=1.0-.12*np.clip(along/(length*.82),0,1)-.07*np.clip(abs(across)/np.maximum(width,1),0,1)**2
+paint[:,:,:3]=np.clip(paint[:,:,:3].astype(float)*shade[:,:,None],0,255).astype(np.uint8)
+paint[:,:,3]=(coverage*paint[:,:,3]).astype(np.uint8)
 im.alpha_composite(Image.fromarray(paint))
 # Tail covers the rear root, but not lower limb/hoof.
 tailtop=tail.copy();ta=np.array(tailtop);yy,xx=np.mgrid[0:src.height,0:src.width];ta[:,:,3]=(ta[:,:,3]*np.clip((66-yy/S)/3,0,1)).astype(np.uint8);im.alpha_composite(Image.fromarray(ta))
