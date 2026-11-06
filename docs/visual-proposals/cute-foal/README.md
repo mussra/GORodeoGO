@@ -1,0 +1,4 @@
+# Cute foal visual proposal, not integrated
+Ant rejected crude0.21.32foal and asked for cute/charming baby horse. New static concept: rounded head, big expressive eyes, short soft muzzle, compact body, fluffy cream mane/tail, small hooves. No rider/tack, no animation. Concept sheet generated from approved adult reference and rejected foal as negative reference. Not runtime screenshot or validated sprite/masks/mobile-scale asset. Needs user review, extraction, genetic region masks and actual menu-scale inspection before any APK. Galope preview and this redesign remain unapproved. No changes to runtime in this branch.
+
+Platform priority (Ant6Nov07:09): Android primary. PC possible, consoles only future conditional on success. No port starts. Input, legibility/performance must be checked Android first; PC tests cannot certify APK.0.21.33touch hotfix remains trial, bug open pending actual phone test.

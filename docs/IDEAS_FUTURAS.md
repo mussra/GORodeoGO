@@ -19,3 +19,6 @@ La versión actual es de un jugador. El regate del caballo por dibujo libre se p
 ## Desbloqueo progresivo de niveles
 
 Antonio señaló el 4 de noviembre, a las 21:31, que los APK de prueba muestran todos los niveles habilitados. Corregirlo en una versión futura para que se desbloqueen al avanzar. No se cambia en el APK 0.21.15: mantiene el acceso de prueba actual.
+
+## Plataforma principal
+Ant6Nov07:09: Android principal; PC no descartado; consolas solo si hay éxito futuro. No port iniciado. Pruebas PC no certifican Android, especialmente táctil, legibilidad y rendimiento.0.21.33hotfix es ensayo sin validaciónAndroid, bug abierto hasta teléfono.
