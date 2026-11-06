@@ -108,7 +108,7 @@ func detail_view()->void:
   label("POTRILLO: no puede trabajar ni criar. Plazo por definir.",Vector2(420,505),18)
   button("ENSAYO: CRECER Y ADIESTRAR",Vector2(40,550),func():
    message="Adulto de ensayo, sin esperar ni pagar" if SaveData.mature_horse_trial(h.id) else "No se pudo guardar";refresh(),360)
- label("Capacidad de lazo intacta. Alcance equipado de fusta: %d px"%SaveData.equipped_whip_reach(),Vector2(420,525),20)
+ label("Fusta: no aplicable mientras es potrillo" if not SaveData.horse_collection.is_adult(h.id) else "Capacidad de lazo intacta. Alcance equipado de fusta: %d px"%SaveData.equipped_whip_reach(),Vector2(420,535),20)
  button("VER PARENTESCO · PRUEBA",Vector2(420,570),func():show_page("family"),420)
 func atlas_view()->void:
  label("ATLAS DE ASPECTOS · CATÁLOGO CANDIDATO",Vector2(35,185),25)
