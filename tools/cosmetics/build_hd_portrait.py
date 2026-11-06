@@ -72,10 +72,29 @@ hat_dilated=np.array(Image.fromarray(hat.astype('uint8')*255).filter(ImageFilter
 hat |= hat_dilated&(y<136)&(H>=6)&(H<=25)&(S>70)&(V>35)
 hat |= hat_dilated&(y>=136)&(y<174)&(x>680)&(H>=6)&(H<=25)&(S>70)&(V>45)
 coat &= ~region([[(924,284),(943,283),(958,286),(968,296),(972,312),(958,324),(940,317),(926,303)]])
+# Hide follows the lower curve of the reins, after the exact leather edge.
+coat |= region([[(745,350),(767,360),(790,367),(812,370),(834,367),(855,360),(877,347),(888,338),(883,353),(860,368),(837,378),(813,381),(789,378),(765,369),(744,359)]])&(H>=7)&(H<=24)&(S>120)&(V>35)
+coat |= region([[(540,543),(561,552),(580,563),(600,572),(621,579),(642,584),(655,588),(655,599),(637,596),(612,589),(589,581),(567,567),(548,556)]])&(H>=7)&(H<=24)&(S>130)&(V>35)
+# Eyebrows stay source brown. They are facial detail, never hide or rainbow hair.
+brows=region([[(858,181),(860,172),(869,164),(882,158),(895,159),(906,164),(909,174),(902,171),(888,170),(875,173),(864,178)],[(971,178),(979,176),(986,179),(990,185),(988,191),(983,185),(978,184),(973,185)]])
+brows |= ((x>857)&(x<911)&(y>154)&(y<186)&(V<175))|((x>970)&(x<994)&(y>173)&(y<193)&(V<140))
+coat &= ~brows
+mane &= ~brows
+# Extend tint only across the lower brim itself, not the hidden face below it.
+hat |= region([[(495,114),(510,119),(541,125),(568,130),(594,139),(620,147),(646,159),(672,173),(698,180),(720,182),(743,176),(766,162),(780,142),(782,127),(768,147),(744,162),(719,173),(699,174),(675,165),(650,151),(626,140),(595,133),(568,124),(540,119),(515,113)]])&(V>30)
 # Gold badge is equipment detail, not hat material.
 hat &= ~(((x-713)/12)**2+((y-111)/19)**2<1)
 # Feather only subpixel edges, preserving separate material channels.
-mask=np.zeros((h,w,3),dtype=np.uint8);mask[:,:,0][coat]=255;mask[:,:,1][mane]=255;mask[:,:,2][hat]=255;mask[a[:,:,3]<8]=0
+mask=np.zeros((h,w,3),dtype=np.uint8);mask[:,:,0][coat]=255;mask[:,:,1][mane]=255;mask[:,:,2][hat]=255
+# Blend the naturally antialiased ginger-to-cream sock boundary continuously.
+# Cream stays cream; intermediate warm pixels inherit only the matching hide share.
+for poly,cream_sat in [([(410,668),(478,668),(478,708),(405,708)],82), ([(537,667),(622,667),(625,706),(539,706)],118), ([(706,696),(798,696),(800,729),(706,729)],90), ([(840,695),(933,695),(938,724),(840,724)],85)]:
+ edge=region([poly]);weight=np.clip((S.astype(float)-cream_sat)/75,0,1)*255
+ mask[:,:,0][edge]=weight[edge].astype('uint8')
+# No hide color may leak through distant hoof seams.
+mask[:,:,0][((x>530)&(x<635)&(y>742))|((x>390)&(x<495)&(y>747))|((x>700)&(x<815)&(y>779))|((x>830)&(x<970)&(y>775))]=0
+mask[y>760]=0
+mask[a[:,:,3]<8]=0
 # Source contains extraction flecks beyond the figure. Fixed reviewed framing.
 bbox=(round(240*w/1313),0,round(1040*w/1313),round(840*h/875))
 alpha=im.getchannel('A').filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.45));im.putalpha(alpha)
