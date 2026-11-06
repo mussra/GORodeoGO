@@ -256,3 +256,8 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 - Dodge hands off immediately to normal running/current joystick, preserves collision/stun and tow penalty.
 - Sequential level selection in debug/release, no save reset. No cosmetic/new horse/animal catalogue yet.
 - 48focused tests343asserts. Native-touch desktop handoff and full points/purchase/equip/persistence flow checked; no physicalAndroid/balance certification.
+
+## 0.21.40 - Hand-painted adult portrait masks
+- Packages checkpoint bf457d6: mane/fringe, blaze edge, eyes, rings and protected equipment on the approved source. No broader style changes.
+- 52 material-ownership checks and deterministic rebuild verified; six variants and head/lower matrices inspected.
+- Whip remains textual. Not a global HQ completion or physical Android validation. No main merge.
