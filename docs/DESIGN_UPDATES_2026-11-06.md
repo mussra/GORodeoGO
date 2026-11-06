@@ -17,3 +17,5 @@ Ant proposes particular horses being able to jump certain fences while bulls mus
 
 ## Adult training before breeding candidate (08:04)
 Ant proposes using and training each adult through completed missions before it can breed. The goal is to link collection, appearance, powers and play rather than leave breeding parents unused. Counts and requirements remain open. This is distinct from foal growth and initial training. No new gates are added to the isolated trial. Preferring completed missions over entering/exiting games, and avoiding forced repetition, are recommendations, not approved final rules.
+
+08:05 clarification candidate: bulls, including lassoed bulls, should walk around the obstacle while the rider jumps. No implementation yet. Current code has a finite throw range and an infinite post-capture rope-break threshold; these are distinct. The user's unfinished reference to an infinite lasso is pending clarification, not a new rule.
