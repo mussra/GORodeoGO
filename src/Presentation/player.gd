@@ -354,10 +354,6 @@ func _physics_process(delta: float) -> void:
 		return
 	queue_redraw()
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	if not input_dir.is_zero_approx():
-		_run_after_dodge = Vector2.ZERO
-	elif not _run_after_dodge.is_zero_approx():
-		input_dir = _run_after_dodge
 	var is_moving: bool = input_dir.length() > 0.0
 
 	if is_moving:
@@ -386,10 +382,11 @@ func _physics_process(delta: float) -> void:
 	_process_throw_input(delta)
 
 func _resume_running_after_dodge() -> void:
-	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	_run_after_dodge = _dodge_direction if input_dir.is_zero_approx() else input_dir.normalized()
+	# Keep the endpoint tangent, never replace it with fresh input or automatic cruise.
+	# Normal acceleration/friction controls braking and turning from the next frame.
+	_run_after_dodge = Vector2.ZERO
 	var speed: float = max_speed * (dual_capture_speed_multiplier if _active_capture_count >= 2 else 1.0)
-	velocity = _run_after_dodge * speed
+	velocity = _dodge_direction * speed
 
 func _process_throw_input(delta: float) -> void:
 	if _is_charging:

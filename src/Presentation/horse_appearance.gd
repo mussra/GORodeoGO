@@ -16,20 +16,25 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
  for y in range(image.get_height()):
   for x in range(image.get_width()):
    var m:Color=mask.get_pixel(x,y)
-   if m.r<0.5 and m.g<0.5:continue
+   if maxf(m.r,m.g)<0.02:continue
    var old:Color=image.get_pixel(x,y);var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))*255.0/205.0,0.25,1.18)
    var color:Color=Color(COLORS[int(t.coat)])
-   if m.g>0.5:
+   if m.g>m.r:
     color=Color.from_hsv(fposmod((y-25.0)/38.0,1.0),0.8,1.0) if int(t.mane)==5 else Color(MANES[int(t.mane)])
    elif int(t.pattern)>0:
     var mark:bool=false
+    var px:float=float(x)*96.0/image.get_width() if anim=="foal" else x
+    var py:float=float(y)*96.0/image.get_height() if anim=="foal" else y
     match int(t.pattern):
-     1:mark=(Vector2(x,y)-Vector2(30,53)).length()<8 or (Vector2(x,y)-Vector2(58,66)).length()<6
-     2:mark=(x%11<5 and y%12<5 and y>43 and y<72)
-     3:mark=x<36 and y>42 and y<72
-     4:mark=y>72
+     1:mark=(Vector2(px,py)-Vector2(30,60)).length()<8 or (Vector2(px,py)-Vector2(58,68)).length()<6
+     2:mark=(int(px)%11<5 and int(py)%12<5 and py>48 and py<78)
+     3:mark=px<40 and py>48 and py<78
+     4:mark=py>77
     if mark:color=Color("f4edd8")
-   image.set_pixel(x,y,Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a))
+   if anim=="foal":
+    shade=clampf(maxf(old.r,maxf(old.g,old.b))*(1.0 if m.g>m.r else 1.10),0.12,1.0)
+   var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
+   image.set_pixel(x,y,old.lerp(tinted,maxf(m.r,m.g)) if anim=="foal" else tinted)
  if cache.size()>600:cache.clear()
  var tex:=ImageTexture.create_from_image(image);cache[key]=tex;return tex
 static func apply(frames:SpriteFrames,t:Dictionary)->void:
