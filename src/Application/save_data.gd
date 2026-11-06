@@ -230,9 +230,9 @@ func end_trial_session()->void:
 	_trial_snapshot.clear();trial_session_active=false
 func effective_progress()->int:
 	return LevelCatalog.MAX_LEVEL if trial_session_active else highest_level_completed
-func preview_trial_traits(coat:int,pattern:int,mane:int)->bool:
+func preview_trial_traits(coat:int,pattern:int,mane:int,eyes:int=10,finish:String="normal")->bool:
 	if not trial_session_active:return false
-	var t:Dictionary={"coat":coat,"pattern":pattern,"mane":mane,"finish":"normal"}
+	var t:Dictionary={"coat":coat,"pattern":pattern,"mane":mane,"eyes":eyes,"finish":finish}
 	if not horse_collection.valid_traits(t):return false
 	var h:Dictionary=horse_collection.find("preview_temporary")
 	if h.is_empty():

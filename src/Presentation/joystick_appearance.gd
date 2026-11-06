@@ -13,7 +13,7 @@ static func texture_for(traits:Dictionary,knob:bool)->Texture2D:
    var p:=Vector2(x+.5,y+.5)/n;var r:=p.distance_to(Vector2(.5,.5))*2
    if r>1:continue
    var border:=smoothstep(.83,.87,r)*(1-smoothstep(.97,1,r))
-   var eye:=Color(HorseAppearance.COLORS[HorseCollection.eye_index(traits)])
+   var eye:=HorseAppearance.eye_color_at(HorseCollection.eye_index(traits),p)
    var angle:=atan2(p.y-.5,p.x-.5)
    var fibers:=sin(angle*71+r*13)*.045+sin(angle*113-r*9)*.025
    var shade:=.87+.13*sin(r*PI)+fibers

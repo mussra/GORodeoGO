@@ -19,6 +19,71 @@ static func rider_top(image:Image)->int:
   for x in range(28,73):
    if image.get_pixel(x,y).a>.5:return y
  return 0
+# One deterministic, non-grid spot layout shared with the large portrait.
+static var spot_layout:Array[Vector4]=[]
+static func spots()->Array[Vector4]:
+ if not spot_layout.is_empty():return spot_layout
+ var rng:=RandomNumberGenerator.new();rng.seed=642601
+ for attempt in range(3000):
+  var center:=Vector2(rng.randf_range(0,128),rng.randf_range(0,104))
+  var separate:bool=true
+  for item in spot_layout:
+   if center.distance_to(Vector2(item.x,item.y))<6.4:separate=false;break
+  if separate:spot_layout.append(Vector4(center.x,center.y,rng.randf_range(.7,2.15),rng.randf_range(-.7,.7)))
+  if spot_layout.size()>=128:break
+ return spot_layout
+static func natural_spot(p:Vector2)->bool:
+ for item in spots():
+  var q:Vector2=(p-Vector2(item.x,item.y)).rotated(item.w)
+  if absf(q.x)<item.z and absf(q.y)<item.z*.85:return true
+ return false
+# Pattern IDs 0..4 remain unchanged for existing saves. New shapes append at 5..9.
+static func shape_point(q:Vector2,pattern:int)->bool:
+ if pattern==5:
+  q.y=-q.y+.25
+  var a:float=q.x*q.x+q.y*q.y-1.0
+  return a*a*a-q.x*q.x*q.y*q.y*q.y<0.0
+ if pattern==6:
+  var inside:bool=false
+  var last:Vector2=Vector2(cos(-PI/2.0+9.0*PI/5.0),sin(-PI/2.0+9.0*PI/5.0))*.48
+  for k in range(10):
+   var angle:float=-PI/2.0+k*PI/5.0
+   var v:Vector2=Vector2(cos(angle),sin(angle))*(1.2 if k%2==0 else .48)
+   if (v.y>q.y)!=(last.y>q.y) and q.x<(last.x-v.x)*(q.y-v.y)/(last.y-v.y)+v.x:inside=not inside
+   last=v
+  return inside
+ if pattern==7:return q.y>-.95 and q.y<.95 and absf(q.x)<(q.y+.95)*.58
+ if pattern==8:return absf(q.x)*.8+absf(q.y)<1.12
+ return absf(q.x)<1.0 and absf(q.y)<.85
+static func genetic_mark(p:Vector2,pattern:int)->bool:
+ if pattern==9:
+  var wave:float=p.x*.95+sin(p.y*.16)*1.35+sin(p.y*.37+p.x*.055)*.55
+  return sin(wave)>.62
+ for item in spots():
+  var q:Vector2=(p-Vector2(item.x,item.y)).rotated(item.w)/item.z
+  if q.length_squared()>3.5:continue
+  if shape_point(q,pattern):return true
+ return false
+static func soft_rainbow(t:float)->Color:
+ var palette:Array[Color]=[Color("ec606c"),Color("efb85d"),Color("e8d874"),Color("77c888"),Color("6aa9da"),Color("9980c8"),Color("ec606c")]
+ var u:float=clampf(t,0.0,.999)*6.0
+ return palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.0,1.0,u-floorf(u)))
+static func galaxy_color(p:Vector2)->Color:
+ var wave:float=(sin(p.x*.22+p.y*.12)+cos(p.y*.29-p.x*.09)+2.0)/4.0
+ var neb:float=exp(-pow((p.y-(.45*p.x+21.0))/9.0,2.0))
+ var color:=Color((30+105*wave+45*neb)/255.0,(28+40*wave+60*neb)/255.0,(80+100*wave+55*neb)/255.0)
+ for star in [Vector2(27,48),Vector2(32,60),Vector2(60,56),Vector2(69,38),Vector2(77,45),Vector2(62,65),Vector2(24,69),Vector2(72,67),Vector2(53,73),Vector2(67,28)]:
+  if p.distance_to(star)<.5:return Color("f4f7ff")
+ return color
+static func eye_color_at(index:int,p:Vector2)->Color:
+ if index<20:return Color(COLORS[clampi(index,0,19)])
+ if index==20:return soft_rainbow(p.y)
+ # Small fixed nebula and stars, no animation or change outside the iris mask.
+ var wave:float=(sin(p.x*10+p.y*5)+cos(p.y*13-p.x*4)+2.0)/4.0
+ var color:=Color(.12+.40*wave,.08+.22*wave,.35+.42*wave)
+ for star in [Vector2(.25,.25),Vector2(.65,.38),Vector2(.42,.72),Vector2(.78,.75)]:
+  if p.distance_to(star)<.022:return Color("f4f7ff")
+ return color
 static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Texture2D:
  if t.get("finish","")=="original":return source
  var key:String=source.resource_path+str(t)
@@ -26,7 +91,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
  var path:String="res://art/horse_masks/%s/frame_%02d.png"%[anim,frame]
  if anim=="stunned":path="res://art/horse_masks/stunned/frame_0.png"
  if not ResourceLoader.exists(path):return source
- var mask:Image=load(path).get_image();var image:Image=source.get_image()
+ var mask:Image=load(path).get_image();var image:Image=source.get_image().duplicate()
  if image.is_compressed():image.decompress()
  if mask.is_compressed():mask.decompress()
  var bob:=body_offset(image,anim,frame)
@@ -61,13 +126,15 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
      1:
       if anim=="walk_diag_down":mark=(Vector2(px,py)-Vector2(32,51)).length()<7 or (Vector2(px,py)-Vector2(58,61)).length()<6
       else:mark=(Vector2(px,py)-Vector2(30,60)).length()<8 or (Vector2(px,py)-Vector2(58,68)).length()<6
-     2:mark=(int(px)%11<5 and int(py)%12<5 and py>48 and py<78)
+     2:mark=natural_spot(Vector2(px,py))
      3:mark=px<40 and py>48 and py<78
      4:mark=py>77
+     5,6,7,8,9:mark=genetic_mark(Vector2(px,py),int(t.pattern))
     if anim=="foal" and int(t.pattern)==1:
      var dist:float=minf((Vector2(px,py)-Vector2(30,60)).length()-8.0,(Vector2(px,py)-Vector2(58,68)).length()-6.0)
      color=color.lerp(Color("f4edd8"),1.0-smoothstep(-.9,.9,dist))
     elif mark:color=Color("f4edd8")
+   if t.get("finish","")=="galaxy":color=galaxy_color(Vector2(float(x)*96.0/image.get_width(),float(y-bob)*96.0/image.get_height()))
    if anim=="foal":
     shade=clampf(maxf(old.r,maxf(old.g,old.b))*(1.0 if m.g>m.r else 1.10),0.12,1.0)
    var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
@@ -76,11 +143,12 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
  if anim=="foal" and t.has("eyes"):
   var eye_mask:Image=FOAL_EYES.get_image()
   if eye_mask.is_compressed():eye_mask.decompress()
-  var eye:=Color(COLORS[HorseCollection.eye_index(t)])
+  var eye_id:int=HorseCollection.eye_index(t)
   for y in image.get_height():
    for x in image.get_width():
     var weight:float=eye_mask.get_pixel(x,y).r
     if weight<.01:continue
+    var eye:Color=eye_color_at(eye_id,Vector2((float(x)-202.0)/30.0,(float(y)-122.0)/23.0))
     var old:Color=image.get_pixel(x,y);var shade:=clampf(maxf(old.r,maxf(old.g,old.b))/.65,.15,1.15)
     image.set_pixel(x,y,old.lerp(Color(eye.r*shade,eye.g*shade,eye.b*shade,old.a),weight))
  var tex:=ImageTexture.create_from_image(image);cache[key]=tex;return tex

@@ -6,7 +6,7 @@ var message:String=""
 var page:String="collection"
 var parent_a:String="original"
 var parent_b:String="original"
-var choices:Dictionary={"coat":0,"pattern":0,"mane":0,"eyes":0}
+var choices:Dictionary={"coat":0,"pattern":0,"mane":0,"eyes":0,"finish":0}
 var focus_id:String="original"
 var focus_preview:Dictionary={}
 var atlas_page:int=0
@@ -92,6 +92,10 @@ func breed_view()->void:
  for k in ["coat","pattern","mane","eyes"]:
   label(labels[k],Vector2(420,230+n*50),20)
   button("A" if choices[k]==0 else "B",Vector2(670,218+n*50),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
+ label("ACABADO",Vector2(850,510),20)
+ var finish_source:String=parent_b if choices.get("finish",0)==1 else parent_a
+ var finish_value:String=SaveData.horse_collection.find(finish_source).traits.get("finish","normal")
+ button(("B" if choices.get("finish",0)==1 else "A")+" · "+("Galaxy" if finish_value=="galaxy" else "Normal"),Vector2(840,545),func():choices["finish"]=1-int(choices.get("finish",0));refresh(),340)
  var t:Dictionary=SaveData.horse_collection.preview(parent_a,parent_b,choices)
  if not t.is_empty():
   sprite({"traits":t,"stage":"foal"},Vector2(505,375),200)
@@ -150,8 +154,8 @@ func atlas_entries()->Array[Dictionary]:
   owned["%d_%d_%d"%[h.traits.coat,h.traits.pattern,h.traits.mane]]=true
  if not atlas_owned_first:
   result.clear()
- for n in range(600):
-  var t:Dictionary={"coat":int(n/30),"pattern":int(n/6)%5,"mane":n%6}
+ for n in range(HorseCollection.COATS.size()*HorseCollection.PATTERNS.size()*HorseCollection.MANES.size()):
+  var t:Dictionary={"coat":int(n/(HorseCollection.PATTERNS.size()*6)),"pattern":int(n/6)%HorseCollection.PATTERNS.size(),"mane":n%6}
   if not atlas_owned_first or not owned.has("%d_%d_%d"%[t.coat,t.pattern,t.mane]):result.append({"horse":{"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":false})
  if not atlas_owned_first:
   for entry in result:

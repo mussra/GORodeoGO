@@ -9,7 +9,7 @@ func _ready()->void:
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(layout);layout()
  label("ENSAYO AISLADO · NADA SE GUARDA",Vector2(35,20),32)
  label("Al volver al menú o reiniciar recuperas tu estado real. Sin compras, premios ni logros.",Vector2(35,70),23)
- label("Adultos: los tuyos y 2 padres prestados. Potrillos reales siguen sin trabajar.\nAspectos temporales: rasgos existentes, no nuevas adquisiciones ni 600 diseños auditados.",Vector2(35,110),22)
+ label("Adultos: los tuyos y 2 padres prestados. Potrillos reales siguen sin trabajar.\nAspectos temporales: rasgos existentes, no nuevas adquisiciones ni catálogo final auditado.",Vector2(35,110),22)
  button("CABALLOS / COPIA TEMPORAL",Vector2(35,185),func():var p=load("res://src/Presentation/horse_panel.gd").new();add_child(p),550)
  button("SOMBREROS / COPIA TEMPORAL",Vector2(620,185),func():var p=load("res://src/Presentation/hat_panel.gd").new();add_child(p),600)
  label("ASPECTO PRESTADO · atributos BASE (260 / 900 / 0,60 / 1,00)",Vector2(35,255),23)
@@ -18,15 +18,19 @@ func _ready()->void:
   var pick:=OptionButton.new();pick.position=Vector2(35+i*395,300);pick.size=Vector2(365,48);canvas.add_child(pick)
   for value in names[i]:pick.add_item(value)
   picks.append(pick)
- button("USAR ASPECTO TEMPORAL",Vector2(35,365),func():SaveData.preview_trial_traits(picks[0].selected,picks[1].selected,picks[2].selected);refresh(),550)
+ var eye_pick:=OptionButton.new();eye_pick.position=Vector2(35,360);eye_pick.size=Vector2(270,48);canvas.add_child(eye_pick)
+ for value in HorseCollection.EYES:eye_pick.add_item("Ojos: "+value)
+ eye_pick.selected=10
+ var finish_pick:=OptionButton.new();finish_pick.position=Vector2(320,360);finish_pick.size=Vector2(270,48);canvas.add_child(finish_pick);finish_pick.add_item("Acabado normal");finish_pick.add_item("Acabado Galaxy")
+ button("USAR ASPECTO TEMPORAL",Vector2(35,420),func():SaveData.preview_trial_traits(picks[0].selected,picks[1].selected,picks[2].selected,eye_pick.selected,"galaxy" if finish_pick.selected==1 else "normal");refresh(),550)
  var whip:=OptionButton.new();whip.position=Vector2(620,365);whip.size=Vector2(600,48);canvas.add_child(whip)
  for id in ["whip_basic","whip_long"]:whip.add_item(EquipmentCatalog.ITEMS[id].name+" PRESTADA · %d px"%EquipmentCatalog.ITEMS[id].reach)
  whip.item_selected.connect(func(i):SaveData.equip_item("whip_basic" if i==0 else "whip_long");refresh())
- note=label("",Vector2(35,440),22);refresh()
- label("Todas las mejoras existentes activas. Galaxy/materiales/rareza final no implementados.",Vector2(35,505),21)
- level_pick=OptionButton.new();level_pick.position=Vector2(35,555);level_pick.size=Vector2(270,48);canvas.add_child(level_pick)
+ note=label("",Vector2(35,475),22);refresh()
+ label("Todas las mejoras existentes activas. Candidatas visuales; materiales especiales y rareza final sin cerrar.",Vector2(35,530),21)
+ level_pick=OptionButton.new();level_pick.position=Vector2(35,570);level_pick.size=Vector2(270,48);canvas.add_child(level_pick)
  for i in range(1,LevelCatalog.MAX_LEVEL+1):level_pick.add_item("Nivel %02d · ENSAYO"%i)
- button("JUGAR ENSAYO",Vector2(340,555),func():GameState.selected_level=level_pick.selected+1;get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn"),400)
+ button("JUGAR ENSAYO",Vector2(340,570),func():GameState.selected_level=level_pick.selected+1;get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn"),400)
  button("SALIR Y RESTAURAR ESTADO REAL",Vector2(35,635),func():SaveData.end_trial_session();get_tree().reload_current_scene(),1180)
 func layout()->void:
  var k:float=minf(size.x/1280,size.y/720);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2
@@ -35,7 +39,7 @@ func label(text:String,pos:Vector2,font:int)->Label:
 func button(text:String,pos:Vector2,cb:Callable,w:float)->void:
  var b:=Button.new();b.text=text;b.position=pos;b.size=Vector2(w,48);b.pressed.connect(cb);canvas.add_child(b)
 func refresh()->void:
- if note!=null:note.text="Seleccionado: "+SaveData.horse_collection.find(SaveData.horse_collection.selected).name+"\nEquipo temporal: "+EquipmentCatalog.ITEMS[SaveData.equipment_equipped.whip].name
+ if note!=null:note.text="Seleccionado: "+SaveData.horse_collection.find(SaveData.horse_collection.selected).name+" · Equipo temporal: "+EquipmentCatalog.ITEMS[SaveData.equipment_equipped.whip].name
 
 func _process(_delta:float)->void:refresh()
 func _notification(what:int)->void:
