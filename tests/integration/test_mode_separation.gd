@@ -25,3 +25,10 @@ func test_debug_view_survives_menu_return_without_reverting_horses()->void:
  assert_true(SaveData.switch_mode(true));SaveData.horse_collection.add_random_trial_pair();assert_true(SaveData.save_progress());var count:int=SaveData.horse_collection.horses.size();SaveData.end_trial_session();assert_eq(SaveData.horse_collection.horses.size(),count)
 func test_failed_target_creation_restores_departing_mode()->void:
  SaveData.highest_level_completed=4;SaveData.debug_mode_path="user://missing-mode-dir/target.dat";assert_false(SaveData.switch_mode(true));assert_false(SaveData.debug_mode);assert_eq(SaveData.highest_level_completed,4);assert_eq(SaveData.save_path,SaveData.normal_mode_path);assert_push_error_count(1)
+
+func test_corrupt_active_source_preserved_and_cannot_switch_or_save()->void:
+ var file:=FileAccess.open(SaveData.save_path,FileAccess.WRITE);file.store_string("broken [");file.close();var bytes:=FileAccess.get_file_as_bytes(SaveData.save_path);SaveData.load_progress()
+ assert_false(SaveData.save_progress());assert_false(SaveData.switch_mode(true));assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),bytes)
+ SaveData._load_valid=true
+func test_one_horse_debug_collection_does_not_get_reseeded_on_return()->void:
+ assert_true(SaveData.switch_mode(true));SaveData.horse_collection.horses=[SaveData.horse_collection.find("original")];assert_true(SaveData.save_progress());assert_true(SaveData.switch_mode(false));assert_true(SaveData.switch_mode(true));assert_eq(SaveData.horse_collection.horses.size(),1)

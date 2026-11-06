@@ -14,6 +14,7 @@ const SAVE_VERSION: int = 3  ## bump when the file layout changes, to allow migr
 
 const NORMAL_SAVE_PATH:String="user://save-normal-v4.dat"
 const DEBUG_SAVE_PATH:String="user://save-debug-v4.dat"
+var _load_valid:bool=true
 var debug_mode:bool=false
 var normal_mode_path:String=NORMAL_SAVE_PATH
 var debug_mode_path:String=DEBUG_SAVE_PATH
@@ -53,12 +54,14 @@ func mark_dual_lasso_intro_shown() -> void:
 	save_progress()
 
 func save_progress() -> bool:
+	if not _load_valid:return false # retain unreadable source instead of replacing it with defaults
 	if trial_session_active:return true # in-memory selections only, never touch real save
 	var config := ConfigFile.new()
 	config.set_value("meta", "version", SAVE_VERSION)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
 	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
 	config.set_value("appearance", "hat_color", hat_color)
+	if horse_collection.horses.is_empty():horse_collection.seed_trial()
 	config.set_value("horses_trial", "state", horse_collection.export_state())
 	config.set_value("equipment", "points", equipment_points)
 	config.set_value("equipment", "owned", equipment_owned)
@@ -78,6 +81,7 @@ static func load_source_path(current:String,legacy:String)->String:
 	return current if FileAccess.file_exists(current) else legacy
 
 func load_progress() -> void:
+	_load_valid=true
 	if trial_session_active:end_trial_session()
 	horse_collection=HorseCollection.new()
 	horse_collection.seed_trial()
@@ -91,10 +95,16 @@ func load_progress() -> void:
 	if save_path==NORMAL_SAVE_PATH and not FileAccess.file_exists(save_path):source_path=load_source_path(SAVE_PATH,LEGACY_2_SAVE_PATH)
 	var err: Error = config.load(source_path)
 	if err != OK:
+		_load_valid=not FileAccess.file_exists(source_path)
 		dual_lasso_intro_shown = false
 		highest_level_completed = 0  # first run (no file) or unreadable file
 		return
-	horse_collection.restore(config.get_value("horses_trial","state",{}))
+	if not config.has_section_key("progress","highest_level_completed"):
+		_load_valid=false
+		return
+	if config.has_section_key("horses_trial","state") and not horse_collection.restore(config.get_value("horses_trial","state",{})):
+		_load_valid=false
+		return
 	hat_color = HatAppearance.sanitize(config.get_value("appearance", "hat_color", "original"))
 	highest_level_completed = LevelProgression.sanitize_highest_completed(
 		config.get_value("progress", "highest_level_completed", 0)
@@ -262,7 +272,7 @@ func switch_mode(want_debug:bool)->bool:
 	var target_path:String=debug_mode_path if want_debug else normal_mode_path
 	if FileAccess.file_exists(target_path):
 		var check:=ConfigFile.new()
-		if check.load(target_path)!=OK:return false
+		if check.load(target_path)!=OK or not check.has_section_key("progress","highest_level_completed"):return false
 		var verify:=HorseCollection.new()
 		if not verify.restore(check.get_value("horses_trial","state",{})):return false
 	if trial_session_active:end_trial_session()
@@ -272,7 +282,7 @@ func switch_mode(want_debug:bool)->bool:
 	debug_mode=want_debug
 	save_path=debug_mode_path if debug_mode else normal_mode_path
 	load_progress()
-	if debug_mode and horse_collection.horses.size()==1:
+	if debug_mode and not FileAccess.file_exists(target_path):
 		horse_collection.add_trial_parents()
 		equipment_owned.assign(EquipmentCatalog.ITEMS.keys());equipment_equipped={"whip":"whip_basic"}
 	if save_progress():return true

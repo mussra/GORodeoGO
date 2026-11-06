@@ -827,3 +827,10 @@ msgstr "All lineages"
 
 msgid "GEN_ALL_ORIGINS"
 msgstr "All origins"
+
+
+msgid "JUMP_CAPABLE"
+msgstr "Fence jumping: yes (automatic when approaching)"
+
+msgid "JUMP_GROUNDED"
+msgstr "Fence jumping: no, go around the ends"

@@ -133,6 +133,7 @@ func detail_view()->void:
    message=tr("UI_112") if SaveData.select_horse(h.id) else tr("UI_086");refresh(),360)
   equip.disabled=SaveData.horse_collection.selected==h.id
  label(tr("UI_102")+tr(HorseCollection.COATS[h.traits.coat])+tr("UI_103")+tr(HorseCollection.PATTERNS[h.traits.pattern])+tr("UI_113")+tr(HorseCollection.MANES[h.traits.mane]),Vector2(420,220),24)
+ label(tr("JUMP_CAPABLE") if HorseJump.capable(h) else tr("JUMP_GROUNDED"),Vector2(420,470),18)
  var st:Dictionary=HorseStats.read(h)
  label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)
  if not SaveData.horse_collection.is_adult(h.id):

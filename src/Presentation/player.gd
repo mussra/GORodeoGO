@@ -19,6 +19,15 @@ signal dodge_drawing_started
 signal dodge_drawing_finished
 signal dodge_started
 signal dodge_finished
+signal jump_started
+signal jump_finished
+var can_jump:bool=false
+var _jump_time:float=0.0
+var _jump_direction:Vector2=Vector2.RIGHT
+var _jump_mask:int=0
+var _jump_from:Vector2
+var _jump_sprite_base:Vector2
+var _jump_cooldown:float=0.0
 
 const DODGE_RECHARGE_SECONDS: float = 2.5  # provisional feel setting, preview before APK
 var _dodge_cooldown: float = 0.0
@@ -58,7 +67,7 @@ var _dodge_remaining: float = 0.0
 var _dodge_direction: Vector2 = Vector2.ZERO
 
 const ART_ROOT: String = "res://art/player/"
-const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "stunned"]
+const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "stunned", "jump_side", "jump_up", "jump_down", "jump_diag_down", "jump_diag_up"]
 
 @export var max_speed: float = 260.0
 @export var acceleration: float = 900.0
@@ -134,7 +143,7 @@ func _on_move_pressed() -> void:
 	var running_repress: bool = _move_pressed_at - _running_release_at <= MOVE_REPRESS_WINDOW_SECONDS
 	_running_release_at = -INF
 	var double_press: bool = _move_tap.register_tap(_move_pressed_at)
-	if dodge_available and (running_repress or double_press) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
+	if _jump_time<=0 and dodge_available and (running_repress or double_press) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
 		_move_tap.reset()
 		_drawing_dodge = true
 		_drawing_real_started = _now_seconds()
@@ -204,7 +213,7 @@ func _on_move_released(_direction: Vector2) -> void:
 		_move_tap.reset()
 
 func request_dodge_path(points: PackedVector2Array) -> bool:
-	if not dodge_available or _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
+	if _jump_time>0 or not dodge_available or _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
 		return false
 	var preview: PackedVector2Array = dodge_preview_points(points)
 	if preview.size()<2: return false
@@ -222,7 +231,7 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 	return true
 
 func request_dodge(direction: Vector2) -> bool:
-	if not dodge_available or _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
+	if _jump_time>0 or not dodge_available or _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
 		return false
 	_dodge_direction = direction.normalized()
 	_dodge_remaining = DODGE_SECONDS
@@ -230,7 +239,7 @@ func request_dodge(direction: Vector2) -> bool:
 	return true
 
 func _on_aim_pressed() -> void:
-	if _stun_time_remaining > 0.0 or not is_physics_processing():
+	if _jump_time>0 or _stun_time_remaining > 0.0 or not is_physics_processing():
 		return
 	_touch_aim_active = true
 	_aim_pressed_at_seconds = _now_seconds()
@@ -267,6 +276,7 @@ func _on_aim_released(input_vector: Vector2) -> void:
 
 ## Called by an unroped, nervous bull on contact (GAMEPLAY_SPEC.md #Failure feedback).
 func stun(duration: float) -> void:
+	if _jump_time>0:_finish_jump(true)
 	if _stun_time_remaining <= 0.0:
 		stunned.emit()
 	_stun_time_remaining = max(_stun_time_remaining, duration * stun_resistance_multiplier)
@@ -275,6 +285,10 @@ func stun(duration: float) -> void:
 	cancel_input()
 
 func _physics_process(delta: float) -> void:
+	_jump_cooldown=maxf(0,_jump_cooldown-delta)
+	if _jump_time>0:
+		_process_jump(delta);return
+	if can_jump and velocity.length()>60 and _try_fence_ahead():return
 	_dodge_cooldown = maxf(0.0, _dodge_cooldown - delta)
 	if _dodge_path.is_empty():
 		_trail_fade = maxf(0.0, _trail_fade - delta)
@@ -471,6 +485,7 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 		_start_charging()
 
 func cancel_all_actions() -> void:
+	if _jump_time>0:_finish_jump(true)
 	cancel_input()
 	_flight_generation += 1
 	_lasso_in_flight = false
@@ -600,3 +615,51 @@ func _exit_tree() -> void:
 ## One projection shared by drawing and execution: never show unscaled reach.
 func dodge_preview_points(points: PackedVector2Array) -> PackedVector2Array:
 	return DodgeCurve.smooth(points,dodge_path_limit)
+
+# Auto-jump only over explicitly marked internal fences. Perimeter and rocks stay solid.
+func _try_fence_ahead()->bool:
+	if _jump_cooldown>0 or _stun_time_remaining>0 or _drawing_dodge:return false
+	var direction:Vector2=velocity.normalized()
+	var ray:=PhysicsRayQueryParameters2D.create(global_position,global_position+direction*62,32,[get_rid()])
+	var hit:Dictionary=get_world_2d().direct_space_state.intersect_ray(ray)
+	if hit.is_empty():return false
+	return request_jump(direction)
+func request_jump(direction:Vector2)->bool:
+	if not can_jump or _jump_time>0 or _jump_cooldown>0 or _stun_time_remaining>0 or direction.length()<.2:return false
+	var landing:Vector2=global_position+direction.normalized()*HorseJump.DISTANCE
+	if not world_bounds.grow(-28).has_point(landing):return false
+	var query:=PhysicsShapeQueryParameters2D.new();query.shape=$CollisionShape2D.shape;query.collision_mask=collision_mask;query.exclude=[get_rid()];query.transform=Transform2D(0,landing)
+	if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return false
+	# The whole corridor must be clear of solid non-jumpable objects.
+	query.collision_mask=collision_mask & ~32
+	for i in range(1,9):
+		query.transform=Transform2D(0,global_position.lerp(landing,float(i)/8))
+		if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return false
+	_jump_direction=direction.normalized();_jump_from=global_position;_jump_time=HorseJump.DURATION;_jump_mask=collision_mask;collision_mask&=~32;_jump_cooldown=1.2
+	cancel_input();_jump_time=HorseJump.DURATION
+	if _sprite_swap.has_sprite():_jump_sprite_base=_sprite_swap._sprite.position
+	jump_started.emit();return true
+func _process_jump(delta:float)->void:
+	_jump_time=maxf(0,_jump_time-delta);var t:float=1-_jump_time/HorseJump.DURATION
+	velocity=_jump_direction*HorseJump.DISTANCE/HorseJump.DURATION
+	var hit:=move_and_collide(velocity*delta)
+	var info:Array=SpriteSwap.direction_suffix(_jump_direction)
+	if _sprite_swap.has_sprite():
+		_sprite_swap.play("jump_"+info[0]);_sprite_swap.set_flip_h(info[1])
+		_sprite_swap._sprite.pause();_sprite_swap._sprite.frame=mini(7,int(t*8))
+		# Frame animation keeps the gallop articulate. Separate squash, suspension and landing.
+		var sprite:AnimatedSprite2D=_sprite_swap._sprite
+		sprite.position=_jump_sprite_base+Vector2(0,-HorseJump.arc(t));sprite.scale=Vector2(1+.08*sin(PI*t),1-.08*sin(PI*t))
+	if hit!=null:_jump_time=0
+	if _jump_time<=0:
+		_finish_jump(false)
+func _finish_jump(interrupted:bool)->void:
+	_jump_time=0
+	collision_mask=_jump_mask
+	if interrupted or test_move(global_transform,Vector2.ZERO):global_position=_jump_from
+	if _sprite_swap.has_sprite():
+		_sprite_swap._sprite.position=_jump_sprite_base
+		_sprite_swap._sprite.scale=Vector2.ONE
+	velocity=Vector2.ZERO
+	jump_finished.emit()
+	queue_redraw()

@@ -16,7 +16,7 @@ func seed_trial()->void:
  horses=[{"id":"original","name":"Original","parents":[],"traits":{"coat":10,"pattern":0,"mane":1,"finish":"original"}}]
 func add_trial_parents()->void:
  if not find("trial_a").is_empty():return
- horses.append_array([{ "id":"trial_a","name":"Azul de prueba","parents":[],"stats":{"speed":280.0,"handling":900.0,"power":0.6,"dodge":0.85},"traits":{"coat":3,"pattern":1,"mane":2,"finish":"normal"}}, {"id":"trial_b","name":"Arcoíris de prueba","parents":[],"stats":{"speed":260.0,"handling":1250.0,"power":0.8,"dodge":1.0},"traits":{"coat":6,"pattern":0,"mane":5,"finish":"normal"}}])
+ horses.append_array([{ "id":"trial_a","name":"Azul de prueba","can_jump":true,"parents":[],"stats":{"speed":280.0,"handling":900.0,"power":0.6,"dodge":0.85},"traits":{"coat":3,"pattern":1,"mane":2,"finish":"normal"}}, {"id":"trial_b","name":"Arcoíris de prueba","parents":[],"stats":{"speed":260.0,"handling":1250.0,"power":0.8,"dodge":1.0},"traits":{"coat":6,"pattern":0,"mane":5,"finish":"normal"}}])
 func add_random_trial_pair()->Array[Dictionary]:
  var rng:=RandomNumberGenerator.new();rng.randomize()
  var added:Array[Dictionary]=[]
@@ -24,14 +24,14 @@ func add_random_trial_pair()->Array[Dictionary]:
   var n:int=horses.size()+1
   while not find("random_trial_%d"%n).is_empty():n+=1
   var h:Dictionary={"id":"random_trial_%d"%n,"name":"Prueba aleatoria %d"%n,"parents":[],"stage":"adult","traits":{"coat":rng.randi_range(0,COATS.size()-1),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,MANES.size()-1),"eyes":rng.randi_range(0,EYES.size()-1),"finish":"normal"}}
-  h.name=suggest_name(h.traits);horses.append(h);added.append(h)
+  h["can_jump"]=i==0;h.name=suggest_name(h.traits);horses.append(h);added.append(h)
  return added
 func grant_achievement(level:int)->Dictionary:
  var id:String="achievement_%d"%level
  if not find(id).is_empty():return {}
  var rng:=RandomNumberGenerator.new();rng.randomize()
  var h:Dictionary={"id":id,"name":"Hallazgo de nivel %d"%level,"parents":[],"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,5),"eyes":rng.randi_range(0,EYES.size()-1),"finish":"normal"},"stats":{"speed":rng.randf_range(260,285),"handling":rng.randf_range(900,1300),"power":rng.randf_range(0.6,0.8),"dodge":rng.randf_range(0.85,1.0)}}
- h.name=suggest_name(h.traits);horses.append(h);return h
+ h["can_jump"]=level>=3;h.name=suggest_name(h.traits);horses.append(h);return h
 func find(id:String)->Dictionary:
  for h in horses:
   if h.id==id:return h
@@ -54,7 +54,7 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
  if t.is_empty():return {}
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
- child.name=suggest_name(t);next_id+=1;horses.append(child);return child
+ child["can_jump"]=HorseJump.capable(find(a)) or HorseJump.capable(find(b));child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
  return {"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:

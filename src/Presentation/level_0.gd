@@ -71,6 +71,7 @@ func _ready() -> void:
 	_win_requires_all_bulls = level_data.win_requires_all_bulls
 	_spawn_obstacles(_obstacle_rects)
 	_setup_art()
+	_spawn_jump_fences()
 	_spawn_distraction_stations()
 
 	var bull_count: int = clampi(level_data.bull_count, 1, all_bulls.size())
@@ -684,3 +685,22 @@ func _update_follow_camera() -> void:
 	center.y = clampf(center.y,border.position.y+half.y,border.end.y-half.y)
 	camera.position = center - camera.offset
 	camera.force_update_scroll()
+
+func _spawn_jump_fences()->void:
+	# Short internal rails leave clear routes around both ends for bulls.
+	if _level_number<3:return
+	var center:Vector2=Vector2.ZERO
+	for candidate:Vector2 in [Vector2(0,0),Vector2(0,-130),Vector2(0,130),Vector2(-200,0),Vector2(200,0)]:
+		var clear:bool=true
+		var footprint:Rect2=Rect2(candidate-Vector2(105,45),Vector2(210,90))
+		for obstacle:Rect2 in _obstacle_rects:
+			if footprint.intersects(obstacle):clear=false
+		if footprint.intersects(Rect2(pen.position-Vector2(90,90),Vector2(180,180))):clear=false
+		if clear:center=candidate;break
+	var rect:Rect2=Rect2(center-Vector2(75,7),Vector2(150,14))
+	var fence:=JumpFence.new();fence.position=center;add_child(fence)
+	_obstacle_rects.append(rect)
+	player.collision_mask|=32
+	var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
+	player.can_jump=HorseJump.capable(horse)
+	for bull in all_bulls:bull.collision_mask|=32

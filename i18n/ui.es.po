@@ -827,3 +827,10 @@ msgstr "Todos los linajes"
 
 msgid "GEN_ALL_ORIGINS"
 msgstr "Todos los orígenes"
+
+
+msgid "JUMP_CAPABLE"
+msgstr "Salto de vallas: sí (automático al acercarte)"
+
+msgid "JUMP_GROUNDED"
+msgstr "Salto de vallas: no, rodea los extremos"

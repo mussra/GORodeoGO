@@ -416,10 +416,10 @@ func _on_state_changed(new_state: BullState.State) -> void:
 func _update_collision(state: BullState.State) -> void:
 	if controller.is_held() or _delivered:
 		collision_layer = CollisionLayers.BULL_PASSIVE
-		collision_mask = CollisionLayers.FENCE
+		collision_mask = CollisionLayers.FENCE | 32
 		return
 	collision_layer = CollisionLayers.BULL
-	var mask: int = CollisionLayers.FENCE | CollisionLayers.BULL
+	var mask: int = CollisionLayers.FENCE | CollisionLayers.BULL | 32
 	if state != BullState.State.SAFE:
 		mask |= CollisionLayers.PEN_BARRIER
 	collision_mask = mask
