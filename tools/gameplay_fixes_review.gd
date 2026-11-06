@@ -29,9 +29,18 @@ func run()->void:
  p._on_aim_released(Vector2(0,150.0/p.max_throw_distance));await create_timer(p.lasso_travel_time+.1).timeout
  assert(second.controller.is_held());assert(p._active_capture_count==2)
  await create_timer(.8).timeout
- b.controller.use_tranquilizer();assert(b.controller.return_to_pen());second.controller.use_tranquilizer();assert(second.controller.return_to_pen())
- assert(b.controller.current_state()==BullState.State.SAFE);assert(second.controller.current_state()==BullState.State.SAFE)
- note.text="TOROS SEGUROS: estado SAFE sin exclamación de perseguidor\nPrueba controlada en motor, no validación en Android"
+ # New isolated setup, then real movement and pen overlap trigger normal delivery.
+ second.controller.force_escape();second.global_position=Vector2(1500,1500)
+ p.cancel_all_actions();p.global_position=level.pen.global_position+Vector2(-110,0)
+ b.global_position=level.pen.global_position+Vector2(90,0);b._tow_path.clear();b.controller.use_tranquilizer();b.set_physics_process(true)
+ note.text="ENTREGA NORMAL: toro CONTROLLED entra por movimiento al corral\nSin forzar SAFE ni contador, se procesa el área real"
+ Input.action_press("move_left")
+ for i in range(180):
+  await physics_frame
+  if level._bulls_returned>0:break
+ Input.action_release("move_left")
+ assert(level._bulls_returned==1);assert(b.controller.current_state()==BullState.State.SAFE);assert(not b._is_chaser)
+ note.text="ENTREGADO: contador1/5, toro SAFE sin exclamación\nPrueba controlada en motor, no validación en Android"
  await create_timer(1.5).timeout
  root.get_texture().get_image().save_png("/downloads/gameplay-safe-no-alert.png")
  print("GAMEPLAY_FIXES_VIDEO_ASSERTIONS_PASSED")

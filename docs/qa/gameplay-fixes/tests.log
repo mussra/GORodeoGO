@@ -115,7 +115,8 @@ res://tests/integration/test_trial_gameplay_fixes.gd
 [0m[33m    --- Awaiting 0.65 seconds  ---
 [0m* test_safe_bull_clears_chaser_flags
 * test_recovery_targets_recent_position_not_stale_trail
-[1m4/4 passed.
+* test_normal_pen_overlap_delivers_and_no_safe_chaser
+[1m5/5 passed.
 [0m
 
 
@@ -127,10 +128,10 @@ res://tests/integration/test_trial_gameplay_fixes.gd
 Totals
 ------
 Scripts               5
-Tests                14
-Passing Tests        14
-Asserts             269
-Time              19.007s
+Tests                15
+Passing Tests        15
+Asserts             276
+Time              19.285s
 
 
 [32m---- All tests passed! ----
