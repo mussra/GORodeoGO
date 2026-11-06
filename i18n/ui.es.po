@@ -837,3 +837,6 @@ msgstr "Salto de vallas: no, rodea los extremos"
 
 msgid "GEN_RELATION_HINT"
 msgstr "Dorado: antepasados y descendientes completos. Toca el mismo caballo para quitar la selección. Los filtros siguen activos."
+
+msgid "JUMP_BADGE_TITLE"
+msgstr "Salto de vallas"

@@ -11,6 +11,7 @@ var _equipment_panel:EquipmentPanel
 var _missions: Button
 var _caption: Label
 var _equipment_caption: Label
+var _jump_badge:JumpBadge
 var _hd_rider: Sprite2D
 var _rider: AnimatedSprite2D
 var _bull: AnimatedSprite2D
@@ -137,6 +138,7 @@ func _build_menu() -> void:
 	_hd_rider.position = Vector2(0,0)
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
+	_jump_badge=JumpBadge.new();_jump_badge.position=Vector2(1145,525);_jump_badge.size=Vector2(64,56);_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));add_child(_jump_badge)
 	_equipment_caption = _label("",16,Color("9cbcc0"))
 	_equipment_caption.position=Vector2(850,600)
 	add_child(_equipment_caption)
@@ -258,6 +260,8 @@ func _notification(what: int) -> void:
 		else: _on_quit_pressed()
 
 func _refresh_points_caption()->void:
+	if is_instance_valid(_jump_badge):
+		_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));_jump_badge.queue_redraw()
 	if is_instance_valid(_equipment_caption):
 		var id:String=SaveData.equipment_equipped.get("whip","")
 		_equipment_caption.text=tr("UI_013")+(str(EquipmentCatalog.ITEMS[id].name) if EquipmentCatalog.ITEMS.has(id) else tr("UI_014"))

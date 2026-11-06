@@ -24,3 +24,7 @@ func test_hidden_filter_never_invents_edges_or_unhides_relatives()->void:
   if node is Button:count+=1;assert_eq(node.get_meta("horse_id"),"trial_a")
   if node is Line2D:fail_test("hidden ancestors must not gain invented shortcuts")
  assert_eq(count,1);panel.select("trial_a");assert_eq(panel.selected,"trial_a");panel.select("trial_a");assert_eq(panel.selected,"")
+
+func test_jump_badge_tap_explains_both_capabilities()->void:
+ for capable in [false,true]:
+  var badge:=JumpBadge.new();badge.capable=capable;add_child_autofree(badge);badge.pressed.emit();assert_eq(badge.get_child_count(),1);var dialog:AcceptDialog=badge.get_child(0);assert_eq(dialog.dialog_text,TranslationServer.translate("JUMP_CAPABLE" if capable else "JUMP_GROUNDED"));assert_true(dialog.visible);dialog.hide()

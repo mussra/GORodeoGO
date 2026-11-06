@@ -65,7 +65,8 @@ func collection_view()->void:
  for h in SaveData.horse_collection.horses:
   var row:=HBoxContainer.new();row.custom_minimum_size.y=100;rows.add_child(row)
   var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits) if not SaveData.horse_collection.is_adult(h.id) else HorsePortrait.ART;tex.material=HorsePortrait.material_for(h.traits,SaveData.hat_color) if SaveData.horse_collection.is_adult(h.id) else null;tex.custom_minimum_size=Vector2(96,96);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
-  var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=670;row.add_child(l)
+  var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=590;row.add_child(l)
+  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
   var eq:=Button.new();eq.text=tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_059");eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
    message=(tr("UI_084") if SaveData.trial_session_active else tr("UI_085")) if SaveData.select_horse(h.id) else tr("UI_086");refresh())
   var fam:=Button.new();fam.text=tr("FICHA");row.add_child(fam);fam.pressed.connect(func():focus_id=h.id;show_page("detail"))
@@ -133,7 +134,7 @@ func detail_view()->void:
    message=tr("UI_112") if SaveData.select_horse(h.id) else tr("UI_086");refresh(),360)
   equip.disabled=SaveData.horse_collection.selected==h.id
  label(tr("UI_102")+tr(HorseCollection.COATS[h.traits.coat])+tr("UI_103")+tr(HorseCollection.PATTERNS[h.traits.pattern])+tr("UI_113")+tr(HorseCollection.MANES[h.traits.mane]),Vector2(420,220),24)
- label(tr("JUMP_CAPABLE") if HorseJump.capable(h) else tr("JUMP_GROUNDED"),Vector2(420,470),18)
+ var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(420,470);badge.size=Vector2(64,56);content.add_child(badge)
  var st:Dictionary=HorseStats.read(h)
  label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)
  if not SaveData.horse_collection.is_adult(h.id):
