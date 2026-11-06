@@ -17,7 +17,7 @@ func test_round_trip_and_bad_state()->void:
  assert_false(d.restore(invalid));assert_eq(d.find(h.id),h)
 func test_save_failure_rollback()->void:
  var original:Dictionary=SaveData.horse_collection.export_state();var path:String=SaveData.save_path
- SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.horse_collection.add_trial_parents();SaveData.save_path="user://missing-dir/blocked.dat"
+ SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.horse_collection.add_trial_parents();SaveData.horse_collection.birth_credits=2;SaveData.save_path="user://missing-dir/blocked.dat"
  var before:Dictionary=SaveData.horse_collection.export_state()
  assert_true(SaveData.breed_horses("trial_a","trial_b",{}).is_empty());assert_eq(SaveData.horse_collection.export_state(),before)
  assert_false(SaveData.select_horse("trial_a"));assert_eq(SaveData.horse_collection.selected,"original")
@@ -25,7 +25,7 @@ func test_save_failure_rollback()->void:
  SaveData.horse_collection.restore(original);SaveData.save_path=path
 func test_foal_cannot_equip_or_breed_until_trial_training()->void:
  var original:Dictionary=SaveData.horse_collection.export_state();var path:String=SaveData.save_path
- SaveData.save_path="user://qa_foal_test.dat";SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.horse_collection.add_trial_parents()
+ SaveData.save_path="user://qa_foal_test.dat";SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.horse_collection.add_trial_parents();SaveData.horse_collection.birth_credits=2
  var h:Dictionary=SaveData.breed_horses("trial_a","trial_b",{})
  assert_eq(h.stage,"foal");assert_false(SaveData.select_horse(h.id));assert_eq(SaveData.horse_collection.selected,"original")
  assert_true(SaveData.breed_horses(h.id,"original",{}).is_empty())

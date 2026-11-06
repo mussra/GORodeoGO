@@ -11,6 +11,8 @@ var horses:Array[Dictionary]=[]
 var ancestors:Array[Dictionary]=[]
 var selected:String="original"
 var next_id:int=1
+var birth_credits:int=0
+var bought_offers:Array[String]=[]
 func seed_trial()->void:
  if not horses.is_empty():return
  horses=[{"id":"original","name":"Original","parents":[],"traits":{"coat":10,"pattern":0,"mane":1,"finish":"original"}}]
@@ -28,10 +30,11 @@ func add_random_trial_pair()->Array[Dictionary]:
  return added
 func grant_achievement(level:int)->Dictionary:
  var id:String="achievement_%d"%level
- if not find(id).is_empty():return {}
+ if not known_record(id).is_empty():return {}
  var rng:=RandomNumberGenerator.new();rng.randomize()
  var h:Dictionary={"id":id,"name":"Hallazgo de nivel %d"%level,"parents":[],"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,5),"eyes":rng.randi_range(0,EYES.size()-1),"finish":"normal"},"stats":{"speed":rng.randf_range(260,285),"handling":rng.randf_range(900,1300),"power":rng.randf_range(0.6,0.8),"dodge":rng.randf_range(0.85,1.0)}}
- h["can_jump"]=level>=3;h.name=suggest_name(h.traits);horses.append(h);return h
+ var offer:Dictionary=HorseMarket.offers(level)[rng.randi_range(0,5)]
+ h.traits=offer.traits.duplicate(true);h["can_jump"]=level>=3;h.name=suggest_name(h.traits);horses.append(h);return h
 func find(id:String)->Dictionary:
  for h in horses:
   if h.id==id:return h
@@ -56,30 +59,54 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
  child["can_jump"]=HorseJump.capable(find(a)) or HorseJump.capable(find(b));child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
- return {"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
+ return {"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
  if not v is Dictionary or not v.get("horses") is Array:return false
- var clean:Array[Dictionary]=[];var ids:Dictionary={}
+ var offers_state:Variant=v.get("bought_offers",[])
+ if not offers_state is Array:return false
+ for offer in offers_state:
+  if not offer is String:return false
+ var clean:Array[Dictionary]=[];var ids:Dictionary={};var by_id:Dictionary={}
  var known:Variant=v.get("ancestors",[])
  if not known is Array:return false
  var clean_ancestors:Array[Dictionary]=[]
- for a in known:
-  if not a is Dictionary or typeof(a.get("id"))!=TYPE_STRING or a.id.is_empty() or ids.has(a.id) or not valid_traits(a.get("traits")) or typeof(a.get("name"))!=TYPE_STRING:return false
-  if not a.get("parents") is Array or a.parents.size() not in [0,2]:return false
-  for parent in a.parents:
-   if typeof(parent)!=TYPE_STRING or not ids.has(parent):return false
-  ids[a.id]=true;clean_ancestors.append(a.duplicate(true))
- for h in v.horses:
-  if not h is Dictionary or typeof(h.get("id"))!=TYPE_STRING or h.id.is_empty() or ids.has(h.id) or not valid_traits(h.get("traits")):return false
-  if not h.get("parents") is Array or h.parents.size() not in [0,2]:return false
-  if typeof(h.get("name"))!=TYPE_STRING:return false
-  if h.get("stage","adult") not in ["foal","adult"]:return false
+ for group in [known,v.horses]:
+  for h in group:
+   if not h is Dictionary or typeof(h.get("id"))!=TYPE_STRING or h.id.is_empty() or ids.has(h.id) or not valid_traits(h.get("traits")):return false
+   if not h.get("parents") is Array or h.parents.size() not in [0,2] or typeof(h.get("name"))!=TYPE_STRING:return false
+   if h.id=="original" and not h.parents.is_empty():return false
+   if h.parents.size()==2 and h.parents[0]==h.parents[1]:return false
+   if h.get("stage","adult") not in ["foal","adult"]:return false
+   ids[h.id]=true;by_id[h.id]=h
+   if group==known:clean_ancestors.append(h.duplicate(true))
+   else:clean.append(h.duplicate(true))
+ for h in by_id.values():
   for parent in h.parents:
    if typeof(parent)!=TYPE_STRING or not ids.has(parent):return false
-  ids[h.id]=true;clean.append(h.duplicate(true))
- if clean.is_empty() or not ids.has("original"):return false
- horses=clean;ancestors=clean_ancestors;selected=str(v.get("selected","original"))
- if not ids.has(selected) or not is_adult(selected):selected="original"
+ # Validate all dependencies without relying on ownership/list order.
+ var resolved:Dictionary={};var progress:bool=true
+ while progress:
+  progress=false
+  for h in by_id.values():
+   if resolved.has(h.id):continue
+   var ready:bool=true
+   for parent in h.parents:
+    if not resolved.has(parent):ready=false
+   if ready:resolved[h.id]=true;progress=true
+ if resolved.size()!=ids.size() or clean.is_empty() or not ids.has("original"):return false
+ var adult_id:String=""
+ for h in clean:
+  if h.get("stage","adult")=="adult":adult_id=h.id;break
+ if adult_id.is_empty():return false
+ horses=clean;ancestors=clean_ancestors;selected=str(v.get("selected",adult_id))
+ if not is_adult(selected):selected=adult_id
+ var offers:Variant=v.get("bought_offers",[])
+ if not offers is Array:return false
+ bought_offers.clear()
+ for offer in offers:
+  if not offer is String:return false
+  bought_offers.append(offer)
+ birth_credits=maxi(0,int(v.get("birth_credits",0)))
  next_id=maxi(int(v.get("next_id",1)),1)
  while ids.has("child_%d"%next_id):next_id+=1
  return true

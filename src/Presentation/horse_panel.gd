@@ -36,23 +36,25 @@ func _refresh()->void:
  button(tr("UI_073"),Vector2(30,75),func():show_page("collection"))
  button(tr("UI_074"),Vector2(275,75),func():show_page("breed"))
  button(tr("UI_075"),Vector2(520,75),func():show_page("atlas"))
+ button(tr("MARKET_TITLE"),Vector2(765,75),func():show_page("market"),230)
  button(tr("GEN_TITLE"),Vector2(795,130),func():add_child(GenealogyPanel.new()),360)
- var random_button:=button(tr("UI_076"),Vector2(795,75),func():
+ var random_button:=button(tr("UI_076"),Vector2(1010,75),func():
   if not SaveData.debug_mode and not SaveData.trial_session_active and not SaveData.begin_trial_session():
    message=tr("UI_077");refresh();return
   var before:Dictionary=SaveData.horse_collection.export_state();var added:Array[Dictionary]=SaveData.horse_collection.add_random_trial_pair();
   if not SaveData.save_progress():SaveData.horse_collection.restore(before);message=tr("UI_086");refresh();return
-  parent_b=added[0].id;page="collection";scroll_to_newest=true;message=tr("UI_078")%SaveData.horse_collection.horses.size();refresh(),360)
+  parent_b=added[0].id;page="collection";scroll_to_newest=true;message=tr("UI_078")%SaveData.horse_collection.horses.size();refresh(),230)
  random_button.visible=SaveData.debug_mode or SaveData.trial_session_active
- var trial_note:=label(tr("UI_079"),Vector2(30,138),18);trial_note.size=Vector2(745,28);trial_note.clip_text=true
+ var trial_note:=label(tr("MARKET_NORMAL_RULES") if not SaveData.debug_mode and not SaveData.trial_session_active else tr("UI_079"),Vector2(30,138),18);trial_note.size=Vector2(745,28);trial_note.clip_text=true
  match page:
   "collection":collection_view()
   "breed":breed_view()
   "family":family_view()
   "atlas":atlas_view()
+  "market":atlas_view()
   "detail":detail_view()
  label(message,Vector2(30,625),22)
- label(tr("UI_080"),Vector2(30,675),18)
+ label(tr("MARKET_LIVE_NOTE"),Vector2(30,675),17)
 func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
  var tex:=TextureRect.new();tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
  if h.get("stage","adult")=="foal":tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits)
@@ -88,11 +90,14 @@ func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
   else:parent_b=str(pick.get_item_metadata(i))
   refresh())
 func breed_view()->void:
- label(tr("UI_087"),Vector2(40,185));label(tr("UI_088"),Vector2(840,185))
- parent_picker(parent_a,Vector2(40,220),true);parent_picker(parent_b,Vector2(840,220),false)
+ if SaveData.horse_collection.find(parent_a).is_empty():parent_a=SaveData.horse_collection.selected
+ if SaveData.horse_collection.find(parent_b).is_empty():parent_b=SaveData.horse_collection.selected
+ label(tr("BIRTH_CREDITS")%SaveData.horse_collection.birth_credits if not SaveData.debug_mode and not SaveData.trial_session_active else tr("BIRTH_FREE"),Vector2(40,185),18)
+ label(tr("UI_087"),Vector2(40,210),18);label(tr("UI_088"),Vector2(840,210),18)
+ parent_picker(parent_a,Vector2(40,240),true);parent_picker(parent_b,Vector2(840,240),false)
  sprite(SaveData.horse_collection.find(parent_a),Vector2(110,310),105)
  sprite(SaveData.horse_collection.find(parent_b),Vector2(1045,310),105)
- label(tr("UI_089"),Vector2(390,185),21)
+ label(tr("UI_089"),Vector2(390,210),18)
  var labels={"coat":tr("UI_129"),"pattern":tr("UI_130"),"mane":tr("UI_090"),"eyes":tr("UI_131")};var n:int=0
  for k in ["coat","pattern","mane","eyes"]:
   label(labels[k],Vector2(420,230+n*50),20)
@@ -106,7 +111,7 @@ func breed_view()->void:
   sprite({"traits":t,"stage":"foal"},Vector2(505,375),200)
   button(tr("UI_092"),Vector2(440,570),func():
    var h:Dictionary=SaveData.breed_horses(parent_a,parent_b,choices)
-   message=tr("UI_093") if h.is_empty() else tr("UI_094")%h.name
+   message=(tr("BIRTH_NEED_WIN") if not SaveData.debug_mode and not SaveData.trial_session_active and SaveData.horse_collection.birth_credits<=0 else tr("UI_093")) if h.is_empty() else tr("UI_094")%h.name
    if not h.is_empty():focus_id=h.id
    refresh(),390)
  else:label(tr("UI_095"),Vector2(440,500),24)
@@ -121,7 +126,8 @@ func detail_view()->void:
  if not is_owned:
   label(tr(HorseCollection.COATS[h.traits.coat])+tr("UI_101"),Vector2(40,185),28);sprite(h,Vector2(60,245),300)
   label(tr("UI_102")+tr(HorseCollection.COATS[h.traits.coat])+tr("UI_103")+tr(HorseCollection.PATTERNS[h.traits.pattern])+tr("UI_104")+tr(HorseCollection.MANES[h.traits.mane]),Vector2(450,250),26)
-  label(tr("UI_105"),Vector2(450,430),22)
+  label(tr("MARKET_VALUE")%[tr(HorseCollection.RARITIES[HorseMarket.tier(h)]),HorseMarket.buy_price(h)],Vector2(450,380),22)
+  var purchase:=button(tr("MARKET_BUY")%(0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h)),Vector2(450,440),func():confirm_trade(h,false),400);purchase.disabled=not SaveData.debug_mode and not SaveData.trial_session_active and (SaveData.equipment_points<HorseMarket.buy_price(h) or not HorseMarket.available(SaveData.horse_collection,h,SaveData.highest_level_completed))
   button(tr("UI_106"),Vector2(450,510),func():show_page("atlas"),340)
   return
  var title:=label(h.name,Vector2(40,175),27);title.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;title.size.x=365;title.clip_text=true
@@ -134,7 +140,7 @@ func detail_view()->void:
    message=tr("UI_112") if SaveData.select_horse(h.id) else tr("UI_086");refresh(),360)
   equip.disabled=SaveData.horse_collection.selected==h.id
  label(tr("UI_102")+tr(HorseCollection.COATS[h.traits.coat])+tr("UI_103")+tr(HorseCollection.PATTERNS[h.traits.pattern])+tr("UI_113")+tr(HorseCollection.MANES[h.traits.mane]),Vector2(420,220),24)
- var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(420,470);badge.size=Vector2(64,56);content.add_child(badge)
+ var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(1120,225);badge.size=Vector2(64,56);content.add_child(badge)
  var st:Dictionary=HorseStats.read(h)
  label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)
  if not SaveData.horse_collection.is_adult(h.id):
@@ -143,17 +149,24 @@ func detail_view()->void:
    message=tr("UI_117") if SaveData.mature_horse_trial(h.id) else tr("UI_086");refresh(),360)
  label(tr("UI_118") if not SaveData.horse_collection.is_adult(h.id) else tr("UI_119")%SaveData.equipped_whip_reach(),Vector2(560,535),18)
  button(tr("UI_120"),Vector2(420,570),func():show_page("family"),420)
+ var sell:=button(tr("MARKET_SELL")%HorseMarket.sell_price(h),Vector2(860,570),func():confirm_trade(h,true),360);sell.disabled=not HorseMarket.can_sell(SaveData.horse_collection,h.id)
+ sell.tooltip_text=tr("MARKET_PROTECT")
 func atlas_entries()->Array[Dictionary]:
+ if page=="market" and not SaveData.debug_mode and not SaveData.trial_session_active:
+  var limited:Array[Dictionary]=[]
+  for h in HorseMarket.offers(SaveData.highest_level_completed):
+   if not SaveData.horse_collection.bought_offers.has(h.offer_id):limited.append({"horse":h,"owned":false})
+  return limited
  var result:Array[Dictionary]=[];var owned:Dictionary={}
  for h in SaveData.horse_collection.horses:
   result.append({"horse":h,"owned":true})
   owned["%d_%d_%d"%[h.traits.coat,h.traits.pattern,h.traits.mane]]=true
- if not atlas_owned_first:
+ if not atlas_owned_first or page=="market":
   result.clear()
  for n in range(HorseCollection.COATS.size()*HorseCollection.PATTERNS.size()*HorseCollection.MANES.size()):
   var t:Dictionary={"coat":int(n/(HorseCollection.PATTERNS.size()*6)),"pattern":int(n/6)%HorseCollection.PATTERNS.size(),"mane":n%6}
-  if not atlas_owned_first or not owned.has("%d_%d_%d"%[t.coat,t.pattern,t.mane]):result.append({"horse":{"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":false})
- if not atlas_owned_first:
+  if page=="market" or not atlas_owned_first or not owned.has("%d_%d_%d"%[t.coat,t.pattern,t.mane]):result.append({"horse":{"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":false})
+ if not atlas_owned_first and page!="market":
   for entry in result:
    var t:Dictionary=entry.horse.traits
    for h in SaveData.horse_collection.horses:
@@ -161,10 +174,11 @@ func atlas_entries()->Array[Dictionary]:
      entry.horse=h;entry.owned=true;break
  return result
 func atlas_view()->void:
- label(tr("UI_121"),Vector2(35,170),25)
- button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(765,165),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),470)
- label(tr("UI_124"),Vector2(35,208),18)
- var entries:Array[Dictionary]=atlas_entries();var pages:int=ceili(entries.size()/8.0);atlas_page=clampi(atlas_page,0,pages-1)
+ label(tr("MARKET_BALANCE")%SaveData.equipment_points if page=="market" else tr("UI_121"),Vector2(35,170),25)
+ if page!="market":button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(765,165),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),470)
+ label(tr("MARKET_DESIGN_NOTE"),Vector2(35,208),17)
+ if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
+ var entries:Array[Dictionary]=atlas_entries();var pages:int=maxi(1,ceili(entries.size()/8.0));atlas_page=clampi(atlas_page,0,pages-1)
  for j in range(8):
   var n:int=atlas_page*8+j
   if n>=entries.size():break
@@ -172,9 +186,24 @@ func atlas_view()->void:
   var x:float=35+(j%4)*305;var y:float=250+int(j/4)*160
   sprite(h,Vector2(x,y),90)
   var title:=label(("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])),Vector2(x+92,y),18);title.size=Vector2(205,30);title.clip_text=true
-  label(tr(HorseCollection.PATTERNS[t.pattern])+tr("UI_125")+tr(HorseCollection.MANES[t.mane]),Vector2(x+92,y+32),16)
+  label(tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]),Vector2(x+92,y+32),16)
   var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(295,130);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
-  if not entry.owned:label(tr("UI_127"),Vector2(x+92,y+87),16)
+  label(tr(HorseCollection.RARITIES[HorseMarket.tier(h)]),Vector2(x+92,y+58),16)
+  label(tr("MARKET_PRICE")%HorseMarket.buy_price(h),Vector2(x+92,y+82),16)
+  if HorseJump.capable(h):
+   var jump:=JumpBadge.new();jump.capable=true;jump.position=Vector2(x,y+88);jump.size=Vector2(64,56);content.add_child(jump)
  button(tr("UI_132"),Vector2(35,575),func():atlas_page=maxi(0,atlas_page-1);refresh())
  label(tr("UI_128")%[atlas_page+1,pages],Vector2(345,585),23)
  button(tr("UI_133"),Vector2(650,575),func():atlas_page=mini(pages-1,atlas_page+1);refresh())
+
+func confirm_trade(h:Dictionary,selling:bool)->void:
+ var dialog:=ConfirmationDialog.new();dialog.title=tr("MARKET_TITLE")
+ var amount:int=HorseMarket.sell_price(h) if selling else (0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h))
+ dialog.dialog_text=(tr("MARKET_CONFIRM_SELL") if selling else tr("MARKET_CONFIRM_BUY"))%[h.name,amount,SaveData.equipment_points]
+ dialog.get_cancel_button().text=tr("MARKET_CANCEL");dialog.min_size=Vector2i(600,180);add_child(dialog)
+ dialog.confirmed.connect(func():
+  var ok:bool=SaveData.sell_market_horse(str(h.id)) if selling else SaveData.buy_market_horse(h)
+  message=tr("MARKET_OK") if ok else tr("MARKET_FAILED");page="collection";refresh();dialog.queue_free())
+ dialog.canceled.connect(dialog.queue_free);dialog.popup_centered()
+
+func entries_empty()->bool:return atlas_entries().is_empty()

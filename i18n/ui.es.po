@@ -840,3 +840,63 @@ msgstr "Dorado: antepasados y descendientes completos. Toca el mismo caballo par
 
 msgid "JUMP_BADGE_TITLE"
 msgstr "Salto de vallas"
+
+msgid "MARKET_TITLE"
+msgstr "Mercado"
+
+msgid "MARKET_CANDIDATE"
+msgstr "Balance candidato: compra/venta con puntos; rareza de diseño, no frecuencia medida."
+
+msgid "MARKET_VALUE"
+msgstr "%s · Compra: %d puntos"
+
+msgid "MARKET_BUY"
+msgstr "Comprar · %d puntos"
+
+msgid "MARKET_SELL"
+msgstr "Vender · %d puntos"
+
+msgid "MARKET_PROTECT"
+msgstr "Equipa otro caballo para vender. Original y potros protegidos."
+
+msgid "MARKET_BALANCE"
+msgstr "Mercado · Saldo: %d puntos"
+
+msgid "MARKET_DESIGN_NOTE"
+msgstr "Rareza de diseño: no aumenta estadísticas. Normal: solo se compran ofertas del nivel actual."
+
+msgid "MARKET_PRICE"
+msgstr "Compra: %d puntos"
+
+msgid "MARKET_CONFIRM_BUY"
+msgstr "¿Comprar %s por %d puntos?\nSaldo actual: %d puntos. No hay dinero real."
+
+msgid "MARKET_CONFIRM_SELL"
+msgstr "¿Vender %s por %d puntos?\nSaldo actual: %d puntos. Su genealogía se conserva."
+
+msgid "MARKET_OK"
+msgstr "Operación guardada."
+
+msgid "MARKET_FAILED"
+msgstr "No se pudo guardar. No se cambió el saldo ni la colección."
+
+msgid "MARKET_CANCEL"
+msgstr "Cancelar"
+
+msgid "MARKET_NORMAL_RULES"
+msgstr "Normal: 6 ofertas por nivel alcanzado. Cada victoria gana un nacimiento."
+
+msgid "BIRTH_CREDITS"
+msgstr "Nacimientos disponibles: %d · Gana uno por victoria, incluso al repetir nivel."
+
+msgid "BIRTH_FREE"
+msgstr "Debug/ensayo: nacimientos y compras libres, progreso separado."
+
+msgid "MARKET_LIVE_NOTE"
+msgstr "Normal: ofertas limitadas, crías vendibles y un nacimiento por victoria. Debug libre."
+
+msgid "MARKET_EMPTY"
+msgstr "Ofertas agotadas. Alcanza el siguiente nivel para ver seis nuevas."
+
+msgid "BIRTH_NEED_WIN"
+msgstr "Gana una partida para conseguir un nacimiento."

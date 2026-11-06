@@ -185,6 +185,7 @@ func record_victory(level_number:int)->int:
 	if level_number>highest_level_completed:horse_collection.grant_achievement(level_number)
 	highest_level_completed=maxi(highest_level_completed,level_number)
 	equipment_points+=reward
+	horse_collection.birth_credits+=1
 	if save_progress():return reward
 	horse_collection.restore(before_horses)
 	highest_level_completed=before_highest
@@ -202,9 +203,11 @@ func select_hat(value:String)->bool:
 
 ## Trial only: no point charges, no consumed parents. Atomic save rollback.
 func breed_horses(a:String,b:String,choices:Dictionary)->Dictionary:
+	if not debug_mode and not trial_session_active and horse_collection.birth_credits<=0:return {}
 	var before:Dictionary=horse_collection.export_state()
 	var child:Dictionary=horse_collection.breed(a,b,choices)
 	if child.is_empty():return {}
+	if not debug_mode and not trial_session_active:horse_collection.birth_credits-=1
 	if save_progress():return child
 	horse_collection.restore(before)
 	return {}
@@ -287,3 +290,23 @@ func switch_mode(want_debug:bool)->bool:
 		equipment_owned.assign(EquipmentCatalog.ITEMS.keys());equipment_equipped={"whip":"whip_basic"}
 	if save_progress():return true
 	debug_mode=old_debug;save_path=old_path;load_progress();return false
+
+## Internal game currency only. Persist both sides or restore both on failure.
+func buy_market_horse(offer:Dictionary)->bool:
+	if not horse_collection.valid_traits(offer.get("traits")):return false
+	if not debug_mode and not trial_session_active and not HorseMarket.available(horse_collection,offer,highest_level_completed):return false
+	var price:int=0 if debug_mode or trial_session_active else HorseMarket.buy_price(offer)
+	if equipment_points<price:return false
+	var before:Dictionary=horse_collection.export_state();var points:int=equipment_points
+	if HorseMarket.buy(horse_collection,offer).is_empty():return false
+	equipment_points-=price
+	if not debug_mode and not trial_session_active:horse_collection.bought_offers.append(str(offer.offer_id))
+	if save_progress():return true
+	horse_collection.restore(before);equipment_points=points;return false
+func sell_market_horse(id:String)->bool:
+	if not HorseMarket.can_sell(horse_collection,id):return false
+	var price:int=HorseMarket.sell_price(horse_collection.find(id));var before:Dictionary=horse_collection.export_state();var points:int=equipment_points
+	if not HorseMarket.sell(horse_collection,id):return false
+	equipment_points+=price
+	if save_progress():return true
+	horse_collection.restore(before);equipment_points=points;return false

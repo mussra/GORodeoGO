@@ -840,3 +840,63 @@ msgstr "Gold: all ancestors and descendants. Tap the same horse to clear selecti
 
 msgid "JUMP_BADGE_TITLE"
 msgstr "Fence jumping"
+
+msgid "MARKET_TITLE"
+msgstr "Market"
+
+msgid "MARKET_CANDIDATE"
+msgstr "Candidate balance: buy/sell with points; design rarity, not measured frequency."
+
+msgid "MARKET_VALUE"
+msgstr "%s · Buy: %d points"
+
+msgid "MARKET_BUY"
+msgstr "Buy · %d points"
+
+msgid "MARKET_SELL"
+msgstr "Sell · %d points"
+
+msgid "MARKET_PROTECT"
+msgstr "Equip another horse to sell. Original and foals protected."
+
+msgid "MARKET_BALANCE"
+msgstr "Market · Balance: %d points"
+
+msgid "MARKET_DESIGN_NOTE"
+msgstr "Design rarity: does not boost stats. Normal: only current-level offers can be bought."
+
+msgid "MARKET_PRICE"
+msgstr "Buy: %d points"
+
+msgid "MARKET_CONFIRM_BUY"
+msgstr "Buy %s for %d points?\nCurrent balance: %d points. No real money."
+
+msgid "MARKET_CONFIRM_SELL"
+msgstr "Sell %s for %d points?\nCurrent balance: %d points. Genealogy is preserved."
+
+msgid "MARKET_OK"
+msgstr "Trade saved."
+
+msgid "MARKET_FAILED"
+msgstr "Could not save. Balance and collection unchanged."
+
+msgid "MARKET_CANCEL"
+msgstr "Cancel"
+
+msgid "MARKET_NORMAL_RULES"
+msgstr "Normal: 6 offers per reached level. Each victory earns one birth."
+
+msgid "BIRTH_CREDITS"
+msgstr "Births available: %d · Earn one per victory, including replayed levels."
+
+msgid "BIRTH_FREE"
+msgstr "Debug/trial: free births and purchases, separate progress."
+
+msgid "MARKET_LIVE_NOTE"
+msgstr "Normal: limited offers, sellable offspring and one birth per victory. Debug is free."
+
+msgid "MARKET_EMPTY"
+msgstr "Offers sold out. Reach the next level to see six new offers."
+
+msgid "BIRTH_NEED_WIN"
+msgstr "Win a level to earn one birth."
