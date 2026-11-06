@@ -106,6 +106,8 @@ def apply_paint(polys, material):
  for poly in polys:
   draw.polygon([(round(px*w*4/1313),round(py*h*4/875)) for px,py in poly],fill=255)
  weight=np.asarray(layer.resize((w,h),Image.Resampling.LANCZOS),dtype=float)[:,:,None]/255
+ # Hair strokes may touch the hat silhouette, but never own its pixels.
+ if material[1]:weight*=(~hat_region)[:,:,None]
  mask=np.rint(mask*(1-weight)+np.array(material)*weight).astype('uint8')
 apply_paint(paint['coat_add'],[255,0,0])
 apply_paint(paint.get('mane_add',[]),[0,255,0])
