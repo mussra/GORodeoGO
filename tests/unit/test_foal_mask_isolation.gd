@@ -39,5 +39,11 @@ func test_diagonal_hat_pixels_unchanged_all_frames()->void:
    var tex:Texture2D=load("res://art/player/%s/frame_%02d.png"%[anim,i])
    var src:Image=tex.get_image()
    var result:=HorseAppearance.texture(tex,anim,i,{"coat":3,"pattern":0,"mane":5,"finish":"normal"}).get_image()
+   var bob:int=HorseAppearance.body_offset(src,anim,i)
+   for y in range(23+bob):
+    for x in range(28,73):assert_eq(result.get_pixel(x,y),src.get_pixel(x,y),"Hat exclusion follows airborne body")
+   # Independently verify actual hat pixels using the reviewed blue-hat variant.
+   var blue:Image=load("res://art/player_hats/blue/%s/frame_%02d.png"%[anim,i]).get_image()
    for y in range(23):
-    for x in range(28,73):assert_eq(result.get_pixel(x,y),src.get_pixel(x,y),"Hat must not inherit mane")
+    for x in range(28,73):
+     if blue.get_pixel(x,y)!=src.get_pixel(x,y):assert_eq(result.get_pixel(x,y),src.get_pixel(x,y),"Actual hat must not inherit mane")

@@ -5,6 +5,21 @@ const MANES=["222c37","fff3d3","f0ba2e","347ef0","e04c52"]
 const FOAL_EYES=preload("res://art/foal/eyes.png")
 static var cache:Dictionary={}
 static var body_offsets:Dictionary={}
+static var hat_pixels:Dictionary={}
+static func protected_hat(anim:String,frame:int)->Dictionary:
+ var id:String=anim+str(frame)
+ if hat_pixels.has(id):return hat_pixels[id]
+ var pixels:Dictionary={}
+ var original_path:String="res://art/player/%s/frame_%02d.png"%[anim,frame]
+ var blue_path:String="res://art/player_hats/blue/%s/frame_%02d.png"%[anim,frame]
+ if ResourceLoader.exists(original_path) and ResourceLoader.exists(blue_path):
+  var original:Image=load(original_path).get_image();var blue:Image=load(blue_path).get_image()
+  if original.is_compressed():original.decompress()
+  if blue.is_compressed():blue.decompress()
+  for y in range(mini(23,original.get_height())):
+   for x in range(28,mini(73,original.get_width())):
+    if original.get_pixel(x,y)!=blue.get_pixel(x,y):pixels[Vector2i(x,y)]=true
+ hat_pixels[id]=pixels;return pixels
 static func body_offset(source:Image,anim:String,frame:int)->int:
  if anim=="foal" or frame==0:return 0
  var path:="res://art/player/%s/frame_00.png"%anim
@@ -95,12 +110,14 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
  if image.is_compressed():image.decompress()
  if mask.is_compressed():mask.decompress()
  var bob:=body_offset(image,anim,frame)
+ var hat:Dictionary=protected_hat(anim,frame) if anim in ["walk_diag_down","walk_diag_up"] else {}
  for y in range(image.get_height()):
   for x in range(image.get_width()):
    var m:Color=mask.get_pixel(x,y)
    # Horse masks previously touched the hat in downward-diagonal frames 8-11.
-   # The hat ends at row21; these pixels must never inherit horse traits.
-   if anim in ["walk_diag_down","walk_diag_up"] and y<23 and x>=28 and x<=72:continue
+   # Hat exclusion follows the same airborne bob as the source; a fixed row
+   # clipped the horse forehead in raised phases.
+   if anim in ["walk_diag_down","walk_diag_up"] and ((y<23+bob and x>=28 and x<=72) or hat.has(Vector2i(x,y))):continue
    if maxf(m.r,m.g)<0.02:continue
    var old:Color=image.get_pixel(x,y);var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))*255.0/205.0,0.25,1.18)
    var color:Color=Color(COLORS[int(t.coat)])

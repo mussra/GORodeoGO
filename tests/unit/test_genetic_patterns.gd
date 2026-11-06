@@ -104,3 +104,19 @@ func test_genetics_save_namespace_preserves_2_0_rollback()->void:
  assert_eq(FileAccess.get_file_as_bytes(legacy),bytes)
  state.free()
  for path in [legacy,current]:DirAccess.remove_absolute(path)
+func test_airborne_mask_cut_follows_body_without_changing_hat()->void:
+ for anim in ["walk_diag_down","walk_diag_up"]:
+  for frame in range(12):
+   var source:Texture2D=load("res://art/player/%s/frame_%02d.png"%[anim,frame])
+   var original:Image=source.get_image();if original.is_compressed():original.decompress()
+   var bob:int=HorseAppearance.body_offset(original,anim,frame)
+   var changed:Image=HorseAppearance.texture(source,anim,frame,{"coat":19,"pattern":0,"mane":3,"eyes":21,"finish":"galaxy"}).get_image()
+   for y in range(23+bob):
+    for x in range(28,73):assert_eq(changed.get_pixel(x,y),original.get_pixel(x,y))
+   if anim=="walk_diag_down" and frame>=8:
+    var mask:Image=load("res://art/horse_masks/%s/frame_%02d.png"%[anim,frame]).get_image();if mask.is_compressed():mask.decompress()
+    var recovered:int=0
+    for y in range(23+bob,23):
+     for x in range(28,73):
+      if maxf(mask.get_pixel(x,y).r,mask.get_pixel(x,y).g)>.02 and changed.get_pixel(x,y)!=original.get_pixel(x,y):recovered+=1
+    assert_gt(recovered,0)
