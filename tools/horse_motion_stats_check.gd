@@ -2,7 +2,7 @@ extends SceneTree
 func _initialize()->void:call_deferred("run")
 func run()->void:
  var save=root.get_node("SaveData");save.save_path="user://qa_stats.dat";save.horse_collection=HorseCollection.new();save.horse_collection.seed_trial();save.horse_collection.add_trial_parents()
- var h:Dictionary=save.breed_horses("trial_a","trial_b",{});save.select_horse(h.id);save.equipment_owned.assign(["whip_basic"]);save.equipment_equipped={"whip":"whip_basic"};save.highest_level_completed=5
+ var h:Dictionary=save.breed_horses("trial_a","trial_b",{});save.mature_horse_trial(h.id);save.select_horse(h.id);save.equipment_owned.assign(["whip_basic"]);save.equipment_equipped={"whip":"whip_basic"};save.highest_level_completed=5
  root.get_node("GameState").selected_level=1
  var level=load("res://src/Presentation/level_0.tscn").instantiate();root.add_child(level);await physics_frame
  var p=level.player

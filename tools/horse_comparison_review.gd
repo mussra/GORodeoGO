@@ -23,6 +23,7 @@ func scene_for(id:String)->void:
 func run()->void:
  save=root.get_node("SaveData");save.save_path="user://qa_horse_compare.dat";save.horse_collection=HorseCollection.new();save.horse_collection.seed_trial();save.horse_collection.add_trial_parents()
  var child:Dictionary=save.horse_collection.breed("trial_a","trial_b",{"coat":0,"mane":1})
+ save.mature_horse_trial(child.id)
  save.highest_level_completed=5;save.dual_lasso_intro_shown=true;save.equipment_owned.assign(["whip_basic"]);save.equipment_equipped={"whip":"whip_basic"}
  AudioServer.set_bus_mute(0,true)
  var layer:=CanvasLayer.new();layer.layer=100;root.add_child(layer)

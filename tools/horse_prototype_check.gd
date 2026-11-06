@@ -22,7 +22,7 @@ func run()->void:
  var save=root.get_node("SaveData");var old_path:String=save.save_path;var old:Dictionary=save.horse_collection.export_state()
  save.horse_collection=c;save.save_path="user://qa_horses.dat"
  check(save.save_progress(),"save");save.load_progress();check(save.horse_collection.find(child.id)==child,"reload child")
- check(save.select_horse(child.id),"equip");save.load_progress();check(save.horse_collection.selected==child.id,"reload selected")
+ check(not save.select_horse(child.id),"foal blocked");check(save.mature_horse_trial(child.id),"trial training");check(save.select_horse(child.id),"equip");save.load_progress();check(save.horse_collection.selected==child.id,"reload selected")
  save.save_path="user://nonexistent-dir/fail.dat";var snap:Dictionary=save.horse_collection.export_state()
  check(save.breed_horses("trial_a","trial_b",{}).is_empty(),"failed save returns no child")
  check(save.horse_collection.export_state()==snap,"failed save rollback")

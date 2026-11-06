@@ -182,9 +182,16 @@ func breed_horses(a:String,b:String,choices:Dictionary)->Dictionary:
 	horse_collection.restore(before)
 	return {}
 func select_horse(id:String)->bool:
-	if horse_collection.find(id).is_empty():return false
+	if not horse_collection.is_adult(id):return false
 	var before:String=horse_collection.selected
 	horse_collection.selected=id
 	if save_progress():return true
 	horse_collection.selected=before
+	return false
+
+func mature_horse_trial(id:String)->bool:
+	var before:Dictionary=horse_collection.export_state()
+	if not horse_collection.mature_trial(id):return false
+	if save_progress():return true
+	horse_collection.restore(before)
 	return false

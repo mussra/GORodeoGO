@@ -1,6 +1,6 @@
 class_name HorseCollection
 extends RefCounted
-## Isolated trial collection. No economy, functional stats, sex or parent consumption.
+## Isolated trial collection. Provisional stats; no economy, sex or parent consumption.
 const COATS=["Negro","Blanco","Dorado","Azul","Verde","Rojo","Violeta","Turquesa","Rosa","Naranja","Castaño","Gris","Crema","Cobre","Lima","Marino","Lavanda","Coral","Celeste","Ciruela"]
 const PATTERNS=["Liso","Parches","Moteado","Trasera blanca","Patas claras"]
 const MANES=["Negra","Blanca","Dorada","Azul","Roja","Arcoíris"]
@@ -30,7 +30,7 @@ func valid_traits(v:Variant)->bool:
   if typeof(v.get(k))!=TYPE_INT:return false
  return v.coat>=0 and v.coat<20 and v.pattern>=0 and v.pattern<5 and v.mane>=0 and v.mane<6 and v.get("finish","normal") in ["normal","original","galaxy"]
 func preview(a:String,b:String,choices:Dictionary)->Dictionary:
- if a==b or find(a).is_empty() or find(b).is_empty():return {}
+ if a==b or find(a).is_empty() or find(b).is_empty() or not is_adult(a) or not is_adult(b):return {}
  var t:Dictionary={"finish":"normal"}
  for k in ["coat","pattern","mane"]:
   var source:String=b if choices.get(k,0)==1 else a
@@ -39,7 +39,7 @@ func preview(a:String,b:String,choices:Dictionary)->Dictionary:
 func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
  if t.is_empty():return {}
- var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"traits":t,"stats":HorseStats.inherit(find(a),find(b))}
+ var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
  next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
  return {"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
@@ -50,12 +50,21 @@ func restore(v:Variant)->bool:
   if not h is Dictionary or typeof(h.get("id"))!=TYPE_STRING or h.id.is_empty() or ids.has(h.id) or not valid_traits(h.get("traits")):return false
   if not h.get("parents") is Array or h.parents.size() not in [0,2]:return false
   if typeof(h.get("name"))!=TYPE_STRING:return false
+  if h.get("stage","adult") not in ["foal","adult"]:return false
   for parent in h.parents:
    if typeof(parent)!=TYPE_STRING or not ids.has(parent):return false
   ids[h.id]=true;clean.append(h.duplicate(true))
  if clean.is_empty() or not ids.has("original"):return false
  horses=clean;selected=str(v.get("selected","original"))
- if not ids.has(selected):selected="original"
+ if not ids.has(selected) or not is_adult(selected):selected="original"
  next_id=maxi(int(v.get("next_id",1)),1)
  while ids.has("child_%d"%next_id):next_id+=1
  return true
+
+func is_adult(id:String)->bool:
+ var h:=find(id)
+ return not h.is_empty() and h.get("stage","adult")=="adult"
+func mature_trial(id:String)->bool:
+ var h:=find(id)
+ if h.is_empty():return false
+ h["stage"]="adult";return true

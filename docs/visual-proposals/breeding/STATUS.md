@@ -17,3 +17,6 @@ Comparison movie scripted in actual level with same+15%speed upgrade: original29
 
 ## Future multiplayer, not implemented
 Ant6Nov06:46: shared agreed cross between two players always produces2offspring, allocation known in advance(one per player), later negotiable exchange. Does not change single-player1offspring trial. Proposed point market with fixed valuations/ranges by type/generation/rarity, possible rare exceptions; minimum price undecided. No online backend, trades or spending added.
+
+## Superseded by0.21.32
+Ant06:50-06:51requested static foals, unavailable for work until growth/training.0.21.31withdrawn to draft before delivery.0.21.32creates foals, blocks equipment/breeding, persists stage. Static provisional foal artwork without rider with parents in family view, no animation or walk-around ranch. Explicit trial-only GROW AND TRAIN button permits adult testing instantly without cost; no real duration selected.10or2-3days examples only, boosters future undefined idea, no currency/payments/backend.22focused tests128assertions and22isolated checks pass. Comparison fixture explicitly grows child before adult measurements.

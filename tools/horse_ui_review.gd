@@ -16,6 +16,9 @@ func run()->void:
  await snap("/downloads/horse-detail.png");await create_timer(1.3).timeout
  panel.show_page("family");await snap("/downloads/horse-family.png");await create_timer(1.2).timeout
  panel.show_page("atlas");await snap("/downloads/horse-atlas.png");await create_timer(1.5).timeout
+ panel.show_page("detail");await create_timer(.8).timeout
+ assert(not save.select_horse(child.id))
+ save.mature_horse_trial(child.id);panel.refresh();await snap("/downloads/horse-trained.png");await create_timer(.8).timeout
  panel.free();save.select_horse(child.id);root.get_node("GameState").selected_level=1
  var level=load("res://src/Presentation/level_0.tscn").instantiate();root.add_child(level);await physics_frame
  for b in level._active_bulls:b.set_physics_process(false)
