@@ -5,6 +5,8 @@ const COATS=["Negro","Blanco","Dorado","Azul","Verde","Rojo","Violeta","Turquesa
 const PATTERNS=["Liso","Parches","Moteado","Trasera blanca","Patas claras"]
 const MANES=["Negra","Blanca","Dorada","Azul","Roja","Arcoíris"]
 const RARITIES=["Común","Poco frecuente","Raro","Ultra raro","Legendario"]
+const EYES=COATS
+static func eye_index(t:Dictionary)->int:return int(t.get("eyes",10))
 var horses:Array[Dictionary]=[]
 var selected:String="original"
 var next_id:int=1
@@ -20,14 +22,14 @@ func add_random_trial_pair()->Array[Dictionary]:
  for i in range(2):
   var n:int=horses.size()+1
   while not find("random_trial_%d"%n).is_empty():n+=1
-  var h:Dictionary={"id":"random_trial_%d"%n,"name":"Prueba aleatoria %d"%n,"parents":[],"stage":"adult","traits":{"coat":rng.randi_range(0,COATS.size()-1),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,MANES.size()-1),"finish":"normal"}}
+  var h:Dictionary={"id":"random_trial_%d"%n,"name":"Prueba aleatoria %d"%n,"parents":[],"stage":"adult","traits":{"coat":rng.randi_range(0,COATS.size()-1),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,MANES.size()-1),"eyes":rng.randi_range(0,19),"finish":"normal"}}
   horses.append(h);added.append(h)
  return added
 func grant_achievement(level:int)->Dictionary:
  var id:String="achievement_%d"%level
  if not find(id).is_empty():return {}
  var rng:=RandomNumberGenerator.new();rng.randomize()
- var h:Dictionary={"id":id,"name":"Hallazgo de nivel %d"%level,"parents":[],"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,4),"mane":rng.randi_range(0,5),"finish":"normal"},"stats":{"speed":rng.randf_range(260,285),"handling":rng.randf_range(900,1300),"power":rng.randf_range(0.6,0.8),"dodge":rng.randf_range(0.85,1.0)}}
+ var h:Dictionary={"id":id,"name":"Hallazgo de nivel %d"%level,"parents":[],"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,4),"mane":rng.randi_range(0,5),"eyes":rng.randi_range(0,19),"finish":"normal"},"stats":{"speed":rng.randf_range(260,285),"handling":rng.randf_range(900,1300),"power":rng.randf_range(0.6,0.8),"dodge":rng.randf_range(0.85,1.0)}}
  horses.append(h);return h
 func find(id:String)->Dictionary:
  for h in horses:
@@ -37,13 +39,14 @@ func valid_traits(v:Variant)->bool:
  if not v is Dictionary:return false
  for k in ["coat","pattern","mane"]:
   if typeof(v.get(k))!=TYPE_INT:return false
+ if v.has("eyes") and (typeof(v.eyes)!=TYPE_INT or v.eyes<0 or v.eyes>=20):return false
  return v.coat>=0 and v.coat<20 and v.pattern>=0 and v.pattern<5 and v.mane>=0 and v.mane<6 and v.get("finish","normal") in ["normal","original","galaxy"]
 func preview(a:String,b:String,choices:Dictionary)->Dictionary:
  if a==b or find(a).is_empty() or find(b).is_empty() or not is_adult(a) or not is_adult(b):return {}
  var t:Dictionary={"finish":"normal"}
- for k in ["coat","pattern","mane"]:
+ for k in ["coat","pattern","mane","eyes"]:
   var source:String=b if choices.get(k,0)==1 else a
-  t[k]=find(source).traits[k]
+  t[k]=eye_index(find(source).traits) if k=="eyes" else find(source).traits[k]
  return t
 func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)

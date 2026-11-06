@@ -2,6 +2,7 @@ class_name HorseAppearance
 extends RefCounted
 const COLORS=["273440","e9e2d3","dda92c","246bc5","398c54","bd3e3e","8550ad","27a6a0","d45f9d","e07730","975936","8b96a0","e3c388","bb6d45","9db543","334b84","a192d1","dc7972","72b7de","774c77"]
 const MANES=["222c37","fff3d3","f0ba2e","347ef0","e04c52"]
+const FOAL_EYES=preload("res://art/foal/eyes.png")
 static var cache:Dictionary={}
 static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Texture2D:
  if t.get("finish","")=="original":return source
@@ -54,6 +55,16 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
    var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
    image.set_pixel(x,y,old.lerp(tinted,maxf(m.r,m.g)) if anim=="foal" else tinted)
  if cache.size()>600:cache.clear()
+ if anim=="foal" and t.has("eyes"):
+  var eye_mask:Image=FOAL_EYES.get_image()
+  if eye_mask.is_compressed():eye_mask.decompress()
+  var eye:=Color(COLORS[HorseCollection.eye_index(t)])
+  for y in image.get_height():
+   for x in image.get_width():
+    var weight:float=eye_mask.get_pixel(x,y).r
+    if weight<.01:continue
+    var old:Color=image.get_pixel(x,y);var shade:=clampf(maxf(old.r,maxf(old.g,old.b))/.65,.15,1.15)
+    image.set_pixel(x,y,old.lerp(Color(eye.r*shade,eye.g*shade,eye.b*shade,old.a),weight))
  var tex:=ImageTexture.create_from_image(image);cache[key]=tex;return tex
 static func apply(frames:SpriteFrames,t:Dictionary)->void:
  for anim in frames.get_animation_names():

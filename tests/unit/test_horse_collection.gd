@@ -8,7 +8,7 @@ func test_two_distinct_owned_parents_no_consumption()->void:
  assert_true(c.breed("original","unknown",{}).is_empty())
  var a:Dictionary=c.find("trial_a").duplicate(true);var b:Dictionary=c.find("trial_b").duplicate(true)
  var h:Dictionary=c.breed("trial_a","trial_b",{"coat":0,"pattern":0,"mane":1})
- assert_eq(h.traits,{"coat":3,"pattern":1,"mane":5,"finish":"normal"})
+ assert_eq(h.traits,{"coat":3,"pattern":1,"mane":5,"finish":"normal","eyes":10})
  assert_eq(h.parents,["trial_a","trial_b"]);assert_eq(c.find("trial_a"),a);assert_eq(c.find("trial_b"),b)
 func test_round_trip_and_bad_state()->void:
  var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents();var h:Dictionary=c.breed("trial_a","trial_b",{})

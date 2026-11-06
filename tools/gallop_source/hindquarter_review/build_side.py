@@ -2,7 +2,7 @@ from PIL import Image,ImageDraw,ImageFilter
 from pathlib import Path
 import cv2,numpy as np
 O=Path(__file__).parent;S=8
-src=Image.open(O/'original/side.png').convert('RGBA').transpose(Image.Transpose.FLIP_LEFT_RIGHT).resize((96*S,96*S),Image.Resampling.LANCZOS)
+src=Image.open(O.parent/'original/side.png').convert('RGBA').transpose(Image.Transpose.FLIP_LEFT_RIGHT).resize((96*S,96*S),Image.Resampling.LANCZOS)
 def masked(poly):
  m=Image.new('L',src.size);ImageDraw.Draw(m).polygon([(x*S,y*S) for x,y in poly],fill=255)
  a=np.minimum(np.array(m),np.array(src.getchannel('A')));im=src.copy();im.putalpha(Image.fromarray(a));return im

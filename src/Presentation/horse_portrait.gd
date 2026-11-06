@@ -2,9 +2,10 @@ class_name HorsePortrait
 extends RefCounted
 const ART=preload("res://art/portraits/adult_hd.png")
 const MASK=preload("res://art/portraits/adult_hd_mask.png")
+const EYES=preload("res://art/portraits/adult_eyes.png")
 const SHADER=preload("res://art/portraits/portrait.gdshader")
 static func material_for(traits:Dictionary,hat:String="original")->ShaderMaterial:
- var m:=ShaderMaterial.new();m.shader=SHADER;m.set_shader_parameter("region_mask",MASK)
+ var m:=ShaderMaterial.new();m.shader=SHADER;m.set_shader_parameter("eye_mask",EYES);m.set_shader_parameter("custom_eyes",traits.has("eyes"));m.set_shader_parameter("eye_color",Color(HorseAppearance.COLORS[HorseCollection.eye_index(traits)]));m.set_shader_parameter("region_mask",MASK)
  m.set_shader_parameter("original_horse",traits.get("finish","normal")=="original")
  m.set_shader_parameter("coat_color",Color(HorseAppearance.COLORS[int(traits.get("coat",10))]))
  var mane:int=int(traits.get("mane",1));m.set_shader_parameter("mane_color",Color(HorseAppearance.MANES[mini(mane,4)]));m.set_shader_parameter("rainbow",mane==5)

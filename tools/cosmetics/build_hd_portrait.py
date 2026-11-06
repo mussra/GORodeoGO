@@ -112,8 +112,77 @@ def apply_paint(polys, material):
 apply_paint(paint['coat_add'],[255,0,0])
 apply_paint(paint.get('mane_add',[]),[0,255,0])
 apply_paint(paint.get('source_restore',[]),[0,0,0])
+# Snap the user-marked material edges to the original paint using local trimaps.
+# The hand-traced contours seed ownership; only their narrow boundary can move.
+import cv2
+def snap(poly,band=7):
+ initial=region([poly]).astype('uint8')
+ kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(band*2+1,band*2+1))
+ sure=cv2.erode(initial,kernel);possible=cv2.dilate(initial,kernel)
+ labels=np.where(possible,cv2.GC_PR_BGD,cv2.GC_BGD).astype('uint8');labels[initial>0]=cv2.GC_PR_FGD;labels[sure>0]=cv2.GC_FGD
+ cv2.setRNGSeed(0);cv2.grabCut(a[:,:,:3].copy(),labels,None,np.zeros((1,65)),np.zeros((1,65)),5,cv2.GC_INIT_WITH_MASK)
+ return (labels==cv2.GC_FGD)|(labels==cv2.GC_PR_FGD)
+
+# Local hair silhouette below the rein, with leather kept as a separate material.
+hair=snap([(719,335),(734,342),(752,348),(767,352),(762,363),(749,370),(743,369),(748,357),(736,359),(722,361),(706,359),(697,356),(692,351),(708,348)],3)
+rein=snap([(683,296),(706,310),(729,325),(753,338),(781,347),(809,353),(834,350),(858,342),(879,328),(892,309),(899,316),(890,334),(873,349),(852,361),(830,366),(809,368),(786,363),(763,357),(739,348),(716,336),(695,321)],5)
+local=region([[(745,345),(775,345),(813,351),(850,340),(880,323),(903,317),(902,352),(871,376),(830,386),(784,379),(749,372)]])
+mask[local&~rein&~hair]=[255,0,0]
+mask[hair]=[0,255,0]
+mask[rein]=0
+side=snap([(689,367),(715,385),(740,402),(766,420),(791,435),(815,447),(837,456),(852,459),(851,481),(831,475),(807,465),(782,452),(757,437),(733,419),(711,401),(691,383)],3)
+plate=snap([(851,451),(863,444),(876,443),(887,450),(894,462),(894,479),(887,492),(878,497),(877,514),(872,534),(862,552),(848,567),(830,578),(812,586),(794,591),(810,581),(830,564),(844,546),(854,521),(860,497),(850,487),(846,475),(846,463)],4)
+local=region([[(840,432),(900,432),(900,523),(881,563),(838,591),(792,598),(792,577),(827,550),(844,514)]])
+mask[local&~plate&~side]=[255,0,0]
+mask[plate|side]=0
+# Local side strap material separation. Leather has a lower hue than hide,
+# even where hide is heavily shaded; retain the edge's fractional coverage.
+side_local=region([[(690,360),(720,376),(750,395),(780,411),(815,430),(846,441),(854,455),(851,493),(827,486),(792,470),(752,448),(720,425),(690,405)]])
+skin=np.clip((hsv[:,:,0].astype(float)-8.5)/2.5,0,1)*255
+mask[side_local]=0;mask[:,:,0][side_local]=skin[side_local].astype('uint8')
+# Preserve medallion and lower leather as found by the narrow source trimap.
+mask[plate]=0
+# Orange below the lowest curl, without growing into tack or blanket.
+small=region([[(737,364),(747,364),(753,370),(747,375),(737,374)]])
+mask[small&~hair&~rein]=[255,0,0]
+# The side-strap window also crosses the blue blanket and gold piping.
+# Neither belongs to horse skin. Preserve the source throughout those pixels.
+mask[side_local&((H>24)|(S<50))]=0
+# Remove isolated leather freckles classified as skin in this source window.
+leather_core=side_local&(H<10)&(V<175)
+mask[leather_core]=0
+# Blanket is equipment even where its piping shares the hide's warm hue.
+mask[region([[(685,389),(699,398),(714,410),(709,432),(695,422),(685,414)]])]=0
+# Smooth traced hair/coat seam at tail root, no isolated original-orange islands.
+apply_paint([[(471,358),(479,352),(488,348),(497,349),(493,356),(484,363),(477,372),(470,385),(466,393),(465,380)]],[0,255,0])
+# Rebuild only the tail/rump contact zone as an exclusive two-material seam.
+tail_contact=region([[(461,348),(483,340),(508,340),(507,364),(490,385),(472,410),(458,410)]])
+share=(S>170).astype(float)
+mask[tail_contact]=0
+mask[:,:,0][tail_contact]=(share[tail_contact]*255).astype('uint8')
+mask[:,:,1][tail_contact]=((1-share[tail_contact])*255).astype('uint8')
+# Blanket's red cloth, gold piping and blue strip are source equipment.
+blanket_local=region([[(670,370),(708,390),(719,408),(720,430),(710,477),(699,510),(675,510)]])
+mask[blanket_local&((H>16)|(H<5))]=0
+mask[region([[(678,375),(701,389),(716,405),(713,425),(707,452),(698,480),(688,494),(674,501),(667,496),(675,450)]])]=0
+# Orange hide begins directly to the right/below the blue blanket, not its gold trim.
+mask[blanket_local&(x>701)&(H>=7)&(H<=16)&(S>160)]=[255,0,0]
+mask[region([[(658,485),(710,480),(710,530),(650,530)]])&(H>=7)&(H<=22)&(S>130)]=[255,0,0]
+mask[region([[(707,357),(728,355),(745,358),(745,372),(727,379),(708,374)]])&~hair&~rein&(H>=7)&(H<=22)&(S>160)]=[255,0,0]
+mask[region([[(706,363),(718,368),(721,379),(712,379),(705,372)]])]=0
+# Face/hair below the actual brim edge are not hat pixels.
+apply_paint([[(550,125),(565,125),(580,128),(598,134),(616,142),(634,151),(651,160),(669,167),(688,172),(708,174),(731,174),(750,170),(767,161),(780,149),(788,136),(792,145),(780,180),(746,206),(699,220),(639,219),(581,191),(549,157)]],[0,0,0])
+# Tiny deep tail crease, bounded away from orange rump.
+apply_paint([[(474,367),(483,359),(492,353),(494,354),(485,363),(474,373)]],[0,255,0])
+
 # Source contains extraction flecks beyond the figure. Fixed reviewed framing.
 bbox=(round(240*w/1313),0,round(1040*w/1313),round(840*h/875))
+# Iris-only texture: saturated painted ring, excluding dark pupil and white highlights.
+eye_region=Image.new('L',im.size);draw=ImageDraw.Draw(eye_region)
+for box in [(879,207,906,244),(975,204,986,229)]:
+ draw.ellipse(tuple(round(v*(w/1313 if i%2==0 else h/875)) for i,v in enumerate(box)),fill=255)
+eye_weight=np.asarray(eye_region).astype(float)/255*np.clip((S.astype(float)-90)/70,0,1)*np.clip((V.astype(float)-45)/50,0,1)
+Image.fromarray((eye_weight*255).astype('uint8')).crop(bbox).save(R/'art/portraits/adult_eyes.png')
 alpha=im.getchannel('A').filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.45));im.putalpha(alpha)
 im.crop(bbox).save(R/'art/portraits/adult_hd.png');Image.fromarray(mask).filter(ImageFilter.GaussianBlur(.55)).crop(bbox).save(R/'art/portraits/adult_hd_mask.png')
 preview=a.copy();sel=np.max(mask,axis=2)>0;preview[:,:,:3][sel]=mask[sel];Image.fromarray(preview).save('/downloads/hd-mask-review.png')

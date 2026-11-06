@@ -12,3 +12,9 @@ for anim in ['walk_side','idle','stunned']:
   keep=np.array(m)>0;yy,xx=np.mgrid[:96,:96]
   a[:,:,1][(xx<32)&~keep]=0
   Image.fromarray(a).save(p)
+# Bright cream rear socks must keep their source paint after geometry rebuilds.
+for p in (R/'art/horse_masks/walk_side').glob('*.png'):
+ a=np.array(Image.open(p));src=np.array(Image.open(R/'art/player/walk_side'/p.name).convert('RGBA'))/255.0
+ yy,xx=np.mgrid[:96,:96]
+ socks=(xx>=19)&(xx<29)&(yy>=69)&(yy<88)&(src[:,:,3]>.9)&(src[:,:,0]>.6)&(src[:,:,1]>.5)&(src[:,:,2]>.4)&(np.abs(src[:,:,0]-src[:,:,2])<.3)
+ a[socks]=0;Image.fromarray(a).save(p)

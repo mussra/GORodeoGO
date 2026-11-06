@@ -34,4 +34,11 @@ for x,y in [(951,200),(947,190)]:
  assert max(pixel(x,y))<10,(x,y,pixel(x,y));checks+=1
 for x,y in [(908,145),(923,156)]:
  assert pixel(x,y)[1]>240,(x,y,pixel(x,y));checks+=1
+# User-arrow regressions: tack and blanket remain source; adjacent hide/hair tint.
+for x,y in [(695,410),(690,440),(700,450),(810,360),(878,470),(863,530)]:
+ assert max(pixel(x,y))<10,(x,y,pixel(x,y));checks+=1
+for x,y in [(483,352),(478,363),(470,374)]:
+ assert pixel(x,y)[1]>240,(x,y,pixel(x,y));checks+=1
+for x,y in [(740,375),(720,440),(685,515)]:
+ assert pixel(x,y)[0]>240,(x,y,pixel(x,y));checks+=1
 print(f'HD_PORTRAIT_MATERIAL_OWNERSHIP_PASS {checks} checks')

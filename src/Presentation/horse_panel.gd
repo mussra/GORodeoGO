@@ -6,9 +6,10 @@ var message:String=""
 var page:String="collection"
 var parent_a:String="original"
 var parent_b:String="original"
-var choices:Dictionary={"coat":0,"pattern":0,"mane":0}
+var choices:Dictionary={"coat":0,"pattern":0,"mane":0,"eyes":0}
 var focus_id:String="original"
 var atlas_page:int=0
+var scroll_to_newest:bool=false
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=80
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
@@ -23,6 +24,9 @@ func button(text:String,pos:Vector2,cb:Callable,w:float=230)->Button:
 func show_page(value:String)->void:
  page=value;message="";refresh()
 func refresh()->void:
+ _refresh.call_deferred()
+func _refresh()->void:
+ if not is_inside_tree():return
  if content!=null:canvas.remove_child(content);content.queue_free()
  content=Control.new();canvas.add_child(content)
  label("ENSAYO AISLADO · COPIA TEMPORAL" if SaveData.trial_session_active else "CABALLERIZA · PROTOTIPO DE CRÍA",Vector2(30,20),30)
@@ -31,9 +35,9 @@ func refresh()->void:
  button("CRUZAR",Vector2(275,75),func():show_page("breed"))
  button("ATLAS · PRUEBA",Vector2(520,75),func():show_page("atlas"))
  button("AÑADIR 2 DE PRUEBA",Vector2(795,75),func():
-  if not SaveData.trial_session_active:
-   message="Añade caballos temporales desde ENSAYO AISLADO";refresh();return
-  var added:Array[Dictionary]=SaveData.horse_collection.add_random_trial_pair();parent_b=added[0].id;message="Añadidos otros 2 caballos aleatorios de ensayo";refresh(),360)
+  if not SaveData.trial_session_active and not SaveData.begin_trial_session():
+   message="No se pudo abrir el ensayo aislado";refresh();return
+  var added:Array[Dictionary]=SaveData.horse_collection.add_random_trial_pair();parent_b=added[0].id;page="collection";scroll_to_newest=true;message="Añadidos 2 aleatorios · Total: %d caballos · solo en ensayo"%SaveData.horse_collection.horses.size();refresh(),360)
  label("PRUEBA: padres intactos, sin coste. Valores de ensayo. Reglas de herencia provisionales.",Vector2(30,138),20)
  match page:
   "collection":collection_view()
@@ -49,6 +53,7 @@ func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
  else:HorsePortrait.apply(tex,h.traits,SaveData.hat_color)
  tex.position=pos;tex.size=Vector2.ONE*size_px;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;content.add_child(tex)
 func collection_view()->void:
+ label("%d CABALLOS EN LA COLECCIÓN"%SaveData.horse_collection.horses.size(),Vector2(30,162),18)
  var scroll:=ScrollContainer.new();scroll.position=Vector2(30,185);scroll.size=Vector2(1210,420);content.add_child(scroll)
  var rows:=VBoxContainer.new();rows.custom_minimum_size.x=1170;scroll.add_child(rows)
  for h in SaveData.horse_collection.horses:
@@ -58,6 +63,9 @@ func collection_view()->void:
   var eq:=Button.new();eq.text="EQUIPADO" if SaveData.horse_collection.selected==h.id else "EQUIPAR";eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
    message=("Equipado solo en ensayo" if SaveData.trial_session_active else "Caballo equipado") if SaveData.select_horse(h.id) else "No se pudo guardar";refresh())
   var fam:=Button.new();fam.text="FICHA";row.add_child(fam);fam.pressed.connect(func():focus_id=h.id;show_page("detail"))
+ if scroll_to_newest:
+  scroll_to_newest=false
+  scroll.set_deferred("scroll_vertical",2147483647)
 func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
  var pick:=OptionButton.new();pick.position=pos;pick.size=Vector2(370,48);content.add_child(pick)
  for h in SaveData.horse_collection.horses:
@@ -74,10 +82,10 @@ func breed_view()->void:
  sprite(SaveData.horse_collection.find(parent_a),Vector2(110,310),105)
  sprite(SaveData.horse_collection.find(parent_b),Vector2(1045,310),105)
  label("ELIGE RASGOS PARA ESTA PRUEBA",Vector2(390,185),21)
- var labels={"coat":"Pelaje","pattern":"Manchas","mane":"Crin y cola"};var n:int=0
- for k in ["coat","pattern","mane"]:
-  label(labels[k],Vector2(420,240+n*62),20)
-  button("A" if choices[k]==0 else "B",Vector2(670,228+n*62),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
+ var labels={"coat":"Pelaje","pattern":"Manchas","mane":"Crin y cola","eyes":"Ojos"};var n:int=0
+ for k in ["coat","pattern","mane","eyes"]:
+  label(labels[k],Vector2(420,230+n*50),20)
+  button("A" if choices[k]==0 else "B",Vector2(670,218+n*50),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
  var t:Dictionary=SaveData.horse_collection.preview(parent_a,parent_b,choices)
  if not t.is_empty():
   sprite({"traits":t,"stage":"foal"},Vector2(505,375),200)
@@ -106,7 +114,7 @@ func detail_view()->void:
  label(h.name.to_upper(),Vector2(40,195),30);sprite(h,Vector2(70,255),255)
  label("Pelaje: "+HorseCollection.COATS[h.traits.coat]+"\nManchas: "+HorseCollection.PATTERNS[h.traits.pattern]+"\nCrin/cola: "+HorseCollection.MANES[h.traits.mane],Vector2(420,220),24)
  var st:Dictionary=HorseStats.read(h)
- label("VALORES PROVISIONALES\nVelocidad base: %.0f px/s\nManejabilidad: %.0f px/s²\nPotencia: conserva %.0f%% con 2 toros\nRegate: %.0f%% del alcance de la fusta"%[st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)
+ label("Ojos: %s\nVALORES PROVISIONALES\nVelocidad base: %.0f px/s\nManejabilidad: %.0f px/s²\nPotencia: conserva %.0f%% con 2 toros\nRegate: %.0f%% del alcance de la fusta"%[HorseCollection.EYES[HorseCollection.eye_index(h.traits)],st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)
  if not SaveData.horse_collection.is_adult(h.id):
   label("POTRILLO: no puede trabajar ni criar. Plazo por definir.",Vector2(420,505),18)
   button("ENSAYO: CRECER Y ADIESTRAR",Vector2(40,550),func():

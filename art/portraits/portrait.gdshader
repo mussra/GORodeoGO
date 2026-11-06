@@ -1,4 +1,7 @@
 shader_type canvas_item;
+uniform sampler2D eye_mask: filter_linear;
+uniform vec4 eye_color: source_color = vec4(.6,.3,.1,1);
+uniform bool custom_eyes = false;
 uniform sampler2D region_mask: filter_linear;
 uniform vec4 coat_color: source_color = vec4(.6,.3,.1,1);
 uniform vec4 mane_color: source_color = vec4(1,.95,.8,1);
@@ -25,5 +28,6 @@ void fragment(){
   col=mix(col,mane*shade,m.g);
  }
  if(!original_hat)col=mix(col,hat_color.rgb*shade,m.b);
+ if(custom_eyes)col=mix(col,eye_color.rgb*clamp(max(src.r,max(src.g,src.b))/.65,.15,1.15),texture(eye_mask,UV).r);
  COLOR=vec4(col,src.a);
 }
