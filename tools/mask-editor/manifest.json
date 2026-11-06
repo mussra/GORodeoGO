@@ -1,0 +1,431 @@
+{
+  "baseline": "2.0",
+  "assets": [
+    {
+      "id": "art/portraits/adult_hd_mask.png",
+      "hash": "127b5c5237f7d85880d1e7419ea79de251bbcf0146dcffd764f24b56047fd192",
+      "width": 936,
+      "height": 983
+    },
+    {
+      "id": "art/portraits/adult_eyes.png",
+      "hash": "17c38fa1fe1db32cc3db49c3cfa70eca4bd9b6c7d5144b846b9d064a27039a4f",
+      "width": 936,
+      "height": 983
+    },
+    {
+      "id": "art/horse_masks/foal/frame_00.png",
+      "hash": "7ccb3cc8afc38b24dd8db5941e011e7a0f444865d7cb4293ed578763f6158e02",
+      "width": 299,
+      "height": 346
+    },
+    {
+      "id": "art/foal/eyes.png",
+      "hash": "4f3a8d37df74a84c5c33ef98844a1e21b30e771e7e5b593da4c18ae182d43061",
+      "width": 299,
+      "height": 346
+    },
+    {
+      "id": "art/horse_masks/idle/frame_00.png",
+      "hash": "57d63c51340ec2fe2f4669836bc2453299658c62a01ff6feedae404eea2486fb",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/idle/frame_01.png",
+      "hash": "1b0fb3a8dee0d6a3934eadd86ce173b2a85a3fa42329105438c780bafb7d995e",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/idle/frame_02.png",
+      "hash": "856978c744eb5b740c73fb35d29c2086a2ce933458a5a2f732d15b7d1fbe8e61",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/idle/frame_03.png",
+      "hash": "e231e0685f1a6e28b87fa094d029b0a8e47cc5ff9a21728c6de7c284ecb4d9fe",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/idle/frame_04.png",
+      "hash": "fdc603494168274fca35e3024ffaf0e0f7254ef82f570ea11cba8a69777ef748",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/idle/frame_05.png",
+      "hash": "cf01b9df2e39b5c653191a54aa8d4ac773a279efa621d471efff62739cad49da",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/stunned/frame_0.png",
+      "hash": "1ddb9a2c96d9fcb7b12a51106b3f87cef0f9f813025fdfc861d228274f98d2fa",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_00.png",
+      "hash": "0e9504c61db17bae64ba053e74ade7cf0c9208adf278e63e92a6fa74f7f8a298",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_01.png",
+      "hash": "20e93be5205baeceec2b05d3733b53f2c727951f8f473ed95414aeafe7b73112",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_02.png",
+      "hash": "7a569703a677a272da60dbac01eecf63e0f20f011269379f5ebc0ccee07e7ec8",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_03.png",
+      "hash": "b00a0ce07968be6709e6bf362805ab471151657a5f3f13832b1130995f646f3f",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_04.png",
+      "hash": "70f794967ab1d2864200fec8ccbab326530b6d8f409cdaa9fe4d5aa581c100c7",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_05.png",
+      "hash": "63861acd350ccf6a07d33eff7543b565e43258e8f735bad51076ac2720b77a64",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_06.png",
+      "hash": "e329dc49ada5059a2abd2de9811981a9b6882395df85ec752004486105ca558a",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_07.png",
+      "hash": "e4dfd63e4238b278fd81cfad4b94eaf4974ce8c31217eef6272542ec21d4f92f",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_08.png",
+      "hash": "3d0a63050c9ca028795cc00b9fd727156b4b16af54fd66e58abcd59ced53eb99",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_09.png",
+      "hash": "8df8648b965254addc1826694655f306a5a861054abc026da543da0fbe4ca4d0",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_10.png",
+      "hash": "87377adaa7cfe0ecc4b2aeb8d0d3aa0d95645058b6febb16eb97932d4c48c620",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_down/frame_11.png",
+      "hash": "12b99617e5b671b46392609f6448f8666b72192bcd12522f342fc89571434155",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_00.png",
+      "hash": "c122b2e9a1ffb642459cd7f3294b21fedae99bf85d438fd44da2dc74d1e51585",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_01.png",
+      "hash": "f59d9c028d81eab684fe7e1f942e57f44ff9081aeeded7e9d0a44b9401f7a9ea",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_02.png",
+      "hash": "00b1264159152ad991e9feb26cea2dcebfbeab26d4cc6fab4d7855d24fffef29",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_03.png",
+      "hash": "feccc2dd8b0e16fef94d07a46f834102ee72443fc6a0a5127ab3f56faefb8578",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_04.png",
+      "hash": "22e84e1340440216eda5debe2924688a18ef28a09451e4f8d0e377b36a705da0",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_05.png",
+      "hash": "e37eaf173c1649a67bb84ceee9be00fecc2c0420e2fb94e19a40b8b00a6cb603",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_06.png",
+      "hash": "3922c3f984dacf5722b9b88e1eee79c1d3a4118cc282b3ab5a030746f80d5b73",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_07.png",
+      "hash": "d7f1c74c5e8aaef5a349ca98c556d30ae010f12e9b781b3cc857aa5efca893b5",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_08.png",
+      "hash": "a14a9363af1a713e506c5c95b4e722a4d37fccb3c613bcf4a6d58a59897f3d85",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_09.png",
+      "hash": "0abaff703eba2499abe64a855be42276ece4adb028db92f3f26ebc05d71466a7",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_10.png",
+      "hash": "2cca1339fee00a2efbdb8d0fd2c4f35e0ba22310ce3c1ecd12e231c0f53dea85",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_diag_up/frame_11.png",
+      "hash": "8bc002542189e46d6b3e40b4d7e7099cf0ef45b5c11386295c2001514279184d",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_00.png",
+      "hash": "4d612b2e5234b4d0e2d5291307108485f71d79f2c7754fe0658720713e7f54f5",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_01.png",
+      "hash": "900af890db52d9df176e0088fbe7d3cdff9badfb75bc820c2365b0ecae69a71c",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_02.png",
+      "hash": "9a330e6ee8d628d43e5fe2ac6e5c3231f4fab1b9134044cb3414908de3675312",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_03.png",
+      "hash": "3e5b8e4ae2249573d659411c54c7b7e0374b26f6380be2f3bc7e40e0659ad686",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_04.png",
+      "hash": "1bf1fe7a872b327d92856810b9c19d225423c898feb9356133fe2be389fab1ce",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_05.png",
+      "hash": "48c903ee672fc29fafc7413839251ce4bdae8d3dff7983beb5c4a86be50a5973",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_06.png",
+      "hash": "d8051d118ef5d80706e8832bd26b811efbe68643bee8b69453d3705379b6ac17",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_07.png",
+      "hash": "90c827f070ee6f273d535e2dc7439918a3590b64d0dd3237e1d0ffe7f27e1805",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_08.png",
+      "hash": "edc0e2083da34dc2dbf6d77db83abe8016ab3287ee4537c35cafe8cd90cbb43d",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_09.png",
+      "hash": "082d24595f0faa75334227041566d43f0e80388ea4c11dc6e46339e91611df6a",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_10.png",
+      "hash": "77af438edf9810bedc750a412b1216f4e2b4dd1ce754810fc686e597bd25fa9e",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_down/frame_11.png",
+      "hash": "cb02c3f5439c84f2fd871e3bfb737c228d567669afbeea417f66368b3317e8e0",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_00.png",
+      "hash": "d88fae1d1954dfe9eb6bd7fbda178e28b520f8316eb1be2e8e23cc6aa6f911b9",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_01.png",
+      "hash": "f3b3094f8600ea2092bd2b53ff903850d397482be962c4425f5214c3449dff73",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_02.png",
+      "hash": "7e4761fdc7c1c5278a27b5525de25d5c51cc9f07e631c6c06f7fba397db9480f",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_03.png",
+      "hash": "91a793df638144f39701b6516eb234f58d0b2b5689b5b2c604c9b82f5cb1cc93",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_04.png",
+      "hash": "1298513b7f97f7ae1151697a2edb8dd7b3da2bc5079d850cae6fe0b325c3d6d4",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_05.png",
+      "hash": "0c571351c97f8abc2df7ecbfb4db46067c9bbd6738e7e6f5d203e0a9cc7a46e0",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_06.png",
+      "hash": "ff3b96d28a1bb67f824a8815f30e629580d743384c048d4c8fd8e1b46c1edd4e",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_07.png",
+      "hash": "0242bc4ecd26cc1881c533f126a2ce53b9e2838d3233c607aa2252adb444a100",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_08.png",
+      "hash": "4f03745b32c7032edc0d9957746e673518e9d415312a210ee7218f18d7810be3",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_09.png",
+      "hash": "c7d9b382d27aa8009e2f701e15988e982524f030fc60db5ad15539490cd09764",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_10.png",
+      "hash": "0d48e760890213d331886a3fc9fafb68431736bbb9f7021cfb7f219549fa91c7",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_side/frame_11.png",
+      "hash": "695b03a31e4be07891ba98436f2d549ea0d81841813aa6496c52f9b5bebf7ab1",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_00.png",
+      "hash": "8a3da80e7e38d3a2f5d1c2a27147d2a12a06db5423afbf5e5c8c8d0d41f1bb6a",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_01.png",
+      "hash": "5481c628aedc38609c7e95d2533b88caacd943b565e488d2268048f5fdfe296a",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_02.png",
+      "hash": "ebb2c2ea807a2cf5cab74ef2a58ee03f742743e33bbaa943289a6ae7e166299b",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_03.png",
+      "hash": "679e9679df400fc88da96d9b6d144c6cdb03266e9853fb3eb7cc3847ea039a9e",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_04.png",
+      "hash": "e0e6b03d56d209da1742e15402169474d6b1a69f81a583a756122adcd67d6544",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_05.png",
+      "hash": "7815759525d0b7943d1053f343054c43e9f58f4e4b8149a50a6106ba160947e3",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_06.png",
+      "hash": "51e83c70f970781643c6e7b0b8f12d98d8511de03e0510522d22ffa8e0b4a00d",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_07.png",
+      "hash": "bf09ddef6b7d8cc9503268d82125417509716774c92cbeb44367f77a6937b736",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_08.png",
+      "hash": "9438a6ccfe0eeb435a039f63ec01a34f5e8825693feb6c16f2169af73bc7ba16",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_09.png",
+      "hash": "f4eec0938a1e7ae4156232161a538c39a551d9c785d8948220e02045ea6d10ff",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_10.png",
+      "hash": "f1f23380eeee5956299d6479b61c929a4401a31cd2bf757e03b0f602c07f5801",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "id": "art/horse_masks/walk_up/frame_11.png",
+      "hash": "118af1043706096a94a86724e9fcc7675357a6ad1b710b0dceb9e85bf996fd04",
+      "width": 96,
+      "height": 96
+    }
+  ]
+}
