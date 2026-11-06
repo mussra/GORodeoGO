@@ -16,6 +16,8 @@ var origin_filter:int=0
 var dragging:bool=false
 var drag_start:Vector2
 var drag_scroll:Vector2
+var relation_nodes:Dictionary={}
+var relation_edges:Dictionary={}
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=110
  collection=SaveData.horse_collection
@@ -66,6 +68,9 @@ func _unhandled_input(event:InputEvent)->void:
  if event is InputEventMagnifyGesture:set_zoom(zoom*event.factor);get_viewport().set_input_as_handled()
 func draw_graph()->void:
  if view==null:return
+ var saved_scroll:=Vector2(view.scroll_horizontal,view.scroll_vertical)
+ var related:Dictionary=HorseGenealogy.related_paths(collection,selected)
+ relation_nodes=related.nodes;relation_edges=related.edges
  for child in view.get_children():view.remove_child(child);child.queue_free()
  world=Control.new();world.mouse_filter=Control.MOUSE_FILTER_PASS;view.add_child(world);world.gui_input.connect(_map_input)
  var positions:Dictionary=HorseGenealogy.layout(collection);var hits:int=0;var shown:Dictionary={};var bounds:Vector2=Vector2(1200,350)
@@ -79,10 +84,17 @@ func draw_graph()->void:
   if not shown.has(h.id):continue
   for parent in h.parents:
    if not shown.has(parent):continue
-   var a:Vector2=positions[parent]+Vector2(115,160);var b:Vector2=positions[h.id]+Vector2(115,0);var line:=Line2D.new();line.width=3;line.default_color=Color("729b9c");line.points=PackedVector2Array([a,b]);layer.add_child(line)
+   var a:Vector2=positions[parent]+Vector2(115,160);var b:Vector2=positions[h.id]+Vector2(115,0);var line:=Line2D.new();line.width=5 if relation_edges.has([parent,h.id]) else 3;line.default_color=Color("f4cf67") if relation_edges.has([parent,h.id]) else Color("729b9c");line.modulate.a=1.0 if selected.is_empty() or relation_edges.has([parent,h.id]) else .18;line.set_meta("relation_edge",[parent,h.id]);line.points=PackedVector2Array([a,b]);layer.add_child(line)
  for h in HorseGenealogy.records(collection):
   if not shown.has(h.id):continue
-  var card:=Button.new();card.position=positions[h.id];card.size=Vector2(230,160);card.text="";card.add_theme_stylebox_override("normal",RanchTheme.box(Color("245346") if _matches(h) else Color("1e333d"),Color("e7c67f") if selected==h.id else Color("6d9b94"),10));card.modulate.a=1 if _matches(h) else .4;layer.add_child(card)
+  var is_related:bool=relation_nodes.has(h.id)
+  var card:=Button.new();card.set_meta("horse_id",h.id);card.position=positions[h.id];card.size=Vector2(230,160);card.text=""
+  var border:Color=Color("f4cf67") if is_related else Color("6d9b94")
+  var style:StyleBoxFlat=RanchTheme.box(Color("245346") if _matches(h) else Color("1e333d"),border,10)
+  if is_related:style.set_border_width_all(4 if selected==h.id else 3)
+  for state in ["normal","hover","pressed","focus"]:card.add_theme_stylebox_override(state,style)
+  card.modulate.a=(1.0 if is_related else .24) if not selected.is_empty() else (1.0 if _matches(h) else .4)
+  layer.add_child(card)
   var tex:=TextureRect.new();tex.position=Vector2(8,8);tex.size=Vector2(65,70);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.mouse_filter=Control.MOUSE_FILTER_IGNORE
   if h.get("stage","adult")=="foal":tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits)
   else:HorsePortrait.apply(tex,h.traits,SaveData.hat_color)
@@ -95,6 +107,9 @@ func draw_graph()->void:
     view.scroll_horizontal-=int(event.relative.x);view.scroll_vertical-=int(event.relative.y))
  counter.text=tr("GEN_COUNT")%[hits,HorseGenealogy.records(collection).size()]
  if hits==0:info.text=tr("GEN_EMPTY")
+ elif selected.is_empty():info.text=tr("GEN_HINT")
+ else:info.text=_selection_text()
+ _restore_scroll.call_deferred(saved_scroll)
 func _matches(h:Dictionary)->bool:
  var simple:Dictionary=filters.duplicate();simple.erase("finish")
  if not HorseGenealogy.matches(h,query,simple):return false
@@ -103,8 +118,13 @@ func _matches(h:Dictionary)->bool:
  if origin_filter==2 and h.get("origin","")!="purchased":return false
  if origin_filter==3 and not h.parents.is_empty():return false
  var f:int=int(filters.get("finish",-1));return f<0 or h.traits.get("finish","normal")==["normal","galaxy","original"][f]
+func _restore_scroll(value:Vector2)->void:
+ if is_instance_valid(view):view.scroll_horizontal=int(value.x);view.scroll_vertical=int(value.y)
 func select(id:String)->void:
- selected=id;var h:Dictionary=collection.known_record(id);var parents:Array=[]
- for p in h.parents:parents.append(str(collection.known_record(p).get("name",p)))
- info.text=str(h.name)+" · "+HorseGenealogy.lineage(h)+"\n"+tr("GEN_PARENTS")+(" + ".join(parents) if not parents.is_empty() else tr("GEN_UNRECORDED"))+"\n"+tr("GEN_NO_INVENT")
+ if collection.known_record(id).is_empty():return
+ selected="" if selected==id else id
  draw_graph()
+func _selection_text()->String:
+ var h:Dictionary=collection.known_record(selected);var parents:Array=[]
+ for p in h.parents:parents.append(str(collection.known_record(p).get("name",p)))
+ return str(h.name)+" · "+HorseGenealogy.lineage(h)+"\n"+tr("GEN_PARENTS")+(" + ".join(parents) if not parents.is_empty() else tr("GEN_UNRECORDED"))+"\n"+tr("GEN_RELATION_HINT")

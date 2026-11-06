@@ -33,3 +33,30 @@ static func origin(h:Dictionary)->String:
  if value=="purchased":return TranslationServer.translate("GEN_PURCHASED")
  if not h.get("parents",[]).is_empty():return TranslationServer.translate("GEN_BRED")
  return TranslationServer.translate("GEN_UNRECORDED")
+
+## Independent walks: a descendant's other parent is not the selected horse's ancestor.
+## Sets prevent shared-ancestor duplicates and terminate even on malformed cyclic input.
+static func related_paths(collection:HorseCollection,id:String)->Dictionary:
+ var by_id:Dictionary={};var children:Dictionary={};var nodes:Dictionary={};var edges:Dictionary={}
+ for h in records(collection):
+  by_id[h.id]=h
+  for parent in h.get("parents",[]):
+   if not children.has(parent):children[parent]=[]
+   children[parent].append(h.id)
+ if not by_id.has(id):return {"nodes":nodes,"edges":edges}
+ nodes[id]=true
+ for ascending in [true,false]:
+  var pending:Array=[id];var seen:Dictionary={}
+  while not pending.is_empty():
+   var current:String=pending.pop_back()
+   if seen.has(current):continue
+   seen[current]=true
+   var next:Array=by_id[current].get("parents",[]) if ascending else children.get(current,[])
+   for other in next:
+    if not by_id.has(other):continue
+    nodes[other]=true
+    var parent:String=other if ascending else current
+    var child:String=current if ascending else other
+    edges[[parent,child]]=true
+    if not seen.has(other):pending.append(other)
+ return {"nodes":nodes,"edges":edges}

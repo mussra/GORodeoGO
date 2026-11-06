@@ -834,3 +834,6 @@ msgstr "Fence jumping: yes (automatic when approaching)"
 
 msgid "JUMP_GROUNDED"
 msgstr "Fence jumping: no, go around the ends"
+
+msgid "GEN_RELATION_HINT"
+msgstr "Gold: all ancestors and descendants. Tap the same horse to clear selection. Filters remain active."

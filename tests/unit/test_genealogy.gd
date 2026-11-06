@@ -16,3 +16,15 @@ func test_external_ancestor_can_connect_owned_child_without_becoming_owned()->vo
 func test_invalid_ancestor_cycle_and_duplicate_rejected_atomically()->void:
  var c:=HorseCollection.new();c.seed_trial();var before:=c.export_state();var a:Dictionary=c.find("original").duplicate(true);a.id="bad";a.parents=["bad","bad"]
  assert_false(c.register_ancestor(a));assert_eq(c.export_state(),before)
+func test_paths_include_complete_ancestors_descendants_not_spouses_or_siblings()->void:
+ var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents();var child:=c.breed("trial_a","trial_b",{});c.mature_trial(child.id);var sibling:=c.breed("trial_a","trial_b",{});var grand:=c.breed(child.id,"original",{})
+ var r:Dictionary=HorseGenealogy.related_paths(c,child.id)
+ for id in [child.id,"trial_a","trial_b",grand.id]:assert_true(r.nodes.has(id))
+ assert_false(r.nodes.has("original"),"other parent of descendant is not an ancestor");assert_false(r.nodes.has(sibling.id),"siblings are not on ascending or descending paths")
+ assert_eq(r.edges.size(),3);assert_false(r.edges.has(["original",grand.id]))
+func test_shared_ancestors_all_branches_and_malformed_cycle_terminate()->void:
+ var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents();var a:=c.breed("trial_a","trial_b",{});c.mature_trial(a.id);var b:=c.breed("trial_a","trial_b",{});c.mature_trial(b.id);var child:=c.breed(a.id,b.id,{})
+ var r:Dictionary=HorseGenealogy.related_paths(c,child.id);assert_eq(r.nodes.size(),5);assert_eq(r.edges.size(),6)
+ c.find("trial_a").parents=[child.id,"trial_b"]
+ r=HorseGenealogy.related_paths(c,child.id);assert_eq(r.nodes.size(),5);assert_lte(r.edges.size(),8)
+ assert_true(HorseGenealogy.related_paths(c,"missing").nodes.is_empty())
