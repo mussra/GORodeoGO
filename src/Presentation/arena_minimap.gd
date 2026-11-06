@@ -57,7 +57,7 @@ func _draw()->void:
 	var view:=Rect2(_point(camera_center-half,area),half*2/level.world_bounds.size*area.size)
 	view=view.intersection(area)
 	draw_rect(view,Color(1,1,1,.4),false,1)
-	var title:String="MAPA · pausa · toca para cerrar" if expanded else "MAPA +"
+	var title:String=tr("MAPA · pausa · toca para cerrar") if expanded else tr("MAPA +")
 	draw_string(ThemeDB.fallback_font,Vector2(12,18),title,HORIZONTAL_ALIGNMENT_LEFT,-1,13,Color("fff1cd"))
 	if expanded:
 		draw_string(ThemeDB.fallback_font,Vector2(12,size.y-9),"● Tú   ■ Meta   Nº (toros)   Flecha: abre   Dorado: cerrado",HORIZONTAL_ALIGNMENT_LEFT,-1,13,Color("e5e9ce"))

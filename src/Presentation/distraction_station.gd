@@ -17,7 +17,7 @@ func _draw() -> void:
 		for i in range(2):
 			var y:float=-25+i*3+sin(_time*1.8+i)*.7
 			draw_arc(Vector2(-13+i*25,y),5,0.1,2.5,14,Color(.7,.95,.93,.5+sin(_time*2+i)*.15),1.2,true)
-	var label: String = "AGUA" if kind == "water" else "HENO"
+	var label: String = tr("AGUA") if kind == "water" else tr("HENO")
 	draw_string(ThemeDB.fallback_font, Vector2(-36, -62), label, HORIZONTAL_ALIGNMENT_CENTER, 72, 12, Color("fff1cd"))
 func draw_ellipse_shadow() -> void:
 	draw_set_transform(Vector2(3, 17), 0, Vector2(1, 0.35))

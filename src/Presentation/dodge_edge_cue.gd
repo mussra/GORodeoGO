@@ -13,7 +13,7 @@ func _draw()->void:
 	draw_line(at-direction*6,at+direction*9,color,2,true)
 	draw_line(at+direction*9,at+direction*3+direction.orthogonal()*5,color,2,true)
 	draw_line(at+direction*9,at+direction*3-direction.orthogonal()*5,color,2,true)
-	var text:String="Prolongando" if player._draw_edge_active else "Mantén para prolongar"
+	var text:String=tr("Prolongando") if player._draw_edge_active else tr("Mantén para prolongar")
 	var x:float=clampf(at.x+25,12,view.x-165)
 	var y:float=at.y+38 if at.y<130 else at.y-26
 	draw_style_box(RanchTheme.box(Color(.03,.13,.18,.88),Color.TRANSPARENT,5),Rect2(x-5,y-17,160,24))

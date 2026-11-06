@@ -13,37 +13,37 @@ func _ready()->void:
  z_index=50
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  _canvas=Control.new();_canvas.size=Vector2(1280,720);add_child(_canvas)
- _label("EQUIPO · VERSIÓN DE PRUEBA",Vector2(40,24),32)
- _label("Gana puntos al completar niveles, también al repetir. Avanzar da más puntos.",Vector2(40,75),21)
+ _label(tr("UI_046"),Vector2(40,24),32)
+ _label(tr("UI_047"),Vector2(40,75),21)
  _balance=_label("",Vector2(40,125),26)
- var back:=_button("VOLVER",Vector2(1020,24),func():hide();closed.emit())
+ var back:=_button(tr("UI_009"),Vector2(1020,24),func():hide();closed.emit())
  back.size=Vector2(220,45)
  var ids=["whip_basic","whip_long"]
  for i in range(2):
   var id:String=ids[i];var item:Dictionary=EquipmentCatalog.ITEMS[id];var x:float=60+i*620
-  _label(item["name"].to_upper(),Vector2(x,225),30)
-  var detail:String="%d puntos\nTrazo máximo: %d px\nNo aumenta la velocidad" % [item["price"],item["reach"]]
-  if id=="whip_basic":detail+="\nHabilita el regate"
-  if item.has("requires"):detail+="\nRequiere la fusta básica"
+  _label(tr(item["name"]).to_upper(),Vector2(x,225),30)
+  var detail:String=tr("UI_048") % [item["price"],item["reach"]]
+  if id=="whip_basic":detail+=tr("UI_049")
+  if item.has("requires"):detail+=tr("UI_050")
   _label(detail,Vector2(x,275),21)
   _buy[id]=_button("",Vector2(x,425),func():
-   if not SaveData.buy_equipment(id):_state.text="No se pudo conseguir: comprueba saldo o guardado"
+   if not SaveData.buy_equipment(id):_state.text=tr("UI_051")
    refresh())
-  _equip[id]=_button("EQUIPAR",Vector2(x+240,425),func():
+  _equip[id]=_button(tr("UI_059"),Vector2(x+240,425),func():
    SaveData.equip_item(id)
    refresh())
  _state=_label("",Vector2(40,510),24)
- var hats_button:=_button("SOMBREROS · PROBAR",Vector2(840,125),func():
+ var hats_button:=_button(tr("UI_052"),Vector2(840,125),func():
   if _hats==null:
    _hats=HatPanel.new();add_child(_hats)
   else:_hats.show();_hats.refresh())
  hats_button.size=Vector2(360,52)
- var horse_button:=_button("CABALLERIZA · CRÍA",Vector2(430,125),func():
+ var horse_button:=_button(tr("UI_053"),Vector2(430,125),func():
   if _horses==null:
    _horses=HorsePanel.new();add_child(_horses)
   else:_horses.show();_horses.refresh())
  horse_button.size=Vector2(360,52)
- _label("Recompensas y precios provisionales para probar el equilibrio. Sin dinero real.\nNivel 1: 10 puntos · Nivel 5: 200 · Nivel 10: 1.000\nSombreros: prueba de color sin coste. Cría: prototipo separado, sin economía definitiva.",Vector2(40,580),20)
+ _label(tr("UI_054"),Vector2(40,580),20)
  resized.connect(_layout);_layout();refresh()
 func _label(text:String,pos:Vector2,font:int)->Label:
  var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);_canvas.add_child(l);return l
@@ -55,14 +55,14 @@ func _layout()->void:
  _canvas.scale=Vector2.ONE*k;_canvas.position=(size-Vector2(1280,720)*k)/2
 func refresh()->void:
  if _balance==null:return
- _balance.text="SALDO: %d PUNTOS" % SaveData.equipment_points
+ _balance.text=tr("UI_055") % SaveData.equipment_points
  var state:EquipmentPoints=SaveData.equipment_state()
  for id in _buy:
   var item:Dictionary=EquipmentCatalog.ITEMS[id]
-  _buy[id].text="CONSEGUIDA" if state.owned.has(id) else "CONSEGUIR · %d"%item["price"]
+  _buy[id].text=tr("UI_062") if state.owned.has(id) else tr("UI_056")%item["price"]
   _buy[id].disabled=not state.can_buy(id,EquipmentCatalog.ITEMS)
   var selected:bool=state.equipped.get("whip","")==id
-  _equip[id].text="EQUIPADA" if selected else "EQUIPAR"
+  _equip[id].text=tr("UI_061") if selected else tr("UI_059")
   _equip[id].disabled=selected or not state.owned.has(id)
  var selected:String=state.equipped.get("whip","")
- _state.text="EQUIPADO: "+(EquipmentCatalog.ITEMS[selected]["name"] if EquipmentCatalog.ITEMS.has(selected) else "Sin fusta · consigue y equipa una para regatear")
+ _state.text=tr("UI_057")+(tr(EquipmentCatalog.ITEMS[selected]["name"]) if EquipmentCatalog.ITEMS.has(selected) else tr("UI_058"))

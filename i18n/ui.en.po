@@ -136,7 +136,604 @@ msgstr "Basic whip"
 msgid "UI_043"
 msgstr "Long whip"
 
+msgid "UI_046"
+msgstr "EQUIPMENT · TEST VERSION"
+
+msgid "UI_047"
+msgstr "Earn points by completing levels, including replays. New levels earn more."
+
+msgid "UI_048"
+msgstr "%d points\nMaximum stroke: %d px\nDoes not increase speed"
+
+msgid "UI_049"
+msgstr "\nEnables dodge"
+
+msgid "UI_050"
+msgstr "\nRequires the basic whip"
+
+msgid "UI_051"
+msgstr "Could not obtain item: check points or save"
+
+msgid "UI_052"
+msgstr "HATS · TRY"
+
+msgid "UI_053"
+msgstr "STABLE · BREEDING"
+
+msgid "UI_054"
+msgstr "Trial rewards and prices for balance testing. No real money.\nLevel 1: 10 points · Level 5: 200 · Level 10: 1,000\nHats: free color trial. Breeding: separate prototype; economy not final."
+
+msgid "UI_055"
+msgstr "BALANCE: %d POINTS"
+
+msgid "UI_056"
+msgstr "OBTAIN · %d"
+
+msgid "UI_057"
+msgstr "EQUIPPED: "
+
+msgid "UI_058"
+msgstr "No whip · obtain and equip one to dodge"
+
+msgid "UI_059"
+msgstr "EQUIP"
+
+msgid "UI_060"
+msgstr "EQUIPPED"
+
+msgid "UI_061"
+msgstr "EQUIPPED"
+
+msgid "UI_062"
+msgstr "OBTAINED"
+
+msgid "UI_063"
+msgstr "HATS · COLOR TRIAL"
+
+msgid "UI_064"
+msgstr "Same hat and abilities. The original is always available."
+
+msgid "UI_065"
+msgstr "Could not save color. Previous color kept."
+
+msgid "UI_066"
+msgstr "Color saved. Visible when you enter the game."
+
+msgid "UI_067"
+msgstr "No points charged for this trial. Cosmetic prices and unlocks are not final."
+
+msgid "UI_068"
+msgstr "Original"
+
+msgid "UI_069"
+msgstr "Night blue"
+
+msgid "UI_070"
+msgstr "Sand"
+
+msgid "UI_071"
+msgstr "ISOLATED TRIAL · TEMPORARY COPY"
+
+msgid "UI_072"
+msgstr "STABLE · BREEDING PROTOTYPE"
+
+msgid "UI_073"
+msgstr "COLLECTION"
+
+msgid "UI_074"
+msgstr "BREED"
+
+msgid "UI_075"
+msgstr "ATLAS · TRIAL"
+
+msgid "UI_076"
+msgstr "ADD 2 TRIAL HORSES"
+
+msgid "UI_077"
+msgstr "Could not open isolated trial"
+
+msgid "UI_078"
+msgstr "Added 2 random horses · Total: %d · trial only"
+
+msgid "UI_079"
+msgstr "TRIAL: parents kept, no charge. Trial values. Inheritance rules are not final."
+
+msgid "UI_080"
+msgstr "Rarity: planned categories, not assigned. Saddle and accessories are NOT inherited."
+
+msgid "UI_081"
+msgstr "%d HORSES IN COLLECTION"
+
+msgid "UI_082"
+msgstr "%s%s\n%s · %s · mane %s"
+
+msgid "UI_083"
+msgstr " · FOAL"
+
+msgid "UI_084"
+msgstr "Equipped for trial only"
+
+msgid "UI_085"
+msgstr "Horse equipped"
+
+msgid "UI_086"
+msgstr "Could not save"
+
+msgid "UI_087"
+msgstr "PARENT A"
+
+msgid "UI_088"
+msgstr "PARENT B"
+
+msgid "UI_089"
+msgstr "CHOOSE TRAITS FOR THIS TRIAL"
+
+msgid "UI_090"
+msgstr "Mane and tail"
+
+msgid "UI_091"
+msgstr "FINISH"
+
+msgid "UI_092"
+msgstr "CREATE TRIAL FOAL"
+
+msgid "UI_093"
+msgstr "Could not create/save"
+
+msgid "UI_094"
+msgstr "%s created. Both parents kept."
+
+msgid "UI_095"
+msgstr "Choose two different horses"
+
+msgid "UI_096"
+msgstr "FAMILY RANCH · "
+
+msgid "UI_097"
+msgstr " · ADULT"
+
+msgid "UI_098"
+msgstr "Trial founder horse. No ancestors recorded."
+
+msgid "UI_099"
+msgstr " · VIEW BRANCH"
+
+msgid "UI_100"
+msgstr "A + B → FOAL · no sex distinction"
+
+msgid "UI_101"
+msgstr " · APPEARANCE NOT OWNED"
+
+msgid "UI_102"
+msgstr "Coat: "
+
+msgid "UI_103"
+msgstr "\nPattern: "
+
+msgid "UI_104"
+msgstr "\nMane: "
+
+msgid "UI_105"
+msgstr "Catalog preview. Cannot select until obtained."
+
+msgid "UI_106"
+msgstr "BACK TO ATLAS"
+
+msgid "UI_107"
+msgstr "Horse name"
+
+msgid "UI_108"
+msgstr "SAVE"
+
+msgid "UI_109"
+msgstr "Name saved"
+
+msgid "UI_110"
+msgstr "Enter a name (up to 60 characters) / check save"
+
+msgid "UI_111"
+msgstr "SELECT HORSE"
+
+msgid "UI_112"
+msgstr "Horse selected"
+
+msgid "UI_113"
+msgstr "\nMane/tail: "
+
+msgid "UI_114"
+msgstr "Eyes: %s\nTRIAL VALUES\nBase speed: %.0f px/s\nHandling: %.0f px/s²\nPower: keeps %.0f%% with 2 bulls\nDodge: %.0f%% of whip reach"
+
+msgid "UI_115"
+msgstr "FOAL: cannot work or breed. Growth time is not final."
+
+msgid "UI_116"
+msgstr "TRIAL: GROW AND TRAIN"
+
+msgid "UI_117"
+msgstr "Trial adult, no wait or payment"
+
+msgid "UI_118"
+msgstr "Whip: not applicable to foals"
+
+msgid "UI_119"
+msgstr "Lasso capacity unchanged. Equipped whip reach: %d px"
+
+msgid "UI_120"
+msgstr "VIEW FAMILY · TRIAL"
+
+msgid "UI_121"
+msgstr "HORSE ATLAS"
+
+msgid "UI_122"
+msgstr "ORDER: OWNED FIRST"
+
+msgid "UI_123"
+msgstr "ORDER: NORMAL ATLAS"
+
+msgid "UI_124"
+msgstr "Owned horses, then candidate appearances. Acquisition and rarity are not final."
+
+msgid "UI_125"
+msgstr "\nMane "
+
+msgid "UI_126"
+msgstr "Open profile"
+
+msgid "UI_127"
+msgstr "Unavailable"
+
+msgid "UI_128"
+msgstr "Page %d / %d"
+
+msgid "UI_129"
+msgstr "Coat"
+
+msgid "UI_130"
+msgstr "Pattern"
+
+msgid "UI_131"
+msgstr "Eyes"
+
+msgid "UI_132"
+msgstr "PREVIOUS"
+
+msgid "UI_133"
+msgstr "NEXT"
+
+msgid "UI_134"
+msgstr "ISOLATED TRIAL · NOTHING IS SAVED"
+
+msgid "UI_135"
+msgstr "Menu return or restart restores your real state. No purchases, rewards or achievements."
+
+msgid "UI_136"
+msgstr "Adults: your horses and 2 borrowed parents. Real foals still cannot work.\nTemporary appearances: existing traits, not new acquisitions or a final catalog."
+
+msgid "UI_137"
+msgstr "HORSES / TEMPORARY COPY"
+
+msgid "UI_138"
+msgstr "HATS / TEMPORARY COPY"
+
+msgid "UI_139"
+msgstr "BORROWED LOOK · BASE stats (260 / 900 / 0.60 / 1.00)"
+
+msgid "UI_140"
+msgstr "Eyes: "
+
+msgid "UI_141"
+msgstr "Normal finish"
+
+msgid "UI_142"
+msgstr "Galaxy finish"
+
+msgid "UI_143"
+msgstr "USE TEMPORARY LOOK"
+
+msgid "UI_144"
+msgstr " BORROWED · %d px"
+
+msgid "UI_145"
+msgstr "Existing upgrades active. Candidate looks; special materials and rarity are not final."
+
+msgid "UI_146"
+msgstr "Level %02d · TRIAL"
+
+msgid "UI_147"
+msgstr "PLAY TRIAL"
+
+msgid "UI_148"
+msgstr "EXIT AND RESTORE REAL STATE"
+
+msgid "UI_149"
+msgstr "Selected: "
+
+msgid "UI_150"
+msgstr " · Trial gear: "
+
+msgid "UI_151"
+msgstr "Black"
+
+msgid "UI_152"
+msgstr "White"
+
+msgid "UI_153"
+msgstr "Golden"
+
+msgid "UI_154"
+msgstr "Blue"
+
+msgid "UI_155"
+msgstr "Green"
+
+msgid "UI_156"
+msgstr "Red"
+
+msgid "UI_157"
+msgstr "Violet"
+
+msgid "UI_158"
+msgstr "Turquoise"
+
+msgid "UI_159"
+msgstr "Pink"
+
+msgid "UI_160"
+msgstr "Orange"
+
+msgid "UI_161"
+msgstr "Brown"
+
+msgid "UI_162"
+msgstr "Gray"
+
+msgid "UI_163"
+msgstr "Cream"
+
+msgid "UI_164"
+msgstr "Copper"
+
+msgid "UI_165"
+msgstr "Lime"
+
+msgid "UI_166"
+msgstr "Navy"
+
+msgid "UI_167"
+msgstr "Lavender"
+
+msgid "UI_168"
+msgstr "Coral"
+
+msgid "UI_169"
+msgstr "Sky blue"
+
+msgid "UI_170"
+msgstr "Plum"
+
+msgid "UI_171"
+msgstr "Solid"
+
+msgid "UI_172"
+msgstr "Patches"
+
+msgid "UI_173"
+msgstr "Spotted"
+
+msgid "UI_174"
+msgstr "White hindquarters"
+
+msgid "UI_175"
+msgstr "Light legs"
+
+msgid "UI_176"
+msgstr "Hearts"
+
+msgid "UI_177"
+msgstr "Stars"
+
+msgid "UI_178"
+msgstr "Triangles"
+
+msgid "UI_179"
+msgstr "Diamonds"
+
+msgid "UI_180"
+msgstr "Zebra"
+
+msgid "UI_181"
+msgstr "Black"
+
+msgid "UI_182"
+msgstr "White"
+
+msgid "UI_183"
+msgstr "Golden"
+
+msgid "UI_184"
+msgstr "Red"
+
+msgid "UI_185"
+msgstr "Rainbow"
+
 msgid "HORSE_COUNT"
 msgid_plural "HORSE_COUNTS"
 msgstr[0] "%d horse"
 msgstr[1] "%d horses"
+
+msgid "Fusta básica"
+msgstr "Basic whip"
+
+msgid "Fusta larga"
+msgstr "Long whip"
+
+msgid "Original"
+msgstr "Original"
+
+msgid "Azul noche"
+msgstr "Night blue"
+
+msgid "Arena"
+msgstr "Sand"
+
+msgid "Negro"
+msgstr "Black"
+
+msgid "Blanco"
+msgstr "White"
+
+msgid "Dorado"
+msgstr "Golden"
+
+msgid "Azul"
+msgstr "Blue"
+
+msgid "Verde"
+msgstr "Green"
+
+msgid "Rojo"
+msgstr "Red"
+
+msgid "Violeta"
+msgstr "Violet"
+
+msgid "Turquesa"
+msgstr "Turquoise"
+
+msgid "Rosa"
+msgstr "Pink"
+
+msgid "Naranja"
+msgstr "Orange"
+
+msgid "Castaño"
+msgstr "Brown"
+
+msgid "Gris"
+msgstr "Gray"
+
+msgid "Crema"
+msgstr "Cream"
+
+msgid "Cobre"
+msgstr "Copper"
+
+msgid "Lima"
+msgstr "Lime"
+
+msgid "Marino"
+msgstr "Navy"
+
+msgid "Lavanda"
+msgstr "Lavender"
+
+msgid "Coral"
+msgstr "Coral"
+
+msgid "Celeste"
+msgstr "Sky blue"
+
+msgid "Ciruela"
+msgstr "Plum"
+
+msgid "Liso"
+msgstr "Solid"
+
+msgid "Parches"
+msgstr "Patches"
+
+msgid "Moteado"
+msgstr "Spotted"
+
+msgid "Trasera blanca"
+msgstr "White hindquarters"
+
+msgid "Patas claras"
+msgstr "Light legs"
+
+msgid "Corazones"
+msgstr "Hearts"
+
+msgid "Estrellas"
+msgstr "Stars"
+
+msgid "Triángulos"
+msgstr "Triangles"
+
+msgid "Rombos"
+msgstr "Diamonds"
+
+msgid "Cebra"
+msgstr "Zebra"
+
+msgid "Negra"
+msgstr "Black"
+
+msgid "Blanca"
+msgstr "White"
+
+msgid "Dorada"
+msgstr "Golden"
+
+msgid "Roja"
+msgstr "Red"
+
+msgid "Arcoíris"
+msgstr "Rainbow"
+
+msgid "Fusta"
+msgstr "Whip"
+
+msgid "Fusta mejorada"
+msgstr "Improved whip"
+
+msgid "FICHA"
+msgstr "PROFILE"
+
+msgid "META"
+msgstr "GOAL"
+
+msgid "TORO"
+msgstr "BULL"
+
+msgid "CIERRE "
+msgstr "GATE "
+
+msgid "AGUA"
+msgstr "WATER"
+
+msgid "HENO"
+msgstr "HAY"
+
+msgid "Bebiendo..."
+msgstr "Drinking..."
+
+msgid "Comiendo..."
+msgstr "Eating..."
+
+msgid "Prolongando"
+msgstr "Extending"
+
+msgid "Mantén para prolongar"
+msgstr "Hold to extend"
+
+msgid "MAPA · pausa · toca para cerrar"
+msgstr "MAP · paused · tap to close"
+
+msgid "MAPA +"
+msgstr "MAP +"
+
+msgid "ENSAYO AISLADO · sin premios ni guardado · equipo prestado"
+msgstr "ISOLATED TRIAL · no rewards or saving · borrowed gear"
+
+msgid "ENSAYO: regate y doble lazo activos, sin alterar progreso"
+msgstr "TRIAL: dodge and double lasso active, progress unchanged"
+
+msgid "¡Se acabó el tiempo!"
+msgstr "Time is up!"
+
+msgid "Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar"
+msgstr "No room: double-tap the lasso to release a bull before throwing"
+
+msgid "Usar Tranquilizante"
+msgstr "Use tranquilizer"

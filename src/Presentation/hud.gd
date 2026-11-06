@@ -39,6 +39,7 @@ func _ready() -> void:
 	nerves_group.visible = false
 	nerves_group_2.visible = false
 	end_panel.visible = false
+	tranquilizer_button.text = tr("Usar Tranquilizante")
 	tranquilizer_button.visible = false
 	restart_button.pressed.connect(func(): restart_requested.emit())
 	quit_button.pressed.connect(func(): quit_requested.emit())

@@ -25,3 +25,21 @@ func test_catalog_keys_and_format_placeholders_match()->void:
  assert_eq(es.get_message_list(),en.get_message_list())
  for key in es.get_message_list():
   assert_false(str(en.get_message(key)).is_empty())
+  var format:=RegEx.new();format.compile("%[-+0-9.]*[dfs]|%%")
+  var a:Array=[];var b:Array=[]
+  for found in format.search_all(str(es.get_message(key))):a.append(found.get_string())
+  for found in format.search_all(str(en.get_message(key))):b.append(found.get_string())
+  assert_eq(a,b,"Matching placeholders: "+key)
+
+func test_source_phrase_aliases_and_player_names()->void:
+ var before:String=TranslationServer.get_locale()
+ TranslationServer.set_locale("en")
+ assert_eq(str(TranslationServer.translate("MAPA · pausa · toca para cerrar")),"MAP · paused · tap to close")
+ assert_eq(str(TranslationServer.translate("Mantén para prolongar")),"Hold to extend")
+ assert_eq(str(TranslationServer.translate("Fusta")),"Whip")
+ assert_eq(str(TranslationServer.translate("Arcoíris de prueba")),"Arcoíris de prueba")
+ var panel=load("res://src/Presentation/horse_panel.gd").new()
+ panel.atlas_owned_first=false
+ var entries:Array=panel.atlas_entries()
+ assert_eq(entries[0].horse.name,HorseCollection.COATS[0])
+ panel.free();TranslationServer.set_locale(before)

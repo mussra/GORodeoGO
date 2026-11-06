@@ -494,7 +494,7 @@ func _draw() -> void:
 		else:
 			draw_polyline(PackedVector2Array([Vector2(-7, -47), Vector2(-1, -41), Vector2(10, -54)]), color, 3, true)
 	elif _distraction.active():
-		var label: String = "Bebiendo..." if _distraction.kind == "water" else "Comiendo..."
+		var label: String = tr("Bebiendo...") if _distraction.kind == "water" else tr("Comiendo...")
 		draw_style_box(RanchTheme.box(Color("244b40"), Color("9dd5af"), 6), Rect2(-50, -73, 100, 25))
 		draw_string(ThemeDB.fallback_font, Vector2(-45, -55), label, HORIZONTAL_ALIGNMENT_CENTER, 90, 13, Color("fff1d2"))
 	elif controller.is_wild() and (_is_chaser or _random_chase.is_active()):

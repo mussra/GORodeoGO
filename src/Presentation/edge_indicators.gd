@@ -26,16 +26,16 @@ func _process(delta: float) -> void:
 	var size: Vector2 = get_viewport_rect().size
 	var safe := Rect2(Vector2(70,110),size-Vector2(140,235))
 	var transform: Transform2D = level.get_global_transform_with_canvas()
-	_add_marker(transform * level.pen.global_position, safe, "META", Color("f4d383"), false, level.pen.get_instance_id())
+	_add_marker(transform * level.pen.global_position, safe, tr("META"), Color("f4d383"), false, level.pen.get_instance_id())
 	for bull in level._active_bulls:
 		if is_instance_valid(bull) and not bull._delivered and bull.controller.current_state()!=BullState.State.SAFE:
-			_add_marker(transform * bull.global_position, safe, "TORO", Color("efab81"), true, bull.get_instance_id())
+			_add_marker(transform * bull.global_position, safe, tr("TORO"), Color("efab81"), true, bull.get_instance_id())
 	# Closed corral latches are useful navigation targets without labelling every
 	# penned bull as an urgent offscreen threat.
 	for i in range(level._pen_doors.size()):
 		var door=level._pen_doors[i]
 		if is_instance_valid(door) and not door.is_opened():
-			_add_marker(transform*door.global_position,safe,"CIERRE "+str(i+1),Color("a2d6ca"),true,door.get_instance_id())
+			_add_marker(transform*door.global_position,safe,tr("CIERRE ")+str(i+1),Color("a2d6ca"),true,door.get_instance_id())
 	for key in _visibility.keys():
 		if not _seen.has(key): _visibility.erase(key)
 	queue_redraw()

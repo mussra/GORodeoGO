@@ -61,7 +61,7 @@ func _ready() -> void:
 	_upgrades = PlayerUpgrades.for_progress(SaveData.effective_progress())
 	_apply_unlocked_upgrades()
 	if SaveData.trial_session_active:
-		var banner:=Label.new();banner.text="ENSAYO AISLADO · sin premios ni guardado · equipo prestado";banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);hud.add_child(banner)
+		var banner:=Label.new();banner.text=tr("ENSAYO AISLADO · sin premios ni guardado · equipo prestado");banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);hud.add_child(banner)
 	_level_number = level_data.level_number
 	_arena_scale=ArenaLayout.scale_for_level(_level_number)
 	world_bounds=ArenaLayout.bounds_for_level(_level_number)
@@ -108,7 +108,7 @@ func _ready() -> void:
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
 	hud.update_timer(_time_remaining)
 	hud.set_level(_level_number)
-	if GameState.trial_tools_enabled():hud.flash_hint("ENSAYO: regate y doble lazo activos, sin alterar progreso",5.0)
+	if GameState.trial_tools_enabled():hud.flash_hint(tr("ENSAYO: regate y doble lazo activos, sin alterar progreso"),5.0)
 	hud.hide_nerves_slot(0)
 	hud.hide_nerves_slot(1)
 	hud.restart_requested.connect(_on_restart_requested)
@@ -370,7 +370,7 @@ func _process(delta: float) -> void:
 	_update_chaser(delta)
 
 	if _time_remaining <= 0.0:
-		_trigger_lose("¡Se acabó el tiempo!")
+		_trigger_lose(tr("¡Se acabó el tiempo!"))
 
 func _held_bulls() -> Array:
 	var held: Array = []
@@ -467,7 +467,7 @@ func _on_lasso_thrown(throw_origin: Vector2, landing_point: Vector2) -> void:
 ## the available slots — 1 normally, 2 with the dual lasso). The throw is refused in
 ## player.gd; here we explain why and how to free a slot.
 func _on_throw_blocked() -> void:
-	hud.flash_hint("Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar", 1.8)
+	hud.flash_hint(tr("Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar"), 1.8)
 
 ## One-shot dual-lasso unlock celebration: pause the action, show the animated overlay,
 ## remember it so it never nags again on later levels or replays.

@@ -136,7 +136,604 @@ msgstr "Fusta básica"
 msgid "UI_043"
 msgstr "Fusta larga"
 
+msgid "UI_046"
+msgstr "EQUIPO · VERSIÓN DE PRUEBA"
+
+msgid "UI_047"
+msgstr "Gana puntos al completar niveles, también al repetir. Avanzar da más puntos."
+
+msgid "UI_048"
+msgstr "%d puntos\nTrazo máximo: %d px\nNo aumenta la velocidad"
+
+msgid "UI_049"
+msgstr "\nHabilita el regate"
+
+msgid "UI_050"
+msgstr "\nRequiere la fusta básica"
+
+msgid "UI_051"
+msgstr "No se pudo conseguir: comprueba saldo o guardado"
+
+msgid "UI_052"
+msgstr "SOMBREROS · PROBAR"
+
+msgid "UI_053"
+msgstr "CABALLERIZA · CRÍA"
+
+msgid "UI_054"
+msgstr "Recompensas y precios provisionales para probar el equilibrio. Sin dinero real.\nNivel 1: 10 puntos · Nivel 5: 200 · Nivel 10: 1.000\nSombreros: prueba de color sin coste. Cría: prototipo separado, sin economía definitiva."
+
+msgid "UI_055"
+msgstr "SALDO: %d PUNTOS"
+
+msgid "UI_056"
+msgstr "CONSEGUIR · %d"
+
+msgid "UI_057"
+msgstr "EQUIPADO: "
+
+msgid "UI_058"
+msgstr "Sin fusta · consigue y equipa una para regatear"
+
+msgid "UI_059"
+msgstr "EQUIPAR"
+
+msgid "UI_060"
+msgstr "EQUIPADO"
+
+msgid "UI_061"
+msgstr "EQUIPADA"
+
+msgid "UI_062"
+msgstr "CONSEGUIDA"
+
+msgid "UI_063"
+msgstr "SOMBREROS · PRUEBA DE COLOR"
+
+msgid "UI_064"
+msgstr "Mismo sombrero y mismas habilidades. El original siempre está disponible."
+
+msgid "UI_065"
+msgstr "No se pudo guardar el color. Se mantiene el anterior."
+
+msgid "UI_066"
+msgstr "Color guardado. Se verá al entrar en la partida."
+
+msgid "UI_067"
+msgstr "Prueba sin coste en puntos. Precios y desbloqueos estéticos por definir."
+
+msgid "UI_068"
+msgstr "Original"
+
+msgid "UI_069"
+msgstr "Azul noche"
+
+msgid "UI_070"
+msgstr "Arena"
+
+msgid "UI_071"
+msgstr "ENSAYO AISLADO · COPIA TEMPORAL"
+
+msgid "UI_072"
+msgstr "CABALLERIZA · PROTOTIPO DE CRÍA"
+
+msgid "UI_073"
+msgstr "COLECCIÓN"
+
+msgid "UI_074"
+msgstr "CRUZAR"
+
+msgid "UI_075"
+msgstr "ATLAS · PRUEBA"
+
+msgid "UI_076"
+msgstr "AÑADIR 2 DE PRUEBA"
+
+msgid "UI_077"
+msgstr "No se pudo abrir el ensayo aislado"
+
+msgid "UI_078"
+msgstr "Añadidos 2 aleatorios · Total: %d caballos · solo en ensayo"
+
+msgid "UI_079"
+msgstr "PRUEBA: padres intactos, sin coste. Valores de ensayo. Reglas de herencia provisionales."
+
+msgid "UI_080"
+msgstr "Rareza: categorías previstas, aún sin asignar. Silla y complementos NO se heredan."
+
+msgid "UI_081"
+msgstr "%d CABALLOS EN LA COLECCIÓN"
+
+msgid "UI_082"
+msgstr "%s%s\n%s · %s · crin %s"
+
+msgid "UI_083"
+msgstr " · POTRILLO"
+
+msgid "UI_084"
+msgstr "Equipado solo en ensayo"
+
+msgid "UI_085"
+msgstr "Caballo equipado"
+
+msgid "UI_086"
+msgstr "No se pudo guardar"
+
+msgid "UI_087"
+msgstr "PROGENITOR A"
+
+msgid "UI_088"
+msgstr "PROGENITOR B"
+
+msgid "UI_089"
+msgstr "ELIGE RASGOS PARA ESTA PRUEBA"
+
+msgid "UI_090"
+msgstr "Crin y cola"
+
+msgid "UI_091"
+msgstr "ACABADO"
+
+msgid "UI_092"
+msgstr "CREAR CRÍA DE PRUEBA"
+
+msgid "UI_093"
+msgstr "No se pudo crear/guardar"
+
+msgid "UI_094"
+msgstr "%s creada. Ambos padres conservados."
+
+msgid "UI_095"
+msgstr "Elige dos caballos distintos"
+
+msgid "UI_096"
+msgstr "RANCHO FAMILIAR · "
+
+msgid "UI_097"
+msgstr " · ADULTO"
+
+msgid "UI_098"
+msgstr "Caballo fundador de prueba. Sin ascendencia registrada."
+
+msgid "UI_099"
+msgstr " · VER RAMA"
+
+msgid "UI_100"
+msgstr "A + B → CRÍA · sin distinguir sexos"
+
+msgid "UI_101"
+msgstr " · ASPECTO NO ADQUIRIDO"
+
+msgid "UI_102"
+msgstr "Pelaje: "
+
+msgid "UI_103"
+msgstr "\nManchas: "
+
+msgid "UI_104"
+msgstr "\nCrin: "
+
+msgid "UI_105"
+msgstr "Vista de catálogo. No seleccionable hasta obtenerlo."
+
+msgid "UI_106"
+msgstr "VOLVER AL ATLAS"
+
+msgid "UI_107"
+msgstr "Nombre del caballo"
+
+msgid "UI_108"
+msgstr "GUARDAR"
+
+msgid "UI_109"
+msgstr "Nombre guardado"
+
+msgid "UI_110"
+msgstr "Escribe un nombre (máximo 60 caracteres) / revisa guardado"
+
+msgid "UI_111"
+msgstr "SELECCIONAR CABALLO"
+
+msgid "UI_112"
+msgstr "Caballo seleccionado"
+
+msgid "UI_113"
+msgstr "\nCrin/cola: "
+
+msgid "UI_114"
+msgstr "Ojos: %s\nVALORES PROVISIONALES\nVelocidad base: %.0f px/s\nManejabilidad: %.0f px/s²\nPotencia: conserva %.0f%% con 2 toros\nRegate: %.0f%% del alcance de la fusta"
+
+msgid "UI_115"
+msgstr "POTRILLO: no puede trabajar ni criar. Plazo por definir."
+
+msgid "UI_116"
+msgstr "ENSAYO: CRECER Y ADIESTRAR"
+
+msgid "UI_117"
+msgstr "Adulto de ensayo, sin esperar ni pagar"
+
+msgid "UI_118"
+msgstr "Fusta: no aplicable mientras es potrillo"
+
+msgid "UI_119"
+msgstr "Capacidad de lazo intacta. Alcance equipado de fusta: %d px"
+
+msgid "UI_120"
+msgstr "VER PARENTESCO · PRUEBA"
+
+msgid "UI_121"
+msgstr "ATLAS DE CABALLOS"
+
+msgid "UI_122"
+msgstr "ORDEN: LOS MÍOS PRIMERO"
+
+msgid "UI_123"
+msgstr "ORDEN: ATLAS NORMAL"
+
+msgid "UI_124"
+msgstr "Colección propia y después aspectos candidatos. Sin rutas de obtención ni rarezas aprobadas."
+
+msgid "UI_125"
+msgstr "\nCrin "
+
+msgid "UI_126"
+msgstr "Abrir ficha"
+
+msgid "UI_127"
+msgstr "No disponible"
+
+msgid "UI_128"
+msgstr "Página %d / %d"
+
+msgid "UI_129"
+msgstr "Pelaje"
+
+msgid "UI_130"
+msgstr "Manchas"
+
+msgid "UI_131"
+msgstr "Ojos"
+
+msgid "UI_132"
+msgstr "ANTERIOR"
+
+msgid "UI_133"
+msgstr "SIGUIENTE"
+
+msgid "UI_134"
+msgstr "ENSAYO AISLADO · NADA SE GUARDA"
+
+msgid "UI_135"
+msgstr "Al volver al menú o reiniciar recuperas tu estado real. Sin compras, premios ni logros."
+
+msgid "UI_136"
+msgstr "Adultos: los tuyos y 2 padres prestados. Potrillos reales siguen sin trabajar.\nAspectos temporales: rasgos existentes, no nuevas adquisiciones ni catálogo final auditado."
+
+msgid "UI_137"
+msgstr "CABALLOS / COPIA TEMPORAL"
+
+msgid "UI_138"
+msgstr "SOMBREROS / COPIA TEMPORAL"
+
+msgid "UI_139"
+msgstr "ASPECTO PRESTADO · atributos BASE (260 / 900 / 0,60 / 1,00)"
+
+msgid "UI_140"
+msgstr "Ojos: "
+
+msgid "UI_141"
+msgstr "Acabado normal"
+
+msgid "UI_142"
+msgstr "Acabado Galaxy"
+
+msgid "UI_143"
+msgstr "USAR ASPECTO TEMPORAL"
+
+msgid "UI_144"
+msgstr " PRESTADA · %d px"
+
+msgid "UI_145"
+msgstr "Todas las mejoras existentes activas. Candidatas visuales; materiales especiales y rareza final sin cerrar."
+
+msgid "UI_146"
+msgstr "Nivel %02d · ENSAYO"
+
+msgid "UI_147"
+msgstr "JUGAR ENSAYO"
+
+msgid "UI_148"
+msgstr "SALIR Y RESTAURAR ESTADO REAL"
+
+msgid "UI_149"
+msgstr "Seleccionado: "
+
+msgid "UI_150"
+msgstr " · Equipo temporal: "
+
+msgid "UI_151"
+msgstr "Negro"
+
+msgid "UI_152"
+msgstr "Blanco"
+
+msgid "UI_153"
+msgstr "Dorado"
+
+msgid "UI_154"
+msgstr "Azul"
+
+msgid "UI_155"
+msgstr "Verde"
+
+msgid "UI_156"
+msgstr "Rojo"
+
+msgid "UI_157"
+msgstr "Violeta"
+
+msgid "UI_158"
+msgstr "Turquesa"
+
+msgid "UI_159"
+msgstr "Rosa"
+
+msgid "UI_160"
+msgstr "Naranja"
+
+msgid "UI_161"
+msgstr "Castaño"
+
+msgid "UI_162"
+msgstr "Gris"
+
+msgid "UI_163"
+msgstr "Crema"
+
+msgid "UI_164"
+msgstr "Cobre"
+
+msgid "UI_165"
+msgstr "Lima"
+
+msgid "UI_166"
+msgstr "Marino"
+
+msgid "UI_167"
+msgstr "Lavanda"
+
+msgid "UI_168"
+msgstr "Coral"
+
+msgid "UI_169"
+msgstr "Celeste"
+
+msgid "UI_170"
+msgstr "Ciruela"
+
+msgid "UI_171"
+msgstr "Liso"
+
+msgid "UI_172"
+msgstr "Parches"
+
+msgid "UI_173"
+msgstr "Moteado"
+
+msgid "UI_174"
+msgstr "Trasera blanca"
+
+msgid "UI_175"
+msgstr "Patas claras"
+
+msgid "UI_176"
+msgstr "Corazones"
+
+msgid "UI_177"
+msgstr "Estrellas"
+
+msgid "UI_178"
+msgstr "Triángulos"
+
+msgid "UI_179"
+msgstr "Rombos"
+
+msgid "UI_180"
+msgstr "Cebra"
+
+msgid "UI_181"
+msgstr "Negra"
+
+msgid "UI_182"
+msgstr "Blanca"
+
+msgid "UI_183"
+msgstr "Dorada"
+
+msgid "UI_184"
+msgstr "Roja"
+
+msgid "UI_185"
+msgstr "Arcoíris"
+
 msgid "HORSE_COUNT"
 msgid_plural "HORSE_COUNTS"
 msgstr[0] "%d caballo"
 msgstr[1] "%d caballos"
+
+msgid "Fusta básica"
+msgstr "Fusta básica"
+
+msgid "Fusta larga"
+msgstr "Fusta larga"
+
+msgid "Original"
+msgstr "Original"
+
+msgid "Azul noche"
+msgstr "Azul noche"
+
+msgid "Arena"
+msgstr "Arena"
+
+msgid "Negro"
+msgstr "Negro"
+
+msgid "Blanco"
+msgstr "Blanco"
+
+msgid "Dorado"
+msgstr "Dorado"
+
+msgid "Azul"
+msgstr "Azul"
+
+msgid "Verde"
+msgstr "Verde"
+
+msgid "Rojo"
+msgstr "Rojo"
+
+msgid "Violeta"
+msgstr "Violeta"
+
+msgid "Turquesa"
+msgstr "Turquesa"
+
+msgid "Rosa"
+msgstr "Rosa"
+
+msgid "Naranja"
+msgstr "Naranja"
+
+msgid "Castaño"
+msgstr "Castaño"
+
+msgid "Gris"
+msgstr "Gris"
+
+msgid "Crema"
+msgstr "Crema"
+
+msgid "Cobre"
+msgstr "Cobre"
+
+msgid "Lima"
+msgstr "Lima"
+
+msgid "Marino"
+msgstr "Marino"
+
+msgid "Lavanda"
+msgstr "Lavanda"
+
+msgid "Coral"
+msgstr "Coral"
+
+msgid "Celeste"
+msgstr "Celeste"
+
+msgid "Ciruela"
+msgstr "Ciruela"
+
+msgid "Liso"
+msgstr "Liso"
+
+msgid "Parches"
+msgstr "Parches"
+
+msgid "Moteado"
+msgstr "Moteado"
+
+msgid "Trasera blanca"
+msgstr "Trasera blanca"
+
+msgid "Patas claras"
+msgstr "Patas claras"
+
+msgid "Corazones"
+msgstr "Corazones"
+
+msgid "Estrellas"
+msgstr "Estrellas"
+
+msgid "Triángulos"
+msgstr "Triángulos"
+
+msgid "Rombos"
+msgstr "Rombos"
+
+msgid "Cebra"
+msgstr "Cebra"
+
+msgid "Negra"
+msgstr "Negra"
+
+msgid "Blanca"
+msgstr "Blanca"
+
+msgid "Dorada"
+msgstr "Dorada"
+
+msgid "Roja"
+msgstr "Roja"
+
+msgid "Arcoíris"
+msgstr "Arcoíris"
+
+msgid "Fusta"
+msgstr "Fusta"
+
+msgid "Fusta mejorada"
+msgstr "Fusta mejorada"
+
+msgid "FICHA"
+msgstr "FICHA"
+
+msgid "META"
+msgstr "META"
+
+msgid "TORO"
+msgstr "TORO"
+
+msgid "CIERRE "
+msgstr "CIERRE "
+
+msgid "AGUA"
+msgstr "AGUA"
+
+msgid "HENO"
+msgstr "HENO"
+
+msgid "Bebiendo..."
+msgstr "Bebiendo..."
+
+msgid "Comiendo..."
+msgstr "Comiendo..."
+
+msgid "Prolongando"
+msgstr "Prolongando"
+
+msgid "Mantén para prolongar"
+msgstr "Mantén para prolongar"
+
+msgid "MAPA · pausa · toca para cerrar"
+msgstr "MAPA · pausa · toca para cerrar"
+
+msgid "MAPA +"
+msgstr "MAPA +"
+
+msgid "ENSAYO AISLADO · sin premios ni guardado · equipo prestado"
+msgstr "ENSAYO AISLADO · sin premios ni guardado · equipo prestado"
+
+msgid "ENSAYO: regate y doble lazo activos, sin alterar progreso"
+msgstr "ENSAYO: regate y doble lazo activos, sin alterar progreso"
+
+msgid "¡Se acabó el tiempo!"
+msgstr "¡Se acabó el tiempo!"
+
+msgid "Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar"
+msgstr "Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar"
+
+msgid "Usar Tranquilizante"
+msgstr "Usar Tranquilizante"

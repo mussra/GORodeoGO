@@ -1,59 +1,293 @@
-keys,es,en
-UI_000,RANCHO // FRONTERA 01,RANCHO // FRONTIER 01
-UI_001,"DOMINA EL LAZO.
+"keys","es","en"
+"UI_000","RANCHO // FRONTERA 01","RANCHO // FRONTIER 01"
+"UI_001","DOMINA EL LAZO.
 ASEGURA EL RANCHO.","MASTER THE LASSO.
 SECURE THE RANCH."
-UI_002,JUGAR   >   NIVEL %02d,PLAY   >   LEVEL %02d
-UI_003,NIVELES · AVANZA UNO A UNO,LEVELS · ONE AT A TIME
-UI_004,EQUIPO,EQUIPMENT
-UI_005,ENSAYO AISLADO · TODO PRESTADO,ISOLATED TRIAL · BORROWED GEAR
-UI_006,IZQUIERDA  MOVER    /    DERECHA  LAZO    /    DOBLE TOQUE  LIBERAR,LEFT  MOVE    /    RIGHT  LASSO    /    DOUBLE TAP  RELEASE
-UI_007,SALIR,QUIT
-UI_008,ELIGE TU SIGUIENTE RETO,CHOOSE YOUR NEXT CHALLENGE
-UI_009,VOLVER,BACK
-UI_010,BLOQUEADO,LOCKED
-UI_011,RODEO,RODEO
-UI_012,CORRALES,PENS
-UI_013,"EQUIPO: ","EQUIPMENT: "
-UI_014,Sin fusta,No whip
-UI_015,"%02d / 20 COMPLETADOS · %d PUNTOS
+"UI_002","JUGAR   >   NIVEL %02d","PLAY   >   LEVEL %02d"
+"UI_003","NIVELES · AVANZA UNO A UNO","LEVELS · ONE AT A TIME"
+"UI_004","EQUIPO","EQUIPMENT"
+"UI_005","ENSAYO AISLADO · TODO PRESTADO","ISOLATED TRIAL · BORROWED GEAR"
+"UI_006","IZQUIERDA  MOVER    /    DERECHA  LAZO    /    DOBLE TOQUE  LIBERAR","LEFT  MOVE    /    RIGHT  LASSO    /    DOUBLE TAP  RELEASE"
+"UI_007","SALIR","QUIT"
+"UI_008","ELIGE TU SIGUIENTE RETO","CHOOSE YOUR NEXT CHALLENGE"
+"UI_009","VOLVER","BACK"
+"UI_010","BLOQUEADO","LOCKED"
+"UI_011","RODEO","RODEO"
+"UI_012","CORRALES","PENS"
+"UI_013","EQUIPO: ","EQUIPMENT: "
+"UI_014","Sin fusta","No whip"
+"UI_015","%02d / 20 COMPLETADOS · %d PUNTOS
 Equipo y recompensas en prueba","%02d / 20 COMPLETE · %d POINTS
 Trial equipment and rewards"
-UI_016,Toros en el corral: %d/%d,Bulls in the pen: %d/%d
-UI_017,NIVEL %02d,LEVEL %02d
-UI_018,Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes,Numbered pens · Open the gate · A bull follows the path and opens the next pens
-UI_019,"Laza un toro, espera a que se calme y llévalo a la META","Lasso a bull, let it calm down, then lead it to the GOAL"
-UI_020,"¡Rancho asegurado!
+"UI_016","Toros en el corral: %d/%d","Bulls in the pen: %d/%d"
+"UI_017","NIVEL %02d","LEVEL %02d"
+"UI_018","Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes","Numbered pens · Open the gate · A bull follows the path and opens the next pens"
+"UI_019","Laza un toro, espera a que se calme y llévalo a la META","Lasso a bull, let it calm down, then lead it to the GOAL"
+"UI_020","¡Rancho asegurado!
 Todos los toros en el corral.","Ranch secured!
 All bulls are in the pen."
-UI_021,"Nivel fallido.
+"UI_021","Nivel fallido.
 %s","Level failed.
 %s"
-UI_022,Pausa,Pause
-UI_023,Continuar,Resume
-UI_024,Sonido,Sound
-UI_025,Menú principal,Main menu
-UI_026,Siguiente nivel,Next level
-UI_027,Calmando al toro...,Calming the bull...
-UI_028,Calmando al segundo...,Calming the second bull...
-UI_029,¡HAS CONSEGUIDO EL DOBLE LAZO!,YOU UNLOCKED THE DOUBLE LASSO!
-UI_030,"Ahora puedes enlazar DOS toros a la vez:
+"UI_022","Pausa","Pause"
+"UI_023","Continuar","Resume"
+"UI_024","Sonido","Sound"
+"UI_025","Menú principal","Main menu"
+"UI_026","Siguiente nivel","Next level"
+"UI_027","Calmando al toro...","Calming the bull..."
+"UI_028","Calmando al segundo...","Calming the second bull..."
+"UI_029","¡HAS CONSEGUIDO EL DOBLE LAZO!","YOU UNLOCKED THE DOUBLE LASSO!"
+"UI_030","Ahora puedes enlazar DOS toros a la vez:
 lanza un segundo lazo mientras llevas uno cogido.
 Para soltar uno, doble toque rápido en el stick del lazo.","You can now lasso TWO bulls at once:
 throw a second lasso while leading the first bull.
 To release one, double-tap the lasso stick."
-UI_031,¡Vamos!,Let's go!
-UI_032,¡Ya está calmado! Guíalo hasta la META marcada con ✓,It is calm! Lead it to the GOAL marked with ✓
-UI_033,Mantén la distancia con los toros sueltos mientras se calma,Keep away from loose bulls while it calms down
-UI_034,Laza y calma · Lleva a los perseguidores al AGUA o HENO para distraerlos,Lasso and calm · Lead pursuers to WATER or HAY to distract them
-UI_035,AJUSTES,SETTINGS
-UI_036,Idioma,Language
-UI_037,Automático (móvil),Automatic (device)
-UI_038,Español,Español
-UI_039,English,English
-UI_040,El idioma se guarda en este dispositivo. Sin conexión.,Language is saved on this device. Works offline.
-UI_041,No se pudo guardar el idioma. Se mantiene la elección anterior.,Could not save the language. The previous choice is kept.
-UI_042,Fusta básica,Basic whip
-UI_043,Fusta larga,Long whip
-UI_044,%d caballo,%d horse
-UI_045,%d caballos,%d horses
+"UI_031","¡Vamos!","Let's go!"
+"UI_032","¡Ya está calmado! Guíalo hasta la META marcada con ✓","It is calm! Lead it to the GOAL marked with ✓"
+"UI_033","Mantén la distancia con los toros sueltos mientras se calma","Keep away from loose bulls while it calms down"
+"UI_034","Laza y calma · Lleva a los perseguidores al AGUA o HENO para distraerlos","Lasso and calm · Lead pursuers to WATER or HAY to distract them"
+"UI_035","AJUSTES","SETTINGS"
+"UI_036","Idioma","Language"
+"UI_037","Automático (móvil)","Automatic (device)"
+"UI_038","Español","Español"
+"UI_039","English","English"
+"UI_040","El idioma se guarda en este dispositivo. Sin conexión.","Language is saved on this device. Works offline."
+"UI_041","No se pudo guardar el idioma. Se mantiene la elección anterior.","Could not save the language. The previous choice is kept."
+"UI_042","Fusta básica","Basic whip"
+"UI_043","Fusta larga","Long whip"
+"UI_044","%d caballo","%d horse"
+"UI_045","%d caballos","%d horses"
+"UI_046","EQUIPO · VERSIÓN DE PRUEBA","EQUIPMENT · TEST VERSION"
+"UI_047","Gana puntos al completar niveles, también al repetir. Avanzar da más puntos.","Earn points by completing levels, including replays. New levels earn more."
+"UI_048","%d puntos
+Trazo máximo: %d px
+No aumenta la velocidad","%d points
+Maximum stroke: %d px
+Does not increase speed"
+"UI_049","
+Habilita el regate","
+Enables dodge"
+"UI_050","
+Requiere la fusta básica","
+Requires the basic whip"
+"UI_051","No se pudo conseguir: comprueba saldo o guardado","Could not obtain item: check points or save"
+"UI_052","SOMBREROS · PROBAR","HATS · TRY"
+"UI_053","CABALLERIZA · CRÍA","STABLE · BREEDING"
+"UI_054","Recompensas y precios provisionales para probar el equilibrio. Sin dinero real.
+Nivel 1: 10 puntos · Nivel 5: 200 · Nivel 10: 1.000
+Sombreros: prueba de color sin coste. Cría: prototipo separado, sin economía definitiva.","Trial rewards and prices for balance testing. No real money.
+Level 1: 10 points · Level 5: 200 · Level 10: 1,000
+Hats: free color trial. Breeding: separate prototype; economy not final."
+"UI_055","SALDO: %d PUNTOS","BALANCE: %d POINTS"
+"UI_056","CONSEGUIR · %d","OBTAIN · %d"
+"UI_057","EQUIPADO: ","EQUIPPED: "
+"UI_058","Sin fusta · consigue y equipa una para regatear","No whip · obtain and equip one to dodge"
+"UI_059","EQUIPAR","EQUIP"
+"UI_060","EQUIPADO","EQUIPPED"
+"UI_061","EQUIPADA","EQUIPPED"
+"UI_062","CONSEGUIDA","OBTAINED"
+"UI_063","SOMBREROS · PRUEBA DE COLOR","HATS · COLOR TRIAL"
+"UI_064","Mismo sombrero y mismas habilidades. El original siempre está disponible.","Same hat and abilities. The original is always available."
+"UI_065","No se pudo guardar el color. Se mantiene el anterior.","Could not save color. Previous color kept."
+"UI_066","Color guardado. Se verá al entrar en la partida.","Color saved. Visible when you enter the game."
+"UI_067","Prueba sin coste en puntos. Precios y desbloqueos estéticos por definir.","No points charged for this trial. Cosmetic prices and unlocks are not final."
+"UI_068","Original","Original"
+"UI_069","Azul noche","Night blue"
+"UI_070","Arena","Sand"
+"UI_071","ENSAYO AISLADO · COPIA TEMPORAL","ISOLATED TRIAL · TEMPORARY COPY"
+"UI_072","CABALLERIZA · PROTOTIPO DE CRÍA","STABLE · BREEDING PROTOTYPE"
+"UI_073","COLECCIÓN","COLLECTION"
+"UI_074","CRUZAR","BREED"
+"UI_075","ATLAS · PRUEBA","ATLAS · TRIAL"
+"UI_076","AÑADIR 2 DE PRUEBA","ADD 2 TRIAL HORSES"
+"UI_077","No se pudo abrir el ensayo aislado","Could not open isolated trial"
+"UI_078","Añadidos 2 aleatorios · Total: %d caballos · solo en ensayo","Added 2 random horses · Total: %d · trial only"
+"UI_079","PRUEBA: padres intactos, sin coste. Valores de ensayo. Reglas de herencia provisionales.","TRIAL: parents kept, no charge. Trial values. Inheritance rules are not final."
+"UI_080","Rareza: categorías previstas, aún sin asignar. Silla y complementos NO se heredan.","Rarity: planned categories, not assigned. Saddle and accessories are NOT inherited."
+"UI_081","%d CABALLOS EN LA COLECCIÓN","%d HORSES IN COLLECTION"
+"UI_082","%s%s
+%s · %s · crin %s","%s%s
+%s · %s · mane %s"
+"UI_083"," · POTRILLO"," · FOAL"
+"UI_084","Equipado solo en ensayo","Equipped for trial only"
+"UI_085","Caballo equipado","Horse equipped"
+"UI_086","No se pudo guardar","Could not save"
+"UI_087","PROGENITOR A","PARENT A"
+"UI_088","PROGENITOR B","PARENT B"
+"UI_089","ELIGE RASGOS PARA ESTA PRUEBA","CHOOSE TRAITS FOR THIS TRIAL"
+"UI_090","Crin y cola","Mane and tail"
+"UI_091","ACABADO","FINISH"
+"UI_092","CREAR CRÍA DE PRUEBA","CREATE TRIAL FOAL"
+"UI_093","No se pudo crear/guardar","Could not create/save"
+"UI_094","%s creada. Ambos padres conservados.","%s created. Both parents kept."
+"UI_095","Elige dos caballos distintos","Choose two different horses"
+"UI_096","RANCHO FAMILIAR · ","FAMILY RANCH · "
+"UI_097"," · ADULTO"," · ADULT"
+"UI_098","Caballo fundador de prueba. Sin ascendencia registrada.","Trial founder horse. No ancestors recorded."
+"UI_099"," · VER RAMA"," · VIEW BRANCH"
+"UI_100","A + B → CRÍA · sin distinguir sexos","A + B → FOAL · no sex distinction"
+"UI_101"," · ASPECTO NO ADQUIRIDO"," · APPEARANCE NOT OWNED"
+"UI_102","Pelaje: ","Coat: "
+"UI_103","
+Manchas: ","
+Pattern: "
+"UI_104","
+Crin: ","
+Mane: "
+"UI_105","Vista de catálogo. No seleccionable hasta obtenerlo.","Catalog preview. Cannot select until obtained."
+"UI_106","VOLVER AL ATLAS","BACK TO ATLAS"
+"UI_107","Nombre del caballo","Horse name"
+"UI_108","GUARDAR","SAVE"
+"UI_109","Nombre guardado","Name saved"
+"UI_110","Escribe un nombre (máximo 60 caracteres) / revisa guardado","Enter a name (up to 60 characters) / check save"
+"UI_111","SELECCIONAR CABALLO","SELECT HORSE"
+"UI_112","Caballo seleccionado","Horse selected"
+"UI_113","
+Crin/cola: ","
+Mane/tail: "
+"UI_114","Ojos: %s
+VALORES PROVISIONALES
+Velocidad base: %.0f px/s
+Manejabilidad: %.0f px/s²
+Potencia: conserva %.0f%% con 2 toros
+Regate: %.0f%% del alcance de la fusta","Eyes: %s
+TRIAL VALUES
+Base speed: %.0f px/s
+Handling: %.0f px/s²
+Power: keeps %.0f%% with 2 bulls
+Dodge: %.0f%% of whip reach"
+"UI_115","POTRILLO: no puede trabajar ni criar. Plazo por definir.","FOAL: cannot work or breed. Growth time is not final."
+"UI_116","ENSAYO: CRECER Y ADIESTRAR","TRIAL: GROW AND TRAIN"
+"UI_117","Adulto de ensayo, sin esperar ni pagar","Trial adult, no wait or payment"
+"UI_118","Fusta: no aplicable mientras es potrillo","Whip: not applicable to foals"
+"UI_119","Capacidad de lazo intacta. Alcance equipado de fusta: %d px","Lasso capacity unchanged. Equipped whip reach: %d px"
+"UI_120","VER PARENTESCO · PRUEBA","VIEW FAMILY · TRIAL"
+"UI_121","ATLAS DE CABALLOS","HORSE ATLAS"
+"UI_122","ORDEN: LOS MÍOS PRIMERO","ORDER: OWNED FIRST"
+"UI_123","ORDEN: ATLAS NORMAL","ORDER: NORMAL ATLAS"
+"UI_124","Colección propia y después aspectos candidatos. Sin rutas de obtención ni rarezas aprobadas.","Owned horses, then candidate appearances. Acquisition and rarity are not final."
+"UI_125","
+Crin ","
+Mane "
+"UI_126","Abrir ficha","Open profile"
+"UI_127","No disponible","Unavailable"
+"UI_128","Página %d / %d","Page %d / %d"
+"UI_129","Pelaje","Coat"
+"UI_130","Manchas","Pattern"
+"UI_131","Ojos","Eyes"
+"UI_132","ANTERIOR","PREVIOUS"
+"UI_133","SIGUIENTE","NEXT"
+"UI_134","ENSAYO AISLADO · NADA SE GUARDA","ISOLATED TRIAL · NOTHING IS SAVED"
+"UI_135","Al volver al menú o reiniciar recuperas tu estado real. Sin compras, premios ni logros.","Menu return or restart restores your real state. No purchases, rewards or achievements."
+"UI_136","Adultos: los tuyos y 2 padres prestados. Potrillos reales siguen sin trabajar.
+Aspectos temporales: rasgos existentes, no nuevas adquisiciones ni catálogo final auditado.","Adults: your horses and 2 borrowed parents. Real foals still cannot work.
+Temporary appearances: existing traits, not new acquisitions or a final catalog."
+"UI_137","CABALLOS / COPIA TEMPORAL","HORSES / TEMPORARY COPY"
+"UI_138","SOMBREROS / COPIA TEMPORAL","HATS / TEMPORARY COPY"
+"UI_139","ASPECTO PRESTADO · atributos BASE (260 / 900 / 0,60 / 1,00)","BORROWED LOOK · BASE stats (260 / 900 / 0.60 / 1.00)"
+"UI_140","Ojos: ","Eyes: "
+"UI_141","Acabado normal","Normal finish"
+"UI_142","Acabado Galaxy","Galaxy finish"
+"UI_143","USAR ASPECTO TEMPORAL","USE TEMPORARY LOOK"
+"UI_144"," PRESTADA · %d px"," BORROWED · %d px"
+"UI_145","Todas las mejoras existentes activas. Candidatas visuales; materiales especiales y rareza final sin cerrar.","Existing upgrades active. Candidate looks; special materials and rarity are not final."
+"UI_146","Nivel %02d · ENSAYO","Level %02d · TRIAL"
+"UI_147","JUGAR ENSAYO","PLAY TRIAL"
+"UI_148","SALIR Y RESTAURAR ESTADO REAL","EXIT AND RESTORE REAL STATE"
+"UI_149","Seleccionado: ","Selected: "
+"UI_150"," · Equipo temporal: "," · Trial gear: "
+"UI_151","Negro","Black"
+"UI_152","Blanco","White"
+"UI_153","Dorado","Golden"
+"UI_154","Azul","Blue"
+"UI_155","Verde","Green"
+"UI_156","Rojo","Red"
+"UI_157","Violeta","Violet"
+"UI_158","Turquesa","Turquoise"
+"UI_159","Rosa","Pink"
+"UI_160","Naranja","Orange"
+"UI_161","Castaño","Brown"
+"UI_162","Gris","Gray"
+"UI_163","Crema","Cream"
+"UI_164","Cobre","Copper"
+"UI_165","Lima","Lime"
+"UI_166","Marino","Navy"
+"UI_167","Lavanda","Lavender"
+"UI_168","Coral","Coral"
+"UI_169","Celeste","Sky blue"
+"UI_170","Ciruela","Plum"
+"UI_171","Liso","Solid"
+"UI_172","Parches","Patches"
+"UI_173","Moteado","Spotted"
+"UI_174","Trasera blanca","White hindquarters"
+"UI_175","Patas claras","Light legs"
+"UI_176","Corazones","Hearts"
+"UI_177","Estrellas","Stars"
+"UI_178","Triángulos","Triangles"
+"UI_179","Rombos","Diamonds"
+"UI_180","Cebra","Zebra"
+"UI_181","Negra","Black"
+"UI_182","Blanca","White"
+"UI_183","Dorada","Golden"
+"UI_184","Roja","Red"
+"UI_185","Arcoíris","Rainbow"
+"","",""
+"Fusta básica","Fusta básica","Basic whip"
+"Fusta larga","Fusta larga","Long whip"
+"Original","Original","Original"
+"Azul noche","Azul noche","Night blue"
+"Arena","Arena","Sand"
+"Negro","Negro","Black"
+"Blanco","Blanco","White"
+"Dorado","Dorado","Golden"
+"Azul","Azul","Blue"
+"Verde","Verde","Green"
+"Rojo","Rojo","Red"
+"Violeta","Violeta","Violet"
+"Turquesa","Turquesa","Turquoise"
+"Rosa","Rosa","Pink"
+"Naranja","Naranja","Orange"
+"Castaño","Castaño","Brown"
+"Gris","Gris","Gray"
+"Crema","Crema","Cream"
+"Cobre","Cobre","Copper"
+"Lima","Lima","Lime"
+"Marino","Marino","Navy"
+"Lavanda","Lavanda","Lavender"
+"Coral","Coral","Coral"
+"Celeste","Celeste","Sky blue"
+"Ciruela","Ciruela","Plum"
+"Liso","Liso","Solid"
+"Parches","Parches","Patches"
+"Moteado","Moteado","Spotted"
+"Trasera blanca","Trasera blanca","White hindquarters"
+"Patas claras","Patas claras","Light legs"
+"Corazones","Corazones","Hearts"
+"Estrellas","Estrellas","Stars"
+"Triángulos","Triángulos","Triangles"
+"Rombos","Rombos","Diamonds"
+"Cebra","Cebra","Zebra"
+"Negra","Negra","Black"
+"Blanca","Blanca","White"
+"Dorada","Dorada","Golden"
+"Roja","Roja","Red"
+"Arcoíris","Arcoíris","Rainbow"
+"Fusta","Fusta","Whip"
+"Fusta mejorada","Fusta mejorada","Improved whip"
+"FICHA","FICHA","PROFILE"
+"META","META","GOAL"
+"TORO","TORO","BULL"
+"CIERRE ","CIERRE ","GATE "
+"AGUA","AGUA","WATER"
+"HENO","HENO","HAY"
+"Bebiendo...","Bebiendo...","Drinking..."
+"Comiendo...","Comiendo...","Eating..."
+"Prolongando","Prolongando","Extending"
+"Mantén para prolongar","Mantén para prolongar","Hold to extend"
+"MAPA · pausa · toca para cerrar","MAPA · pausa · toca para cerrar","MAP · paused · tap to close"
+"MAPA +","MAPA +","MAP +"
+"ENSAYO AISLADO · sin premios ni guardado · equipo prestado","ENSAYO AISLADO · sin premios ni guardado · equipo prestado","ISOLATED TRIAL · no rewards or saving · borrowed gear"
+"ENSAYO: regate y doble lazo activos, sin alterar progreso","ENSAYO: regate y doble lazo activos, sin alterar progreso","TRIAL: dodge and double lasso active, progress unchanged"
+"¡Se acabó el tiempo!","¡Se acabó el tiempo!","Time is up!"
+"Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar","Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar","No room: double-tap the lasso to release a bull before throwing"
+"Usar Tranquilizante","Usar Tranquilizante","Use tranquilizer"
