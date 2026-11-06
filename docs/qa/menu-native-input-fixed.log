@@ -1,0 +1,17 @@
+Godot Engine v4.7.dev1.official.bf95b6258 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 23.2.1-1ubuntu3.1~22.04.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 15.0.7, 256 bits)
+
+REAL_INPUT_START menu=res://src/Presentation/main_menu.tscn emulate_mouse=true
+PASS native EQUIPO
+PASS native VOLVER
+PASS native NIVELES
+ERROR: Condition "!is_inside_tree()" is true. Returning: false
+   at: can_process (scene/main/node.cpp:902)
+PASS native JUGAR and scene transition
+PASS native PAUSA
+PASS native CONTINUAR
+ABOUT_TO_TEST_SALIR_BY_NATIVE_TOUCH
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:2640)
