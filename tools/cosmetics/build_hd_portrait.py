@@ -95,6 +95,12 @@ for poly,cream_sat in [([(410,668),(478,668),(478,708),(405,708)],82), ([(537,66
 mask[:,:,0][((x>530)&(x<635)&(y>742))|((x>390)&(x<495)&(y>747))|((x>700)&(x<815)&(y>779))|((x>830)&(x<970)&(y>775))]=0
 mask[y>760]=0
 mask[a[:,:,3]<8]=0
+# Hand-painted overrides are traced on the untouched approved source.
+# They do not use hue expansion and keep gold/leather boundaries intact.
+import json
+paint=json.loads((R/'tools/cosmetics/hd_handpaint_regions.json').read_text())
+coat_paint=region(paint['coat_add'])
+mask[coat_paint]=[255,0,0]
 # Source contains extraction flecks beyond the figure. Fixed reviewed framing.
 bbox=(round(240*w/1313),0,round(1040*w/1313),round(840*h/875))
 alpha=im.getchannel('A').filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.45));im.putalpha(alpha)
