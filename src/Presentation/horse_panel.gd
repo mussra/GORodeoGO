@@ -185,7 +185,7 @@ func atlas_view()->void:
   var entry:Dictionary=entries[n];var h:Dictionary=entry.horse;var t:Dictionary=h.traits
   var x:float=35+(j%4)*305;var y:float=250+int(j/4)*160
   sprite(h,Vector2(x,y),90)
-  var title:=label(("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])),Vector2(x+92,y),18);title.size=Vector2(205,30);title.clip_text=true
+  var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat]))),Vector2(x+92,y),18);title.size=Vector2(205,30);title.clip_text=true
   label(tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]),Vector2(x+92,y+32),16)
   var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(295,130);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
   label(tr(HorseCollection.RARITIES[HorseMarket.tier(h)]),Vector2(x+92,y+58),16)
