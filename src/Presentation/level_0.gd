@@ -50,6 +50,7 @@ var _link_overlay: PenLinkOverlay
 var _pen_released: Array = []  # bool per pen index — a pen's bulls are released at most once
 
 func _ready() -> void:
+	JoystickAppearance.apply(self)
 	RanchMusic.set_paused(false)
 	RanchMusic.set_enabled(GameState.sound_enabled)
 	RanchMusic.play_context("gameplay")
