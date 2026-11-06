@@ -99,10 +99,17 @@ mask[a[:,:,3]<8]=0
 # They do not use hue expansion and keep gold/leather boundaries intact.
 import json
 paint=json.loads((R/'tools/cosmetics/hd_handpaint_regions.json').read_text())
-coat_paint=region(paint['coat_add'])
-mask[coat_paint]=[255,0,0]
-mask[region(paint.get('mane_add',[]))]=[0,255,0]
-mask[region(paint.get('source_restore',[]))]=[0,0,0]
+# Supersampled strokes preserve subpixel ownership at diagonal painted edges.
+def apply_paint(polys, material):
+ global mask
+ layer=Image.new('L',(w*4,h*4));draw=ImageDraw.Draw(layer)
+ for poly in polys:
+  draw.polygon([(round(px*w*4/1313),round(py*h*4/875)) for px,py in poly],fill=255)
+ weight=np.asarray(layer.resize((w,h),Image.Resampling.LANCZOS),dtype=float)[:,:,None]/255
+ mask=np.rint(mask*(1-weight)+np.array(material)*weight).astype('uint8')
+apply_paint(paint['coat_add'],[255,0,0])
+apply_paint(paint.get('mane_add',[]),[0,255,0])
+apply_paint(paint.get('source_restore',[]),[0,0,0])
 # Source contains extraction flecks beyond the figure. Fixed reviewed framing.
 bbox=(round(240*w/1313),0,round(1040*w/1313),round(840*h/875))
 alpha=im.getchannel('A').filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.45));im.putalpha(alpha)
