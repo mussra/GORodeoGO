@@ -19,6 +19,8 @@ func run()->void:
  await tap(menu._equipment_button);assert(menu._equipment_panel.visible);print("PASS native EQUIPO")
  await tap(find_button(menu._equipment_panel,"VOLVER"));assert(not menu._equipment_panel.visible);print("PASS native VOLVER")
  await tap(menu._missions);assert(menu._drawer.visible);print("PASS native NIVELES")
+ await create_timer(.5).timeout
+ root.get_texture().get_image().save_png("/downloads/menu-levels-stable.png")
  await tap(find_button(menu._drawer,"VOLVER"));assert(not menu._drawer.visible)
  await tap(menu._play);await create_timer(.5).timeout
  assert(current_scene.scene_file_path=="res://src/Presentation/level_0.tscn");print("PASS native JUGAR and scene transition")
