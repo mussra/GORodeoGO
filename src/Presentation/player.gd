@@ -458,6 +458,9 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 
 	lasso_thrown.emit(throw_origin, landing_point)
 	_flash_landing_area(landing_point)
+	# A second touch can begin before first flight lands. Keep held aim usable.
+	if _touch_aim_active and not _is_charging and _has_free_lasso_slot() and _stun_time_remaining<=0:
+		_start_charging()
 
 func cancel_all_actions() -> void:
 	cancel_input()
