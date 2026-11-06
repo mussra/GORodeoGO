@@ -9,6 +9,7 @@ var _equipment_button:Button
 var _equipment_panel:EquipmentPanel
 var _missions: Button
 var _caption: Label
+var _equipment_caption: Label
 var _hd_rider: Sprite2D
 var _rider: AnimatedSprite2D
 var _bull: AnimatedSprite2D
@@ -130,6 +131,10 @@ func _build_menu() -> void:
 	_hd_rider.position = Vector2(0,0)
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
+	_equipment_caption = _label("",16,Color("9cbcc0"))
+	_equipment_caption.position=Vector2(850,632)
+	add_child(_equipment_caption)
+	_refresh_points_caption()
 	var bull_host := Node2D.new()
 	_hero.add_child(bull_host)
 	var b := Polygon2D.new()
@@ -247,6 +252,9 @@ func _notification(what: int) -> void:
 		else: _on_quit_pressed()
 
 func _refresh_points_caption()->void:
+	if is_instance_valid(_equipment_caption):
+		var id:String=SaveData.equipment_equipped.get("whip","")
+		_equipment_caption.text="EQUIPO: "+(str(EquipmentCatalog.ITEMS[id].name) if EquipmentCatalog.ITEMS.has(id) else "Sin fusta")
 	if is_instance_valid(_hd_rider):HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
 	_caption.text="%02d / 20 COMPLETADOS · %d PUNTOS\nEquipo y recompensas en prueba" % [SaveData.highest_level_completed,SaveData.equipment_points]
 

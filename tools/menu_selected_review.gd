@@ -5,10 +5,11 @@ func run()->void:
  save.save_path="user://qa_menu_selected.dat";save.horse_collection=HorseCollection.new();save.horse_collection.seed_trial();save.horse_collection.add_trial_parents();save.select_horse("trial_b");save.select_hat("blue")
  root.get_node("GameState").brand_intro_played=true
  var menu:Control=load("res://src/Presentation/main_menu.tscn").instantiate();root.add_child(menu)
- for i in range(10):await process_frame
+ await create_timer(1.2).timeout
  menu._hero.modulate.a=1
  await RenderingServer.frame_post_draw
  root.get_texture().get_image().save_png("/downloads/menu-selected39.png")
+ print("HDTRANS ",menu._hd_rider.global_transform," TEX ",menu._hd_rider.texture.get_size())
  var m:ShaderMaterial=menu._hd_rider.material
  assert(m.get_shader_parameter("rainbow")==true)
  save.select_horse("trial_a");menu._refresh_points_caption();assert(menu._hd_rider.material.get_shader_parameter("rainbow")==false)
