@@ -11,4 +11,10 @@ for x,y in [(810,371),(620,586),(860,240),(870,270)]:
  assert pixel(x,y)[0]>240,(x,y,pixel(x,y));checks+=1
 for x,y in [(640,80),(740,100),(600,120)]:
  assert pixel(x,y)[2]>240,(x,y,pixel(x,y));checks+=1
+for x,y in [(832,190),(840,198),(829,214),(889,211),(882,163),(901,165)]:
+ assert max(pixel(x,y))<10,(x,y,pixel(x,y));checks+=1
+for x,y in [(854,196),(884,182),(888,238),(902,303)]:
+ assert pixel(x,y)[0]>240,(x,y,pixel(x,y));checks+=1
+for x,y in [(1000,183),(994,202)]:
+ assert pixel(x,y)[1]>240,(x,y,pixel(x,y));checks+=1
 print(f'HD_PORTRAIT_MATERIAL_OWNERSHIP_PASS {checks} checks')

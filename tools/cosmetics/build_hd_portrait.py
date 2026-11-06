@@ -101,6 +101,8 @@ import json
 paint=json.loads((R/'tools/cosmetics/hd_handpaint_regions.json').read_text())
 coat_paint=region(paint['coat_add'])
 mask[coat_paint]=[255,0,0]
+mask[region(paint.get('mane_add',[]))]=[0,255,0]
+mask[region(paint.get('source_restore',[]))]=[0,0,0]
 # Source contains extraction flecks beyond the figure. Fixed reviewed framing.
 bbox=(round(240*w/1313),0,round(1040*w/1313),round(840*h/875))
 alpha=im.getchannel('A').filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.45));im.putalpha(alpha)
