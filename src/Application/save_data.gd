@@ -174,7 +174,7 @@ func equipped_whip_reach()->float:
 	if not equipment_owned.has(item_id) or not EquipmentCatalog.ITEMS.has(item_id):return 0.0
 	return float(EquipmentCatalog.ITEMS[item_id].get("reach",0.0))
 
-func record_victory(level_number:int)->int:
+func record_victory(level_number:int,training_session:Dictionary={})->int:
 	if trial_session_active:return 0 # no temporary victory becomes an acquisition
 	if level_number<1 or level_number>LevelCatalog.MAX_LEVEL:return 0
 	if not apply_legacy_points_credit(EquipmentCatalog.REWARDS):return 0
@@ -186,6 +186,7 @@ func record_victory(level_number:int)->int:
 	highest_level_completed=maxi(highest_level_completed,level_number)
 	equipment_points+=reward
 	horse_collection.birth_credits+=1
+	HorseTraining.complete(horse_collection,training_session)
 	if save_progress():return reward
 	horse_collection.restore(before_horses)
 	highest_level_completed=before_highest
@@ -310,3 +311,13 @@ func sell_market_horse(id:String)->bool:
 	equipment_points+=price
 	if save_progress():return true
 	horse_collection.restore(before);equipment_points=points;return false
+
+func set_training_pair(mentor:String,learner:String,skill:String)->bool:
+	var before:Dictionary=horse_collection.export_state()
+	if not HorseTraining.configure(horse_collection,mentor,learner,skill):return false
+	if save_progress():return true
+	horse_collection.restore(before);return false
+func clear_training_pair()->bool:
+	var before:Dictionary=horse_collection.training_pair.duplicate(true);horse_collection.training_pair={}
+	if save_progress():return true
+	horse_collection.training_pair=before;return false

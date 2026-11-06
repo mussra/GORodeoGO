@@ -301,10 +301,6 @@ func _on_dual_lasso_accept_pressed() -> void:
 	dual_lasso_intro_accepted.emit()
 
 ## HUD keeps processing while paused; the level intentionally does not.
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and not event.is_echo():
-		pause_toggle_requested.emit()
-		get_viewport().set_input_as_handled()
 
 ## Transient override for update_guidance (which refreshes every frame): a blocked lasso
 ## throw explains itself here instead of failing silently.

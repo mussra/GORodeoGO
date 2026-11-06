@@ -29,6 +29,8 @@ var _jump_from:Vector2
 var _jump_sprite_base:Vector2
 var _jump_cooldown:float=0.0
 
+var dodge_recharge_seconds:float=2.5
+var jump_recovery_multiplier:float=1.0
 const DODGE_RECHARGE_SECONDS: float = 2.5  # provisional feel setting, preview before APK
 var _dodge_cooldown: float = 0.0
 
@@ -225,7 +227,7 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 	_trail_fade = .7
 	for i in range(1, preview.size()):
 		_dodge_path.append(global_position + preview[i])
-	_dodge_cooldown = DODGE_RECHARGE_SECONDS
+	_dodge_cooldown = dodge_recharge_seconds
 	_dodge_remaining = 1.0
 	dodge_started.emit()
 	return true
@@ -235,7 +237,7 @@ func request_dodge(direction: Vector2) -> bool:
 		return false
 	_dodge_direction = direction.normalized()
 	_dodge_remaining = DODGE_SECONDS
-	_dodge_cooldown = DODGE_RECHARGE_SECONDS
+	_dodge_cooldown = dodge_recharge_seconds
 	return true
 
 func _on_aim_pressed() -> void:
@@ -566,7 +568,7 @@ func _draw() -> void:
 	if _drawing_dodge and _draw_points.size() > 1:
 		_draw_flash_path(dodge_preview_points(_draw_points), 1.0)
 		draw_string(ThemeDB.fallback_font,Vector2(-64,-78),"TIEMPO BALA",HORIZONTAL_ALIGNMENT_LEFT,150,15,Color("a7fff0"))
-	var recharge: float = 1.0 - _dodge_cooldown / DODGE_RECHARGE_SECONDS
+	var recharge: float = 1.0 - _dodge_cooldown / dodge_recharge_seconds
 	if dodge_available: draw_line(_overhead_bar_anchor()+Vector2(-22,0), _overhead_bar_anchor()+Vector2(22,0), Color("263747"), 5.0)
 	if dodge_available: draw_line(_overhead_bar_anchor()+Vector2(-22,0), _overhead_bar_anchor()+Vector2(-22+44*recharge,0), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
 	if _dodge_remaining > 0.0:
@@ -638,7 +640,7 @@ func request_jump(direction:Vector2)->bool:
 	for i in range(1,9):
 		query.transform=Transform2D(0,global_position.lerp(landing,float(i)/8))
 		if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return false
-	_jump_direction=direction.normalized();_jump_from=global_position;_jump_time=HorseJump.DURATION;_jump_mask=collision_mask;collision_mask&=~32;_jump_cooldown=1.2
+	_jump_direction=direction.normalized();_jump_from=global_position;_jump_time=HorseJump.DURATION;_jump_mask=collision_mask;collision_mask&=~32;_jump_cooldown=1.2*jump_recovery_multiplier
 	cancel_input();_jump_time=HorseJump.DURATION
 	if _sprite_swap.has_sprite():_jump_sprite_base=_sprite_swap._sprite.position
 	jump_started.emit();return true

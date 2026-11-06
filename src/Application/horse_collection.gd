@@ -11,6 +11,8 @@ var horses:Array[Dictionary]=[]
 var ancestors:Array[Dictionary]=[]
 var selected:String="original"
 var next_id:int=1
+var training_pair:Dictionary={}
+var affinities:Dictionary={}
 var birth_credits:int=0
 var bought_offers:Array[String]=[]
 func seed_trial()->void:
@@ -57,11 +59,12 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
  if t.is_empty():return {}
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
- child["can_jump"]=HorseJump.capable(find(a)) or HorseJump.capable(find(b));child.name=suggest_name(t);next_id+=1;horses.append(child);return child
+ child["can_jump"]=false;child["can_dodge"]=false;child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
- return {"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
+ return {"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
  if not v is Dictionary or not v.get("horses") is Array:return false
+ if not v.get("training_pair",{}) is Dictionary or not v.get("affinities",{}) is Dictionary:return false
  var offers_state:Variant=v.get("bought_offers",[])
  if not offers_state is Array:return false
  for offer in offers_state:
@@ -106,6 +109,7 @@ func restore(v:Variant)->bool:
  for offer in offers:
   if not offer is String:return false
   bought_offers.append(offer)
+ training_pair=v.get("training_pair",{}).duplicate(true);affinities=v.get("affinities",{}).duplicate(true)
  birth_credits=maxi(0,int(v.get("birth_credits",0)))
  next_id=maxi(int(v.get("next_id",1)),1)
  while ids.has("child_%d"%next_id):next_id+=1

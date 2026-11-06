@@ -31,6 +31,8 @@ var _tranquilizer_available: bool = false
 var _level_number: int = 1
 var _max_simultaneous_captures: int = 1
 var _obstacle_rects: Array = []
+var _training_session:Dictionary={}
+var _training_companion:Node2D
 var _win_requires_all_bulls: bool = true
 var _chaser_director: ChaserDirector = ChaserDirector.new(CHASER_ENGAGE_DELAY_SECONDS)
 var _chaser_index: int = ChaserDirector.NO_CHASER
@@ -334,7 +336,12 @@ func _release_pen_bulls(pen_index: int) -> void:
 func _apply_unlocked_upgrades() -> void:
 	var reach:float=SaveData.equipped_whip_reach()
 	if GameState.debug_cheats_active():reach=maxf(reach,260.0)
-	player.dodge_available=reach>0
+	var trained_horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
+	player.dodge_available=reach>0 and HorseTraining.knows(trained_horse,"dodge")
+	player.dodge_recharge_seconds=2.5*HorseTraining.recovery(trained_horse,"dodge")
+	player.jump_recovery_multiplier=HorseTraining.recovery(trained_horse,"jump")
+	_training_session=HorseTraining.session(SaveData.horse_collection)
+	if not _training_session.is_empty():_show_training_companion()
 	player.dodge_path_limit=reach if reach>0 else 260.0
 	var horse_stats:Dictionary=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected))
 	player.max_speed=horse_stats.speed
@@ -532,7 +539,7 @@ func _trigger_win() -> void:
 		return
 	_game_over = true
 	_freeze_gameplay()
-	var reward:int=SaveData.record_victory(_level_number)
+	var reward:int=SaveData.record_victory(_level_number,_training_session)
 	hud.show_win()
 	hud.end_label.text += "\nENSAYO AISLADO: sin premios ni progreso guardado" if SaveData.trial_session_active else "\n+%d puntos · Saldo: %d\nEquipo y precios en prueba" % [reward,SaveData.equipment_points]
 	_audio.play("win")
@@ -588,11 +595,7 @@ func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_WM_WINDOW_FOCUS_OUT:
 			pause_game()
-		NOTIFICATION_WM_GO_BACK_REQUEST:
-			if _paused_by_user_or_os:
-				resume_game()
-			else:
-				pause_game()
+
 
 func pause_game() -> void:
 	if _game_over or _paused_by_user_or_os or _intro_overlay_active:
@@ -704,3 +707,18 @@ func _spawn_jump_fences()->void:
 	var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
 	player.can_jump=HorseJump.capable(horse)
 	for bull in all_bulls:bull.collision_mask|=32
+
+func _show_training_companion()->void:
+	var other:String=_training_session.learner if SaveData.horse_collection.selected==_training_session.mentor else _training_session.mentor
+	var h:Dictionary=SaveData.horse_collection.find(other)
+	# Partner is a support card, not a second collidable rider or a ghost over fences.
+	var card:=Panel.new();card.position=Vector2(22,100);card.size=Vector2(215,100);card.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("77dbd5"),8));hud.add_child(card)
+	var portrait:=TextureRect.new();portrait.position=Vector2(4,3);portrait.size=Vector2(78,90);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;HorsePortrait.apply(portrait,h.traits,SaveData.hat_color);card.add_child(portrait)
+	var caption:=Label.new();caption.text=tr("TRAIN_COMPANION")%h.name;caption.position=Vector2(84,20);caption.size=Vector2(125,65);caption.custom_minimum_size=Vector2.ZERO;caption.clip_text=true;caption.autowrap_mode=TextServer.AUTOWRAP_ARBITRARY;caption.add_theme_font_size_override("font_size",16);card.add_child(caption)
+	var cue:=Label.new();cue.text=tr("TRAIN_MISSION")%[SaveData.horse_collection.find(_training_session.mentor).name,SaveData.horse_collection.find(_training_session.learner).name];cue.position=Vector2(25,72);cue.add_theme_font_size_override("font_size",18);hud.add_child(cue)
+
+func navigate_back()->void:
+	if _game_over:
+		hud.quit_requested.emit()
+	elif _paused_by_user_or_os:resume_game()
+	else:pause_game()

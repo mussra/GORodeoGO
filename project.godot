@@ -17,9 +17,11 @@ boot_splash/use_filter=true
 
 config/name="Rancho"
 config/icon="res://art/icon.png"
-config/version="2.5"
+config/version="2.6"
 run/main_scene="res://src/Presentation/main_menu.tscn"
 config/quit_on_go_back=false
+auto_accept_quit=false
+quit_on_go_back=false
 config/features=PackedStringArray("4.7")
 
 [autoload]

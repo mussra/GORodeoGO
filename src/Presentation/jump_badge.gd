@@ -1,16 +1,23 @@
 class_name JumpBadge
 extends Button
 var capable:bool=false
+var skill:String="jump"
 func _ready()->void:
  custom_minimum_size=Vector2(64,56);flat=true
  pressed.connect(show_explanation)
- tooltip_text=tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED")
+ tooltip_text=tr("DODGE_CAPABLE" if capable else "DODGE_GROUNDED") if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"))
  queue_redraw()
 func show_explanation()->void:
- var explanation:=AcceptDialog.new();explanation.title=tr("JUMP_BADGE_TITLE");explanation.dialog_text=tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED");explanation.min_size=Vector2i(460,120);add_child(explanation);explanation.confirmed.connect(explanation.queue_free);explanation.canceled.connect(explanation.queue_free);explanation.popup_centered()
+ var explanation:=AcceptDialog.new();explanation.title=tr("JUMP_BADGE_TITLE");explanation.dialog_text=(tr("DODGE_CAPABLE") if capable else tr("DODGE_GROUNDED")) if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"));explanation.min_size=Vector2i(460,120);add_child(explanation);explanation.confirmed.connect(explanation.queue_free);explanation.canceled.connect(explanation.queue_free);explanation.popup_centered()
 func _draw()->void:
  var ink:Color=Color("f4cf67") if capable else Color("c8d3d5")
  draw_style_box(RanchTheme.box(Color("10252d"),ink,8),Rect2(0,0,64,56))
+ if skill=="dodge":
+  draw_polyline(PackedVector2Array([Vector2(12,14),Vector2(44,14),Vector2(18,39),Vector2(49,39)]),ink,4,true)
+  draw_polyline(PackedVector2Array([Vector2(42,32),Vector2(50,39),Vector2(42,46)]),ink,3,true)
+  if not capable:
+   draw_line(Vector2(15,10),Vector2(49,47),Color("e9a59b"),4,true)
+  return
  # Fence with two posts and rails, horse silhouette above it.
  for x in [15,49]:draw_line(Vector2(x,32),Vector2(x,45),ink,3,true)
  for y in [35,41]:draw_line(Vector2(13,y),Vector2(51,y),ink,2,true)

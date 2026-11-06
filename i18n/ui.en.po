@@ -900,3 +900,69 @@ msgstr "Offers sold out. Reach the next level to see six new offers."
 
 msgid "BIRTH_NEED_WIN"
 msgstr "Win a level to earn one birth."
+
+msgid "TRAIN_TITLE"
+msgstr "Training"
+
+msgid "TRAIN_JUMP"
+msgstr "Skill: jumping"
+
+msgid "TRAIN_DODGE"
+msgstr "Skill: dodge"
+
+msgid "TRAIN_MENTOR"
+msgstr "Mentor who knows the skill"
+
+msgid "TRAIN_LEARNER"
+msgstr "Learner / partner"
+
+msgid "TRAIN_STATUS"
+msgstr "Mentor: %s · Mastery %.0f/100\nLearner: %s · Learning %.0f/100\nPair affinity: %.0f/100"
+
+msgid "TRAIN_KNOWN"
+msgstr "Both know the skill: practice improves mastery without making their stats equal."
+
+msgid "TRAIN_STUDY"
+msgstr "The learner unlocks the skill at 100. The mentor keeps theirs."
+
+msgid "TRAIN_START"
+msgstr "Save pair"
+
+msgid "TRAIN_STOP"
+msgstr "Clear pair"
+
+msgid "TRAIN_SAVED"
+msgstr "Pair saved. Ride one of them and win a mission."
+
+msgid "TRAIN_STOPPED"
+msgstr "Pair cleared. Progress kept."
+
+msgid "TRAIN_ACTIVE"
+msgstr "Active pair: %s + %s"
+
+msgid "TRAIN_NONE"
+msgstr "No active pair."
+
+msgid "TRAIN_RULES"
+msgstr "Wins with the pair earn learning, mastery and affinity. No decay while away.\nMastery: up to 20% less cooldown, no animation or base-stat changes. Dodge needs a whip."
+
+msgid "TRAIN_COMPANION"
+msgstr "Training: %s"
+
+msgid "TRAIN_MISSION"
+msgstr "Training: %s + %s · Win to progress"
+
+msgid "BACK_EXIT_TITLE"
+msgstr "Exit game"
+
+msgid "BACK_EXIT_BODY"
+msgstr "Exit now? Saved progress is kept."
+
+msgid "DODGE_CAPABLE"
+msgstr "Dodge learned. Needs an equipped whip."
+
+msgid "DODGE_GROUNDED"
+msgstr "Dodge not learned. Train with a mentor who knows it."
+
+msgid "TRAIN_PICK_VALID"
+msgstr "Choose two different adults and a mentor who knows the skill."

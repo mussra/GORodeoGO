@@ -42,6 +42,3 @@ func refresh()->void:
  if note!=null:note.text=tr("UI_149")+SaveData.horse_collection.find(SaveData.horse_collection.selected).name+tr("UI_150")+tr(EquipmentCatalog.ITEMS.get(SaveData.equipment_equipped.get("whip",""),{}).get("name","UI_058"))
 
 func _process(_delta:float)->void:refresh()
-func _notification(what:int)->void:
- if what==NOTIFICATION_WM_GO_BACK_REQUEST:
-  get_tree().reload_current_scene()

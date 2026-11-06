@@ -900,3 +900,69 @@ msgstr "Ofertas agotadas. Alcanza el siguiente nivel para ver seis nuevas."
 
 msgid "BIRTH_NEED_WIN"
 msgstr "Gana una partida para conseguir un nacimiento."
+
+msgid "TRAIN_TITLE"
+msgstr "Entrenamiento"
+
+msgid "TRAIN_JUMP"
+msgstr "Técnica: salto"
+
+msgid "TRAIN_DODGE"
+msgstr "Técnica: regate"
+
+msgid "TRAIN_MENTOR"
+msgstr "Mentor con la habilidad"
+
+msgid "TRAIN_LEARNER"
+msgstr "Aprendiz / compañero"
+
+msgid "TRAIN_STATUS"
+msgstr "Mentor: %s · Dominio %.0f/100\nAprendiz: %s · Aprendizaje %.0f/100\nAfinidad de pareja: %.0f/100"
+
+msgid "TRAIN_KNOWN"
+msgstr "Ambos conocen la técnica: practicar mejora dominio sin igualar sus rasgos."
+
+msgid "TRAIN_STUDY"
+msgstr "El aprendiz desbloquea la técnica al llegar a 100. El mentor conserva la suya."
+
+msgid "TRAIN_START"
+msgstr "Guardar pareja"
+
+msgid "TRAIN_STOP"
+msgstr "Quitar pareja"
+
+msgid "TRAIN_SAVED"
+msgstr "Pareja guardada. Monta uno de ellos y gana una misión."
+
+msgid "TRAIN_STOPPED"
+msgstr "Pareja quitada. Avances conservados."
+
+msgid "TRAIN_ACTIVE"
+msgstr "Pareja activa: %s + %s"
+
+msgid "TRAIN_NONE"
+msgstr "Sin pareja activa."
+
+msgid "TRAIN_RULES"
+msgstr "Victorias con la pareja: aprendizaje, dominio y afinidad. Sin pérdida por ausencia.\nDominio: hasta 20% menos recuperación, sin cambiar animación ni stats base. Regate requiere fusta."
+
+msgid "TRAIN_COMPANION"
+msgstr "Entrena: %s"
+
+msgid "TRAIN_MISSION"
+msgstr "Entrenamiento: %s + %s · Gana para progresar"
+
+msgid "BACK_EXIT_TITLE"
+msgstr "Salir del juego"
+
+msgid "BACK_EXIT_BODY"
+msgstr "¿Quieres salir? La partida guardada se conserva."
+
+msgid "DODGE_CAPABLE"
+msgstr "Regate aprendido. Necesita una fusta equipada."
+
+msgid "DODGE_GROUNDED"
+msgstr "Regate no aprendido. Entrena con un mentor que lo conozca."
+
+msgid "TRAIN_PICK_VALID"
+msgstr "Elige dos adultos distintos y un mentor que conozca la técnica."

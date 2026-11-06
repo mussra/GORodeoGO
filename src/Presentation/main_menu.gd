@@ -12,6 +12,7 @@ var _missions: Button
 var _caption: Label
 var _equipment_caption: Label
 var _jump_badge:JumpBadge
+var _dodge_badge:JumpBadge
 var _hd_rider: Sprite2D
 var _rider: AnimatedSprite2D
 var _bull: AnimatedSprite2D
@@ -138,7 +139,8 @@ func _build_menu() -> void:
 	_hd_rider.position = Vector2(0,0)
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
-	_jump_badge=JumpBadge.new();_jump_badge.position=Vector2(1145,525);_jump_badge.size=Vector2(64,56);_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));add_child(_jump_badge)
+	_jump_badge=JumpBadge.new();_jump_badge.position=Vector2(1070,525);_jump_badge.size=Vector2(64,56);_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));add_child(_jump_badge)
+	_dodge_badge=JumpBadge.new();_dodge_badge.skill="dodge";_dodge_badge.position=Vector2(1145,525);_dodge_badge.size=Vector2(64,56);_dodge_badge.capable=HorseTraining.knows(SaveData.horse_collection.find(SaveData.horse_collection.selected),"dodge");add_child(_dodge_badge)
 	_equipment_caption = _label("",16,Color("9cbcc0"))
 	_equipment_caption.position=Vector2(850,600)
 	add_child(_equipment_caption)
@@ -253,13 +255,14 @@ func _on_level_selected(number: int) -> void:
 	_transitioning = true
 	GameState.selected_level = number
 	get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn")
-func _on_quit_pressed() -> void: get_tree().quit()
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if is_instance_valid(_drawer) and _drawer.visible: _hide_levels()
-		else: _on_quit_pressed()
+func _on_quit_pressed()->void:GameState.confirm_exit()
+func navigate_back()->void:
+	if is_instance_valid(_drawer) and _drawer.visible:_hide_levels()
+	else:GameState.confirm_exit()
 
 func _refresh_points_caption()->void:
+	if is_instance_valid(_dodge_badge):
+		_dodge_badge.capable=HorseTraining.knows(SaveData.horse_collection.find(SaveData.horse_collection.selected),"dodge");_dodge_badge.queue_redraw()
 	if is_instance_valid(_jump_badge):
 		_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));_jump_badge.queue_redraw()
 	if is_instance_valid(_equipment_caption):
@@ -273,7 +276,7 @@ func _show_equipment()->void:
 	_equipment_panel.show()
 
 func _show_settings()->void:
-	var panel:=Control.new();panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
+	var panel:=Control.new();panel.set_meta("back_closes",true);panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
 	var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.add_child(bg)
 	var box:=VBoxContainer.new();box.position=Vector2(60,70);box.size=Vector2(540,330);box.add_theme_constant_override("separation",24);panel.add_child(box)
 	var title:=Label.new();title.text=tr("UI_035");title.add_theme_font_size_override("font_size",30);box.add_child(title)
