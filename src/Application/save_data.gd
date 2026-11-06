@@ -6,8 +6,11 @@ extends Node
 ## Persisted data is validated on load (LevelProgression.sanitize_highest_completed) and
 ## written atomically (temp file + rename) so an interrupted write cannot corrupt the save.
 
-const SAVE_PATH: String = "user://save.dat"
-const SAVE_VERSION: int = 2  ## bump when the file layout changes, to allow migrations
+# Separate candidate storage preserves the 2.0 save byte-for-byte for rollback.
+# First launch reads 2.0 only when the new file does not yet exist.
+const LEGACY_2_SAVE_PATH: String = "user://save.dat"
+const SAVE_PATH: String = "user://save-genetics-v3.dat"
+const SAVE_VERSION: int = 3  ## bump when the file layout changes, to allow migrations
 
 var horse_collection:HorseCollection = HorseCollection.new()
 var hat_color: String = "original"
@@ -65,6 +68,10 @@ func save_progress() -> bool:
 		return false
 	return true
 
+static func load_source_path(current:String,legacy:String)->String:
+	# An unreadable new save must not silently fall back to stale progress.
+	return current if FileAccess.file_exists(current) else legacy
+
 func load_progress() -> void:
 	if trial_session_active:end_trial_session()
 	horse_collection=HorseCollection.new()
@@ -75,7 +82,8 @@ func load_progress() -> void:
 	equipment_equipped.clear()
 	points_legacy_credit_applied = false
 	var config := ConfigFile.new()
-	var err: Error = config.load(save_path)
+	var source_path:String=load_source_path(save_path,LEGACY_2_SAVE_PATH) if save_path==SAVE_PATH else save_path
+	var err: Error = config.load(source_path)
 	if err != OK:
 		dual_lasso_intro_shown = false
 		highest_level_completed = 0  # first run (no file) or unreadable file

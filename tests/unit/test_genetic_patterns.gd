@@ -82,3 +82,25 @@ func test_special_trial_selection_restores_real_collection()->void:
  assert_eq(t.eyes,21);assert_eq(t.pattern,9);assert_eq(t.finish,"galaxy")
  SaveData.end_trial_session()
  assert_eq(SaveData.horse_collection.export_state(),before)
+
+func test_genetics_save_namespace_preserves_2_0_rollback()->void:
+ var legacy:String="user://genetics_test_legacy.dat"
+ var current:String="user://genetics_test_current.dat"
+ for path in [legacy,current]:
+  if FileAccess.file_exists(path):DirAccess.remove_absolute(path)
+ var source:=ConfigFile.new();source.set_value("meta","version",2)
+ var old:=HorseCollection.new();old.seed_trial();source.set_value("horses_trial","state",old.export_state());source.set_value("progress","highest_level_completed",3)
+ assert_eq(source.save(legacy),OK)
+ var bytes:PackedByteArray=FileAccess.get_file_as_bytes(legacy)
+ var state=load("res://src/Application/save_data.gd").new()
+ assert_ne(state.SAVE_PATH,state.LEGACY_2_SAVE_PATH)
+ assert_eq(state.load_source_path(current,legacy),legacy)
+ state.save_path=legacy;state.load_progress();assert_eq(state.highest_level_completed,3)
+ state.save_path=current;state.horse_collection.find("original").traits.eyes=21;state.horse_collection.find("original").traits.pattern=9
+ assert_true(state.save_progress());assert_eq(FileAccess.get_file_as_bytes(legacy),bytes)
+ assert_eq(state.load_source_path(current,legacy),current)
+ state.load_progress();assert_eq(state.horse_collection.find("original").traits.eyes,21)
+ state.save_path=legacy;state.load_progress();assert_eq(HorseCollection.eye_index(state.horse_collection.find("original").traits),10)
+ assert_eq(FileAccess.get_file_as_bytes(legacy),bytes)
+ state.free()
+ for path in [legacy,current]:DirAccess.remove_absolute(path)
