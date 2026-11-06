@@ -37,6 +37,7 @@ func close_top_overlay(node:Node)->bool:
    if child.visible:child.hide();child.queue_free();return true
    continue
   if close_top_overlay(child):return true
+  if child is EmblemPanel:child.request_close();return true
   if child is TrainingPanel or child is GenealogyPanel:child.queue_free();return true
   if child is HorsePanel:
    if child.page!="collection":child.show_page("collection")

@@ -1,4 +1,6 @@
 shader_type canvas_item;
+uniform bool emblem_enabled=false;
+uniform sampler2D emblem_mask: filter_linear;
 uniform sampler2D eye_mask: filter_linear;
 uniform vec4 eye_color: source_color = vec4(.6,.3,.1,1);
 uniform bool custom_eyes = false;
@@ -81,5 +83,11 @@ void fragment(){
  }
  if(!original_hat)col=mix(col,hat_color.rgb*shade,m.b);
  if(custom_eyes){vec3 eye=eye_color.rgb;if(eye_style>=20)eye=special_eye(vec2((UV.x*936.-748.)/118.,(UV.y*983.-244.)/25.));col=mix(col,eye*clamp(max(src.r,max(src.g,src.b))/.65,.15,1.15),texture(eye_mask,UV).r);}
+ if(emblem_enabled){
+  vec2 step_uv=1./vec2(936.,983.);float ink=texture(emblem_mask,UV).a;float edge=ink;
+  for(int y=-1;y<=1;y++){for(int x=-1;x<=1;x++){edge=max(edge,texture(emblem_mask,UV+vec2(float(x),float(y))*step_uv).a);}}
+  vec3 sample_col=texture(TEXTURE,vec2(.29,.63)).rgb;float lum=original_horse?.25:dot(coat_color.rgb,vec3(.2126,.7152,.0722));vec3 fg=lum>.46?vec3(.125,.106,.11):vec3(1.,.95,.85);vec3 opposite=lum>.46?vec3(1.,.95,.85):vec3(.125,.106,.11);
+  col=mix(col,opposite,edge*.9);col=mix(col,fg,ink);
+ }
  COLOR=vec4(col,src.a);
 }

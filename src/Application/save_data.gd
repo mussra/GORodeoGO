@@ -321,3 +321,12 @@ func clear_training_pair()->bool:
 	var before:Dictionary=horse_collection.training_pair.duplicate(true);horse_collection.training_pair={}
 	if save_progress():return true
 	horse_collection.training_pair=before;return false
+
+func set_horse_emblem(id:String,config:Dictionary)->bool:
+	var horse:Dictionary=horse_collection.find(id)
+	if horse.is_empty() or (not config.is_empty() and not HorseEmblem.valid(config)):return false
+	var before:Dictionary=horse_collection.export_state()
+	if config.is_empty():horse.traits.erase("emblem")
+	else:horse.traits["emblem"]=config.duplicate(true)
+	if save_progress():return true
+	horse_collection.restore(before);return false

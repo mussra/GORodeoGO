@@ -45,6 +45,7 @@ func valid_traits(v:Variant)->bool:
  if not v is Dictionary:return false
  for k in ["coat","pattern","mane"]:
   if typeof(v.get(k))!=TYPE_INT:return false
+ if v.has("emblem") and not HorseEmblem.valid(v.emblem):return false
  if v.has("eyes") and (typeof(v.eyes)!=TYPE_INT or v.eyes<0 or v.eyes>=EYES.size()):return false
  return v.coat>=0 and v.coat<20 and v.pattern>=0 and v.pattern<PATTERNS.size() and v.mane>=0 and v.mane<6 and v.get("finish","normal") in ["normal","original","galaxy"]
 func preview(a:String,b:String,choices:Dictionary)->Dictionary:

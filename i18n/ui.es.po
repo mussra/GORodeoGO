@@ -966,3 +966,96 @@ msgstr "Regate no aprendido. Entrena con un mentor que lo conozca."
 
 msgid "TRAIN_PICK_VALID"
 msgstr "Elige dos adultos distintos y un mentor que conozca la técnica."
+
+msgid "EMBLEM_TITLE"
+msgstr "Escudo personalizado"
+
+msgid "EMBLEM_SHAPE"
+msgstr "Forma"
+
+msgid "EMBLEM_CLASSIC"
+msgstr "Clásico"
+
+msgid "EMBLEM_ROUND"
+msgstr "Redondo"
+
+msgid "EMBLEM_FLAT"
+msgstr "Recto"
+
+msgid "EMBLEM_DIVISION"
+msgstr "División"
+
+msgid "EMBLEM_SINGLE"
+msgstr "Sin dividir"
+
+msgid "EMBLEM_SPLIT"
+msgstr "Dos mitades"
+
+msgid "EMBLEM_DIAGONAL"
+msgstr "Banda diagonal"
+
+msgid "EMBLEM_SYMBOL_A"
+msgstr "Símbolo / primera zona"
+
+msgid "EMBLEM_SYMBOL_B"
+msgstr "Símbolo / segunda zona"
+
+msgid "EMBLEM_SUN"
+msgstr "Sol"
+
+msgid "EMBLEM_SIERRA"
+msgstr "Sierra"
+
+msgid "EMBLEM_DIAMOND"
+msgstr "Rombo"
+
+msgid "EMBLEM_CROSS"
+msgstr "Cruz"
+
+msgid "EMBLEM_WAVE"
+msgstr "Onda"
+
+msgid "EMBLEM_COLOR"
+msgstr "Color de ficha"
+
+msgid "EMBLEM_TEAL"
+msgstr "Verde"
+
+msgid "EMBLEM_COPPER"
+msgstr "Cobre"
+
+msgid "EMBLEM_BLUE"
+msgstr "Azul"
+
+msgid "EMBLEM_LILAC"
+msgstr "Lila"
+
+msgid "EMBLEM_GOLD"
+msgstr "Oro"
+
+msgid "EMBLEM_CONTRAST"
+msgstr "La tinta contrasta con el pelaje; el color identifica la ficha."
+
+msgid "EMBLEM_COSMETIC"
+msgstr "Personalizar no cambia rareza, precio ni ascendencia."
+
+msgid "EMBLEM_SAVE"
+msgstr "Guardar escudo"
+
+msgid "EMBLEM_REMOVE"
+msgstr "Quitar escudo"
+
+msgid "EMBLEM_REMOVE_ASK"
+msgstr "¿Quitar la marca de este caballo? No cambia su ascendencia."
+
+msgid "EMBLEM_SAVED"
+msgstr "Escudo guardado."
+
+msgid "EMBLEM_DRAFT"
+msgstr "Vista previa. Guarda para aplicar a este caballo."
+
+msgid "EMBLEM_DISCARD"
+msgstr "Hay cambios sin guardar. ¿Salir y descartarlos?"
+
+msgid "EMBLEM_DISCARD_YES"
+msgstr "Descartar cambios"

@@ -320,3 +320,34 @@ DEBUG_USE_LOOK,USAR ASPECTO EN DEBUG,USE LOOK IN DEBUG
 DEBUG_PLAY,JUGAR EN DEBUG,PLAY IN DEBUG
 GEN_ALL_LINEAGES,Todos los linajes,All lineages
 GEN_ALL_ORIGINS,Todos los orígenes,All origins
+EMBLEM_TITLE,Escudo personalizado,Custom shield
+EMBLEM_SHAPE,Forma,Shape
+EMBLEM_CLASSIC,Clásico,Classic
+EMBLEM_ROUND,Redondo,Round
+EMBLEM_FLAT,Recto,Straight
+EMBLEM_DIVISION,División,Division
+EMBLEM_SINGLE,Sin dividir,Undivided
+EMBLEM_SPLIT,Dos mitades,Two halves
+EMBLEM_DIAGONAL,Banda diagonal,Diagonal band
+EMBLEM_SYMBOL_A,Símbolo / primera zona,Symbol / first area
+EMBLEM_SYMBOL_B,Símbolo / segunda zona,Symbol / second area
+EMBLEM_SUN,Sol,Sun
+EMBLEM_SIERRA,Sierra,Mountain
+EMBLEM_DIAMOND,Rombo,Diamond
+EMBLEM_CROSS,Cruz,Cross
+EMBLEM_WAVE,Onda,Wave
+EMBLEM_COLOR,Color de ficha,Card color
+EMBLEM_TEAL,Verde,Teal
+EMBLEM_COPPER,Cobre,Copper
+EMBLEM_BLUE,Azul,Blue
+EMBLEM_LILAC,Lila,Lilac
+EMBLEM_GOLD,Oro,Gold
+EMBLEM_CONTRAST,La tinta contrasta con el pelaje; el color identifica la ficha.,Ink contrasts with the coat; color identifies the card.
+EMBLEM_COSMETIC,"Personalizar no cambia rareza, precio ni ascendencia.","Customization does not change rarity, price or ancestry."
+EMBLEM_SAVE,Guardar escudo,Save shield
+EMBLEM_REMOVE,Quitar escudo,Remove shield
+EMBLEM_REMOVE_ASK,¿Quitar la marca de este caballo? No cambia su ascendencia.,Remove this horse's mark? Its ancestry stays the same.
+EMBLEM_SAVED,Escudo guardado.,Shield saved.
+EMBLEM_DRAFT,Vista previa. Guarda para aplicar a este caballo.,Preview. Save to apply to this horse.
+EMBLEM_DISCARD,Hay cambios sin guardar. ¿Salir y descartarlos?,Unsaved changes. Leave and discard them?
+EMBLEM_DISCARD_YES,Descartar cambios,Discard changes

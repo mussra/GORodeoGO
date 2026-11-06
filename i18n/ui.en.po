@@ -966,3 +966,96 @@ msgstr "Dodge not learned. Train with a mentor who knows it."
 
 msgid "TRAIN_PICK_VALID"
 msgstr "Choose two different adults and a mentor who knows the skill."
+
+msgid "EMBLEM_TITLE"
+msgstr "Custom shield"
+
+msgid "EMBLEM_SHAPE"
+msgstr "Shape"
+
+msgid "EMBLEM_CLASSIC"
+msgstr "Classic"
+
+msgid "EMBLEM_ROUND"
+msgstr "Round"
+
+msgid "EMBLEM_FLAT"
+msgstr "Straight"
+
+msgid "EMBLEM_DIVISION"
+msgstr "Division"
+
+msgid "EMBLEM_SINGLE"
+msgstr "Undivided"
+
+msgid "EMBLEM_SPLIT"
+msgstr "Two halves"
+
+msgid "EMBLEM_DIAGONAL"
+msgstr "Diagonal band"
+
+msgid "EMBLEM_SYMBOL_A"
+msgstr "Symbol / first area"
+
+msgid "EMBLEM_SYMBOL_B"
+msgstr "Symbol / second area"
+
+msgid "EMBLEM_SUN"
+msgstr "Sun"
+
+msgid "EMBLEM_SIERRA"
+msgstr "Mountain"
+
+msgid "EMBLEM_DIAMOND"
+msgstr "Diamond"
+
+msgid "EMBLEM_CROSS"
+msgstr "Cross"
+
+msgid "EMBLEM_WAVE"
+msgstr "Wave"
+
+msgid "EMBLEM_COLOR"
+msgstr "Card color"
+
+msgid "EMBLEM_TEAL"
+msgstr "Teal"
+
+msgid "EMBLEM_COPPER"
+msgstr "Copper"
+
+msgid "EMBLEM_BLUE"
+msgstr "Blue"
+
+msgid "EMBLEM_LILAC"
+msgstr "Lilac"
+
+msgid "EMBLEM_GOLD"
+msgstr "Gold"
+
+msgid "EMBLEM_CONTRAST"
+msgstr "Ink contrasts with the coat; color identifies the card."
+
+msgid "EMBLEM_COSMETIC"
+msgstr "Customization does not change rarity, price or ancestry."
+
+msgid "EMBLEM_SAVE"
+msgstr "Save shield"
+
+msgid "EMBLEM_REMOVE"
+msgstr "Remove shield"
+
+msgid "EMBLEM_REMOVE_ASK"
+msgstr "Remove this horse's mark? Its ancestry stays the same."
+
+msgid "EMBLEM_SAVED"
+msgstr "Shield saved."
+
+msgid "EMBLEM_DRAFT"
+msgstr "Preview. Save to apply to this horse."
+
+msgid "EMBLEM_DISCARD"
+msgstr "Unsaved changes. Leave and discard them?"
+
+msgid "EMBLEM_DISCARD_YES"
+msgstr "Discard changes"

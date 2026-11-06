@@ -13,6 +13,8 @@ static func material_for(traits:Dictionary,hat:String="original")->ShaderMateria
  var mane:int=int(traits.get("mane",1));m.set_shader_parameter("mane_color",Color(HorseAppearance.MANES[mini(mane,4)]));m.set_shader_parameter("rainbow",mane==5)
  m.set_shader_parameter("pattern",int(traits.get("pattern",0)))
  m.set_shader_parameter("original_hat",hat=="original");m.set_shader_parameter("hat_color",Color("415c81") if hat=="blue" else Color("c8b994"))
+ if HorseEmblem.valid(traits.get("emblem")):
+  m.set_shader_parameter("emblem_enabled",true);m.set_shader_parameter("emblem_mask",HorseEmblem.portrait_mask(traits.emblem))
  return m
 static func apply(view:CanvasItem,traits:Dictionary,hat:String="original")->void:
  view.set("texture",ART);view.material=material_for(traits,hat);view.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR

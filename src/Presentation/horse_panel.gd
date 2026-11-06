@@ -71,6 +71,8 @@ func collection_view()->void:
   var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;row.add_child(l)
   var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
   var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");row.add_child(dodge_badge)
+  if HorseEmblem.valid(h.traits.get("emblem")):
+   var emblem:=TextureRect.new();emblem.texture=HorseEmblem.mask(h.traits.emblem);emblem.modulate=Color(HorseEmblem.COLORS[h.traits.emblem.color]);emblem.custom_minimum_size=Vector2(45,45);emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(emblem)
   var eq:=Button.new();eq.text=tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_059");eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
    message=(tr("UI_084") if SaveData.trial_session_active else tr("UI_085")) if SaveData.select_horse(h.id) else tr("UI_086");refresh())
   var fam:=Button.new();fam.text=tr("FICHA");row.add_child(fam);fam.pressed.connect(func():focus_id=h.id;show_page("detail"))
@@ -142,6 +144,8 @@ func detail_view()->void:
    message=tr("UI_112") if SaveData.select_horse(h.id) else tr("UI_086");refresh(),360)
   equip.disabled=SaveData.horse_collection.selected==h.id
  label(tr("UI_102")+tr(HorseCollection.COATS[h.traits.coat])+tr("UI_103")+tr(HorseCollection.PATTERNS[h.traits.pattern])+tr("UI_113")+tr(HorseCollection.MANES[h.traits.mane]),Vector2(420,220),24)
+ button(tr("EMBLEM_TITLE"),Vector2(420,450),func():
+  var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor),360).disabled=not SaveData.horse_collection.is_adult(h.id)
  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(1120,225);badge.size=Vector2(64,56);content.add_child(badge)
  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.position=Vector2(1120,290);dodge_badge.size=Vector2(64,56);content.add_child(dodge_badge)
  var st:Dictionary=HorseStats.read(h)
