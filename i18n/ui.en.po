@@ -737,3 +737,93 @@ msgstr "No room: double-tap the lasso to release a bull before throwing"
 
 msgid "Usar Tranquilizante"
 msgstr "Use tranquilizer"
+
+msgid "GEN_TITLE"
+msgstr "Family map"
+
+msgid "GEN_SEARCH"
+msgstr "Search name or ID"
+
+msgid "GEN_UNKNOWN"
+msgstr "Undocumented lineage"
+
+msgid "GEN_PURCHASED"
+msgstr "Purchased"
+
+msgid "GEN_BRED"
+msgstr "Bred at the ranch"
+
+msgid "GEN_UNRECORDED"
+msgstr "Undocumented ancestors"
+
+msgid "GEN_HIGHLIGHT"
+msgstr "Highlight matches"
+
+msgid "GEN_ONLY"
+msgstr "Only matches"
+
+msgid "GEN_RESET_VIEW"
+msgstr "Reset view"
+
+msgid "GEN_HINT"
+msgstr "Drag to move · +/− or pinch to zoom · Tap a horse. Filters do not change your collection."
+
+msgid "GEN_COUNT"
+msgstr "%d / %d match"
+
+msgid "GEN_EMPTY"
+msgstr "No matches. Remove a filter or change the search."
+
+msgid "GEN_PARENTS"
+msgstr "Parents: "
+
+msgid "GEN_NO_INVENT"
+msgstr "Only recorded relationships are shown. Color does not determine breed."
+
+msgid "MODE_NORMAL"
+msgstr "NORMAL MODE · switch to Debug"
+
+msgid "MODE_DEBUG"
+msgstr "DEBUG MODE · switch to Normal"
+
+msgid "DEBUG_TOOLS"
+msgstr "DEBUG · free horses and levels"
+
+msgid "DEBUG_TITLE"
+msgstr "DEBUG · test save"
+
+msgid "DEBUG_SEPARATE"
+msgstr "Free horses and levels · separate from normal mode"
+
+msgid "DEBUG_KEEP"
+msgstr "Your Debug progress stays when returning to the menu or changing mode."
+
+msgid "DEBUG_RETURN"
+msgstr "Return to Debug menu · keep progress"
+
+msgid "DEBUG_GAMEPLAY"
+msgstr "DEBUG · assists active · separate progress"
+
+msgid "GEN_ROOT"
+msgstr "Root · parents unknown"
+
+msgid "DEBUG_HORSES"
+msgstr "HORSES · Debug save"
+
+msgid "DEBUG_HATS"
+msgstr "HATS · Debug save"
+
+msgid "DEBUG_APPEARANCE"
+msgstr "DEBUG LOOK · BASE stats"
+
+msgid "DEBUG_USE_LOOK"
+msgstr "USE LOOK IN DEBUG"
+
+msgid "DEBUG_PLAY"
+msgstr "PLAY IN DEBUG"
+
+msgid "GEN_ALL_LINEAGES"
+msgstr "All lineages"
+
+msgid "GEN_ALL_ORIGINS"
+msgstr "All origins"

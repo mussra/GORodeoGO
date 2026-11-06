@@ -12,6 +12,11 @@ const LEGACY_2_SAVE_PATH: String = "user://save.dat"
 const SAVE_PATH: String = "user://save-genetics-v3.dat"
 const SAVE_VERSION: int = 3  ## bump when the file layout changes, to allow migrations
 
+const NORMAL_SAVE_PATH:String="user://save-normal-v4.dat"
+const DEBUG_SAVE_PATH:String="user://save-debug-v4.dat"
+var debug_mode:bool=false
+var normal_mode_path:String=NORMAL_SAVE_PATH
+var debug_mode_path:String=DEBUG_SAVE_PATH
 var horse_collection:HorseCollection = HorseCollection.new()
 var hat_color: String = "original"
 var highest_level_completed: int = 0
@@ -25,7 +30,7 @@ var points_legacy_credit_applied: bool = false
 ## upgrade applies (entering a level with dual capture unlocked), never again after.
 var dual_lasso_intro_shown: bool = false
 # Overridden only by isolated persistence tests; production retains its original path.
-var save_path: String = SAVE_PATH
+var save_path: String = NORMAL_SAVE_PATH
 
 func _ready() -> void:
 	load_progress()
@@ -83,6 +88,7 @@ func load_progress() -> void:
 	points_legacy_credit_applied = false
 	var config := ConfigFile.new()
 	var source_path:String=load_source_path(save_path,LEGACY_2_SAVE_PATH) if save_path==SAVE_PATH else save_path
+	if save_path==NORMAL_SAVE_PATH and not FileAccess.file_exists(save_path):source_path=load_source_path(SAVE_PATH,LEGACY_2_SAVE_PATH)
 	var err: Error = config.load(source_path)
 	if err != OK:
 		dual_lasso_intro_shown = false
@@ -237,9 +243,9 @@ func end_trial_session()->void:
 	horse_collection=HorseCollection.new();horse_collection.restore(_trial_snapshot.horses)
 	_trial_snapshot.clear();trial_session_active=false
 func effective_progress()->int:
-	return LevelCatalog.MAX_LEVEL if trial_session_active else highest_level_completed
+	return LevelCatalog.MAX_LEVEL if trial_session_active or debug_mode else highest_level_completed
 func preview_trial_traits(coat:int,pattern:int,mane:int,eyes:int=10,finish:String="normal")->bool:
-	if not trial_session_active:return false
+	if not trial_session_active and not debug_mode:return false
 	var t:Dictionary={"coat":coat,"pattern":pattern,"mane":mane,"eyes":eyes,"finish":finish}
 	if not horse_collection.valid_traits(t):return false
 	var h:Dictionary=horse_collection.find("preview_temporary")
@@ -248,4 +254,26 @@ func preview_trial_traits(coat:int,pattern:int,mane:int,eyes:int=10,finish:Strin
 		horse_collection.horses.append(h)
 	else:h.traits=t
 	horse_collection.selected=h.id
-	return true
+	return save_progress()
+
+# Each mode owns a different file. Switching saves the departing mode first.
+func switch_mode(want_debug:bool)->bool:
+	if debug_mode==want_debug:return true
+	var target_path:String=debug_mode_path if want_debug else normal_mode_path
+	if FileAccess.file_exists(target_path):
+		var check:=ConfigFile.new()
+		if check.load(target_path)!=OK:return false
+		var verify:=HorseCollection.new()
+		if not verify.restore(check.get_value("horses_trial","state",{})):return false
+	if trial_session_active:end_trial_session()
+	if not save_progress():return false
+	var old_path:String=save_path
+	var old_debug:bool=debug_mode
+	debug_mode=want_debug
+	save_path=debug_mode_path if debug_mode else normal_mode_path
+	load_progress()
+	if debug_mode and horse_collection.horses.size()==1:
+		horse_collection.add_trial_parents()
+		equipment_owned.assign(EquipmentCatalog.ITEMS.keys());equipment_equipped={"whip":"whip_basic"}
+	if save_progress():return true
+	debug_mode=old_debug;save_path=old_path;load_progress();return false

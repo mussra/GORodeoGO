@@ -15,3 +15,5 @@ var brand_intro_played: bool = false
 # Test build only. Never persisted or applied by normal builds without explicit flag.
 func trial_tools_enabled()->bool:
  return bool(ProjectSettings.get_setting("rancho/trial_tools",false))
+func debug_cheats_active()->bool:
+ return trial_tools_enabled() and (SaveData.debug_mode or SaveData.trial_session_active)

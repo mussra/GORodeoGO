@@ -36,11 +36,15 @@ func _refresh()->void:
  button(tr("UI_073"),Vector2(30,75),func():show_page("collection"))
  button(tr("UI_074"),Vector2(275,75),func():show_page("breed"))
  button(tr("UI_075"),Vector2(520,75),func():show_page("atlas"))
- button(tr("UI_076"),Vector2(795,75),func():
-  if not SaveData.trial_session_active and not SaveData.begin_trial_session():
+ button(tr("GEN_TITLE"),Vector2(795,130),func():add_child(GenealogyPanel.new()),360)
+ var random_button:=button(tr("UI_076"),Vector2(795,75),func():
+  if not SaveData.debug_mode and not SaveData.trial_session_active and not SaveData.begin_trial_session():
    message=tr("UI_077");refresh();return
-  var added:Array[Dictionary]=SaveData.horse_collection.add_random_trial_pair();parent_b=added[0].id;page="collection";scroll_to_newest=true;message=tr("UI_078")%SaveData.horse_collection.horses.size();refresh(),360)
- label(tr("UI_079"),Vector2(30,138),20)
+  var before:Dictionary=SaveData.horse_collection.export_state();var added:Array[Dictionary]=SaveData.horse_collection.add_random_trial_pair();
+  if not SaveData.save_progress():SaveData.horse_collection.restore(before);message=tr("UI_086");refresh();return
+  parent_b=added[0].id;page="collection";scroll_to_newest=true;message=tr("UI_078")%SaveData.horse_collection.horses.size();refresh(),360)
+ random_button.visible=SaveData.debug_mode or SaveData.trial_session_active
+ var trial_note:=label(tr("UI_079"),Vector2(30,138),18);trial_note.size=Vector2(745,28);trial_note.clip_text=true
  match page:
   "collection":collection_view()
   "breed":breed_view()
@@ -106,17 +110,7 @@ func breed_view()->void:
    refresh(),390)
  else:label(tr("UI_095"),Vector2(440,500),24)
 func family_view()->void:
- var h:Dictionary=SaveData.horse_collection.find(focus_id)
- if h.is_empty():return
- label(tr("UI_096")+h.name,Vector2(40,185),26);sprite(h,Vector2(475,250),320)
- label(h.name+(tr("UI_083") if not SaveData.horse_collection.is_adult(h.id) else tr("UI_097")),Vector2(475,580),24)
- if h.parents.is_empty():label(tr("UI_098"),Vector2(40,560),22)
- else:
-  for i in range(2):
-   var p:Dictionary=SaveData.horse_collection.find(h.parents[i]);var x:float=300+i*450
-   sprite(p,Vector2(90 if i==0 else 1060,300),100)
-   button(p.name+tr("UI_099"),Vector2(35 if i==0 else 965,420),func():focus_id=p.id;refresh(),280)
-  label(tr("UI_100"),Vector2(420,615),18)
+ var graph:=GenealogyPanel.new();add_child(graph);graph.select(focus_id);page="collection"
 
 func detail_view()->void:
  var h:Dictionary=SaveData.horse_collection.find(focus_id)

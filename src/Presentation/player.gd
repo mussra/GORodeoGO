@@ -599,10 +599,4 @@ func _exit_tree() -> void:
 
 ## One projection shared by drawing and execution: never show unscaled reach.
 func dodge_preview_points(points: PackedVector2Array) -> PackedVector2Array:
-	var length: float=0.0
-	for i in range(1,points.size()): length+=points[i].distance_to(points[i-1])
-	if length<15.0: return PackedVector2Array()
-	var factor: float=minf(1.0,dodge_path_limit/length)
-	var result:=PackedVector2Array()
-	for p in points: result.append((p-points[0])*factor)
-	return result
+	return DodgeCurve.smooth(points,dodge_path_limit)

@@ -27,7 +27,7 @@ func _ready() -> void:
 	GameState.menu_scene = scene_file_path
 	theme = RanchTheme.create()
 	$Title.hide()
-	_next_level = mini(SaveData.highest_level_completed + 1, LevelCatalog.MAX_LEVEL)
+	_next_level = 1 if SaveData.debug_mode else mini(SaveData.highest_level_completed + 1, LevelCatalog.MAX_LEVEL)
 	_build_menu()
 	resized.connect(_layout)
 	_layout()
@@ -112,10 +112,14 @@ func _build_menu() -> void:
 	_equipment_panel.visible=false
 	add_child(_equipment_panel)
 	_equipment_panel.closed.connect(_refresh_points_caption)
-	if GameState.trial_tools_enabled():
-		var trial:=Button.new();trial.text=tr("UI_005");trial.position=Vector2(40,625);trial.size=Vector2(560,48);_hero.add_child(trial)
+	if bool(ProjectSettings.get_setting("rancho/trial_tools",false)):
+		var mode:=Button.new();mode.text=tr("MODE_DEBUG") if SaveData.debug_mode else tr("MODE_NORMAL");mode.position=Vector2(650,625);mode.size=Vector2(550,48);_hero.add_child(mode)
+		mode.pressed.connect(func():
+			if SaveData.switch_mode(not SaveData.debug_mode):get_tree().reload_current_scene())
+		var trial:=Button.new();trial.text=tr("DEBUG_TOOLS");trial.position=Vector2(40,625);trial.size=Vector2(560,48);_hero.add_child(trial)
+		trial.visible=SaveData.debug_mode
 		trial.pressed.connect(func():
-			if SaveData.begin_trial_session():
+			if SaveData.debug_mode:
 				var panel=load("res://src/Presentation/trial_panel.gd").new();add_child(panel))
 	_settings_button=Button.new();_settings_button.text=tr("UI_035");_settings_button.position=Vector2(1000,70);_settings_button.size=Vector2(210,48);_settings_button.pressed.connect(_show_settings);_hero.add_child(_settings_button)
 	_refresh_points_caption()
@@ -134,7 +138,7 @@ func _build_menu() -> void:
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
 	_equipment_caption = _label("",16,Color("9cbcc0"))
-	_equipment_caption.position=Vector2(850,632)
+	_equipment_caption.position=Vector2(850,600)
 	add_child(_equipment_caption)
 	_refresh_points_caption()
 	var bull_host := Node2D.new()
@@ -174,7 +178,7 @@ func _build_menu() -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size = Vector2(0,58)
-		button.disabled = not LevelProgression.is_unlocked(number,SaveData.highest_level_completed)
+		button.disabled = not LevelProgression.is_unlocked(number,SaveData.effective_progress())
 		button.text = "%02d\n%s" % [number,(tr("UI_010") if button.disabled else (tr("UI_011") if number <=10 else tr("UI_012")))]
 		button.pressed.connect(_on_level_selected.bind(number))
 		level_grid.add_child(button)
@@ -243,7 +247,7 @@ func _hide_levels() -> void:
 	_drawer.hide()
 	_missions.grab_focus()
 func _on_level_selected(number: int) -> void:
-	if _transitioning or not LevelProgression.is_unlocked(number, SaveData.highest_level_completed): return
+	if _transitioning or not LevelProgression.is_unlocked(number, SaveData.effective_progress()): return
 	_transitioning = true
 	GameState.selected_level = number
 	get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn")

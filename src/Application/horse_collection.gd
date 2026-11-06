@@ -8,6 +8,7 @@ const RARITIES=["Común","Poco frecuente","Raro","Ultra raro","Legendario"]
 const EYES=COATS+["Arcoíris","Galaxy"]
 static func eye_index(t:Dictionary)->int:return int(t.get("eyes",10))
 var horses:Array[Dictionary]=[]
+var ancestors:Array[Dictionary]=[]
 var selected:String="original"
 var next_id:int=1
 func seed_trial()->void:
@@ -55,10 +56,19 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
  child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
- return {"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
+ return {"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
  if not v is Dictionary or not v.get("horses") is Array:return false
  var clean:Array[Dictionary]=[];var ids:Dictionary={}
+ var known:Variant=v.get("ancestors",[])
+ if not known is Array:return false
+ var clean_ancestors:Array[Dictionary]=[]
+ for a in known:
+  if not a is Dictionary or typeof(a.get("id"))!=TYPE_STRING or a.id.is_empty() or ids.has(a.id) or not valid_traits(a.get("traits")) or typeof(a.get("name"))!=TYPE_STRING:return false
+  if not a.get("parents") is Array or a.parents.size() not in [0,2]:return false
+  for parent in a.parents:
+   if typeof(parent)!=TYPE_STRING or not ids.has(parent):return false
+  ids[a.id]=true;clean_ancestors.append(a.duplicate(true))
  for h in v.horses:
   if not h is Dictionary or typeof(h.get("id"))!=TYPE_STRING or h.id.is_empty() or ids.has(h.id) or not valid_traits(h.get("traits")):return false
   if not h.get("parents") is Array or h.parents.size() not in [0,2]:return false
@@ -68,7 +78,7 @@ func restore(v:Variant)->bool:
    if typeof(parent)!=TYPE_STRING or not ids.has(parent):return false
   ids[h.id]=true;clean.append(h.duplicate(true))
  if clean.is_empty() or not ids.has("original"):return false
- horses=clean;selected=str(v.get("selected","original"))
+ horses=clean;ancestors=clean_ancestors;selected=str(v.get("selected","original"))
  if not ids.has(selected) or not is_adult(selected):selected="original"
  next_id=maxi(int(v.get("next_id",1)),1)
  while ids.has("child_%d"%next_id):next_id+=1
@@ -97,3 +107,14 @@ func rename_horse(id:String,value:String)->bool:
  if h.is_empty() or clean.is_empty() or clean.length()>60:return false
  h.name=clean
  return true
+
+func known_record(id:String)->Dictionary:
+ var owned:=find(id)
+ if not owned.is_empty():return owned
+ for a in ancestors:
+  if a.id==id:return a
+ return {}
+func register_ancestor(record:Dictionary)->bool:
+ if not known_record(str(record.get("id",""))).is_empty():return false
+ var candidate:=export_state();candidate.ancestors.append(record.duplicate(true))
+ return restore(candidate)

@@ -290,3 +290,33 @@ Temporary appearances: existing traits, not new acquisitions or a final catalog.
 "¡Se acabó el tiempo!","¡Se acabó el tiempo!","Time is up!"
 "Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar","Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar","No room: double-tap the lasso to release a bull before throwing"
 "Usar Tranquilizante","Usar Tranquilizante","Use tranquilizer"
+GEN_TITLE,Mapa genealógico,Family map
+GEN_SEARCH,Buscar nombre o ID,Search name or ID
+GEN_UNKNOWN,Linaje sin documentar,Undocumented lineage
+GEN_PURCHASED,Comprado,Purchased
+GEN_BRED,Criado en el rancho,Bred at the ranch
+GEN_UNRECORDED,Antepasados no documentados,Undocumented ancestors
+GEN_HIGHLIGHT,Resaltar coincidencias,Highlight matches
+GEN_ONLY,Solo coincidencias,Only matches
+GEN_RESET_VIEW,Vista inicial,Reset view
+GEN_HINT,Arrastra para mover · +/− o pellizco para zoom · Toca un caballo. Los filtros no cambian tu colección.,Drag to move · +/− or pinch to zoom · Tap a horse. Filters do not change your collection.
+GEN_COUNT,%d / %d coinciden,%d / %d match
+GEN_EMPTY,Sin coincidencias. Quita algún filtro o cambia la búsqueda.,No matches. Remove a filter or change the search.
+GEN_PARENTS,Padres: ,Parents: 
+GEN_NO_INVENT,Solo aparecen parentescos registrados. El color no determina la raza.,Only recorded relationships are shown. Color does not determine breed.
+MODE_NORMAL,MODO NORMAL · cambiar a Debug,NORMAL MODE · switch to Debug
+MODE_DEBUG,MODO DEBUG · cambiar a Normal,DEBUG MODE · switch to Normal
+DEBUG_TOOLS,DEBUG · caballos y niveles libres,DEBUG · free horses and levels
+DEBUG_TITLE,DEBUG · partida de pruebas,DEBUG · test save
+DEBUG_SEPARATE,Caballos y niveles libres · separado del modo normal,Free horses and levels · separate from normal mode
+DEBUG_KEEP,Tu progreso Debug se conserva al volver al menú o cambiar de modo.,Your Debug progress stays when returning to the menu or changing mode.
+DEBUG_RETURN,Volver al menú Debug · conservar progreso,Return to Debug menu · keep progress
+DEBUG_GAMEPLAY,DEBUG · ayudas activas · progreso separado,DEBUG · assists active · separate progress
+GEN_ROOT,Raíz · padres desconocidos,Root · parents unknown
+DEBUG_HORSES,CABALLOS · partida Debug,HORSES · Debug save
+DEBUG_HATS,SOMBREROS · partida Debug,HATS · Debug save
+DEBUG_APPEARANCE,ASPECTO DEBUG · estadísticas BASE,DEBUG LOOK · BASE stats
+DEBUG_USE_LOOK,USAR ASPECTO EN DEBUG,USE LOOK IN DEBUG
+DEBUG_PLAY,JUGAR EN DEBUG,PLAY IN DEBUG
+GEN_ALL_LINEAGES,Todos los linajes,All lineages
+GEN_ALL_ORIGINS,Todos los orígenes,All origins

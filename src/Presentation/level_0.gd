@@ -108,7 +108,7 @@ func _ready() -> void:
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
 	hud.update_timer(_time_remaining)
 	hud.set_level(_level_number)
-	if GameState.trial_tools_enabled():hud.flash_hint(tr("ENSAYO: regate y doble lazo activos, sin alterar progreso"),5.0)
+	if GameState.debug_cheats_active():hud.flash_hint(tr("DEBUG_GAMEPLAY") if SaveData.debug_mode else tr("ENSAYO: regate y doble lazo activos, sin alterar progreso"),5.0)
 	hud.hide_nerves_slot(0)
 	hud.hide_nerves_slot(1)
 	hud.restart_requested.connect(_on_restart_requested)
@@ -332,7 +332,7 @@ func _release_pen_bulls(pen_index: int) -> void:
 ## continuously-recalculated level rules. Schedule/numbers: PlayerUpgrades.
 func _apply_unlocked_upgrades() -> void:
 	var reach:float=SaveData.equipped_whip_reach()
-	if GameState.trial_tools_enabled():reach=maxf(reach,260.0)
+	if GameState.debug_cheats_active():reach=maxf(reach,260.0)
 	player.dodge_available=reach>0
 	player.dodge_path_limit=reach if reach>0 else 260.0
 	var horse_stats:Dictionary=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected))
@@ -344,7 +344,7 @@ func _apply_unlocked_upgrades() -> void:
 	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier
 	player.lasso_travel_time *= _upgrades.lasso_travel_time_multiplier
 	player.max_throw_distance *= _upgrades.throw_distance_multiplier
-	_max_simultaneous_captures = maxi(2,_upgrades.max_simultaneous_captures) if GameState.trial_tools_enabled() else _upgrades.max_simultaneous_captures
+	_max_simultaneous_captures = maxi(2,_upgrades.max_simultaneous_captures) if GameState.debug_cheats_active() else _upgrades.max_simultaneous_captures
 	player.set_max_captures(_max_simultaneous_captures)
 
 func _process(delta: float) -> void:

@@ -737,3 +737,93 @@ msgstr "Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar"
 
 msgid "Usar Tranquilizante"
 msgstr "Usar Tranquilizante"
+
+msgid "GEN_TITLE"
+msgstr "Mapa genealógico"
+
+msgid "GEN_SEARCH"
+msgstr "Buscar nombre o ID"
+
+msgid "GEN_UNKNOWN"
+msgstr "Linaje sin documentar"
+
+msgid "GEN_PURCHASED"
+msgstr "Comprado"
+
+msgid "GEN_BRED"
+msgstr "Criado en el rancho"
+
+msgid "GEN_UNRECORDED"
+msgstr "Antepasados no documentados"
+
+msgid "GEN_HIGHLIGHT"
+msgstr "Resaltar coincidencias"
+
+msgid "GEN_ONLY"
+msgstr "Solo coincidencias"
+
+msgid "GEN_RESET_VIEW"
+msgstr "Vista inicial"
+
+msgid "GEN_HINT"
+msgstr "Arrastra para mover · +/− o pellizco para zoom · Toca un caballo. Los filtros no cambian tu colección."
+
+msgid "GEN_COUNT"
+msgstr "%d / %d coinciden"
+
+msgid "GEN_EMPTY"
+msgstr "Sin coincidencias. Quita algún filtro o cambia la búsqueda."
+
+msgid "GEN_PARENTS"
+msgstr "Padres: "
+
+msgid "GEN_NO_INVENT"
+msgstr "Solo aparecen parentescos registrados. El color no determina la raza."
+
+msgid "MODE_NORMAL"
+msgstr "MODO NORMAL · cambiar a Debug"
+
+msgid "MODE_DEBUG"
+msgstr "MODO DEBUG · cambiar a Normal"
+
+msgid "DEBUG_TOOLS"
+msgstr "DEBUG · caballos y niveles libres"
+
+msgid "DEBUG_TITLE"
+msgstr "DEBUG · partida de pruebas"
+
+msgid "DEBUG_SEPARATE"
+msgstr "Caballos y niveles libres · separado del modo normal"
+
+msgid "DEBUG_KEEP"
+msgstr "Tu progreso Debug se conserva al volver al menú o cambiar de modo."
+
+msgid "DEBUG_RETURN"
+msgstr "Volver al menú Debug · conservar progreso"
+
+msgid "DEBUG_GAMEPLAY"
+msgstr "DEBUG · ayudas activas · progreso separado"
+
+msgid "GEN_ROOT"
+msgstr "Raíz · padres desconocidos"
+
+msgid "DEBUG_HORSES"
+msgstr "CABALLOS · partida Debug"
+
+msgid "DEBUG_HATS"
+msgstr "SOMBREROS · partida Debug"
+
+msgid "DEBUG_APPEARANCE"
+msgstr "ASPECTO DEBUG · estadísticas BASE"
+
+msgid "DEBUG_USE_LOOK"
+msgstr "USAR ASPECTO EN DEBUG"
+
+msgid "DEBUG_PLAY"
+msgstr "JUGAR EN DEBUG"
+
+msgid "GEN_ALL_LINEAGES"
+msgstr "Todos los linajes"
+
+msgid "GEN_ALL_ORIGINS"
+msgstr "Todos los orígenes"
