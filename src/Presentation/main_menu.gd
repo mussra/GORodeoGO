@@ -9,7 +9,7 @@ var _equipment_button:Button
 var _equipment_panel:EquipmentPanel
 var _missions: Button
 var _caption: Label
-var _hd_rider: HDRiderIdle
+var _hd_rider: Sprite2D
 var _rider: AnimatedSprite2D
 var _bull: AnimatedSprite2D
 var _intro: Tween
@@ -125,8 +125,8 @@ func _build_menu() -> void:
 	_rider = swap._sprite
 	rider_host.name = "Rider"
 	_rider.hide()
-	_hd_rider = HDRiderIdle.new()
-	_hd_rider.texture = preload("res://art/ui/hero/rider_hd.png")
+	_hd_rider = Sprite2D.new()
+	HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
 	_hd_rider.position = Vector2(0,0)
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
@@ -247,6 +247,7 @@ func _notification(what: int) -> void:
 		else: _on_quit_pressed()
 
 func _refresh_points_caption()->void:
+	if is_instance_valid(_hd_rider):HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
 	_caption.text="%02d / 20 COMPLETADOS · %d PUNTOS\nEquipo y recompensas en prueba" % [SaveData.highest_level_completed,SaveData.equipment_points]
 
 func _show_equipment()->void:

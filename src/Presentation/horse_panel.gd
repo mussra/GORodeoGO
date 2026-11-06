@@ -31,7 +31,9 @@ func refresh()->void:
  button("CRUZAR",Vector2(275,75),func():show_page("breed"))
  button("ATLAS · PRUEBA",Vector2(520,75),func():show_page("atlas"))
  button("AÑADIR 2 DE PRUEBA",Vector2(795,75),func():
-  SaveData.horse_collection.add_trial_parents();parent_b="trial_a";refresh(),360)
+  if not SaveData.trial_session_active:
+   message="Añade caballos temporales desde ENSAYO AISLADO";refresh();return
+  var added:Array[Dictionary]=SaveData.horse_collection.add_random_trial_pair();parent_b=added[0].id;message="Añadidos otros 2 caballos aleatorios de ensayo";refresh(),360)
  label("PRUEBA: padres intactos, sin coste. Valores de ensayo. Reglas de herencia provisionales.",Vector2(30,138),20)
  match page:
   "collection":collection_view()
@@ -42,14 +44,16 @@ func refresh()->void:
  label(message,Vector2(30,625),22)
  label("Rareza: categorías previstas, aún sin asignar. Silla y complementos NO se heredan.",Vector2(30,675),18)
 func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
- var t:Texture2D=load("res://art/foal/base.png") if h.get("stage","adult")=="foal" else load("res://art/player/walk_side/frame_00.png")
- var tex:=TextureRect.new();tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.texture=HorseAppearance.texture(t,"foal" if h.get("stage","adult")=="foal" else "walk_side",0,h.traits);tex.position=pos;tex.size=Vector2.ONE*size_px;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR if h.get("stage","adult")=="foal" else CanvasItem.TEXTURE_FILTER_NEAREST;content.add_child(tex)
+ var tex:=TextureRect.new();tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ if h.get("stage","adult")=="foal":tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits)
+ else:HorsePortrait.apply(tex,h.traits,SaveData.hat_color)
+ tex.position=pos;tex.size=Vector2.ONE*size_px;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;content.add_child(tex)
 func collection_view()->void:
  var scroll:=ScrollContainer.new();scroll.position=Vector2(30,185);scroll.size=Vector2(1210,420);content.add_child(scroll)
  var rows:=VBoxContainer.new();rows.custom_minimum_size.x=1170;scroll.add_child(rows)
  for h in SaveData.horse_collection.horses:
   var row:=HBoxContainer.new();row.custom_minimum_size.y=100;rows.add_child(row)
-  var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(load("res://art/foal/base.png") if not SaveData.horse_collection.is_adult(h.id) else load("res://art/player/walk_side/frame_00.png"),"foal" if not SaveData.horse_collection.is_adult(h.id) else "walk_side",0,h.traits);tex.custom_minimum_size=Vector2(96,96);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
+  var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits) if not SaveData.horse_collection.is_adult(h.id) else HorsePortrait.ART;tex.material=HorsePortrait.material_for(h.traits,SaveData.hat_color) if SaveData.horse_collection.is_adult(h.id) else null;tex.custom_minimum_size=Vector2(96,96);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
   var l:=Label.new();l.text="%s%s\n%s · %s · crin %s"%[h.name," · POTRILLO" if h.get("stage","adult")=="foal" else "",HorseCollection.COATS[h.traits.coat],HorseCollection.PATTERNS[h.traits.pattern],HorseCollection.MANES[h.traits.mane]];l.custom_minimum_size.x=670;row.add_child(l)
   var eq:=Button.new();eq.text="EQUIPADO" if SaveData.horse_collection.selected==h.id else "EQUIPAR";eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
    message=("Equipado solo en ensayo" if SaveData.trial_session_active else "Caballo equipado") if SaveData.select_horse(h.id) else "No se pudo guardar";refresh())

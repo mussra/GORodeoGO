@@ -3,6 +3,7 @@ extends Control
 var _canvas:Control
 var _buttons:Dictionary={}
 var _message:Label
+var _portraits:Dictionary={}
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  z_index=60
@@ -15,7 +16,7 @@ func _ready()->void:
  for id in HatAppearance.OPTIONS:
   var x:float=80+i*410
   _label(HatAppearance.OPTIONS[id],Vector2(x,155),29)
-  var sprite:=TextureRect.new();sprite.texture=load(HatAppearance.art_root(id)+"walk_side/frame_00.png");sprite.position=Vector2(x,220);sprite.size=Vector2(290,290);sprite.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;sprite.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;sprite.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST;_canvas.add_child(sprite)
+  var sprite:=TextureRect.new();sprite.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;HorsePortrait.apply(sprite,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,id);_portraits[id]=sprite;sprite.position=Vector2(x,220);sprite.size=Vector2(290,290);sprite.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;sprite.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;sprite.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;_canvas.add_child(sprite)
   var b:=Button.new();b.position=Vector2(x,530);b.size=Vector2(290,55);b.pressed.connect(func():
    if not SaveData.select_hat(id):_message.text="No se pudo guardar el color. Se mantiene el anterior."
    else:_message.text="Color guardado. Se verá al entrar en la partida."
@@ -32,6 +33,7 @@ func _layout()->void:
  _canvas.scale=Vector2.ONE*k;_canvas.position=(size-Vector2(1280,720)*k)/2
 func refresh()->void:
  for id in _buttons:
+  HorsePortrait.apply(_portraits[id],SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,id)
   var selected:bool=SaveData.hat_color==id
   _buttons[id].text="EQUIPADO" if selected else "EQUIPAR"
   _buttons[id].disabled=selected
