@@ -6,3 +6,5 @@
 .ds-file-card,.file-card,.ds-group,.file-group,section{min-width:0;max-width:100%}.viewport{width:100%;box-sizing:border-box;min-width:0;isolation:isolate;overscroll-behavior:contain}.drawing{min-width:0;flex-shrink:0}.drawing img{display:block;max-width:none;pointer-events:none;user-select:none;-webkit-user-drag:none}.drawing canvas{touch-action:none;user-select:none;-webkit-user-select:none}.precision{position:static}.field{min-width:0}.field select{width:100%;min-width:0}.hint{max-width:100%}
 
 .save-status{font-size:13px;padding:10px 12px;background:#edf5ef;border:1px solid #b8d7c1;border-radius:8px;margin:8px 0}.save-status p{margin:4px 0;line-height:1.4}.export-png{max-width:100%;height:auto;image-rendering:pixelated}textarea{user-select:text!important;-webkit-user-select:text!important}
+
+.save-status.warning{background:#f4efec;border-color:#c0bebf}.save-status.saved{background:#edf5ef;border-color:#b8d7c1}

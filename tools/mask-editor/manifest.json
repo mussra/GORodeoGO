@@ -1,9 +1,9 @@
 {
-  "baseline": "2.0",
+  "baseline": "review-20261106-aae61841d7e8",
   "assets": [
     {
       "id": "art/portraits/adult_hd_mask.png",
-      "hash": "127b5c5237f7d85880d1e7419ea79de251bbcf0146dcffd764f24b56047fd192",
+      "hash": "aae61841d7e80f7b7cbdf870fd9133e27cf251ae81c741483f368709581403f4",
       "width": 936,
       "height": 983
     },
