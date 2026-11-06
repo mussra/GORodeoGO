@@ -9,6 +9,14 @@ var parent_b:String="original"
 var choices:Dictionary={"coat":0,"pattern":0,"mane":0}
 var focus_id:String="original"
 var atlas_page:int=0
+var preview_playing:bool=true
+var preview_texture:TextureRect
+var preview_frames:Array[Texture2D]=[]
+var preview_clock:float=0.0
+func _process(delta:float)->void:
+ if not visible or page!="detail" or not preview_playing or not is_instance_valid(preview_texture) or preview_frames.is_empty():return
+ preview_clock+=delta
+ preview_texture.texture=preview_frames[int(preview_clock*16.0)%preview_frames.size()]
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=80
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
@@ -24,6 +32,7 @@ func show_page(value:String)->void:
  page=value;message="";refresh()
 func refresh()->void:
  if content!=null:canvas.remove_child(content);content.queue_free()
+ preview_texture=null;preview_frames.clear();preview_clock=0
  content=Control.new();canvas.add_child(content)
  label("CABALLERIZA · PROTOTIPO DE CRÍA",Vector2(30,20),30)
  button("VOLVER",Vector2(1050,20),hide,200)
@@ -41,10 +50,10 @@ func refresh()->void:
   "detail":detail_view()
  label(message,Vector2(30,625),22)
  label("Rareza: categorías previstas, aún sin asignar. Silla y complementos NO se heredan.",Vector2(30,675),18)
-func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
+func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->TextureRect:
  if h.get("stage","adult")=="foal":size_px*=0.62
  var t:Texture2D=load("res://art/foal/base.png") if h.get("stage","adult")=="foal" else load("res://art/player/walk_side/frame_00.png")
- var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(t,"foal" if h.get("stage","adult")=="foal" else "walk_side",0,h.traits);tex.position=pos;tex.size=Vector2.ONE*size_px;tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST;content.add_child(tex)
+ var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(t,"foal" if h.get("stage","adult")=="foal" else "walk_side",0,h.traits);tex.position=pos;tex.size=Vector2.ONE*size_px;tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST;content.add_child(tex);return tex
 func collection_view()->void:
  var scroll:=ScrollContainer.new();scroll.position=Vector2(30,185);scroll.size=Vector2(1210,420);content.add_child(scroll)
  var rows:=VBoxContainer.new();rows.custom_minimum_size.x=1170;scroll.add_child(rows)
@@ -100,7 +109,15 @@ func family_view()->void:
 func detail_view()->void:
  var h:Dictionary=SaveData.horse_collection.find(focus_id)
  if h.is_empty():return
- label(h.name.to_upper(),Vector2(40,195),30);sprite(h,Vector2(70,260),270)
+ label(h.name.to_upper(),Vector2(40,195),30)
+ var portrait:TextureRect=sprite(h,Vector2(70,260),270)
+ if SaveData.horse_collection.is_adult(h.id):
+  preview_texture=portrait
+  var anim:String="walk_side"
+  var paths:Array=SpriteSwap.new(null,null,"",[])._list_sorted_image_paths(HatAppearance.art_root(SaveData.hat_color).path_join(anim))
+  for i in paths.size():preview_frames.append(HorseAppearance.texture(load(paths[i]),anim,i,h.traits))
+  if not preview_frames.is_empty():portrait.texture=preview_frames[0]
+  button("PAUSAR GALOPE" if preview_playing else "VER GALOPE",Vector2(40,550),func():preview_playing=not preview_playing;refresh(),330)
  label("Pelaje: "+HorseCollection.COATS[h.traits.coat]+"\nManchas: "+HorseCollection.PATTERNS[h.traits.pattern]+"\nCrin/cola: "+HorseCollection.MANES[h.traits.mane],Vector2(420,220),24)
  var st:Dictionary=HorseStats.read(h)
  label("VALORES PROVISIONALES\nVelocidad base: %.0f px/s\nManejabilidad: %.0f px/s²\nPotencia: conserva %.0f%% con 2 toros\nRegate: %.0f%% del alcance de la fusta"%[st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)

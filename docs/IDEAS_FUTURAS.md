@@ -19,3 +19,11 @@ La versión actual es de un jugador. El regate del caballo por dibujo libre se p
 ## Desbloqueo progresivo de niveles
 
 Antonio señaló el 4 de noviembre, a las 21:31, que los APK de prueba muestran todos los niveles habilitados. Corregirlo en una versión futura para que se desbloqueen al avanzar. No se cambia en el APK 0.21.15: mantiene el acceso de prueba actual.
+
+## Mi rancho y colección visible (Ant,6nov2026,06:58)
+
+Lugar para disfrutar viendo todos los caballos a la vez o al menos los más raros. Con colección grande, varios ranchos organizados por rareza (comunes, raros, legendarios...). Alternativas abiertas: zonas en mismo rancho o ranchos separados, número de visibles, prioridad y distribución. No asigna rarezas ni aprueba un límite. No incluido enAPK0.21.32.
+
+Fuente original: WhatsApp06:58:23, wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzQ0Nzc5MjdDODRBNjg0NTU3ODlBMDcwNTQ0NTlFMgA=.
+
+Petición separada06:58:50: vista animada de adultos galopando en menú/ficha, para valorar apariencia en movimiento. Potrillos permanecen estáticos; no autoriza animar Mi rancho completo. Se prepara después de0.21.32.
