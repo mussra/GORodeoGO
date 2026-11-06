@@ -16,6 +16,9 @@ static func spread_corral(layout: Dictionary, scale: float) -> Dictionary:
 	moved["rect"] = Rect2(layout["rect"].position + shift, layout["rect"].size)
 	moved["gate"] += shift
 	moved["door"] += shift
+	# Compact puzzle arenas (11-14): keep latch radius clear of destination pen.
+	# Expanded arenas retain the original latch and all memberships/gates.
+	if is_equal_approx(scale,1.0):moved["door"].y -= 11.0 * float(layout["inward"])
 	for i in range(moved["slots"].size()): moved["slots"][i] += shift
 	return moved
 
