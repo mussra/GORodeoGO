@@ -18,6 +18,7 @@ var _transitioning: bool = false
 var _next_level: int = 1
 
 func _ready() -> void:
+	SaveData.end_trial_session() # returning to menu always restores real state
 	RanchMusic.set_paused(false)
 	RanchMusic.set_enabled(GameState.sound_enabled)
 	RanchMusic.play_context("menu")
@@ -109,6 +110,11 @@ func _build_menu() -> void:
 	_equipment_panel.visible=false
 	add_child(_equipment_panel)
 	_equipment_panel.closed.connect(_refresh_points_caption)
+	if GameState.trial_tools_enabled():
+		var trial:=Button.new();trial.text="ENSAYO AISLADO · TODO PRESTADO";trial.position=Vector2(40,625);trial.size=Vector2(560,48);_hero.add_child(trial)
+		trial.pressed.connect(func():
+			if SaveData.begin_trial_session():
+				var panel=load("res://src/Presentation/trial_panel.gd").new();add_child(panel))
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)

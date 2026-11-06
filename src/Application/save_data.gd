@@ -45,6 +45,7 @@ func mark_dual_lasso_intro_shown() -> void:
 	save_progress()
 
 func save_progress() -> bool:
+	if trial_session_active:return true # in-memory selections only, never touch real save
 	var config := ConfigFile.new()
 	config.set_value("meta", "version", SAVE_VERSION)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
@@ -65,6 +66,7 @@ func save_progress() -> bool:
 	return true
 
 func load_progress() -> void:
+	if trial_session_active:end_trial_session()
 	horse_collection=HorseCollection.new()
 	horse_collection.seed_trial()
 	hat_color = "original"
@@ -149,6 +151,7 @@ func equipped_whip_reach()->float:
 	return float(EquipmentCatalog.ITEMS[item_id].get("reach",0.0))
 
 func record_victory(level_number:int)->int:
+	if trial_session_active:return 0 # no temporary victory becomes an acquisition
 	if level_number<1 or level_number>LevelCatalog.MAX_LEVEL:return 0
 	if not apply_legacy_points_credit(EquipmentCatalog.REWARDS):return 0
 	var reward:int=int(EquipmentCatalog.REWARDS.get(level_number,0))
@@ -195,3 +198,37 @@ func mature_horse_trial(id:String)->bool:
 	if save_progress():return true
 	horse_collection.restore(before)
 	return false
+
+# Explicit scratch session. Snapshot is never serialized; restart loads the real file.
+var trial_session_active:bool=false
+var _trial_snapshot:Dictionary={}
+func begin_trial_session()->bool:
+	if not GameState.trial_tools_enabled() or trial_session_active:return false
+	for key in ["hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
+	_trial_snapshot.horses=horse_collection.export_state()
+	trial_session_active=true
+	horse_collection=HorseCollection.new();horse_collection.restore(_trial_snapshot.horses)
+	horse_collection.add_trial_parents()
+	equipment_owned.assign(EquipmentCatalog.ITEMS.keys());equipment_equipped={"whip":"whip_basic"}
+	dual_lasso_intro_shown=true
+	return true
+func end_trial_session()->void:
+	if not trial_session_active:return
+	for key in _trial_snapshot:
+		if key!="horses":set(key,_trial_snapshot[key])
+	horse_collection=HorseCollection.new();horse_collection.restore(_trial_snapshot.horses)
+	_trial_snapshot.clear();trial_session_active=false
+func effective_progress()->int:
+	return LevelCatalog.MAX_LEVEL if trial_session_active else highest_level_completed
+func preview_trial_traits(coat:int,pattern:int,mane:int)->bool:
+	if not trial_session_active:return false
+	var t:Dictionary={"coat":coat,"pattern":pattern,"mane":mane,"finish":"normal"}
+	if not horse_collection.valid_traits(t):return false
+	var h:Dictionary=horse_collection.find("preview_temporary")
+	if h.is_empty():
+		h={"id":"preview_temporary","name":"Aspecto prestado · BASE","parents":[],"stage":"adult","stats":HorseStats.BASE.duplicate(),"traits":t}
+		horse_collection.horses.append(h)
+	else:h.traits=t
+	horse_collection.selected=h.id
+	return true

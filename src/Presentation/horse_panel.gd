@@ -25,7 +25,7 @@ func show_page(value:String)->void:
 func refresh()->void:
  if content!=null:canvas.remove_child(content);content.queue_free()
  content=Control.new();canvas.add_child(content)
- label("CABALLERIZA · PROTOTIPO DE CRÍA",Vector2(30,20),30)
+ label("ENSAYO AISLADO · COPIA TEMPORAL" if SaveData.trial_session_active else "CABALLERIZA · PROTOTIPO DE CRÍA",Vector2(30,20),30)
  button("VOLVER",Vector2(1050,20),hide,200)
  button("COLECCIÓN",Vector2(30,75),func():show_page("collection"))
  button("CRUZAR",Vector2(275,75),func():show_page("breed"))
@@ -53,7 +53,7 @@ func collection_view()->void:
   var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(load("res://art/foal/base.png") if not SaveData.horse_collection.is_adult(h.id) else load("res://art/player/walk_side/frame_00.png"),"foal" if not SaveData.horse_collection.is_adult(h.id) else "walk_side",0,h.traits);tex.custom_minimum_size=Vector2(96,96);row.add_child(tex)
   var l:=Label.new();l.text="%s%s\n%s · %s · crin %s"%[h.name," · POTRILLO" if h.get("stage","adult")=="foal" else "",HorseCollection.COATS[h.traits.coat],HorseCollection.PATTERNS[h.traits.pattern],HorseCollection.MANES[h.traits.mane]];l.custom_minimum_size.x=670;row.add_child(l)
   var eq:=Button.new();eq.text="EQUIPADO" if SaveData.horse_collection.selected==h.id else "EQUIPAR";eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
-   message="Caballo equipado" if SaveData.select_horse(h.id) else "No se pudo guardar";refresh())
+   message=("Equipado solo en ensayo" if SaveData.trial_session_active else "Caballo equipado") if SaveData.select_horse(h.id) else "No se pudo guardar";refresh())
   var fam:=Button.new();fam.text="FICHA";row.add_child(fam);fam.pressed.connect(func():focus_id=h.id;show_page("detail"))
 func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
  var pick:=OptionButton.new();pick.position=pos;pick.size=Vector2(370,48);content.add_child(pick)
