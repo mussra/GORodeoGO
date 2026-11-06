@@ -16,11 +16,20 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
  for y in range(image.get_height()):
   for x in range(image.get_width()):
    var m:Color=mask.get_pixel(x,y)
+   # Horse masks previously touched the hat in downward-diagonal frames 8-11.
+   # The hat ends at row21; these pixels must never inherit horse traits.
+   if anim=="walk_diag_down" and y<21 and x>=28 and x<=68:continue
    if maxf(m.r,m.g)<0.02:continue
    var old:Color=image.get_pixel(x,y);var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))*255.0/205.0,0.25,1.18)
    var color:Color=Color(COLORS[int(t.coat)])
    if m.g>m.r:
-    color=Color.from_hsv(fposmod((y-25.0)/38.0,1.0),0.8,1.0) if int(t.mane)==5 else Color(MANES[int(t.mane)])
+    if int(t.mane)==5:
+     if anim=="foal":
+      var palette:Array[Color]=[Color("ec606c"),Color("efb85d"),Color("e8d874"),Color("77c888"),Color("6aa9da"),Color("9980c8"),Color("ec606c")]
+      var u:float=clampf((float(y)-165.0)/105.0 if x<110 else float(y)/180.0,0.0,.999)*6.0
+      color=palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.0,1.0,u-floorf(u)))
+     else:color=Color.from_hsv(fposmod((y-25.0)/38.0,1.0),0.8,1.0)
+    else:color=Color(MANES[int(t.mane)])
    elif int(t.pattern)>0:
     var mark:bool=false
     var px:float=float(x)*96.0/image.get_width() if anim=="foal" else x
@@ -30,7 +39,10 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
      2:mark=(int(px)%11<5 and int(py)%12<5 and py>48 and py<78)
      3:mark=px<40 and py>48 and py<78
      4:mark=py>77
-    if mark:color=Color("f4edd8")
+    if anim=="foal" and int(t.pattern)==1:
+     var dist:float=minf((Vector2(px,py)-Vector2(30,60)).length()-8.0,(Vector2(px,py)-Vector2(58,68)).length()-6.0)
+     color=color.lerp(Color("f4edd8"),1.0-smoothstep(-.9,.9,dist))
+    elif mark:color=Color("f4edd8")
    if anim=="foal":
     shade=clampf(maxf(old.r,maxf(old.g,old.b))*(1.0 if m.g>m.r else 1.10),0.12,1.0)
    var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
