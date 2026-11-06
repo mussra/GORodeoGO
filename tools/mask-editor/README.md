@@ -1,12 +1,12 @@
 # Editor de revisión de máscaras
 
-Fuente de la página privada de revisión de Rancho 2.0. No forma parte del juego ni se ejecuta al arrancarlo.
+Fuente de la página privada de revisión de Rancho, sincronizada con los contornos aprobados el 6 de noviembre. No forma parte del juego ni se ejecuta al arrancarlo.
 
 - 71 máscaras: retrato adulto y ojos, potrillo y ojos, reposo, aturdido y cinco direcciones de galope.
 - Los PNG base y su SHA-256 identifican la revisión. Las variantes de sombrero reutilizan las máscaras de fase.
 - Pintar, borrar, deshacer, restaurar, zoom, desplazar con Mano y cuatro vistas.
 - Exporta JSON con trazos y hashes. Importar recupera la sesión.
-- Sin servidor ni guardado automático. Exportar antes de cerrar.
+- Guardado local por navegador con indicador de confirmación y envío explícito al chat. Preview usa memoria; no garantiza persistencia. Ver RECOVERY.md.
 - Resultado usa colores diagnósticos, no reproduce exactamente el shader Godot.
 - Ninguna corrección se aplica automáticamente al juego.
 
