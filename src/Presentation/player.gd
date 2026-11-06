@@ -28,7 +28,9 @@ const DODGE_SPEED_FACTOR: float = 2.2
 const DODGE_COAST_SECONDS: float = .18  # short soft stop, preview tuning
 const DODGE_COAST_SPEED_FACTOR: float = .8
 var _dodge_coast_remaining: float = 0.0
-var _move_tap: DoubleTapDetector = DoubleTapDetector.new(.3)
+const MOVE_REPRESS_WINDOW_SECONDS: float = .3
+var _move_tap: DoubleTapDetector = DoubleTapDetector.new(MOVE_REPRESS_WINDOW_SECONDS)
+var _running_release_at: float = -INF
 const DRAW_TIME_SCALE: float = .24
 var _run_after_dodge: Vector2 = Vector2.ZERO
 var dodge_available: bool = true
@@ -129,7 +131,11 @@ func set_move_joystick(stick: VirtualJoystick) -> void:
 
 func _on_move_pressed() -> void:
 	_move_pressed_at = _now_seconds()
-	if dodge_available and _move_tap.register_tap(_move_pressed_at) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
+	var running_repress: bool = _move_pressed_at - _running_release_at <= MOVE_REPRESS_WINDOW_SECONDS
+	_running_release_at = -INF
+	var double_press: bool = _move_tap.register_tap(_move_pressed_at)
+	if dodge_available and (running_repress or double_press) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
+		_move_tap.reset()
 		_drawing_dodge = true
 		_drawing_real_started = _now_seconds()
 		Engine.time_scale = DRAW_TIME_SCALE
@@ -181,6 +187,7 @@ func _extend_drawing_at_edge(real_delta:float)->void:
 	_append_draw_point()
 
 func _on_move_released(_direction: Vector2) -> void:
+	_running_release_at = -INF
 	_run_after_dodge = Vector2.ZERO
 	if _drawing_dodge:
 		_drawing_dodge = false
@@ -188,6 +195,10 @@ func _on_move_released(_direction: Vector2) -> void:
 		dodge_drawing_finished.emit()
 		request_dodge_path(_draw_points)
 		_draw_points = PackedVector2Array()
+		_move_tap.reset()
+	elif not _direction.is_zero_approx() and velocity.length() > 1.0 and _stun_time_remaining <= 0.0 and _dodge_path.is_empty():
+		# A running hold is the first press. Only the gap after release is timed.
+		_running_release_at = _now_seconds()
 		_move_tap.reset()
 	elif _now_seconds() - _move_pressed_at > .22:
 		_move_tap.reset()
@@ -471,6 +482,7 @@ func cancel_all_actions() -> void:
 	_flight_tween = null
 
 func cancel_input() -> void:
+	_running_release_at = -INF
 	_run_after_dodge = Vector2.ZERO
 	if _drawing_dodge: dodge_drawing_finished.emit()
 	Engine.time_scale = 1.0

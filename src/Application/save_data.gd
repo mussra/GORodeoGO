@@ -192,6 +192,15 @@ func select_horse(id:String)->bool:
 	horse_collection.selected=before
 	return false
 
+func rename_horse(id:String,value:String)->bool:
+	var h:Dictionary=horse_collection.find(id)
+	if h.is_empty():return false
+	var before:String=h.name
+	if not horse_collection.rename_horse(id,value):return false
+	if save_progress():return true
+	h.name=before
+	return false
+
 func mature_horse_trial(id:String)->bool:
 	var before:Dictionary=horse_collection.export_state()
 	if not horse_collection.mature_trial(id):return false

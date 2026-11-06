@@ -75,7 +75,7 @@ func test_trace_transitions_immediately_to_normal_running() -> void:
 	player.cancel_input()
 	assert_eq(player._run_after_dodge,Vector2.ZERO,"pause/stun can stop continuation")
 
-func test_finish_uses_current_input_and_dual_capture_speed() -> void:
+func test_finish_preserves_endpoint_tangent_and_dual_capture_speed() -> void:
 	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	var player: Node = source.get_node("Player").duplicate()
 	source.free()
@@ -87,8 +87,8 @@ func test_finish_uses_current_input_and_dual_capture_speed() -> void:
 	for i in range(60):
 		player._physics_process(1.0/60)
 		if player._dodge_path.is_empty():break
-	assert_almost_eq(player.velocity.x,0.0,.01)
-	assert_almost_eq(player.velocity.y,player.max_speed*player.dual_capture_speed_multiplier,.1)
+	assert_almost_eq(player.velocity.x,player.max_speed*player.dual_capture_speed_multiplier,.1,"endpoint tangent is retained before normal steering")
+	assert_almost_eq(player.velocity.y,0.0,.01)
 	Input.action_release("move_down")
 	player._on_move_released(Vector2.DOWN)
 	assert_eq(player._run_after_dodge,Vector2.ZERO,"normal joystick release still stops running")
@@ -115,7 +115,7 @@ func test_trace_hits_obstacle_instead_of_crossing_it() -> void:
 	assert_true(player._dodge_path.is_empty())
 	assert_eq(player.velocity, Vector2.ZERO, "no sprint coast after a collision either")
 
-func test_long_normal_drag_does_not_arm_next_touch_as_double_tap() -> void:
+func test_long_stationary_hold_does_not_arm_next_touch_as_double_tap() -> void:
 	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	var player: Node = source.get_node("Player").duplicate()
 	source.free()
@@ -164,3 +164,55 @@ func test_handoff_has_no_stationary_frame_at_30_60_120_fps() -> void:
 		player.stun(.5)
 		assert_eq(player._run_after_dodge,Vector2.ZERO,"contact cancels continued running")
 		assert_eq(player.velocity,Vector2.ZERO)
+
+func _gesture_player() -> Node:
+	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	var player: Node = source.get_node("Player").duplicate()
+	source.free()
+	add_child_autofree(player)
+	player.set_physics_process(false)
+	return player
+
+func test_running_hold_release_and_single_repress_arms_dodge() -> void:
+	var player := _gesture_player()
+	player._on_move_pressed()
+	player._move_pressed_at -= 5.0
+	player.velocity = Vector2(200,0)
+	player._on_move_released(Vector2.RIGHT)
+	player._on_move_pressed()
+	assert_true(player._drawing_dodge, "long running hold counts as the first press")
+	player.cancel_input()
+
+func test_running_repress_after_window_is_normal_movement() -> void:
+	var player := _gesture_player()
+	player._on_move_pressed()
+	player._move_pressed_at -= 5.0
+	player.velocity = Vector2(200,0)
+	player._on_move_released(Vector2.RIGHT)
+	player._running_release_at -= .31
+	player._on_move_pressed()
+	assert_false(player._drawing_dodge)
+
+func test_stationary_start_still_requires_two_quick_presses() -> void:
+	var player := _gesture_player()
+	player._on_move_pressed()
+	assert_false(player._drawing_dodge)
+	player._on_move_released(Vector2.ZERO)
+	player._on_move_pressed()
+	assert_true(player._drawing_dodge)
+	player.cancel_input()
+
+func test_cancel_clears_running_release_and_cooldown_blocks_repress() -> void:
+	var player := _gesture_player()
+	player._on_move_pressed()
+	player._move_pressed_at -= 5.0
+	player.velocity = Vector2(200,0)
+	player._on_move_released(Vector2.RIGHT)
+	player.cancel_input()
+	player._on_move_pressed()
+	assert_false(player._drawing_dodge)
+	player.velocity = Vector2(200,0)
+	player._on_move_released(Vector2.RIGHT)
+	player._dodge_cooldown = 1.0
+	player._on_move_pressed()
+	assert_false(player._drawing_dodge)

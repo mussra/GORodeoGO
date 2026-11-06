@@ -8,7 +8,9 @@ var parent_a:String="original"
 var parent_b:String="original"
 var choices:Dictionary={"coat":0,"pattern":0,"mane":0,"eyes":0}
 var focus_id:String="original"
+var focus_preview:Dictionary={}
 var atlas_page:int=0
+var atlas_owned_first:bool=true
 var scroll_to_newest:bool=false
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=80
@@ -66,10 +68,14 @@ func collection_view()->void:
  if scroll_to_newest:
   scroll_to_newest=false
   scroll.set_deferred("scroll_vertical",2147483647)
+func thumbnail(h:Dictionary)->Texture2D:
+ var foal:bool=h.get("stage","adult")=="foal"
+ var source:Texture2D=load("res://art/foal/base.png" if foal else "res://art/player/walk_diag_down/frame_00.png")
+ return HorseAppearance.texture(source,"foal" if foal else "walk_diag_down",0,h.traits)
 func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
- var pick:=OptionButton.new();pick.position=pos;pick.size=Vector2(370,48);content.add_child(pick)
+ var pick:=OptionButton.new();pick.position=pos;pick.size=Vector2(370,64);pick.add_theme_constant_override("icon_max_width",56);pick.get_popup().add_theme_constant_override("icon_max_width",56);content.add_child(pick)
  for h in SaveData.horse_collection.horses:
-  pick.add_item(h.name);pick.set_item_metadata(pick.item_count-1,h.id)
+  pick.add_icon_item(thumbnail(h),h.name);pick.set_item_metadata(pick.item_count-1,h.id)
   pick.set_item_disabled(pick.item_count-1,not SaveData.horse_collection.is_adult(h.id))
   if h.id==id:pick.select(pick.item_count-1)
  pick.item_selected.connect(func(i:int):
@@ -110,30 +116,65 @@ func family_view()->void:
 
 func detail_view()->void:
  var h:Dictionary=SaveData.horse_collection.find(focus_id)
+ var is_owned:bool=not h.is_empty()
+ if not is_owned:h=focus_preview
  if h.is_empty():return
- label(h.name.to_upper(),Vector2(40,195),30);sprite(h,Vector2(70,255),255)
+ if not is_owned:
+  label(h.name+" · ASPECTO NO ADQUIRIDO",Vector2(40,185),28);sprite(h,Vector2(60,245),300)
+  label("Pelaje: "+HorseCollection.COATS[h.traits.coat]+"\nManchas: "+HorseCollection.PATTERNS[h.traits.pattern]+"\nCrin: "+HorseCollection.MANES[h.traits.mane],Vector2(450,250),26)
+  label("Vista de catálogo. No seleccionable hasta obtenerlo.",Vector2(450,430),22)
+  button("VOLVER AL ATLAS",Vector2(450,510),func():show_page("atlas"),340)
+  return
+ var title:=label(h.name,Vector2(40,175),27);title.size.x=365;title.clip_text=true
+ sprite(h,Vector2(70,250),235)
+ var name_edit:=LineEdit.new();name_edit.text=h.name;name_edit.placeholder_text="Nombre del caballo";name_edit.max_length=60;name_edit.position=Vector2(40,485);name_edit.size=Vector2(200,48);content.add_child(name_edit)
+ button("GUARDAR",Vector2(245,485),func():
+  message="Nombre guardado" if SaveData.rename_horse(h.id,name_edit.text) else "Escribe un nombre (máximo 60 caracteres) / revisa guardado";refresh(),160)
+ if SaveData.horse_collection.is_adult(h.id):
+  var equip:=button("EQUIPADO" if SaveData.horse_collection.selected==h.id else "SELECCIONAR CABALLO",Vector2(40,545),func():
+   message="Caballo seleccionado" if SaveData.select_horse(h.id) else "No se pudo guardar";refresh(),360)
+  equip.disabled=SaveData.horse_collection.selected==h.id
  label("Pelaje: "+HorseCollection.COATS[h.traits.coat]+"\nManchas: "+HorseCollection.PATTERNS[h.traits.pattern]+"\nCrin/cola: "+HorseCollection.MANES[h.traits.mane],Vector2(420,220),24)
  var st:Dictionary=HorseStats.read(h)
  label("Ojos: %s\nVALORES PROVISIONALES\nVelocidad base: %.0f px/s\nManejabilidad: %.0f px/s²\nPotencia: conserva %.0f%% con 2 toros\nRegate: %.0f%% del alcance de la fusta"%[HorseCollection.EYES[HorseCollection.eye_index(h.traits)],st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)
  if not SaveData.horse_collection.is_adult(h.id):
-  label("POTRILLO: no puede trabajar ni criar. Plazo por definir.",Vector2(420,505),18)
-  button("ENSAYO: CRECER Y ADIESTRAR",Vector2(40,550),func():
+  label("POTRILLO: no puede trabajar ni criar. Plazo por definir.",Vector2(560,505),18)
+  button("ENSAYO: CRECER Y ADIESTRAR",Vector2(40,545),func():
    message="Adulto de ensayo, sin esperar ni pagar" if SaveData.mature_horse_trial(h.id) else "No se pudo guardar";refresh(),360)
- label("Fusta: no aplicable mientras es potrillo" if not SaveData.horse_collection.is_adult(h.id) else "Capacidad de lazo intacta. Alcance equipado de fusta: %d px"%SaveData.equipped_whip_reach(),Vector2(420,535),20)
+ label("Fusta: no aplicable mientras es potrillo" if not SaveData.horse_collection.is_adult(h.id) else "Capacidad de lazo intacta. Alcance equipado de fusta: %d px"%SaveData.equipped_whip_reach(),Vector2(560,535),18)
  button("VER PARENTESCO · PRUEBA",Vector2(420,570),func():show_page("family"),420)
-func atlas_view()->void:
- label("ATLAS DE ASPECTOS · CATÁLOGO CANDIDATO",Vector2(35,185),25)
- label("600 combinaciones de diseño. No son rutas de obtención ni rarezas aprobadas.",Vector2(35,225),20)
- var owned:Dictionary={}
+func atlas_entries()->Array[Dictionary]:
+ var result:Array[Dictionary]=[];var owned:Dictionary={}
  for h in SaveData.horse_collection.horses:
-  var t:Dictionary=h.traits;owned["%d_%d_%d"%[t.coat,t.pattern,t.mane]]=true
- for j in range(12):
-  var n:int=atlas_page*12+j
-  var coat:int=int(n/30);var pattern:int=int(n/6)%5;var mane:int=n%6
-  var x:float=35+(j%4)*300;var y:float=275+int(j/4)*100
-  var key:String="%d_%d_%d"%[coat,pattern,mane]
-  label(("✓ " if owned.has(key) else "? ")+HorseCollection.COATS[coat],Vector2(x,y),21)
-  label(HorseCollection.PATTERNS[pattern]+" / "+HorseCollection.MANES[mane],Vector2(x,y+30),17)
- button("ANTERIOR",Vector2(35,570),func():atlas_page=maxi(0,atlas_page-1);refresh())
- label("Página %d / 50"%(atlas_page+1),Vector2(345,580),23)
- button("SIGUIENTE",Vector2(650,570),func():atlas_page=mini(49,atlas_page+1);refresh())
+  result.append({"horse":h,"owned":true})
+  owned["%d_%d_%d"%[h.traits.coat,h.traits.pattern,h.traits.mane]]=true
+ if not atlas_owned_first:
+  result.clear()
+ for n in range(600):
+  var t:Dictionary={"coat":int(n/30),"pattern":int(n/6)%5,"mane":n%6}
+  if not atlas_owned_first or not owned.has("%d_%d_%d"%[t.coat,t.pattern,t.mane]):result.append({"horse":{"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":false})
+ if not atlas_owned_first:
+  for entry in result:
+   var t:Dictionary=entry.horse.traits
+   for h in SaveData.horse_collection.horses:
+    if h.traits.coat==t.coat and h.traits.pattern==t.pattern and h.traits.mane==t.mane:
+     entry.horse=h;entry.owned=true;break
+ return result
+func atlas_view()->void:
+ label("ATLAS DE CABALLOS",Vector2(35,170),25)
+ button("ORDEN: LOS MÍOS PRIMERO" if atlas_owned_first else "ORDEN: ATLAS NORMAL",Vector2(765,165),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),470)
+ label("Colección propia y después aspectos candidatos. Sin rutas de obtención ni rarezas aprobadas.",Vector2(35,208),18)
+ var entries:Array[Dictionary]=atlas_entries();var pages:int=ceili(entries.size()/8.0);atlas_page=clampi(atlas_page,0,pages-1)
+ for j in range(8):
+  var n:int=atlas_page*8+j
+  if n>=entries.size():break
+  var entry:Dictionary=entries[n];var h:Dictionary=entry.horse;var t:Dictionary=h.traits
+  var x:float=35+(j%4)*305;var y:float=250+int(j/4)*160
+  sprite(h,Vector2(x,y),90)
+  var title:=label(("✓ " if entry.owned else "? ")+h.name,Vector2(x+92,y),18);title.size=Vector2(205,30);title.clip_text=true
+  label(HorseCollection.PATTERNS[t.pattern]+"\nCrin "+HorseCollection.MANES[t.mane],Vector2(x+92,y+32),16)
+  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(295,130);open.tooltip_text="Abrir ficha";content.add_child(open);open.pressed.connect(func():focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
+  if not entry.owned:label("No disponible",Vector2(x+92,y+87),16)
+ button("ANTERIOR",Vector2(35,575),func():atlas_page=maxi(0,atlas_page-1);refresh())
+ label("Página %d / %d"%[atlas_page+1,pages],Vector2(345,585),23)
+ button("SIGUIENTE",Vector2(650,575),func():atlas_page=mini(pages-1,atlas_page+1);refresh())

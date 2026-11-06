@@ -23,14 +23,14 @@ func add_random_trial_pair()->Array[Dictionary]:
   var n:int=horses.size()+1
   while not find("random_trial_%d"%n).is_empty():n+=1
   var h:Dictionary={"id":"random_trial_%d"%n,"name":"Prueba aleatoria %d"%n,"parents":[],"stage":"adult","traits":{"coat":rng.randi_range(0,COATS.size()-1),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,MANES.size()-1),"eyes":rng.randi_range(0,19),"finish":"normal"}}
-  horses.append(h);added.append(h)
+  h.name=suggest_name(h.traits);horses.append(h);added.append(h)
  return added
 func grant_achievement(level:int)->Dictionary:
  var id:String="achievement_%d"%level
  if not find(id).is_empty():return {}
  var rng:=RandomNumberGenerator.new();rng.randomize()
  var h:Dictionary={"id":id,"name":"Hallazgo de nivel %d"%level,"parents":[],"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,4),"mane":rng.randi_range(0,5),"eyes":rng.randi_range(0,19),"finish":"normal"},"stats":{"speed":rng.randf_range(260,285),"handling":rng.randf_range(900,1300),"power":rng.randf_range(0.6,0.8),"dodge":rng.randf_range(0.85,1.0)}}
- horses.append(h);return h
+ h.name=suggest_name(h.traits);horses.append(h);return h
 func find(id:String)->Dictionary:
  for h in horses:
   if h.id==id:return h
@@ -52,7 +52,7 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
  if t.is_empty():return {}
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
- next_id+=1;horses.append(child);return child
+ child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
  return {"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
@@ -80,3 +80,19 @@ func mature_trial(id:String)->bool:
  var h:=find(id)
  if h.is_empty():return false
  h["stage"]="adult";return true
+
+## Suggested names do not overwrite saved names, including player-authored names.
+func suggest_name(traits:Dictionary)->String:
+ var base:String=COATS[int(traits.coat)]+" "+["liso","manchado","moteado","de trasera blanca","de patas claras"][int(traits.pattern)]
+ var candidate:String=base;var suffix:int=2
+ var names:Array=[]
+ for h in horses:names.append(str(h.name).to_lower())
+ while names.has(candidate.to_lower()):
+  candidate=base+" "+str(suffix);suffix+=1
+ return candidate
+func rename_horse(id:String,value:String)->bool:
+ var h:Dictionary=find(id)
+ var clean:String=value.strip_edges()
+ if h.is_empty() or clean.is_empty() or clean.length()>60:return false
+ h.name=clean
+ return true

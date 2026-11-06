@@ -4,6 +4,21 @@ const COLORS=["273440","e9e2d3","dda92c","246bc5","398c54","bd3e3e","8550ad","27
 const MANES=["222c37","fff3d3","f0ba2e","347ef0","e04c52"]
 const FOAL_EYES=preload("res://art/foal/eyes.png")
 static var cache:Dictionary={}
+static var body_offsets:Dictionary={}
+static func body_offset(source:Image,anim:String,frame:int)->int:
+ if anim=="foal" or frame==0:return 0
+ var path:="res://art/player/%s/frame_00.png"%anim
+ if not ResourceLoader.exists(path):return 0
+ if not body_offsets.has(anim):
+  var base:Image=load(path).get_image()
+  if base.is_compressed():base.decompress()
+  body_offsets[anim]=rider_top(base)
+ return rider_top(source)-int(body_offsets[anim])
+static func rider_top(image:Image)->int:
+ for y in range(35):
+  for x in range(28,73):
+   if image.get_pixel(x,y).a>.5:return y
+ return 0
 static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Texture2D:
  if t.get("finish","")=="original":return source
  var key:String=source.resource_path+str(t)
@@ -14,6 +29,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
  var mask:Image=load(path).get_image();var image:Image=source.get_image()
  if image.is_compressed():image.decompress()
  if mask.is_compressed():mask.decompress()
+ var bob:=body_offset(image,anim,frame)
  for y in range(image.get_height()):
   for x in range(image.get_width()):
    var m:Color=mask.get_pixel(x,y)
@@ -40,9 +56,11 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
    elif int(t.pattern)>0:
     var mark:bool=false
     var px:float=float(x)*96.0/image.get_width() if anim=="foal" else x
-    var py:float=float(y)*96.0/image.get_height() if anim=="foal" else y
+    var py:float=float(y)*96.0/image.get_height() if anim=="foal" else y-bob
     match int(t.pattern):
-     1:mark=(Vector2(px,py)-Vector2(30,60)).length()<8 or (Vector2(px,py)-Vector2(58,68)).length()<6
+     1:
+      if anim=="walk_diag_down":mark=(Vector2(px,py)-Vector2(32,51)).length()<7 or (Vector2(px,py)-Vector2(58,61)).length()<6
+      else:mark=(Vector2(px,py)-Vector2(30,60)).length()<8 or (Vector2(px,py)-Vector2(58,68)).length()<6
      2:mark=(int(px)%11<5 and int(py)%12<5 and py>48 and py<78)
      3:mark=px<40 and py>48 and py<78
      4:mark=py>77
