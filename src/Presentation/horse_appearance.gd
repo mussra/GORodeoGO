@@ -28,7 +28,10 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
      var tpos:float
      if anim=="foal":tpos=(float(y)-165.0)/105.0 if x<110 else float(y)/180.0
      elif anim=="walk_up":tpos=(float(y)-48.0)/30.0
-     elif x<40:tpos=(float(y)-42.0)/32.0
+     elif x<40:
+      if anim=="walk_diag_down":tpos=(float(y)-35.0)/30.0
+      elif anim=="walk_diag_up":tpos=(float(y)-46.0)/33.0
+      else:tpos=(float(y)-40.0)/36.0
      else:tpos=(float(y)-25.0)/28.0
      var u:float=clampf(tpos,0.0,.999)*6.0
      color=palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.0,1.0,u-floorf(u)))

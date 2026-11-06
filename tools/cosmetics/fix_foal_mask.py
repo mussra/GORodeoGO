@@ -39,6 +39,12 @@ m *= (((a[:,:,0].astype(float)<a[:,:,1]*1.40)&(ss<.60)) | (y>145)).astype(float)
 m[(x>132)&(x<200)&(y>350)&(y<505)&(a[:,:,0].astype(float)>a[:,:,1]*1.35)]=0
 mane_edge=(x>237)&(x<310)&(y>188)&(y<362)&(ss<.64)&(a[:,:,0].astype(float)<a[:,:,1]*1.46)
 m=np.maximum(m,mane_edge.astype(float))
+# Trace the actual tail/body seam; dark outline pixels are not hair either.
+seam=np.interp(y,[350,375,400,425,450,480,505],[194,181,166,155,148,144,132])
+m[(y>350)&(y<510)&(x>seam)&(x<205)]=0
+# The neck mane curls back over the coat at its lower edge.
+neck_edge=poly([[(295,173),(304,190),(307,220),(307,253),(311,279),(318,302),(320,330),(312,351),(298,365),(279,375),(263,373),(281,349),(294,320),(301,288),(301,252),(301,215)]])
+m=np.maximum(m,np.array(neck_edge)/255.)
 s=s.astype(float)*(1-m)
 # Retain actual cream blaze/muzzle by source color, not rectangular exclusion.
 s = np.maximum(s,((hh>8)&(hh<48)&(ss>.28)&(vv>.2)&face&(a[:,:,3]>8)&~eye).astype(float)*(1-m))
