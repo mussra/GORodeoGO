@@ -2,6 +2,7 @@ extends Control
 
 @onready var level_grid: GridContainer = $LevelGrid
 @onready var quit_button: Button = $QuitButton
+var _settings_button:Button
 var _hero: Control
 var _drawer: Panel
 var _play: Button
@@ -76,7 +77,7 @@ func _build_menu() -> void:
 	_hero = Control.new()
 	_hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_hero)
-	var tag := _label("RANCHO // FRONTERA 01",15,Color("7de1cc"))
+	var tag := _label(tr("UI_000"),15,Color("7de1cc"))
 	tag.name = "Tag"
 	_hero.add_child(tag)
 	var title := _label("GO RODEO\nGO",74,Color("f8edce"))
@@ -84,11 +85,11 @@ func _build_menu() -> void:
 	title.add_theme_font_override("font",preload("res://art/ui/fonts/RodeoDisplay.ttf"))
 	title.add_theme_constant_override("line_spacing",-18)
 	_hero.add_child(title)
-	var desc := _label("DOMINA EL LAZO.\nASEGURA EL RANCHO.",19,Color("adc5c6"))
+	var desc := _label(tr("UI_001"),19,Color("adc5c6"))
 	desc.name = "Description"
 	_hero.add_child(desc)
 	_play = Button.new()
-	_play.text = "JUGAR   >   NIVEL %02d" % _next_level
+	_play.text = tr("UI_002") % _next_level
 	_play.add_theme_font_size_override("font_size",23)
 	_play.add_theme_font_override("font",preload("res://art/ui/fonts/RodeoDisplay.ttf"))
 	_play.add_theme_color_override("font_color",Color("10252d"))
@@ -97,14 +98,14 @@ func _build_menu() -> void:
 	_play.pressed.connect(_on_level_selected.bind(_next_level))
 	_hero.add_child(_play)
 	_missions = Button.new()
-	_missions.text = "NIVELES · AVANZA UNO A UNO"
+	_missions.text = tr("UI_003")
 	_missions.add_theme_font_size_override("font_size",16)
 	_missions.pressed.connect(_show_levels)
 	_hero.add_child(_missions)
 	_caption = _label("%02d / 20 COMPLETADOS     ·     RODEO + CORRALES" % SaveData.highest_level_completed,14,Color("85a9ad"))
 	_hero.add_child(_caption)
 	_equipment_button=Button.new()
-	_equipment_button.text="EQUIPO"
+	_equipment_button.text=tr("UI_004")
 	_equipment_button.pressed.connect(_show_equipment)
 	_hero.add_child(_equipment_button)
 	_equipment_panel=EquipmentPanel.new()
@@ -112,10 +113,11 @@ func _build_menu() -> void:
 	add_child(_equipment_panel)
 	_equipment_panel.closed.connect(_refresh_points_caption)
 	if GameState.trial_tools_enabled():
-		var trial:=Button.new();trial.text="ENSAYO AISLADO · TODO PRESTADO";trial.position=Vector2(40,625);trial.size=Vector2(560,48);_hero.add_child(trial)
+		var trial:=Button.new();trial.text=tr("UI_005");trial.position=Vector2(40,625);trial.size=Vector2(560,48);_hero.add_child(trial)
 		trial.pressed.connect(func():
 			if SaveData.begin_trial_session():
 				var panel=load("res://src/Presentation/trial_panel.gd").new();add_child(panel))
+	_settings_button=Button.new();_settings_button.text=tr("UI_035");_settings_button.position=Vector2(1000,70);_settings_button.size=Vector2(210,48);_settings_button.pressed.connect(_show_settings);_hero.add_child(_settings_button)
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
@@ -144,21 +146,21 @@ func _build_menu() -> void:
 	_bull = bull_swap._sprite
 	bull_host.hide()
 	bull_host.name = "Bull"
-	var footer := _label("IZQUIERDA  MOVER    /    DERECHA  LAZO    /    DOBLE TOQUE  LIBERAR",13,Color("78979d"))
+	var footer := _label(tr("UI_006"),13,Color("78979d"))
 	footer.name = "Footer"
 	add_child(footer)
 	quit_button.reparent(self)
-	quit_button.text = "SALIR"
+	quit_button.text = tr("UI_007")
 	quit_button.pressed.connect(_on_quit_pressed)
 	_drawer = Panel.new()
 	_drawer.theme = theme
 	_drawer.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252e"),Color("47727a"),14))
 	add_child(_drawer)
-	var heading := _label("ELIGE TU SIGUIENTE RETO",24,Color("f8edce"))
+	var heading := _label(tr("UI_008"),24,Color("f8edce"))
 	heading.position = Vector2(24,18)
 	_drawer.add_child(heading)
 	var close := Button.new()
-	close.text = "VOLVER"
+	close.text = tr("UI_009")
 	close.position = Vector2(24,62)
 	close.size = Vector2(140,44)
 	close.pressed.connect(_hide_levels)
@@ -173,7 +175,7 @@ func _build_menu() -> void:
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size = Vector2(0,58)
 		button.disabled = not LevelProgression.is_unlocked(number,SaveData.highest_level_completed)
-		button.text = "%02d\n%s" % [number,("BLOQUEADO" if button.disabled else ("RODEO" if number <=10 else "CORRALES"))]
+		button.text = "%02d\n%s" % [number,(tr("UI_010") if button.disabled else (tr("UI_011") if number <=10 else tr("UI_012")))]
 		button.pressed.connect(_on_level_selected.bind(number))
 		level_grid.add_child(button)
 	_drawer.hide()
@@ -254,10 +256,25 @@ func _notification(what: int) -> void:
 func _refresh_points_caption()->void:
 	if is_instance_valid(_equipment_caption):
 		var id:String=SaveData.equipment_equipped.get("whip","")
-		_equipment_caption.text="EQUIPO: "+(str(EquipmentCatalog.ITEMS[id].name) if EquipmentCatalog.ITEMS.has(id) else "Sin fusta")
+		_equipment_caption.text=tr("UI_013")+(str(EquipmentCatalog.ITEMS[id].name) if EquipmentCatalog.ITEMS.has(id) else tr("UI_014"))
 	if is_instance_valid(_hd_rider):HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
-	_caption.text="%02d / 20 COMPLETADOS · %d PUNTOS\nEquipo y recompensas en prueba" % [SaveData.highest_level_completed,SaveData.equipment_points]
+	_caption.text=tr("UI_015") % [SaveData.highest_level_completed,SaveData.equipment_points]
 
 func _show_equipment()->void:
 	_equipment_panel.refresh()
 	_equipment_panel.show()
+
+func _show_settings()->void:
+	var panel:=Control.new();panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
+	var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.add_child(bg)
+	var box:=VBoxContainer.new();box.position=Vector2(60,70);box.size=Vector2(540,330);box.add_theme_constant_override("separation",24);panel.add_child(box)
+	var title:=Label.new();title.text=tr("UI_035");title.add_theme_font_size_override("font_size",30);box.add_child(title)
+	var language:=Label.new();language.text=tr("UI_036");box.add_child(language)
+	var pick:=OptionButton.new();pick.custom_minimum_size=Vector2(400,56);box.add_child(pick)
+	for text in [tr("UI_037"),"Español","English"]:pick.add_item(text)
+	pick.selected=["auto","es","en"].find(Localization.choice)
+	var note:=Label.new();note.text=tr("UI_040");box.add_child(note)
+	var close:=Button.new();close.text=tr("UI_009");close.custom_minimum_size.y=52;box.add_child(close);close.pressed.connect(panel.queue_free)
+	pick.item_selected.connect(func(i:int):
+		if Localization.set_choice(["auto","es","en"][i]):get_tree().reload_current_scene()
+		else:note.text=tr("UI_041"))

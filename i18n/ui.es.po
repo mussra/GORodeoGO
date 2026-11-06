@@ -1,0 +1,142 @@
+msgid ""
+msgstr ""
+"Language: es\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "UI_000"
+msgstr "RANCHO // FRONTERA 01"
+
+msgid "UI_001"
+msgstr "DOMINA EL LAZO.\nASEGURA EL RANCHO."
+
+msgid "UI_002"
+msgstr "JUGAR   >   NIVEL %02d"
+
+msgid "UI_003"
+msgstr "NIVELES · AVANZA UNO A UNO"
+
+msgid "UI_004"
+msgstr "EQUIPO"
+
+msgid "UI_005"
+msgstr "ENSAYO AISLADO · TODO PRESTADO"
+
+msgid "UI_006"
+msgstr "IZQUIERDA  MOVER    /    DERECHA  LAZO    /    DOBLE TOQUE  LIBERAR"
+
+msgid "UI_007"
+msgstr "SALIR"
+
+msgid "UI_008"
+msgstr "ELIGE TU SIGUIENTE RETO"
+
+msgid "UI_009"
+msgstr "VOLVER"
+
+msgid "UI_010"
+msgstr "BLOQUEADO"
+
+msgid "UI_011"
+msgstr "RODEO"
+
+msgid "UI_012"
+msgstr "CORRALES"
+
+msgid "UI_013"
+msgstr "EQUIPO: "
+
+msgid "UI_014"
+msgstr "Sin fusta"
+
+msgid "UI_015"
+msgstr "%02d / 20 COMPLETADOS · %d PUNTOS\nEquipo y recompensas en prueba"
+
+msgid "UI_016"
+msgstr "Toros en el corral: %d/%d"
+
+msgid "UI_017"
+msgstr "NIVEL %02d"
+
+msgid "UI_018"
+msgstr "Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes"
+
+msgid "UI_019"
+msgstr "Laza un toro, espera a que se calme y llévalo a la META"
+
+msgid "UI_020"
+msgstr "¡Rancho asegurado!\nTodos los toros en el corral."
+
+msgid "UI_021"
+msgstr "Nivel fallido.\n%s"
+
+msgid "UI_022"
+msgstr "Pausa"
+
+msgid "UI_023"
+msgstr "Continuar"
+
+msgid "UI_024"
+msgstr "Sonido"
+
+msgid "UI_025"
+msgstr "Menú principal"
+
+msgid "UI_026"
+msgstr "Siguiente nivel"
+
+msgid "UI_027"
+msgstr "Calmando al toro..."
+
+msgid "UI_028"
+msgstr "Calmando al segundo..."
+
+msgid "UI_029"
+msgstr "¡HAS CONSEGUIDO EL DOBLE LAZO!"
+
+msgid "UI_030"
+msgstr "Ahora puedes enlazar DOS toros a la vez:\nlanza un segundo lazo mientras llevas uno cogido.\nPara soltar uno, doble toque rápido en el stick del lazo."
+
+msgid "UI_031"
+msgstr "¡Vamos!"
+
+msgid "UI_032"
+msgstr "¡Ya está calmado! Guíalo hasta la META marcada con ✓"
+
+msgid "UI_033"
+msgstr "Mantén la distancia con los toros sueltos mientras se calma"
+
+msgid "UI_034"
+msgstr "Laza y calma · Lleva a los perseguidores al AGUA o HENO para distraerlos"
+
+msgid "UI_035"
+msgstr "AJUSTES"
+
+msgid "UI_036"
+msgstr "Idioma"
+
+msgid "UI_037"
+msgstr "Automático (móvil)"
+
+msgid "UI_038"
+msgstr "Español"
+
+msgid "UI_039"
+msgstr "English"
+
+msgid "UI_040"
+msgstr "El idioma se guarda en este dispositivo. Sin conexión."
+
+msgid "UI_041"
+msgstr "No se pudo guardar el idioma. Se mantiene la elección anterior."
+
+msgid "UI_042"
+msgstr "Fusta básica"
+
+msgid "UI_043"
+msgstr "Fusta larga"
+
+msgid "HORSE_COUNT"
+msgid_plural "HORSE_COUNTS"
+msgstr[0] "%d caballo"
+msgstr[1] "%d caballos"

@@ -73,7 +73,7 @@ func thumbnail(h:Dictionary)->Texture2D:
  var source:Texture2D=load("res://art/foal/base.png" if foal else "res://art/player/walk_diag_down/frame_00.png")
  return HorseAppearance.texture(source,"foal" if foal else "walk_diag_down",0,h.traits)
 func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
- var pick:=OptionButton.new();pick.position=pos;pick.size=Vector2(370,64);pick.add_theme_constant_override("icon_max_width",56);pick.get_popup().add_theme_constant_override("icon_max_width",56);content.add_child(pick)
+ var pick:=OptionButton.new();pick.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;pick.position=pos;pick.size=Vector2(370,64);pick.add_theme_constant_override("icon_max_width",56);pick.get_popup().add_theme_constant_override("icon_max_width",56);content.add_child(pick)
  for h in SaveData.horse_collection.horses:
   pick.add_icon_item(thumbnail(h),h.name);pick.set_item_metadata(pick.item_count-1,h.id)
   pick.set_item_disabled(pick.item_count-1,not SaveData.horse_collection.is_adult(h.id))
@@ -129,9 +129,9 @@ func detail_view()->void:
   label("Vista de catálogo. No seleccionable hasta obtenerlo.",Vector2(450,430),22)
   button("VOLVER AL ATLAS",Vector2(450,510),func():show_page("atlas"),340)
   return
- var title:=label(h.name,Vector2(40,175),27);title.size.x=365;title.clip_text=true
+ var title:=label(h.name,Vector2(40,175),27);title.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;title.size.x=365;title.clip_text=true
  sprite(h,Vector2(70,250),235)
- var name_edit:=LineEdit.new();name_edit.text=h.name;name_edit.placeholder_text="Nombre del caballo";name_edit.max_length=60;name_edit.position=Vector2(40,485);name_edit.size=Vector2(200,48);content.add_child(name_edit)
+ var name_edit:=LineEdit.new();name_edit.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;name_edit.text=h.name;name_edit.placeholder_text="Nombre del caballo";name_edit.max_length=60;name_edit.position=Vector2(40,485);name_edit.size=Vector2(200,48);content.add_child(name_edit)
  button("GUARDAR",Vector2(245,485),func():
   message="Nombre guardado" if SaveData.rename_horse(h.id,name_edit.text) else "Escribe un nombre (máximo 60 caracteres) / revisa guardado";refresh(),160)
  if SaveData.horse_collection.is_adult(h.id):

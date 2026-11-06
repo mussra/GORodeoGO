@@ -17,12 +17,14 @@ boot_splash/use_filter=true
 
 config/name="Rancho"
 config/icon="res://art/icon.png"
-config/version="2.0"
+config/version="2.1"
 run/main_scene="res://src/Presentation/main_menu.tscn"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.7")
 
 [autoload]
+
+Localization="*res://src/Application/localization.gd"
 
 RanchMusic="*res://src/Application/ranch_music.gd"
 
@@ -107,3 +109,8 @@ textures/vram_compression/import_etc2_astc=true
 [rancho]
 
 trial_tools=true
+
+[internationalization]
+
+locale/fallback="es"
+locale/translations=PackedStringArray("res://i18n/ui.es.po", "res://i18n/ui.en.po")

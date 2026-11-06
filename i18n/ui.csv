@@ -1,0 +1,59 @@
+keys,es,en
+UI_000,RANCHO // FRONTERA 01,RANCHO // FRONTIER 01
+UI_001,"DOMINA EL LAZO.
+ASEGURA EL RANCHO.","MASTER THE LASSO.
+SECURE THE RANCH."
+UI_002,JUGAR   >   NIVEL %02d,PLAY   >   LEVEL %02d
+UI_003,NIVELES · AVANZA UNO A UNO,LEVELS · ONE AT A TIME
+UI_004,EQUIPO,EQUIPMENT
+UI_005,ENSAYO AISLADO · TODO PRESTADO,ISOLATED TRIAL · BORROWED GEAR
+UI_006,IZQUIERDA  MOVER    /    DERECHA  LAZO    /    DOBLE TOQUE  LIBERAR,LEFT  MOVE    /    RIGHT  LASSO    /    DOUBLE TAP  RELEASE
+UI_007,SALIR,QUIT
+UI_008,ELIGE TU SIGUIENTE RETO,CHOOSE YOUR NEXT CHALLENGE
+UI_009,VOLVER,BACK
+UI_010,BLOQUEADO,LOCKED
+UI_011,RODEO,RODEO
+UI_012,CORRALES,PENS
+UI_013,"EQUIPO: ","EQUIPMENT: "
+UI_014,Sin fusta,No whip
+UI_015,"%02d / 20 COMPLETADOS · %d PUNTOS
+Equipo y recompensas en prueba","%02d / 20 COMPLETE · %d POINTS
+Trial equipment and rewards"
+UI_016,Toros en el corral: %d/%d,Bulls in the pen: %d/%d
+UI_017,NIVEL %02d,LEVEL %02d
+UI_018,Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes,Numbered pens · Open the gate · A bull follows the path and opens the next pens
+UI_019,"Laza un toro, espera a que se calme y llévalo a la META","Lasso a bull, let it calm down, then lead it to the GOAL"
+UI_020,"¡Rancho asegurado!
+Todos los toros en el corral.","Ranch secured!
+All bulls are in the pen."
+UI_021,"Nivel fallido.
+%s","Level failed.
+%s"
+UI_022,Pausa,Pause
+UI_023,Continuar,Resume
+UI_024,Sonido,Sound
+UI_025,Menú principal,Main menu
+UI_026,Siguiente nivel,Next level
+UI_027,Calmando al toro...,Calming the bull...
+UI_028,Calmando al segundo...,Calming the second bull...
+UI_029,¡HAS CONSEGUIDO EL DOBLE LAZO!,YOU UNLOCKED THE DOUBLE LASSO!
+UI_030,"Ahora puedes enlazar DOS toros a la vez:
+lanza un segundo lazo mientras llevas uno cogido.
+Para soltar uno, doble toque rápido en el stick del lazo.","You can now lasso TWO bulls at once:
+throw a second lasso while leading the first bull.
+To release one, double-tap the lasso stick."
+UI_031,¡Vamos!,Let's go!
+UI_032,¡Ya está calmado! Guíalo hasta la META marcada con ✓,It is calm! Lead it to the GOAL marked with ✓
+UI_033,Mantén la distancia con los toros sueltos mientras se calma,Keep away from loose bulls while it calms down
+UI_034,Laza y calma · Lleva a los perseguidores al AGUA o HENO para distraerlos,Lasso and calm · Lead pursuers to WATER or HAY to distract them
+UI_035,AJUSTES,SETTINGS
+UI_036,Idioma,Language
+UI_037,Automático (móvil),Automatic (device)
+UI_038,Español,Español
+UI_039,English,English
+UI_040,El idioma se guarda en este dispositivo. Sin conexión.,Language is saved on this device. Works offline.
+UI_041,No se pudo guardar el idioma. Se mantiene la elección anterior.,Could not save the language. The previous choice is kept.
+UI_042,Fusta básica,Basic whip
+UI_043,Fusta larga,Long whip
+UI_044,%d caballo,%d horse
+UI_045,%d caballos,%d horses

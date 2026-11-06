@@ -1,0 +1,142 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "UI_000"
+msgstr "RANCHO // FRONTIER 01"
+
+msgid "UI_001"
+msgstr "MASTER THE LASSO.\nSECURE THE RANCH."
+
+msgid "UI_002"
+msgstr "PLAY   >   LEVEL %02d"
+
+msgid "UI_003"
+msgstr "LEVELS · ONE AT A TIME"
+
+msgid "UI_004"
+msgstr "EQUIPMENT"
+
+msgid "UI_005"
+msgstr "ISOLATED TRIAL · BORROWED GEAR"
+
+msgid "UI_006"
+msgstr "LEFT  MOVE    /    RIGHT  LASSO    /    DOUBLE TAP  RELEASE"
+
+msgid "UI_007"
+msgstr "QUIT"
+
+msgid "UI_008"
+msgstr "CHOOSE YOUR NEXT CHALLENGE"
+
+msgid "UI_009"
+msgstr "BACK"
+
+msgid "UI_010"
+msgstr "LOCKED"
+
+msgid "UI_011"
+msgstr "RODEO"
+
+msgid "UI_012"
+msgstr "PENS"
+
+msgid "UI_013"
+msgstr "EQUIPMENT: "
+
+msgid "UI_014"
+msgstr "No whip"
+
+msgid "UI_015"
+msgstr "%02d / 20 COMPLETE · %d POINTS\nTrial equipment and rewards"
+
+msgid "UI_016"
+msgstr "Bulls in the pen: %d/%d"
+
+msgid "UI_017"
+msgstr "LEVEL %02d"
+
+msgid "UI_018"
+msgstr "Numbered pens · Open the gate · A bull follows the path and opens the next pens"
+
+msgid "UI_019"
+msgstr "Lasso a bull, let it calm down, then lead it to the GOAL"
+
+msgid "UI_020"
+msgstr "Ranch secured!\nAll bulls are in the pen."
+
+msgid "UI_021"
+msgstr "Level failed.\n%s"
+
+msgid "UI_022"
+msgstr "Pause"
+
+msgid "UI_023"
+msgstr "Resume"
+
+msgid "UI_024"
+msgstr "Sound"
+
+msgid "UI_025"
+msgstr "Main menu"
+
+msgid "UI_026"
+msgstr "Next level"
+
+msgid "UI_027"
+msgstr "Calming the bull..."
+
+msgid "UI_028"
+msgstr "Calming the second bull..."
+
+msgid "UI_029"
+msgstr "YOU UNLOCKED THE DOUBLE LASSO!"
+
+msgid "UI_030"
+msgstr "You can now lasso TWO bulls at once:\nthrow a second lasso while leading the first bull.\nTo release one, double-tap the lasso stick."
+
+msgid "UI_031"
+msgstr "Let's go!"
+
+msgid "UI_032"
+msgstr "It is calm! Lead it to the GOAL marked with ✓"
+
+msgid "UI_033"
+msgstr "Keep away from loose bulls while it calms down"
+
+msgid "UI_034"
+msgstr "Lasso and calm · Lead pursuers to WATER or HAY to distract them"
+
+msgid "UI_035"
+msgstr "SETTINGS"
+
+msgid "UI_036"
+msgstr "Language"
+
+msgid "UI_037"
+msgstr "Automatic (device)"
+
+msgid "UI_038"
+msgstr "Español"
+
+msgid "UI_039"
+msgstr "English"
+
+msgid "UI_040"
+msgstr "Language is saved on this device. Works offline."
+
+msgid "UI_041"
+msgstr "Could not save the language. The previous choice is kept."
+
+msgid "UI_042"
+msgstr "Basic whip"
+
+msgid "UI_043"
+msgstr "Long whip"
+
+msgid "HORSE_COUNT"
+msgid_plural "HORSE_COUNTS"
+msgstr[0] "%d horse"
+msgstr[1] "%d horses"

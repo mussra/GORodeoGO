@@ -63,12 +63,12 @@ func hide_nerves_slot(slot: int) -> void:
 		nerves_group_2.visible = false
 
 func update_bull_count(returned: int, total: int) -> void:
-	bull_count_label.text = "Toros en el corral: %d/%d" % [returned, total]
+	bull_count_label.text = tr("UI_016") % [returned, total]
 
 func set_level(number: int) -> void:
 	_level_number = number
-	_level_label.text = "NIVEL %02d" % number
-	_hint_label.text = "Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes" if number >= 11 else "Laza un toro, espera a que se calme y llévalo a la META"
+	_level_label.text = tr("UI_017") % number
+	_hint_label.text = tr("UI_018") if number >= 11 else tr("UI_019")
 
 func update_timer(seconds_remaining: float) -> void:
 	var whole_seconds: int = max(0, int(ceil(seconds_remaining)))
@@ -83,7 +83,7 @@ func show_win() -> void:
 	_hint_label.hide()
 	_next_button.visible = GameState.selected_level < LevelCatalog.MAX_LEVEL
 	restart_button.visible = not _next_button.visible
-	end_label.text = "¡Rancho asegurado!\nTodos los toros en el corral."
+	end_label.text = tr("UI_020")
 	end_panel.visible = true
 
 func show_lose(reason: String) -> void:
@@ -92,7 +92,7 @@ func show_lose(reason: String) -> void:
 	nerves_group_2.hide()
 	_pause_button.hide()
 	_hint_label.hide()
-	end_label.text = "Nivel fallido.\n%s" % reason
+	end_label.text = tr("UI_021") % reason
 	end_panel.visible = true
 
 func show_pause() -> void:
@@ -119,7 +119,7 @@ func _build_pause_panel() -> void:
 	_pause_panel.visible = false
 
 	var title := Label.new()
-	title.text = "Pausa"
+	title.text = tr("UI_022")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.offset_left = 20.0
 	title.offset_right = 492.0
@@ -128,7 +128,7 @@ func _build_pause_panel() -> void:
 	_pause_panel.add_child(title)
 
 	var resume_button := Button.new()
-	resume_button.text = "Continuar"
+	resume_button.text = tr("UI_023")
 	resume_button.offset_left = 40.0
 	resume_button.offset_right = 240.0
 	resume_button.offset_top = 120.0
@@ -137,14 +137,14 @@ func _build_pause_panel() -> void:
 	_pause_panel.add_child(resume_button)
 
 	var sound_button := CheckButton.new()
-	sound_button.text = "Sonido"
+	sound_button.text = tr("UI_024")
 	sound_button.button_pressed = GameState.sound_enabled
 	sound_button.position = Vector2(185, 65)
 	sound_button.toggled.connect(func(value: bool): sound_toggled.emit(value))
 	_pause_panel.add_child(sound_button)
 
 	var menu_button := Button.new()
-	menu_button.text = "Menú principal"
+	menu_button.text = tr("UI_025")
 	menu_button.offset_left = 272.0
 	menu_button.offset_right = 472.0
 	menu_button.offset_top = 120.0
@@ -157,7 +157,7 @@ func _build_pause_panel() -> void:
 func _apply_ranch_ui() -> void:
 	var ranch_theme: Theme = RanchTheme.create()
 	_next_button = Button.new()
-	_next_button.text = "Siguiente nivel"
+	_next_button.text = tr("UI_026")
 	_next_button.position = restart_button.position
 	_next_button.size = restart_button.size
 	_next_button.visible = false
@@ -190,7 +190,7 @@ func _apply_ranch_ui() -> void:
 	timer_label.add_theme_font_size_override("font_size", 26)
 	_pause_button = Button.new()
 	_pause_button.theme = ranch_theme
-	_pause_button.text = "Pausa"
+	_pause_button.text = tr("UI_022")
 	_pause_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	_pause_button.offset_left = -120
 	_pause_button.offset_right = -20
@@ -213,8 +213,8 @@ func _apply_ranch_ui() -> void:
 		group.modulate = Color("fff1d2")
 	for bar: ProgressBar in [nerves_bar, nerves_bar_2]:
 		bar.show_percentage = false
-	$NervesGroup/NervesLabel.text = "Calmando al toro..."
-	$NervesGroup2/NervesLabel.text = "Calmando al segundo..."
+	$NervesGroup/NervesLabel.text = tr("UI_027")
+	$NervesGroup2/NervesLabel.text = tr("UI_028")
 
 ## One-shot unlock celebration (Ant, 4-nov: "que se vea una animación chula diciendo has
 ## conseguido el doble lazo y que te explique cómo usarlo"). Shown by Level0 with the tree
@@ -257,7 +257,7 @@ func _build_dual_lasso_panel() -> void:
 	pulse.tween_property(icon, "modulate", Color.WHITE, 0.6)
 
 	var title := Label.new()
-	title.text = "¡HAS CONSEGUIDO EL DOBLE LAZO!"
+	title.text = tr("UI_029")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.offset_left = 20.0
 	title.offset_right = 540.0
@@ -268,7 +268,7 @@ func _build_dual_lasso_panel() -> void:
 	_dual_lasso_panel.add_child(title)
 
 	var explanation := Label.new()
-	explanation.text = "Ahora puedes enlazar DOS toros a la vez:\nlanza un segundo lazo mientras llevas uno cogido.\nPara soltar uno, doble toque rápido en el stick del lazo."
+	explanation.text = tr("UI_030")
 	explanation.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	explanation.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	explanation.offset_left = 40.0
@@ -278,7 +278,7 @@ func _build_dual_lasso_panel() -> void:
 	_dual_lasso_panel.add_child(explanation)
 
 	var accept_button := Button.new()
-	accept_button.text = "¡Vamos!"
+	accept_button.text = tr("UI_031")
 	accept_button.offset_left = 180.0
 	accept_button.offset_right = 380.0
 	accept_button.offset_top = 300.0
@@ -315,12 +315,12 @@ func update_guidance(held_count: int, ready_count: int, has_closed_doors: bool) 
 	if Time.get_ticks_msec() / 1000.0 < _flash_hint_until_seconds:
 		return
 	if ready_count > 0:
-		_hint_label.text = "¡Ya está calmado! Guíalo hasta la META marcada con ✓"
+		_hint_label.text = tr("UI_032")
 	elif held_count > 0:
-		_hint_label.text = "Mantén la distancia con los toros sueltos mientras se calma"
+		_hint_label.text = tr("UI_033")
 	elif _level_number >= 11 and has_closed_doors:
-		_hint_label.text = "Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes"
+		_hint_label.text = tr("UI_018")
 	elif _level_number >= 3:
-		_hint_label.text = "Laza y calma · Lleva a los perseguidores al AGUA o HENO para distraerlos"
+		_hint_label.text = tr("UI_034")
 	else:
-		_hint_label.text = "Laza un toro, espera a que se calme y llévalo a la META"
+		_hint_label.text = tr("UI_019")
