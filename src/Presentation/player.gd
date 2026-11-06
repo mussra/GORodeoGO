@@ -285,13 +285,16 @@ func stun(duration: float) -> void:
 	cancel_input()
 
 func _physics_process(delta: float) -> void:
+	# Ground trail keeps fading even while jump/stun branches return early.
+	if _dodge_path.is_empty() and _trail_fade>0:
+		_trail_fade=maxf(0.0,_trail_fade-delta)
+		if _trail_fade<=0:_skid_trail.clear()
+		queue_redraw()
 	_jump_cooldown=maxf(0,_jump_cooldown-delta)
 	if _jump_time>0:
 		_process_jump(delta);return
 	if can_jump and velocity.length()>60 and _try_fence_ahead():return
 	_dodge_cooldown = maxf(0.0, _dodge_cooldown - delta)
-	if _dodge_path.is_empty():
-		_trail_fade = maxf(0.0, _trail_fade - delta)
 	if _stun_time_remaining > 0.0:
 		_stun_time_remaining -= delta
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
@@ -564,8 +567,8 @@ func _draw() -> void:
 		_draw_flash_path(dodge_preview_points(_draw_points), 1.0)
 		draw_string(ThemeDB.fallback_font,Vector2(-64,-78),"TIEMPO BALA",HORIZONTAL_ALIGNMENT_LEFT,150,15,Color("a7fff0"))
 	var recharge: float = 1.0 - _dodge_cooldown / DODGE_RECHARGE_SECONDS
-	if dodge_available: draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
-	if dodge_available: draw_line(Vector2(-22, -59), Vector2(-22 + 44 * recharge, -59), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
+	if dodge_available: draw_line(_overhead_bar_anchor()+Vector2(-22,0), _overhead_bar_anchor()+Vector2(22,0), Color("263747"), 5.0)
+	if dodge_available: draw_line(_overhead_bar_anchor()+Vector2(-22,0), _overhead_bar_anchor()+Vector2(-22+44*recharge,0), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
 	if _dodge_remaining > 0.0:
 		var back: Vector2 = -_dodge_direction
 		var side: Vector2 = _dodge_direction.orthogonal()
@@ -639,6 +642,10 @@ func request_jump(direction:Vector2)->bool:
 	cancel_input();_jump_time=HorseJump.DURATION
 	if _sprite_swap.has_sprite():_jump_sprite_base=_sprite_swap._sprite.position
 	jump_started.emit();return true
+func _overhead_bar_anchor()->Vector2:
+	var lift:float=0.0
+	if _jump_time>0 and _sprite_swap.has_sprite():lift=_sprite_swap._sprite.position.y-_jump_sprite_base.y
+	return Vector2(0,-59+lift)
 func _process_jump(delta:float)->void:
 	_jump_time=maxf(0,_jump_time-delta);var t:float=1-_jump_time/HorseJump.DURATION
 	velocity=_jump_direction*HorseJump.DISTANCE/HorseJump.DURATION
@@ -650,6 +657,7 @@ func _process_jump(delta:float)->void:
 		# Frame animation keeps the gallop articulate. Separate squash, suspension and landing.
 		var sprite:AnimatedSprite2D=_sprite_swap._sprite
 		sprite.position=_jump_sprite_base+Vector2(0,-HorseJump.arc(t));sprite.scale=Vector2(1+.08*sin(PI*t),1-.08*sin(PI*t))
+	queue_redraw()
 	if hit!=null:_jump_time=0
 	if _jump_time<=0:
 		_finish_jump(false)

@@ -32,3 +32,12 @@ func test_roped_bull_recovers_path_around_both_ends_of_solid_fence()->void:
  var previous:Vector2=bull.global_position
  for point:Vector2 in bull._tow_path:
   assert_false(bull.test_move(Transform2D(0,previous),point-previous),"each route segment remains solid-collision safe");previous=point
+
+func test_overhead_bar_follows_jump_and_restores_on_land_and_cancel()->void:
+ player.set_physics_process(false);assert_eq(player._overhead_bar_anchor(),Vector2(0,-59));assert_true(player.request_jump(Vector2.RIGHT));player._process_jump(HorseJump.DURATION/2)
+ assert_almost_eq(player._overhead_bar_anchor().y,-59-HorseJump.arc(.5),.01);assert_lt(player._overhead_bar_anchor().y,-90.0)
+ player._process_jump(HorseJump.DURATION/2);assert_eq(player._overhead_bar_anchor(),Vector2(0,-59));player._jump_cooldown=0;assert_true(player.request_jump(Vector2.LEFT));player._process_jump(.1);player.stun(.2);assert_eq(player._overhead_bar_anchor(),Vector2(0,-59))
+func test_dodge_trail_expires_during_jump_and_stun()->void:
+ player.set_physics_process(false);player._skid_trail.assign([Vector2(-120,0),Vector2(-90,0)]);player._trail_fade=.3;assert_true(player.request_jump(Vector2.RIGHT))
+ player._physics_process(.15);assert_almost_eq(player._trail_fade,.15,.001);player._physics_process(.2);assert_eq(player._trail_fade,0.0);assert_true(player._skid_trail.is_empty())
+ player.stun(.5);player._skid_trail.assign([Vector2(-120,0),Vector2(-90,0)]);player._trail_fade=.1;player._physics_process(.2);assert_eq(player._trail_fade,0.0);assert_true(player._skid_trail.is_empty())
