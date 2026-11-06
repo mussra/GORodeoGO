@@ -50,6 +50,7 @@ var _link_overlay: PenLinkOverlay
 var _pen_released: Array = []  # bool per pen index — a pen's bulls are released at most once
 
 func _ready() -> void:
+	JoystickAppearance.apply(self)
 	RanchMusic.set_paused(false)
 	RanchMusic.set_enabled(GameState.sound_enabled)
 	RanchMusic.play_context("gameplay")
@@ -57,8 +58,10 @@ func _ready() -> void:
 	add_child(_audio)
 	_audio.enabled = GameState.sound_enabled
 	var level_data: LevelData = LevelCatalog.get_level(GameState.selected_level)
-	_upgrades = PlayerUpgrades.for_progress(SaveData.highest_level_completed)
+	_upgrades = PlayerUpgrades.for_progress(SaveData.effective_progress())
 	_apply_unlocked_upgrades()
+	if SaveData.trial_session_active:
+		var banner:=Label.new();banner.text="ENSAYO AISLADO · sin premios ni guardado · equipo prestado";banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);hud.add_child(banner)
 	_level_number = level_data.level_number
 	_arena_scale=ArenaLayout.scale_for_level(_level_number)
 	world_bounds=ArenaLayout.bounds_for_level(_level_number)
@@ -105,6 +108,7 @@ func _ready() -> void:
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
 	hud.update_timer(_time_remaining)
 	hud.set_level(_level_number)
+	if GameState.trial_tools_enabled():hud.flash_hint("ENSAYO: regate y doble lazo activos, sin alterar progreso",5.0)
 	hud.hide_nerves_slot(0)
 	hud.hide_nerves_slot(1)
 	hud.restart_requested.connect(_on_restart_requested)
@@ -327,12 +331,20 @@ func _release_pen_bulls(pen_index: int) -> void:
 ## Applies persistent unlocks once at level start — these are player stats, not
 ## continuously-recalculated level rules. Schedule/numbers: PlayerUpgrades.
 func _apply_unlocked_upgrades() -> void:
-	player.dodge_path_limit = _upgrades.dodge_path_limit
+	var reach:float=SaveData.equipped_whip_reach()
+	if GameState.trial_tools_enabled():reach=maxf(reach,260.0)
+	player.dodge_available=reach>0
+	player.dodge_path_limit=reach if reach>0 else 260.0
+	var horse_stats:Dictionary=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected))
+	player.max_speed=horse_stats.speed
+	player.acceleration=horse_stats.handling
+	player.dual_capture_speed_multiplier=horse_stats.power
+	if reach>0:player.dodge_path_limit=reach*horse_stats.dodge
 	player.max_speed *= _upgrades.speed_multiplier
 	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier
 	player.lasso_travel_time *= _upgrades.lasso_travel_time_multiplier
 	player.max_throw_distance *= _upgrades.throw_distance_multiplier
-	_max_simultaneous_captures = _upgrades.max_simultaneous_captures
+	_max_simultaneous_captures = maxi(2,_upgrades.max_simultaneous_captures) if GameState.trial_tools_enabled() else _upgrades.max_simultaneous_captures
 	player.set_max_captures(_max_simultaneous_captures)
 
 func _process(delta: float) -> void:
@@ -519,8 +531,9 @@ func _trigger_win() -> void:
 		return
 	_game_over = true
 	_freeze_gameplay()
-	SaveData.record_level_completed(_level_number)
+	var reward:int=SaveData.record_victory(_level_number)
 	hud.show_win()
+	hud.end_label.text += "\nENSAYO AISLADO: sin premios ni progreso guardado" if SaveData.trial_session_active else "\n+%d puntos · Saldo: %d\nEquipo y precios en prueba" % [reward,SaveData.equipment_points]
 	_audio.play("win")
 
 func _trigger_lose(reason: String) -> void:

@@ -9,7 +9,7 @@ func _ready()->void:
 	gui_input.connect(_on_input)
 	_layout()
 func _on_input(event:InputEvent)->void:
-	if (event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT):
+	if (event is InputEventMouseButton and event.device!=InputEvent.DEVICE_ID_EMULATION and event.pressed and event.button_index==MOUSE_BUTTON_LEFT):
 		set_expanded(not expanded)
 		accept_event()
 func _layout()->void:

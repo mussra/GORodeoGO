@@ -36,6 +36,7 @@ func test_native_touch_edge_hold_release_executes_same_preview_and_other_finger_
 	add_child_autofree(level)
 	await wait_physics_frames(2)
 	var player:Node=level.player
+	player.dodge_available=true
 	var touch:=InputEventScreenTouch.new()
 	touch.index=0;touch.position=Vector2(130,420);touch.pressed=true
 	Input.parse_input_event(touch.duplicate())

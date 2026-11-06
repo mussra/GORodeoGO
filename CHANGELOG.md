@@ -235,3 +235,29 @@ R para liberar en teclado, ayuda contextual por estado, controles de juego ocult
 ## Source update after 0.21.26 - Shared splash asset (next build)
 - Uses common 1080 square splash supplied for all four games, full text intact, with #041940 background.
 - Landscape layout keeps subtitle readable. Gameplay unchanged.
+
+## 0.21.27 - Stable offscreen indicators
+- Per-target visibility hysteresis and dwell prevent rapid boundary flicker.
+- Tests cover exact thresholds, epsilon offsets, corners and 30/60/120 FPS.
+- Controlled visual repro: ±1.5 px border oscillation, old rule toggles rapidly, fixed rule stays stable.
+- Includes shared square splash normalization already committed to main. No gameplay motion/speed changes.
+
+## 0.21.28 - Cowboy gallop trial
+- Uses the approved lateral painted rig with moderately longer leg chains.
+- Twelve phases in all five base movement views, mirrored to eight directions.
+- Frontal/rear/diagonal motion is a perspective interpretation of the lateral guide, not an exact multi-view reference.
+- Existing game rules, bull art, stun animation, phase-preserving steering and speed scaling unchanged.
+- Five focused asset/transition tests, 231 assertions. Scripted desktop visual review, not Android device validation.
+
+## 0.21.29 - Points, whips and continuous dodge exit (trial)
+- Victory points repeatable, growing by level; provisional curve anchored on 10/200/1000 for levels1/5/10.
+- Equipment menu: basic whip1000 enables260px dodge, improved whip2000 needs basic and equips420px. Buy/equip separate. No real money.
+- One-time points for deducible first wins in prior saves; progress/intro retained. No guessed historic repeats.
+- Dodge hands off immediately to normal running/current joystick, preserves collision/stun and tow penalty.
+- Sequential level selection in debug/release, no save reset. No cosmetic/new horse/animal catalogue yet.
+- 48focused tests343asserts. Native-touch desktop handoff and full points/purchase/equip/persistence flow checked; no physicalAndroid/balance certification.
+
+## 0.21.40 - Hand-painted adult portrait masks
+- Packages checkpoint bf457d6: mane/fringe, blaze edge, eyes, rings and protected equipment on the approved source. No broader style changes.
+- 52 material-ownership checks and deterministic rebuild verified; six variants and head/lower matrices inspected.
+- Whip remains textual. Not a global HQ completion or physical Android validation. No main merge.

@@ -43,3 +43,24 @@ func test_distraction_has_ten_frames_with_six_distinct_head_poses() -> void:
 	assert_eq(swap._frames.get_animation_speed("drinking"), 5.0)
 	for i in range(10):
 		assert_eq(swap._frames.get_frame_texture("drinking", i).get_size(), Vector2(96,96))
+
+func test_player_gallop_keeps_all_eight_directions_and_twelve_distinct_phases() -> void:
+	var host:=Node2D.new()
+	add_child_autofree(host)
+	var placeholder:=Polygon2D.new()
+	host.add_child(placeholder)
+	var names=["walk_side","walk_down","walk_up","walk_diag_down","walk_diag_up"]
+	var swap:=SpriteSwap.new(host,placeholder,"res://art/player/",names,8)
+	for name:String in names:
+		assert_true(swap.play(name))
+		assert_eq(swap._frames.get_frame_count(name),12)
+		assert_eq(swap._frames.get_animation_speed(name),16.0)
+		var hashes:Array=[]
+		for i in range(12):
+			var image=swap._frames.get_frame_texture(name,i).get_image()
+			var hash_value=image.get_data().hex_encode().sha256_text()
+			assert_false(hashes.has(hash_value),name+" phase "+str(i))
+			hashes.append(hash_value)
+	for dir:Vector2 in [Vector2.RIGHT,Vector2(1,1),Vector2.DOWN,Vector2(-1,1),Vector2.LEFT,Vector2(-1,-1),Vector2.UP,Vector2(1,-1)]:
+		var result=SpriteSwap.direction_suffix(dir)
+		assert_true(swap.play("walk_"+result[0]))

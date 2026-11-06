@@ -11,15 +11,12 @@ const STUN_RESISTANCE_UNLOCK_LEVEL: int = 4
 const DUAL_CAPTURE_UNLOCK_LEVEL: int = 5
 const LASSO_SPEED_UNLOCK_LEVEL: int = 6
 const THROW_DISTANCE_UNLOCK_LEVEL: int = 8
-const LONG_DODGE_UNLOCK_LEVEL: int = 10  # reversible night prototype choice
-const LONG_DODGE_PATH_LIMIT: float = 420.0
 
 const SPEED_MULTIPLIER: float = 1.15
 const STUN_DURATION_MULTIPLIER: float = 0.7
 const LASSO_TRAVEL_TIME_MULTIPLIER: float = 0.75
 const THROW_DISTANCE_MULTIPLIER: float = 1.20
 
-var dodge_path_limit: float = 260.0
 var speed_multiplier: float = 1.0
 var stun_duration_multiplier: float = 1.0
 var lasso_travel_time_multiplier: float = 1.0
@@ -41,6 +38,4 @@ static func for_progress(highest_level_completed: int) -> PlayerUpgrades:
 		upgrades.lasso_travel_time_multiplier = LASSO_TRAVEL_TIME_MULTIPLIER
 	if highest_level_completed >= THROW_DISTANCE_UNLOCK_LEVEL:
 		upgrades.throw_distance_multiplier = THROW_DISTANCE_MULTIPLIER
-	if highest_level_completed >= LONG_DODGE_UNLOCK_LEVEL:
-		upgrades.dodge_path_limit = LONG_DODGE_PATH_LIMIT
 	return upgrades

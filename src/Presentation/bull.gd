@@ -366,7 +366,11 @@ func _compute_flee_speed_for_nerves() -> float:
 	return flee_speed
 
 func _on_state_changed(new_state: BullState.State) -> void:
+	queue_redraw()
 	_distraction.cancel()
+	if not controller.is_wild():
+		_is_chaser=false
+		_random_chase.reset()
 	if new_state == BullState.State.CAPTURED or not controller.is_held():
 		_tow_path.clear()
 		_tow_blocked_seconds=0.0
@@ -493,7 +497,7 @@ func _draw() -> void:
 		var label: String = "Bebiendo..." if _distraction.kind == "water" else "Comiendo..."
 		draw_style_box(RanchTheme.box(Color("244b40"), Color("9dd5af"), 6), Rect2(-50, -73, 100, 25))
 		draw_string(ThemeDB.fallback_font, Vector2(-45, -55), label, HORIZONTAL_ALIGNMENT_CENTER, 90, 13, Color("fff1d2"))
-	elif _is_chaser or _random_chase.is_active():
+	elif controller.is_wild() and (_is_chaser or _random_chase.is_active()):
 		draw_circle(Vector2(0, -54), 10, Color("aa4535"))
 		draw_line(Vector2(0, -59), Vector2(0, -54), Color("fff1d2"), 2)
 		draw_circle(Vector2(0, -50), 1.5, Color("fff1d2"))
@@ -583,14 +587,14 @@ func _courier_detour(target: Vector2, interaction_radius:float=0.0) -> PackedVec
 	return result
 
 ## Player rectangle fits closer to fences/corners than the bull's circle.
-## Rejoin the earliest later clear breadcrumb through a collision-aware route;
-## never erase the whole history to chase the player's current position.
+## Recover toward newest reachable rider position, discarding stale history.
+## A collision-aware route still goes around obstacles, never through them.
 func _recover_tow_route() -> void:
 	var query:=PhysicsShapeQueryParameters2D.new()
 	query.shape=$CollisionShape2D.shape
 	query.collision_mask=collision_mask
 	query.exclude=[get_rid()]
-	for i in range(_tow_path.size()):
+	for i in range(_tow_path.size()-1,-1,-1):
 		var target: Vector2=_tow_path[i]
 		if global_position.distance_to(target)<64: continue
 		# Grid endpoints must themselves fit the larger bull footprint.
@@ -611,7 +615,7 @@ func _recover_tow_route() -> void:
 			cell_target=best
 		var route: PackedVector2Array=_courier_detour(cell_target)
 		if route.is_empty(): continue
-		for old in range(i+1): _tow_path.pop_front()
+		_tow_path.clear()
 		for step in range(route.size()-1,-1,-1): _tow_path.push_front(route[step])
 		return
 

@@ -28,8 +28,12 @@ const DODGE_SPEED_FACTOR: float = 2.2
 const DODGE_COAST_SECONDS: float = .18  # short soft stop, preview tuning
 const DODGE_COAST_SPEED_FACTOR: float = .8
 var _dodge_coast_remaining: float = 0.0
-var _move_tap: DoubleTapDetector = DoubleTapDetector.new(.3)
+const MOVE_REPRESS_WINDOW_SECONDS: float = .3
+var _move_tap: DoubleTapDetector = DoubleTapDetector.new(MOVE_REPRESS_WINDOW_SECONDS)
+var _running_release_at: float = -INF
 const DRAW_TIME_SCALE: float = .24
+var _run_after_dodge: Vector2 = Vector2.ZERO
+var dodge_available: bool = true
 var dodge_path_limit: float = 260.0
 var _drawing_real_started: float = 0.0
 var _drawing_dodge: bool = false
@@ -84,7 +88,10 @@ var _max_captures: int = 1
 var _touch_aim_active: bool = false
 
 func _ready() -> void:
-	_sprite_swap = SpriteSwap.new(self, $Polygon2D, ART_ROOT, ANIM_NAMES)
+	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), ANIM_NAMES)
+	if _sprite_swap.has_sprite():
+		var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
+		if not horse.is_empty():HorseAppearance.apply(_sprite_swap._frames,horse.traits)
 	var cue_layer:=CanvasLayer.new()
 	cue_layer.layer=16
 	add_child(cue_layer)
@@ -124,7 +131,11 @@ func set_move_joystick(stick: VirtualJoystick) -> void:
 
 func _on_move_pressed() -> void:
 	_move_pressed_at = _now_seconds()
-	if _move_tap.register_tap(_move_pressed_at) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
+	var running_repress: bool = _move_pressed_at - _running_release_at <= MOVE_REPRESS_WINDOW_SECONDS
+	_running_release_at = -INF
+	var double_press: bool = _move_tap.register_tap(_move_pressed_at)
+	if dodge_available and (running_repress or double_press) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
+		_move_tap.reset()
 		_drawing_dodge = true
 		_drawing_real_started = _now_seconds()
 		Engine.time_scale = DRAW_TIME_SCALE
@@ -176,6 +187,8 @@ func _extend_drawing_at_edge(real_delta:float)->void:
 	_append_draw_point()
 
 func _on_move_released(_direction: Vector2) -> void:
+	_running_release_at = -INF
+	_run_after_dodge = Vector2.ZERO
 	if _drawing_dodge:
 		_drawing_dodge = false
 		Engine.time_scale = 1.0
@@ -183,15 +196,20 @@ func _on_move_released(_direction: Vector2) -> void:
 		request_dodge_path(_draw_points)
 		_draw_points = PackedVector2Array()
 		_move_tap.reset()
+	elif not _direction.is_zero_approx() and velocity.length() > 1.0 and _stun_time_remaining <= 0.0 and _dodge_path.is_empty():
+		# A running hold is the first press. Only the gap after release is timed.
+		_running_release_at = _now_seconds()
+		_move_tap.reset()
 	elif _now_seconds() - _move_pressed_at > .22:
 		_move_tap.reset()
 
 func request_dodge_path(points: PackedVector2Array) -> bool:
-	if _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
+	if not dodge_available or _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
 		return false
 	var preview: PackedVector2Array = dodge_preview_points(points)
 	if preview.size()<2: return false
 	_dodge_path.clear()
+	_run_after_dodge = Vector2.ZERO
 	_dodge_coast_remaining = 0.0
 	_skid_trail.clear()
 	_skid_trail.append(global_position)
@@ -204,7 +222,7 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 	return true
 
 func request_dodge(direction: Vector2) -> bool:
-	if _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
+	if not dodge_available or _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
 		return false
 	_dodge_direction = direction.normalized()
 	_dodge_remaining = DODGE_SECONDS
@@ -279,15 +297,15 @@ func _physics_process(delta: float) -> void:
 	if not _dodge_path.is_empty():
 		var distance_left:float=global_position.distance_to(_dodge_path[0])
 		for i in range(1,_dodge_path.size()): distance_left+=_dodge_path[i-1].distance_to(_dodge_path[i])
-		# Ease down inside the promised path, never coast beyond its endpoint.
-		var budget: float = minf(max_speed*DODGE_SPEED_FACTOR,maxf(25.0,distance_left*14.0))*delta
+		# Ease to running speed, not to a standstill, at the traced endpoint.
+		var budget: float = minf(max_speed*DODGE_SPEED_FACTOR,maxf(max_speed,distance_left*14.0))*delta
 		if _active_capture_count >= 2:
 			budget *= dual_capture_speed_multiplier
 		var collision_free: bool = true
 		while budget > .01 and not _dodge_path.is_empty():
 			var offset: Vector2 = _dodge_path[0] - global_position
 			var step: Vector2 = offset.limit_length(budget)
-			_dodge_direction = offset.normalized()
+			if not offset.is_zero_approx(): _dodge_direction = offset.normalized()
 			var collision: KinematicCollision2D = move_and_collide(step)
 			_skid_trail.append(global_position)
 			budget -= step.length()
@@ -297,15 +315,18 @@ func _physics_process(delta: float) -> void:
 				break
 			if offset.length() <= step.length() + .1:
 				_dodge_path.pop_front()
-		# Only a bounded soft stop follows the trace, never the old full sprint
-		# velocity decaying through ordinary movement friction.
+		# The special trace ends here; ordinary running immediately takes over.
 		if _dodge_path.is_empty():
 			dodge_finished.emit()
 			_dodge_coast_remaining = 0.0
-			velocity = Vector2.ZERO
+			if collision_free:
+				_resume_running_after_dodge()
+			else:
+				_run_after_dodge = Vector2.ZERO
+				velocity = Vector2.ZERO
 		else:
 			velocity = _dodge_direction * max_speed * DODGE_SPEED_FACTOR
-		var facing: Array = SpriteSwap.direction_suffix(_dodge_direction)
+		var facing: Array = SpriteSwap.direction_suffix(velocity if not velocity.is_zero_approx() else _dodge_direction)
 		_sprite_swap.play("walk_" + facing[0])
 		_sprite_swap.set_flip_h(facing[1])
 		_sprite_swap.set_motion_speed(velocity.length(), 260.0)
@@ -335,6 +356,7 @@ func _physics_process(delta: float) -> void:
 		velocity = _dodge_direction * speed
 		move_and_slide()
 		global_position = global_position.clamp(world_bounds.position, world_bounds.end)
+		if _dodge_remaining <= 0.0: _resume_running_after_dodge()
 		var direction: Array = SpriteSwap.direction_suffix(_dodge_direction)
 		_sprite_swap.play("walk_" + direction[0])
 		_sprite_swap.set_flip_h(direction[1])
@@ -369,6 +391,13 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("release_capture"):
 		release_requested.emit()
 	_process_throw_input(delta)
+
+func _resume_running_after_dodge() -> void:
+	# Keep the endpoint tangent, never replace it with fresh input or automatic cruise.
+	# Normal acceleration/friction controls braking and turning from the next frame.
+	_run_after_dodge = Vector2.ZERO
+	var speed: float = max_speed * (dual_capture_speed_multiplier if _active_capture_count >= 2 else 1.0)
+	velocity = _dodge_direction * speed
 
 func _process_throw_input(delta: float) -> void:
 	if _is_charging:
@@ -437,6 +466,9 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 
 	lasso_thrown.emit(throw_origin, landing_point)
 	_flash_landing_area(landing_point)
+	# A second touch can begin before first flight lands. Keep held aim usable.
+	if _touch_aim_active and not _is_charging and _has_free_lasso_slot() and _stun_time_remaining<=0:
+		_start_charging()
 
 func cancel_all_actions() -> void:
 	cancel_input()
@@ -450,6 +482,8 @@ func cancel_all_actions() -> void:
 	_flight_tween = null
 
 func cancel_input() -> void:
+	_running_release_at = -INF
+	_run_after_dodge = Vector2.ZERO
 	if _drawing_dodge: dodge_drawing_finished.emit()
 	Engine.time_scale = 1.0
 	_dodge_coast_remaining = 0.0
@@ -515,8 +549,8 @@ func _draw() -> void:
 		_draw_flash_path(dodge_preview_points(_draw_points), 1.0)
 		draw_string(ThemeDB.fallback_font,Vector2(-64,-78),"TIEMPO BALA",HORIZONTAL_ALIGNMENT_LEFT,150,15,Color("a7fff0"))
 	var recharge: float = 1.0 - _dodge_cooldown / DODGE_RECHARGE_SECONDS
-	draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
-	draw_line(Vector2(-22, -59), Vector2(-22 + 44 * recharge, -59), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
+	if dodge_available: draw_line(Vector2(-22, -59), Vector2(22, -59), Color("263747"), 5.0)
+	if dodge_available: draw_line(Vector2(-22, -59), Vector2(-22 + 44 * recharge, -59), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
 	if _dodge_remaining > 0.0:
 		var back: Vector2 = -_dodge_direction
 		var side: Vector2 = _dodge_direction.orthogonal()

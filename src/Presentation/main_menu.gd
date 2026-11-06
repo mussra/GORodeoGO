@@ -5,9 +5,12 @@ extends Control
 var _hero: Control
 var _drawer: Panel
 var _play: Button
+var _equipment_button:Button
+var _equipment_panel:EquipmentPanel
 var _missions: Button
 var _caption: Label
-var _hd_rider: HDRiderIdle
+var _equipment_caption: Label
+var _hd_rider: Sprite2D
 var _rider: AnimatedSprite2D
 var _bull: AnimatedSprite2D
 var _intro: Tween
@@ -16,6 +19,7 @@ var _transitioning: bool = false
 var _next_level: int = 1
 
 func _ready() -> void:
+	SaveData.end_trial_session() # returning to menu always restores real state
 	RanchMusic.set_paused(false)
 	RanchMusic.set_enabled(GameState.sound_enabled)
 	RanchMusic.play_context("menu")
@@ -93,14 +97,26 @@ func _build_menu() -> void:
 	_play.pressed.connect(_on_level_selected.bind(_next_level))
 	_hero.add_child(_play)
 	_missions = Button.new()
-	_missions.text = "EXPLORAR LOS 20 NIVELES"
+	_missions.text = "NIVELES · AVANZA UNO A UNO"
 	_missions.add_theme_font_size_override("font_size",16)
 	_missions.pressed.connect(_show_levels)
 	_hero.add_child(_missions)
 	_caption = _label("%02d / 20 COMPLETADOS     ·     RODEO + CORRALES" % SaveData.highest_level_completed,14,Color("85a9ad"))
 	_hero.add_child(_caption)
-	if SaveData.highest_level_completed >= PlayerUpgrades.LONG_DODGE_UNLOCK_LEVEL:
-		_caption.text += "   ·   REGATE LARGO"
+	_equipment_button=Button.new()
+	_equipment_button.text="EQUIPO"
+	_equipment_button.pressed.connect(_show_equipment)
+	_hero.add_child(_equipment_button)
+	_equipment_panel=EquipmentPanel.new()
+	_equipment_panel.visible=false
+	add_child(_equipment_panel)
+	_equipment_panel.closed.connect(_refresh_points_caption)
+	if GameState.trial_tools_enabled():
+		var trial:=Button.new();trial.text="ENSAYO AISLADO · TODO PRESTADO";trial.position=Vector2(40,625);trial.size=Vector2(560,48);_hero.add_child(trial)
+		trial.pressed.connect(func():
+			if SaveData.begin_trial_session():
+				var panel=load("res://src/Presentation/trial_panel.gd").new();add_child(panel))
+	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
 	var p := Polygon2D.new()
@@ -110,11 +126,15 @@ func _build_menu() -> void:
 	_rider = swap._sprite
 	rider_host.name = "Rider"
 	_rider.hide()
-	_hd_rider = HDRiderIdle.new()
-	_hd_rider.texture = preload("res://art/ui/hero/rider_hd.png")
+	_hd_rider = Sprite2D.new()
+	HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
 	_hd_rider.position = Vector2(0,0)
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
+	_equipment_caption = _label("",16,Color("9cbcc0"))
+	_equipment_caption.position=Vector2(850,632)
+	add_child(_equipment_caption)
+	_refresh_points_caption()
 	var bull_host := Node2D.new()
 	_hero.add_child(bull_host)
 	var b := Polygon2D.new()
@@ -152,8 +172,8 @@ func _build_menu() -> void:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		button.custom_minimum_size = Vector2(0,58)
-		button.disabled = not LevelProgression.is_unlocked(number,SaveData.highest_level_completed,OS.is_debug_build())
-		button.text = "%02d\n%s" % [number,"RODEO" if number <=10 else "CORRALES"]
+		button.disabled = not LevelProgression.is_unlocked(number,SaveData.highest_level_completed)
+		button.text = "%02d\n%s" % [number,("BLOQUEADO" if button.disabled else ("RODEO" if number <=10 else "CORRALES"))]
 		button.pressed.connect(_on_level_selected.bind(number))
 		level_grid.add_child(button)
 	_drawer.hide()
@@ -171,7 +191,10 @@ func _layout() -> void:
 	_play.position = Vector2(68,411)
 	_play.size = Vector2(418,70)
 	_missions.position = Vector2(68,498)
-	_missions.size = Vector2(418,54)
+	_missions.size = Vector2(270,54)
+	_missions.add_theme_font_size_override("font_size",13)
+	_equipment_button.position=Vector2(350,498)
+	_equipment_button.size=Vector2(136,54)
 	_caption.position = Vector2(70,580)
 	_hero.get_node("Rider").position = Vector2(912,355)
 	_hero.get_node("Rider").scale = Vector2.ONE
@@ -218,7 +241,7 @@ func _hide_levels() -> void:
 	_drawer.hide()
 	_missions.grab_focus()
 func _on_level_selected(number: int) -> void:
-	if _transitioning: return
+	if _transitioning or not LevelProgression.is_unlocked(number, SaveData.highest_level_completed): return
 	_transitioning = true
 	GameState.selected_level = number
 	get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn")
@@ -227,3 +250,14 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
 		if is_instance_valid(_drawer) and _drawer.visible: _hide_levels()
 		else: _on_quit_pressed()
+
+func _refresh_points_caption()->void:
+	if is_instance_valid(_equipment_caption):
+		var id:String=SaveData.equipment_equipped.get("whip","")
+		_equipment_caption.text="EQUIPO: "+(str(EquipmentCatalog.ITEMS[id].name) if EquipmentCatalog.ITEMS.has(id) else "Sin fusta")
+	if is_instance_valid(_hd_rider):HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
+	_caption.text="%02d / 20 COMPLETADOS · %d PUNTOS\nEquipo y recompensas en prueba" % [SaveData.highest_level_completed,SaveData.equipment_points]
+
+func _show_equipment()->void:
+	_equipment_panel.refresh()
+	_equipment_panel.show()

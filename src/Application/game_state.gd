@@ -11,3 +11,7 @@ var sound_enabled: bool = true
 var menu_scene: String = "res://src/Presentation/main_menu.tscn"
 
 var brand_intro_played: bool = false
+
+# Test build only. Never persisted or applied by normal builds without explicit flag.
+func trial_tools_enabled()->bool:
+ return bool(ProjectSettings.get_setting("rancho/trial_tools",false))

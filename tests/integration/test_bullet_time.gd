@@ -17,9 +17,9 @@ func test_drawing_slows_world_and_every_exit_restores_time() -> void:
 	assert_gt(player._dodge_path.size(),0)
 	player.cancel_input()
 	assert_eq(Engine.time_scale,1.0)
-func test_long_trace_upgrade_has_no_cost_and_later_progression_gate() -> void:
-	assert_eq(PlayerUpgrades.for_progress(9).dodge_path_limit,260.0)
-	assert_eq(PlayerUpgrades.for_progress(10).dodge_path_limit,420.0)
+func test_long_trace_is_equipment_not_direct_level_unlock() -> void:
+	assert_eq(EquipmentCatalog.ITEMS["whip_basic"]["reach"],260.0)
+	assert_eq(EquipmentCatalog.ITEMS["whip_long"]["reach"],420.0)
 
 func test_real_time_timeout_and_pause_cannot_leave_world_slowed() -> void:
 	SaveData.dual_lasso_intro_shown = true
@@ -28,6 +28,7 @@ func test_real_time_timeout_and_pause_cannot_leave_world_slowed() -> void:
 	add_child_autofree(level)
 	await wait_physics_frames(2)
 	var player: Node = level.player
+	player.dodge_available=true
 	player._drawing_dodge = true
 	player._drawing_real_started = player._now_seconds()-2.1
 	player._draw_points = PackedVector2Array([Vector2.ZERO])
@@ -48,6 +49,7 @@ func test_screen_events_pass_through_native_joystick_to_time_bullet() -> void:
 	add_child_autofree(level)
 	await wait_physics_frames(2)
 	var player: Node = level.player
+	player.dodge_available=true
 	var size: Vector2 = get_viewport().get_visible_rect().size
 	var origin: Vector2 = size*Vector2(.22,.65)
 	var touch := InputEventScreenTouch.new()

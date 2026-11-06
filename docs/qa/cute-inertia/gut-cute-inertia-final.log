@@ -1,0 +1,172 @@
+Godot Engine v4.7.dev1.official.bf95b6258 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 23.2.1-1ubuntu3.1~22.04.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 15.0.7, 256 bits)
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:500)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:500)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:500)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+SCRIPT ERROR: Parse Error: Identifier "AccessibilityServer" not declared in the current scope.
+          at: GDScript::reload (res://addons/gut/godot_singletons.gd:5)
+          GDScript backtrace (most recent call first):
+              [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+              [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+              [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+              [3] load_all (res://addons/gut/lazy_loader.gd:10)
+              [4] _static_init (res://addons/gut/gut_loader.gd:45)
+              [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+              [6] _init (res://addons/gut/gut_cmdln.gd:24)
+ERROR: Failed to load script "res://addons/gut/godot_singletons.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2905)
+   GDScript backtrace (most recent call first):
+       [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+       [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+       [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+       [3] load_all (res://addons/gut/lazy_loader.gd:10)
+       [4] _static_init (res://addons/gut/gut_loader.gd:45)
+       [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+       [6] _init (res://addons/gut/gut_cmdln.gd:24)
+SCRIPT ERROR: Parse Error: Cannot return value of type "null" because the function return type is "StringName".
+          at: GDScript::reload (res://addons/gut/stub_params.gd:16)
+          GDScript backtrace (most recent call first):
+              [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+              [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+              [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+              [3] load_all (res://addons/gut/lazy_loader.gd:10)
+              [4] _static_init (res://addons/gut/gut_loader.gd:45)
+              [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+              [6] _init (res://addons/gut/gut_cmdln.gd:24)
+ERROR: Failed to load script "res://addons/gut/stub_params.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2905)
+   GDScript backtrace (most recent call first):
+       [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+       [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+       [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+       [3] load_all (res://addons/gut/lazy_loader.gd:10)
+       [4] _static_init (res://addons/gut/gut_loader.gd:45)
+       [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+       [6] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.0
+GUT version:  9.7.1
+[4m
+
+res://tests/integration/test_tow_collision_recovery.gd
+[0m* test_tow_recovers_when_player_path_hugs_outer_boundary_then_returns_inside
+[33m    --- Awaiting 45 physics frames  ---
+[0m[33m    --- Awaiting 50 physics frames  ---
+[0m[33m    --- Awaiting 70 physics frames  ---
+[0m[33m    --- Awaiting 120 physics frames  ---
+[0m* test_tow_recovers_around_real_obstacle_after_narrow_corner
+[33m    --- Awaiting 54 physics frames  ---
+[0m[33m    --- Awaiting 65 physics frames  ---
+[0m[33m    --- Awaiting 40 physics frames  ---
+[0m[1m2/2 passed.
+[0m[4m
+
+res://tests/integration/test_tow_behind.gd
+[0m* test_tow_follows_behind_and_retains_corner_path
+[33m    --- Awaiting 60 physics frames  ---
+[0m[33m    --- Awaiting 30 physics frames  ---
+[0m[33m    --- Awaiting 50 physics frames  ---
+[0m* test_bull_follows_z_dodge_in_order_without_shortcut_or_release
+[33m    --- Awaiting 30 physics frames  ---
+[0m[33m    --- Awaiting 90 physics frames  ---
+[0m[1m2/2 passed.
+[0m[4m
+
+res://tests/integration/test_bullet_time.gd
+[0m* test_drawing_slows_world_and_every_exit_restores_time
+* test_long_trace_is_equipment_not_direct_level_unlock
+* test_real_time_timeout_and_pause_cannot_leave_world_slowed
+* test_screen_events_pass_through_native_joystick_to_time_bullet
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_arena_minimap.gd
+[0m* test_map_coordinates_modal_pause_and_real_touch_do_not_trigger_throw
+* test_actual_screen_touch_opens_and_closes_map_without_aim_charge
+[1m2/2 passed.
+[0m[4m
+
+res://tests/integration/test_trial_gameplay_fixes.gd
+[0m* test_trial_tools_do_not_write_progress_inventory
+* test_second_aim_held_during_first_flight_starts_after_landing
+[33m    --- Awaiting 0.65 seconds  ---
+[0m[33m    --- Awaiting 0.65 seconds  ---
+[0m* test_safe_bull_clears_chaser_flags
+* test_recovery_targets_recent_position_not_stale_trail
+* test_normal_pen_overlap_delivers_and_no_safe_chaser
+[1m5/5 passed.
+[0m[4m
+
+res://tests/integration/test_isolated_trial.gd
+[0m* test_bytes_and_all_state_preserved_across_scratch_routes
+* test_menu_boundary_restores_real_state
+* test_normal_build_cannot_enter_session
+[1m3/3 passed.
+[0m[4m
+
+res://tests/integration/test_dodge_endpoint_inertia.gd
+[0m* test_trace_endpoint_brakes_and_turns_with_handling_for_both_whips
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+* test_endpoint_at_world_boundary_stays_bounded
+* test_lasso_edge_on_ellipse_for_all_directions_and_near_zero
+[1m3/3 passed.
+[0m
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Warnings             16
+
+Scripts               7
+Tests                21
+Passing Tests        21
+Asserts             356
+Time              19.684s
+
+
+[32m---- All tests passed! ----
+[0m
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:2640)

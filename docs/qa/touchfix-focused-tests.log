@@ -1,0 +1,160 @@
+Godot Engine v4.7.dev1.official.bf95b6258 - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:364)
+OpenGL API 4.5 (Core Profile) Mesa 23.2.1-1ubuntu3.1~22.04.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 15.0.7, 256 bits)
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:500)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:500)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:500)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+SCRIPT ERROR: Parse Error: Identifier "AccessibilityServer" not declared in the current scope.
+          at: GDScript::reload (res://addons/gut/godot_singletons.gd:5)
+          GDScript backtrace (most recent call first):
+              [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+              [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+              [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+              [3] load_all (res://addons/gut/lazy_loader.gd:10)
+              [4] _static_init (res://addons/gut/gut_loader.gd:45)
+              [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+              [6] _init (res://addons/gut/gut_cmdln.gd:24)
+ERROR: Failed to load script "res://addons/gut/godot_singletons.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2905)
+   GDScript backtrace (most recent call first):
+       [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+       [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+       [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+       [3] load_all (res://addons/gut/lazy_loader.gd:10)
+       [4] _static_init (res://addons/gut/gut_loader.gd:45)
+       [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+       [6] _init (res://addons/gut/gut_cmdln.gd:24)
+SCRIPT ERROR: Parse Error: Cannot return value of type "null" because the function return type is "StringName".
+          at: GDScript::reload (res://addons/gut/stub_params.gd:16)
+          GDScript backtrace (most recent call first):
+              [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+              [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+              [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+              [3] load_all (res://addons/gut/lazy_loader.gd:10)
+              [4] _static_init (res://addons/gut/gut_loader.gd:45)
+              [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+              [6] _init (res://addons/gut/gut_cmdln.gd:24)
+ERROR: Failed to load script "res://addons/gut/stub_params.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:2905)
+   GDScript backtrace (most recent call first):
+       [0] load_script_using_custom_warnings (res://addons/gut/warnings_manager.gd:173)
+       [1] load_script_ignoring_all_warnings (res://addons/gut/warnings_manager.gd:167)
+       [2] get_loaded (res://addons/gut/lazy_loader.gd:34)
+       [3] load_all (res://addons/gut/lazy_loader.gd:10)
+       [4] _static_init (res://addons/gut/gut_loader.gd:45)
+       [5] @static_initializer (res://addons/gut/gut_loader.gd:1)
+       [6] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.0
+GUT version:  9.7.1
+[4m
+
+res://tests/unit/test_horse_collection.gd
+[0m* test_starter_and_explicit_test_parents
+* test_two_distinct_owned_parents_no_consumption
+* test_round_trip_and_bad_state
+* test_save_failure_rollback
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] save_progress (res://src/Application/save_data.gd:63)
+       [1] breed_horses (res://src/Application/save_data.gd:181)
+       [2] test_save_failure_rollback (res://tests/unit/test_horse_collection.gd:22)
+       [3] _run_test (res://addons/gut/gut.gd:622)
+       [4] _test_the_scripts (res://addons/gut/gut.gd:835)
+       [5] test_scripts (res://addons/gut/gut.gd:1047)
+       [6] run_tests (res://addons/gut/gui/GutRunner.gd:198)
+       [7] _run_tests (res://addons/gut/cli/gut_cli.gd:239)
+       [8] main (res://addons/gut/cli/gut_cli.gd:297)
+       [9] _init (res://addons/gut/gut_cmdln.gd:39)
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1024)
+   GDScript backtrace (most recent call first):
+       [0] save_progress (res://src/Application/save_data.gd:63)
+       [1] select_horse (res://src/Application/save_data.gd:188)
+       [2] test_save_failure_rollback (res://tests/unit/test_horse_collection.gd:23)
+       [3] _run_test (res://addons/gut/gut.gd:622)
+       [4] _test_the_scripts (res://addons/gut/gut.gd:835)
+       [5] test_scripts (res://addons/gut/gut.gd:1047)
+       [6] run_tests (res://addons/gut/gui/GutRunner.gd:198)
+       [7] _run_tests (res://addons/gut/cli/gut_cli.gd:239)
+       [8] main (res://addons/gut/cli/gut_cli.gd:297)
+       [9] _init (res://addons/gut/gut_cmdln.gd:39)
+[34m[ExpectedError][0m
+* test_foal_cannot_equip_or_breed_until_trial_training
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_equipment_points.gd
+[0m* test_repeats_award_points_but_duplicate_result_does_not
+* test_purchase_and_equip_are_separate_and_cannot_double_spend
+* test_free_original_and_single_slot_selection
+* test_invalid_entries_never_grant_or_spend_points
+* test_upgrade_needs_basic_whip_and_replaces_slot_without_stacking
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_points_migration.gd
+[0m* test_credit_is_once_for_completed_levels_and_survives_reload
+* test_incomplete_or_invalid_reward_table_postpones_without_changes
+* test_failed_persistence_rolls_back_credit_and_marker
+* test_points_inventory_roundtrip_does_not_change_progress
+* test_existing_new_points_and_inventory_survive_legacy_credit
+* test_invalid_point_fields_do_not_replace_valid_level_progress
+[1m6/6 passed.
+[0m[4m
+
+res://tests/integration/test_arena_minimap.gd
+[0m* test_map_coordinates_modal_pause_and_real_touch_do_not_trigger_throw
+* test_actual_screen_touch_opens_and_closes_map_without_aim_charge
+[1m2/2 passed.
+[0m[4m
+
+res://tests/integration/test_bullet_time.gd
+[0m* test_drawing_slows_world_and_every_exit_restores_time
+* test_long_trace_is_equipment_not_direct_level_unlock
+* test_real_time_timeout_and_pause_cannot_leave_world_slowed
+* test_screen_events_pass_through_native_joystick_to_time_bullet
+[1m4/4 passed.
+[0m
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Scripts               5
+Tests                22
+Passing Tests        22
+Asserts             128
+Time              1.671s
+
+
+[32m---- All tests passed! ----
+[0m
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+     at: cleanup (core/object/object.cpp:2640)

@@ -1,0 +1,188 @@
+from PIL import Image,ImageDraw,ImageFilter
+import numpy as np
+from pathlib import Path
+R=Path(__file__).resolve().parents[2]
+im=Image.open(R/'docs/concepts/approved-adult-hd/source.png').convert('RGBA')
+# Work in normalized 1313x875 coordinates used for reviewed concept.
+a=np.array(im);h,w=a.shape[:2];yy,xx=np.mgrid[:h,:w];x=xx*1313/w;y=yy*875/h
+hsv=np.array(im.convert("HSV"));hsv[:,:,0]=(hsv[:,:,0].astype(float)*180/255).astype("uint8");H,S,V=hsv[:,:,0],hsv[:,:,1],hsv[:,:,2]
+# Region boundaries deliberately exclude rider, bridle, blanket, saddle and boots.
+def region(polys):
+ m=Image.new('L',(1313,875));d=ImageDraw.Draw(m)
+ for poly in polys:d.polygon(poly,fill=255)
+ return np.array(m.resize((w,h),Image.Resampling.NEAREST))>0
+coat_region=region([[(404,435),(435,392),(476,379),(496,401),(491,471),(519,483),(537,501),(546,532),(586,551),(622,548),(639,524),(663,534),(705,544),(718,507),(722,446),(702,414),(727,360),(764,313),(805,295),(823,309),(844,329),(876,345),(887,363),(923,364),(928,418),(919,467),(937,522),(940,602),(923,689),(942,738),(933,785),(906,806),(865,793),(851,741),(825,684),(803,654),(783,687),(773,747),(794,810),(757,822),(724,804),(705,755),(679,675),(651,616),(626,582),(600,589),(596,623),(601,652),(617,687),(609,716),(568,718),(547,660),(534,619),(503,606),(477,626),(464,677),(476,725),(460,749),(414,744),(410,697),(415,641),(426,592),(432,545)],[(833,215),(851,185),(880,179),(914,180),(946,192),(961,220),(970,252),(977,272),(995,288),(1012,312),(1004,348),(974,362),(940,356),(923,338),(891,316),(865,302),(839,281),(827,247)]])
+# Orange skin excludes darker leather/gold with hue and RGB ratio; preserve face markings and eyes.
+coat=coat_region&(H>=8)&(H<=22)&(S>95)&(V>65)&(a[:,:,1]>a[:,:,0]*.35)
+protect=region([[(826,190),(848,173),(879,178),(892,197),(881,207),(855,203)],[(869,219),(890,215),(909,226),(913,249),(904,265),(878,263),(867,245)],[(969,216),(987,218),(998,243),(990,258),(975,252)],[(923,276),(948,272),(969,273),(979,284),(987,299),(986,322),(957,325),(936,308)],[(917,352),(930,344),(945,364),(936,400),(925,412),(911,394)]])
+# Exclude all tack and muzzle with narrow hand-traced polygons.
+protect |= region([[(819,158),(837,147),(851,159),(854,189),(845,210),(835,237),(841,260),(855,279),(875,289),(889,295),(895,311),(883,322),(865,304),(841,293),(822,272),(817,250),(821,222),(827,197)],[(893,282),(923,267),(952,261),(980,269),(997,282),(991,300),(973,288),(953,282),(930,286),(911,299)],[(907,285),(931,290),(939,316),(931,337),(908,343),(889,330),(887,305)],[(704,321),(716,319),(742,334),(769,348),(800,355),(826,355),(853,349),(872,339),(890,323),(900,330),(877,351),(850,366),(819,375),(787,374),(752,363),(722,345)],[(691,369),(706,365),(741,393),(773,420),(813,442),(850,455),(869,452),(884,458),(892,480),(881,498),(860,497),(843,483),(807,469),(769,447),(733,420),(706,393)],[(859,488),(880,488),(880,514),(866,550),(845,584),(829,594),(816,592),(831,568),(845,539)],[(922,303),(952,299),(981,300),(1010,316),(1023,333),(1018,353),(1000,366),(966,365),(940,351),(925,330)]])
+# Orange hide has a distinct hue from dark leather. Restrict to horse, not rider.
+horse_area=((x>390)&(y>370))|((x>750)&(y>170))|((x>840)&(x<910)&(y>40)&(y<180))|((x>945)&(y>60)&(y<180))
+coat=(horse_area|((x>420)&(x<510)&(y>345)))&(H>=10)&(H<=17)&(S>125)&(V>42)&(a[:,:,3]>100)
+# Exact exclusion for leather, eye and source cream muzzle including shaded edge.
+coat &= ~region([[(842,175),(853,178),(850,211),(844,239),(853,263),(875,285),(890,297),(893,310),(885,316),(873,304),(849,283),(835,262),(834,239),(842,210)],[(892,280),(921,268),(953,261),(981,269),(995,283),(987,293),(975,281),(953,276),(929,285),(909,298)],[(894,293),(913,292),(931,311),(931,330),(914,339),(895,327)],[(930,294),(956,285),(983,289),(1011,307),(1025,333),(1026,350),(1013,372),(990,382),(963,377),(943,362),(924,339),(917,318)],[(936,169),(952,174),(966,194),(978,226),(985,248),(974,260),(955,251),(946,223),(943,201)],[(704,320),(740,336),(775,354),(809,364),(842,361),(874,350),(896,330),(896,340),(877,357),(845,371),(809,375),(775,366),(738,346),(704,330)],[(698,365),(735,387),(773,420),(812,442),(852,456),(879,452),(894,465),(895,484),(884,498),(869,497),(843,481),(804,466),(767,444),(727,415),(698,384)],[(869,494),(887,493),(879,528),(862,558),(833,582),(820,585),(837,563),(854,532)]])
+coat &= ~((((x-890)/13)**2+((y-217)/22)**2<1)|(((x-975)/9)**2+((y-216)/22)**2<1))
+# White socks, hooves, saddle and rider boots must never follow hide tint.
+coat &= ~region([[(395,674),(480,674),(490,838),(390,838)],[(539,671),(625,671),(633,838),(535,838)],[(701,695),(802,695),(817,838),(695,838)],[(832,695),(954,695),(970,838),(827,838)],[(474,371),(501,365),(519,337),(536,303),(560,283),(589,283),(614,299),(640,300),(663,326),(676,346),(672,374),(662,404),(655,435),(655,470),(662,503),(668,535),(652,564),(628,575),(612,566),(602,546),(583,534),(567,533),(553,521),(550,500),(549,480),(530,477),(512,473),(496,462),(490,440),(484,413)]])
+coat |= region([[(560,531),(582,539),(606,551),(615,569),(603,579),(581,567),(566,553)]])&(H>=10)&(H<=17)&(S>125)
+coat &= ~((y>742)&(x>530)&(x<635))
+# Reclaim hide shadows beside the tack without painting the leather itself.
+extra_hide=region([[(432,356),(457,350),(481,357),(490,371),(471,395),(448,426),(433,466),(419,493),(410,483),(418,430)],[(568,534),(597,542),(617,559),(631,566),(641,580),(630,595),(606,590),(586,575),(569,552)],[(735,352),(771,367),(809,377),(848,373),(865,363),(859,381),(832,389),(799,388),(767,379),(741,365)],[(852,207),(862,216),(867,248),(879,266),(887,276),(875,278),(860,262),(849,239)]])
+coat |= extra_hide&(H>=7)&(H<=25)&(S>100)&(V>40)
+mane_region=region([[(248,470),(270,479),(294,475),(306,459),(317,430),(330,394),(355,361),(384,337),(417,320),(454,312),(482,317),(507,331),(517,344),(501,345),(487,358),(469,380),(455,406),(449,444),(449,484),(448,528),(438,563),(420,590),(394,611),(367,627),(335,641),(309,642),(286,636),(276,626),(297,625),(302,620),(281,617),(258,603),(248,582),(244,557),(246,530),(251,538),(267,542),(283,540),(299,529),(304,518),(285,518),(268,509),(254,493)],[(731,349),(752,295),(754,237),(765,196),(776,165),(791,139),(798,114),(832,103),(845,117),(835,141),(819,168),(808,205),(792,244),(784,277),(784,314),(768,350)],[(886,99),(916,95),(944,106),(960,128),(984,135),(1008,132),(1013,145),(1002,160),(981,164),(959,159),(937,153),(916,149),(901,158),(897,183),(879,214),(864,231),(869,203),(872,181),(862,168)]])
+mane=mane_region&(V>40)&((x<540)|((H>=15)&(S<180)))&~region([[(819,153),(858,151),(884,185),(875,218),(841,213)]])
+# Reclaim narrow hide at saddle seam, excluding blanket blue/red/gold.
+coat |= ((x>425)&(x<510)&(y>320)&(y<410)&(H>=9)&(H<=18)&(S>170)&(V>50))
+# Fine tail shadows extend beyond the cream silhouette; hue/saturation separate them from hide.
+mane |= ((x>240)&(x<480)&(y>300)&(y<650)&(H>=14)&(H<=25)&(S<180)&(V>40)&(a[:,:,3]>100))
+coat &= ~mane
+coat |= region([[(550,538),(574,544),(597,545),(612,540),(619,547),(630,570),(648,589),(641,601),(615,594),(589,581),(564,562)]])&(H>=9)&(H<=19)&(S>150)&(V>40)
+coat |= region([[(540,535),(570,546),(595,548),(615,540),(623,558),(635,577),(655,586),(653,603),(620,595),(589,582),(560,564)]])&(H>=8)&(H<=19)&(S>145)&(V>40)
+coat |= region([[(843,218),(845,244),(855,263),(875,283),(883,297),(875,293),(854,276),(840,254),(837,234)]])&(H>=10)&(H<=19)&(S>180)&(V>40)
+# Hide below boot and beside blanket, after all earlier equipment exclusions.
+coat |= region([[(541,540),(569,549),(597,551),(620,542),(632,564),(648,581),(663,590),(662,602),(630,596),(594,584),(563,565)]])&(H>=7)&(H<=22)&(S>140)&(V>38)
+coat |= region([[(455,380),(476,367),(492,358),(508,350),(499,384),(481,421),(470,438),(452,421)]])&(H>=8)&(H<=20)&(S>175)&(V>40)
+coat |= region([[(620,541),(638,536),(649,549),(663,576),(671,596),(651,599),(631,579)]])&(H>=7)&(H<=22)&(S>155)&(V>38)
+coat |= region([[(510,341),(503,366),(483,401),(469,434),(466,448),(477,463),(497,471),(495,480),(468,473),(454,451),(457,412),(478,373),(497,345)]])&(H>=8)&(H<=20)&(S>170)&(V>40)
+coat |= ((x>480)&(x<500)&(y>395)&(y<445)&(H>=9)&(H<=17)&(S>165)&(V>40))
+coat |= ((x>489)&(x<522)&(y>336)&(y<372)&(H>=9)&(H<=17)&(S>165)&(V>40))
+# Keep blanket gold piping: it is brighter and less saturated than hide.
+coat &= ~((x>470)&(x<535)&(y>375)&(y<475)&(H>18)&(S<215))
+# Sock transitions follow the actual cream pixels, not a horizontal cutoff.
+coat |= region([[(410,660),(478,660),(479,720),(405,720)],[(537,655),(622,655),(625,718),(539,718)],[(706,680),(798,680),(800,739),(706,739)],[(840,678),(933,678),(938,735),(840,735)]])&(H>=7)&(H<=23)&(S>120)&(V>45)
+# Fine hide-only seams preserve the neighboring bridle and blanket.
+coat |= region([[(497,333),(520,334),(519,349),(504,351),(499,367),(490,369)]])&(H>=9)&(H<=18)&(S>160)&(V>45)
+coat |= region([[(840,238),(849,257),(866,276),(883,290),(884,298),(872,290),(853,274),(840,255)]])&(H>=9)&(H<=18)&(S>170)&(V>45)
+coat |= region([[(507,338),(527,335),(530,347),(520,360),(513,386),(503,389),(501,369)]])&(H>=8)&(H<=20)&(S>170)&(V>40)
+coat |= ((x>833)&(x<893)&(y>232)&(y<316)&(H>=10)&(H<=19)&(S>185)&(V>45))
+# Hair slivers below the fringe and around neck stay hair, not coat.
+head_hair=region([[(789,99),(836,89),(848,126),(820,167),(809,206),(795,243),(786,282),(783,319),(771,351),(753,342),(753,296),(762,245),(771,192)],[(892,88),(932,88),(973,109),(1018,124),(1024,152),(1011,160),(1005,181),(994,198),(989,201),(988,179),(980,168),(965,162),(946,157),(929,149),(908,140),(902,159),(898,180),(883,202),(862,213),(867,180)]])
+mane |= head_hair&(H>=14)&(S<170)&(V>90)
+mane |= ((x>738)&(x<837)&(y>100)&(y<355)&(H>=14)&(S<145)&(V>95))
+mane &= ~region([[(975,177),(987,185),(994,195),(992,213),(982,213),(977,201)]])
+coat &= ~mane
+coat &= ~(((x-891)/13)**2+((y-299)/20)**2<1)
+coat &= ~((x>919)&(y>286)&(x<1028)&(y<378))
+hat_region=region([[(494,114),(497,96),(515,85),(539,78),(557,79),(563,43),(577,22),(605,12),(657,6),(683,13),(704,24),(715,48),(725,77),(732,91),(743,78),(758,69),(773,76),(781,95),(784,119),(778,142),(758,158),(727,173),(704,179),(679,171),(649,154),(625,145),(590,146),(555,141),(523,134),(505,125)]])
+hat=hat_region&(V>35)&~region([[(551,138),(570,130),(589,143),(595,160),(564,160)]])
+hat |= region([[(718,96),(730,85),(745,74),(759,69),(771,76),(780,95),(782,115),(770,123),(747,116)],[(493,114),(502,103),(521,99),(547,101),(569,109),(571,120),(539,116),(513,116),(499,121)]])&(S>60)&(V>35)
+hat |= region([[(708,46),(733,50),(760,53),(780,65),(789,86),(788,114),(772,130),(745,118),(726,90)]])&(S>60)&(V>35)
+hat_dilated=np.array(Image.fromarray(hat.astype('uint8')*255).filter(ImageFilter.MaxFilter(9)))>0
+hat |= hat_dilated&(y<136)&(H>=6)&(H<=25)&(S>70)&(V>35)
+hat |= hat_dilated&(y>=136)&(y<174)&(x>680)&(H>=6)&(H<=25)&(S>70)&(V>45)
+coat &= ~region([[(924,284),(943,283),(958,286),(968,296),(972,312),(958,324),(940,317),(926,303)]])
+# Hide follows the lower curve of the reins, after the exact leather edge.
+coat |= region([[(745,350),(767,360),(790,367),(812,370),(834,367),(855,360),(877,347),(888,338),(883,353),(860,368),(837,378),(813,381),(789,378),(765,369),(744,359)]])&(H>=7)&(H<=24)&(S>120)&(V>35)
+coat |= region([[(540,543),(561,552),(580,563),(600,572),(621,579),(642,584),(655,588),(655,599),(637,596),(612,589),(589,581),(567,567),(548,556)]])&(H>=7)&(H<=24)&(S>130)&(V>35)
+# Eyebrows stay source brown. They are facial detail, never hide or rainbow hair.
+brows=region([[(858,181),(860,172),(869,164),(882,158),(895,159),(906,164),(909,174),(902,171),(888,170),(875,173),(864,178)],[(971,178),(979,176),(986,179),(990,185),(988,191),(983,185),(978,184),(973,185)]])
+brows |= ((x>857)&(x<911)&(y>154)&(y<186)&(V<175))|((x>970)&(x<994)&(y>173)&(y<193)&(V<140))
+coat &= ~brows
+mane &= ~brows
+# Extend tint only across the lower brim itself, not the hidden face below it.
+hat |= region([[(495,114),(510,119),(541,125),(568,130),(594,139),(620,147),(646,159),(672,173),(698,180),(720,182),(743,176),(766,162),(780,142),(782,127),(768,147),(744,162),(719,173),(699,174),(675,165),(650,151),(626,140),(595,133),(568,124),(540,119),(515,113)]])&(V>30)
+# Gold badge is equipment detail, not hat material.
+hat &= ~(((x-713)/12)**2+((y-111)/19)**2<1)
+# Feather only subpixel edges, preserving separate material channels.
+mask=np.zeros((h,w,3),dtype=np.uint8);mask[:,:,0][coat]=255;mask[:,:,1][mane]=255;mask[:,:,2][hat]=255
+# Blend the naturally antialiased ginger-to-cream sock boundary continuously.
+# Cream stays cream; intermediate warm pixels inherit only the matching hide share.
+for poly,cream_sat in [([(410,668),(478,668),(478,708),(405,708)],82), ([(537,667),(622,667),(625,706),(539,706)],118), ([(706,696),(798,696),(800,729),(706,729)],90), ([(840,695),(933,695),(938,724),(840,724)],85)]:
+ edge=region([poly]);weight=np.clip((S.astype(float)-cream_sat)/75,0,1)*255
+ mask[:,:,0][edge]=weight[edge].astype('uint8')
+# No hide color may leak through distant hoof seams.
+mask[:,:,0][((x>530)&(x<635)&(y>742))|((x>390)&(x<495)&(y>747))|((x>700)&(x<815)&(y>779))|((x>830)&(x<970)&(y>775))]=0
+mask[y>760]=0
+mask[a[:,:,3]<8]=0
+# Hand-painted overrides are traced on the untouched approved source.
+# They do not use hue expansion and keep gold/leather boundaries intact.
+import json
+paint=json.loads((R/'tools/cosmetics/hd_handpaint_regions.json').read_text())
+# Supersampled strokes preserve subpixel ownership at diagonal painted edges.
+def apply_paint(polys, material):
+ global mask
+ layer=Image.new('L',(w*4,h*4));draw=ImageDraw.Draw(layer)
+ for poly in polys:
+  draw.polygon([(round(px*w*4/1313),round(py*h*4/875)) for px,py in poly],fill=255)
+ weight=np.asarray(layer.resize((w,h),Image.Resampling.LANCZOS),dtype=float)[:,:,None]/255
+ # Hair strokes may touch the hat silhouette, but never own its pixels.
+ if material[1]:weight*=(~hat_region)[:,:,None]
+ mask=np.rint(mask*(1-weight)+np.array(material)*weight).astype('uint8')
+apply_paint(paint['coat_add'],[255,0,0])
+apply_paint(paint.get('mane_add',[]),[0,255,0])
+apply_paint(paint.get('source_restore',[]),[0,0,0])
+# Snap the user-marked material edges to the original paint using local trimaps.
+# The hand-traced contours seed ownership; only their narrow boundary can move.
+import cv2
+def snap(poly,band=7):
+ initial=region([poly]).astype('uint8')
+ kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(band*2+1,band*2+1))
+ sure=cv2.erode(initial,kernel);possible=cv2.dilate(initial,kernel)
+ labels=np.where(possible,cv2.GC_PR_BGD,cv2.GC_BGD).astype('uint8');labels[initial>0]=cv2.GC_PR_FGD;labels[sure>0]=cv2.GC_FGD
+ cv2.setRNGSeed(0);cv2.grabCut(a[:,:,:3].copy(),labels,None,np.zeros((1,65)),np.zeros((1,65)),5,cv2.GC_INIT_WITH_MASK)
+ return (labels==cv2.GC_FGD)|(labels==cv2.GC_PR_FGD)
+
+# Local hair silhouette below the rein, with leather kept as a separate material.
+hair=snap([(719,335),(734,342),(752,348),(767,352),(762,363),(749,370),(743,369),(748,357),(736,359),(722,361),(706,359),(697,356),(692,351),(708,348)],3)
+rein=snap([(683,296),(706,310),(729,325),(753,338),(781,347),(809,353),(834,350),(858,342),(879,328),(892,309),(899,316),(890,334),(873,349),(852,361),(830,366),(809,368),(786,363),(763,357),(739,348),(716,336),(695,321)],5)
+local=region([[(745,345),(775,345),(813,351),(850,340),(880,323),(903,317),(902,352),(871,376),(830,386),(784,379),(749,372)]])
+mask[local&~rein&~hair]=[255,0,0]
+mask[hair]=[0,255,0]
+mask[rein]=0
+side=snap([(689,367),(715,385),(740,402),(766,420),(791,435),(815,447),(837,456),(852,459),(851,481),(831,475),(807,465),(782,452),(757,437),(733,419),(711,401),(691,383)],3)
+plate=snap([(851,451),(863,444),(876,443),(887,450),(894,462),(894,479),(887,492),(878,497),(877,514),(872,534),(862,552),(848,567),(830,578),(812,586),(794,591),(810,581),(830,564),(844,546),(854,521),(860,497),(850,487),(846,475),(846,463)],4)
+local=region([[(840,432),(900,432),(900,523),(881,563),(838,591),(792,598),(792,577),(827,550),(844,514)]])
+mask[local&~plate&~side]=[255,0,0]
+mask[plate|side]=0
+# Local side strap material separation. Leather has a lower hue than hide,
+# even where hide is heavily shaded; retain the edge's fractional coverage.
+side_local=region([[(690,360),(720,376),(750,395),(780,411),(815,430),(846,441),(854,455),(851,493),(827,486),(792,470),(752,448),(720,425),(690,405)]])
+skin=np.clip((hsv[:,:,0].astype(float)-8.5)/2.5,0,1)*255
+mask[side_local]=0;mask[:,:,0][side_local]=skin[side_local].astype('uint8')
+# Preserve medallion and lower leather as found by the narrow source trimap.
+mask[plate]=0
+# Orange below the lowest curl, without growing into tack or blanket.
+small=region([[(737,364),(747,364),(753,370),(747,375),(737,374)]])
+mask[small&~hair&~rein]=[255,0,0]
+# The side-strap window also crosses the blue blanket and gold piping.
+# Neither belongs to horse skin. Preserve the source throughout those pixels.
+mask[side_local&((H>24)|(S<50))]=0
+# Remove isolated leather freckles classified as skin in this source window.
+leather_core=side_local&(H<10)&(V<175)
+mask[leather_core]=0
+# Blanket is equipment even where its piping shares the hide's warm hue.
+mask[region([[(685,389),(699,398),(714,410),(709,432),(695,422),(685,414)]])]=0
+# Smooth traced hair/coat seam at tail root, no isolated original-orange islands.
+apply_paint([[(471,358),(479,352),(488,348),(497,349),(493,356),(484,363),(477,372),(470,385),(466,393),(465,380)]],[0,255,0])
+# Rebuild only the tail/rump contact zone as an exclusive two-material seam.
+tail_contact=region([[(461,348),(483,340),(508,340),(507,364),(490,385),(472,410),(458,410)]])
+share=(S>170).astype(float)
+mask[tail_contact]=0
+mask[:,:,0][tail_contact]=(share[tail_contact]*255).astype('uint8')
+mask[:,:,1][tail_contact]=((1-share[tail_contact])*255).astype('uint8')
+# Blanket's red cloth, gold piping and blue strip are source equipment.
+blanket_local=region([[(670,370),(708,390),(719,408),(720,430),(710,477),(699,510),(675,510)]])
+mask[blanket_local&((H>16)|(H<5))]=0
+mask[region([[(678,375),(701,389),(716,405),(713,425),(707,452),(698,480),(688,494),(674,501),(667,496),(675,450)]])]=0
+# Orange hide begins directly to the right/below the blue blanket, not its gold trim.
+mask[blanket_local&(x>701)&(H>=7)&(H<=16)&(S>160)]=[255,0,0]
+mask[region([[(658,485),(710,480),(710,530),(650,530)]])&(H>=7)&(H<=22)&(S>130)]=[255,0,0]
+mask[region([[(707,357),(728,355),(745,358),(745,372),(727,379),(708,374)]])&~hair&~rein&(H>=7)&(H<=22)&(S>160)]=[255,0,0]
+mask[region([[(706,363),(718,368),(721,379),(712,379),(705,372)]])]=0
+# Face/hair below the actual brim edge are not hat pixels.
+apply_paint([[(550,125),(565,125),(580,128),(598,134),(616,142),(634,151),(651,160),(669,167),(688,172),(708,174),(731,174),(750,170),(767,161),(780,149),(788,136),(792,145),(780,180),(746,206),(699,220),(639,219),(581,191),(549,157)]],[0,0,0])
+# Tiny deep tail crease, bounded away from orange rump.
+apply_paint([[(474,367),(483,359),(492,353),(494,354),(485,363),(474,373)]],[0,255,0])
+
+# Source contains extraction flecks beyond the figure. Fixed reviewed framing.
+bbox=(round(240*w/1313),0,round(1040*w/1313),round(840*h/875))
+# Iris-only texture: saturated painted ring, excluding dark pupil and white highlights.
+eye_region=Image.new('L',im.size);draw=ImageDraw.Draw(eye_region)
+for box in [(879,207,906,244),(975,204,986,229)]:
+ draw.ellipse(tuple(round(v*(w/1313 if i%2==0 else h/875)) for i,v in enumerate(box)),fill=255)
+eye_weight=np.asarray(eye_region).astype(float)/255*np.clip((S.astype(float)-90)/70,0,1)*np.clip((V.astype(float)-45)/50,0,1)
+Image.fromarray((eye_weight*255).astype('uint8')).crop(bbox).save(R/'art/portraits/adult_eyes.png')
+alpha=im.getchannel('A').filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.45));im.putalpha(alpha)
+im.crop(bbox).save(R/'art/portraits/adult_hd.png');Image.fromarray(mask).filter(ImageFilter.GaussianBlur(.55)).crop(bbox).save(R/'art/portraits/adult_hd_mask.png')
+preview=a.copy();sel=np.max(mask,axis=2)>0;preview[:,:,:3][sel]=mask[sel];Image.fromarray(preview).save('/downloads/hd-mask-review.png')
