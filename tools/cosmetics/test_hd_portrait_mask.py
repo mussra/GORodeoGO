@@ -32,4 +32,6 @@ for x,y in [(924,180),(928,190),(932,200),(936,210),(940,220),(944,230)]:
  assert pixel(x,y)[0]>240,(x,y,pixel(x,y));checks+=1
 for x,y in [(951,200),(947,190)]:
  assert max(pixel(x,y))<10,(x,y,pixel(x,y));checks+=1
+for x,y in [(908,145),(923,156)]:
+ assert pixel(x,y)[1]>240,(x,y,pixel(x,y));checks+=1
 print(f'HD_PORTRAIT_MATERIAL_OWNERSHIP_PASS {checks} checks')
