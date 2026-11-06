@@ -35,6 +35,10 @@ cream=(ss<.52)&(vv>.30)&mane_area&(a[:,:,3]>8)
 m=np.maximum(m,cream.astype(float))
 # Mane polygon must follow cream hair, never brown ears or skin underneath.
 m *= (((a[:,:,0].astype(float)<a[:,:,1]*1.40)&(ss<.60)) | (y>145)).astype(float)
+# Keep rump skin out of tail mask and include the slim cream edge of neck mane.
+m[(x>132)&(x<200)&(y>350)&(y<505)&(a[:,:,0].astype(float)>a[:,:,1]*1.35)]=0
+mane_edge=(x>237)&(x<310)&(y>188)&(y<362)&(ss<.64)&(a[:,:,0].astype(float)<a[:,:,1]*1.46)
+m=np.maximum(m,mane_edge.astype(float))
 s=s.astype(float)*(1-m)
 # Retain actual cream blaze/muzzle by source color, not rectangular exclusion.
 s = np.maximum(s,((hh>8)&(hh<48)&(ss>.28)&(vv>.2)&face&(a[:,:,3]>8)&~eye).astype(float)*(1-m))

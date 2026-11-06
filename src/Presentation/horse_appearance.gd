@@ -18,17 +18,20 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
    var m:Color=mask.get_pixel(x,y)
    # Horse masks previously touched the hat in downward-diagonal frames 8-11.
    # The hat ends at row21; these pixels must never inherit horse traits.
-   if anim=="walk_diag_down" and y<21 and x>=28 and x<=68:continue
+   if anim in ["walk_diag_down","walk_diag_up"] and y<23 and x>=28 and x<=72:continue
    if maxf(m.r,m.g)<0.02:continue
    var old:Color=image.get_pixel(x,y);var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))*255.0/205.0,0.25,1.18)
    var color:Color=Color(COLORS[int(t.coat)])
    if m.g>m.r:
     if int(t.mane)==5:
-     if anim=="foal":
-      var palette:Array[Color]=[Color("ec606c"),Color("efb85d"),Color("e8d874"),Color("77c888"),Color("6aa9da"),Color("9980c8"),Color("ec606c")]
-      var u:float=clampf((float(y)-165.0)/105.0 if x<110 else float(y)/180.0,0.0,.999)*6.0
-      color=palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.0,1.0,u-floorf(u)))
-     else:color=Color.from_hsv(fposmod((y-25.0)/38.0,1.0),0.8,1.0)
+     var palette:Array[Color]=[Color("ec606c"),Color("efb85d"),Color("e8d874"),Color("77c888"),Color("6aa9da"),Color("9980c8"),Color("ec606c")]
+     var tpos:float
+     if anim=="foal":tpos=(float(y)-165.0)/105.0 if x<110 else float(y)/180.0
+     elif anim=="walk_up":tpos=(float(y)-48.0)/30.0
+     elif x<40:tpos=(float(y)-42.0)/32.0
+     else:tpos=(float(y)-25.0)/28.0
+     var u:float=clampf(tpos,0.0,.999)*6.0
+     color=palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.0,1.0,u-floorf(u)))
     else:color=Color(MANES[int(t.mane)])
    elif int(t.pattern)>0:
     var mark:bool=false
