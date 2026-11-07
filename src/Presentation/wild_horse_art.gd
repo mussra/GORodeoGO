@@ -37,7 +37,7 @@ func set_walk_direction(dir: Vector2) -> void:
 
 static func _build_frames(traits: Dictionary) -> SpriteFrames:
 	var frames := SpriteFrames.new()
-	for spec in [["wild_idle", IDLE_FRAMES, "idle", 3.0], ["wild_walk_side", WALK_FRAMES, "walk", 8.0], ["wild_down", [0], "walk_down", 4.0], ["wild_up", [0], "walk_up", 4.0], ["wild_diag_down", [0], "walk_diag_down", 4.0], ["wild_diag_up", [0], "walk_diag_up", 4.0]]:
+	for spec in [["wild_side", [0], "idle", 3.0], ["wild_side", [0], "walk", 8.0], ["wild_down", [0], "walk_down", 4.0], ["wild_up", [0], "walk_up", 4.0], ["wild_diag_down", [0], "walk_diag_down", 4.0], ["wild_diag_up", [0], "walk_diag_up", 4.0]]:
 		var anim: String = spec[0]
 		frames.add_animation(spec[2])
 		frames.set_animation_speed(spec[2], spec[3])

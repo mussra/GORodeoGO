@@ -35,5 +35,11 @@ func run()->void:
   horses[1]._wander_target=horses[1].position+Vector2(55,45)
   await create_timer(0.55).timeout
   await _snap("/downloads/testzone-dirs.png")
+  horses[0]._wander_pause=0.0
+  horses[0]._wander_target=horses[0].position+Vector2(90,4)
+  horses[1]._wander_pause=0.0
+  horses[1]._wander_target=horses[1].position+Vector2(-90,2)
+  await create_timer(0.55).timeout
+  await _snap("/downloads/testzone-side.png")
  print("testzone review done")
  quit()

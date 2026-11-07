@@ -10,6 +10,7 @@ SHEETS = {
     "up": ("/downloads/image-93928fac.jpg", (612, 43, 752, 326), 60 / 296),
     "diag_down": ("/downloads/image-ae2ae1e2.jpg", (14, 52, 244, 289), 60 / 238),
     "diag_up": ("/downloads/image-ae2ae1e2.jpg", (284, 51, 492, 291), 60 / 238),
+    "side": ("/downloads/image-93928fac.jpg", (236, 34, 537, 327), 60 / 296),
 }
 # bridle strap polygons in source-crop coords + eye exclusion boxes
 BRIDLE = {
@@ -24,6 +25,10 @@ BRIDLE = {
     "diag_up": {"polys": [[(124, 20), (144, 16), (166, 78), (152, 90)],
                           [(144, 68), (182, 70), (184, 96), (146, 96)]],
                 "eyes": [(136, 40, 158, 62)]},
+    "side": {"polys": [[(230, 38), (244, 42), (256, 88), (242, 92)],
+                       [(248, 78), (296, 88), (294, 104), (246, 94)],
+                       [(252, 96), (268, 100), (266, 116), (252, 112)]],
+             "eyes": [(224, 54, 248, 84)]},
 }
 
 def lum(c): return 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]
