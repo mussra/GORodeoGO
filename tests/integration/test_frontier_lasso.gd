@@ -77,9 +77,10 @@ func test_rider_not_blocked_by_horse() -> void:
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	world.player.velocity = Vector2.ZERO
-	_plant_horse(world, Vector2(60, 160))  # calm horse right in the rider's path
+	var horse: Node2D = _plant_horse(world, Vector2(60, 160))  # right in the rider's path
+	horse.set_physics_process(false)  # statue: tests pure collision pass-through, not AI
 	Input.action_press("move_right")
-	await wait_physics_frames(90)
+	await wait_physics_frames(300)  # walk gait is slow (~30 u/s): 5s is ~150u
 	Input.action_release("move_right")
 	assert_gt(world.player.position.x, 100.0, "the rider walks straight through a calm horse")
 

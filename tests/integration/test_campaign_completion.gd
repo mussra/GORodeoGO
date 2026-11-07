@@ -56,3 +56,15 @@ func test_loaded_sprite_animation_advances_and_idle_loops() -> void:
 	await wait_seconds(0.4)
 	assert_ne(sprite.frame, first_frame, "idle animation really advances in the engine")
 	assert_eq(sprite.animation, "idle")
+
+func test_resolve_capture_does_not_reorder_active_bulls() -> void:
+	# Ant 22:22 ("se ha estropeado el modo de los toros"): resolve_capture sorted
+	# the live _active_bulls array in place; pen doors, courier targets and the
+	# chaser index all reference bulls BY INDEX, so captures broke the level.
+	GameState.selected_level = 3
+	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
+	add_child_autofree(level)
+	await wait_physics_frames(2)
+	var before: Array = level._active_bulls.duplicate()
+	level.player.lasso.resolve_capture(level._active_bulls[0].global_position)
+	assert_eq(level._active_bulls, before, "the level's bull array keeps its order")

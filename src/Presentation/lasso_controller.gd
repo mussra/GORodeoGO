@@ -146,7 +146,11 @@ func _update_charge_visual() -> void:
 func draw_charge_aim(canvas: Node2D) -> void:
 	if not is_charging() or charge_distance() <= 1.0:
 		return
+	# Draw exactly at the charge rope's endpoint (Ant 22:23, "el círculo de
+	# apuntar se separa"): circle and rope can never drift apart.
 	var target: Vector2 = aim_direction * charge_distance()
+	if _charge_visual != null and _charge_visual.points.size() == 2:
+		target = _charge_visual.points[1]
 	canvas.draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
 	canvas.draw_arc(target, capture_area_visual_radius, 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
 	canvas.draw_circle(target, 3.0, Color(1.0, 0.92, 0.7))
@@ -216,7 +220,11 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 func resolve_capture(landing_point: Vector2) -> Node2D:
 	if not can_capture.call():
 		return null
-	var candidates: Array = prey_provider.call()
+	# COPY before sorting (Ant 22:22, "modo de los toros estropeado"): the corral's
+	# prey_provider returns the live _active_bulls array; sorting it in place
+	# reordered bulls, breaking pen door bull_indices, courier targets and the
+	# chaser index (bulls frozen, unlassable, counter stuck at 0).
+	var candidates: Array = prey_provider.call().duplicate()
 	candidates.sort_custom(func(a, b): return landing_point.distance_to(a.global_position) < landing_point.distance_to(b.global_position))
 	for prey in candidates:
 		if prey.try_capture(landing_point):
