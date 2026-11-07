@@ -57,6 +57,7 @@ func _wander(delta: float) -> void:
 	var step: Vector2 = to.normalized() * wander_speed * delta
 	position += step
 	_art.flip_h = step.x < 0.0
+	_art.set_walk_direction(step)
 
 func _pick_wander_target() -> void:
 	var a: float = randf() * TAU

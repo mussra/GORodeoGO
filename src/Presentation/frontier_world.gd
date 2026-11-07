@@ -59,7 +59,9 @@ func _ready() -> void:
 	add_child(ranch)
 	# fixed showcase zone near the ranch (Ant, 7-nov-2026): additive overlay,
 	# no effect on chunk seeds, streaming or saves
-	add_child(TestZoneScript.new())
+	var test_zone := TestZoneScript.new()
+	test_zone.name = "test_zone"
+	add_child(test_zone)
 	_build_hud()
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
