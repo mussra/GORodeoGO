@@ -69,3 +69,9 @@ Fuentes: mensajes de WhatsApp del 7 de noviembre de 2026, 8:58 a 9:01 CET:
 ### Autorización de implementación (7 de noviembre de 2026, 9:00-9:02 CET)
 
 Antonio pidió implementarlo: "Impleméntalo, añádelo al menú principal" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQ0IzRTFENUNFMDlGMjIzRDRCRDFDRDA3OTMzMjBBNwA=`) y confirmó el alcance con "Y crea un mundo para probarlo" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzU5OEQ3NUM3OUU4MTQ2QjEzNzdGNDg1ODQ5M0RENAA=`). Alcance autorizado: primera prueba jugable de mundo con entrada desde el menú principal, doma de caballos salvajes y el atributo de calma, en rama aparte, sin sustituir los niveles actuales ni perder progreso.
+
+### Editor de mapas para el mundo abierto (7 de noviembre de 2026, 9:59 CET)
+
+Propuesta de Antonio: "Si quieres, también podemos añadir un editor de mapas para el mundo abierto". Es una idea para el futuro, no una aprobación: queda registrada en la lista de propuestas sin implementar. No cambia el alcance de la prueba de mundo en curso.
+
+Implicación de diseño ya asumible sin coste: el formato de datos del mundo de prueba debe ser editable (tiles/zonas/entidades en datos, no en código), de modo que un futuro editor pueda leerlo y escribirlo. Cuando la prueba de mundo esté terminada, se esbozará una propuesta de editor para su visto bueno.
