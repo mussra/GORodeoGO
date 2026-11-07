@@ -193,7 +193,8 @@ func _on_tamed(c: Vector2i, horse: Node2D) -> void:
 	var was_encargo: bool = SaveData.world_missions.get(mission_id, "") == "encargo"
 	SaveData.mark_world_tamed(mission_id)
 	var herd: Dictionary = horse.herd
-	var stats: Dictionary = {"speed": 265.0, "handling": 950.0, "power": 0.65, "dodge": 0.9, "calm": clampf(float(herd.get("calm", 1.0)), 0.5, 2.0)}
+	var stats: Dictionary = herd.get("stats", {"speed": 265.0, "handling": 950.0, "power": 0.65, "dodge": 0.9}).duplicate()
+	stats["calm"] = clampf(float(herd.get("calm", 1.0)), 0.5, 2.0)
 	var traits: Dictionary = herd.get("traits", {})
 	var h: Dictionary = {"id": "world_%d_%d" % [c.x, c.y], "parents": [], "stage": "adult", "traits": traits, "stats": stats, "can_jump": false, "can_dodge": false}
 	h["name"] = SaveData.horse_collection.suggest_name(traits)

@@ -36,7 +36,7 @@ static func generate(seed:int,cx:int,cy:int)->Dictionary:
  if not is_ranch_chunk(cx,cy) and rng.randf()<PIG_CHANCE:
   chunk.pigs={"pos":origin+Vector2(rng.randf_range(200,CHUNK_SIZE-200),rng.randf_range(200,CHUNK_SIZE-200)),"count":rng.randi_range(2,4)}
  if not is_ranch_chunk(cx,cy) and rng.randf()<HERD_CHANCE:
-  chunk.herd={"pos":origin+Vector2(rng.randf_range(220,CHUNK_SIZE-220),rng.randf_range(220,CHUNK_SIZE-220)),"traits":{"coat":rng.randi_range(0,HorseCollection.COATS.size()-1),"pattern":rng.randi_range(0,HorseCollection.PATTERNS.size()-1),"mane":rng.randi_range(0,HorseCollection.MANES.size()-1),"eyes":rng.randi_range(0,HorseCollection.EYES.size()-1),"finish":"normal"},"temperament":rng.randf_range(0.0,1.0),"calm":rng.randf_range(0.5,1.5)}
+  chunk.herd={"pos":origin+Vector2(rng.randf_range(220,CHUNK_SIZE-220),rng.randf_range(220,CHUNK_SIZE-220)),"traits":{"coat":rng.randi_range(0,HorseCollection.COATS.size()-1),"pattern":rng.randi_range(0,HorseCollection.PATTERNS.size()-1),"mane":rng.randi_range(0,HorseCollection.MANES.size()-1),"eyes":rng.randi_range(0,HorseCollection.EYES.size()-1),"finish":"normal"},"temperament":rng.randf_range(0.0,1.0),"calm":rng.randf_range(0.5,1.5),"stats":{"speed":rng.randf_range(255,285),"handling":rng.randf_range(900,1250),"power":rng.randf_range(0.6,0.8),"dodge":rng.randf_range(0.85,1.0)}}
  return chunk
 
 ## A herd chunk the player discovers becomes a found mission (Ant: misiones por
