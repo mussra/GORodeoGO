@@ -28,5 +28,6 @@ static func apply(level:Node)->void:
  var key:String=str(traits)
  if not cache.has(key):cache[key]=[texture_for(traits,false),texture_for(traits,true)]
  for v in [level.get_node("TouchControls/MoveJoystick"),level.aim_joystick]:
-  v.joystick_texture=cache[key][0];v.tip_texture=cache[key][1]
+  # Native Godot 4.7 VirtualJoystick has no joystick_texture/tip_texture props; assigning
+  # them errors (visuals already default). Keep the no-op tint overrides as before.
   for theme_key in ["ring_normal_color","tip_normal_color","ring_pressed_color","tip_pressed_color"]:v.add_theme_color_override(theme_key,Color.WHITE)
