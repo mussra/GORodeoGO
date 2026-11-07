@@ -28,6 +28,18 @@ static func solid_box(p_kind: String, pos: Vector2, sc: float) -> Rect2:
 			return Rect2(pos + Vector2(-14, 0) * sc, Vector2(28, 10) * sc)
 	return Rect2()
 
+## World-space rect where this decor's body covers whatever stands behind it.
+## Low decor (rock, bush, flower) never hides the rider: empty rect.
+static func occluder_box(p_kind: String, pos: Vector2, sc: float) -> Rect2:
+	match p_kind:
+		"tree", "fruit_tree":
+			return Rect2(pos + Vector2(-26, -54) * sc, Vector2(52, 74) * sc)
+		"pine":
+			return Rect2(pos + Vector2(-24, -48) * sc, Vector2(48, 68) * sc)
+		"cactus":
+			return Rect2(pos + Vector2(-18, -32) * sc, Vector2(36, 52) * sc)
+	return Rect2()
+
 func _ready() -> void:
 	scale = Vector2.ONE * size_scale
 	queue_redraw()

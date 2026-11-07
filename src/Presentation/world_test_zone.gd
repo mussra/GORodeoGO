@@ -89,6 +89,7 @@ func _add_house(world: Node2D, h: Dictionary) -> void:
 		n.draw_rect(Rect2(Vector2(14, 14), Vector2(22, 18)), Color("f2e3b3"))
 		n.draw_rect(Rect2(Vector2(86, 14), Vector2(22, 18)), Color("f2e3b3"))
 	world.add_child(node)
+	world.register_occluder("zone_house_%s" % str(base), Rect2(base + Vector2(-10, -110), Vector2(140, 110)))
 	# walls: back, sides, front split at the door gap (x 47..73); interior open
 	Physics.add_box(world, Rect2(base + Vector2(0, 0), Vector2(120, 8)))
 	Physics.add_box(world, Rect2(base + Vector2(0, 8), Vector2(8, 54)))

@@ -11,6 +11,7 @@ const PigScript := preload("res://src/Presentation/wild_pig.gd")
 const TrailScript := preload("res://src/Presentation/frontier_trail.gd")
 const TestZoneScript := preload("res://src/Presentation/world_test_zone.gd")
 const Physics := preload("res://src/Presentation/world_physics.gd")
+const DrawNode := preload("res://src/Presentation/world_draw_node.gd")
 
 const BOARD_POS := Vector2(145, -20)
 const HOME_POS := Vector2(0, 160)
@@ -54,6 +55,12 @@ var _lasso_state: String = ""
 var _lasso_flight: float = 0.0
 var _lasso_cooldown: float = 0.0
 var _lasso_horse: Node2D = null
+
+## Occluder rects (owner -> Array[Rect2]): when the rider's feet are inside one,
+## a tall body (house, tree, cactus) covers him, so a marker floats above him
+## (Ant 7-nov-2026 16:50: "necesito ver claramente donde esta mi vaquero").
+var _occluders: Dictionary = {}
+var _marker: Node2D = null
 var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
@@ -68,11 +75,17 @@ func _ready() -> void:
 	player = PlayerScript.new()
 	player.position = SaveData.world_position
 	add_child(player)
+	_marker = DrawNode.new()
+	_marker.draw_fn = _draw_rider_marker
+	_marker.z_index = 60
+	_marker.visible = false
+	add_child(_marker)
 	var camera := Camera2D.new()
 	player.add_child(camera)
 	camera.make_current()
 	var ranch := RanchScript.new()
 	add_child(ranch)
+	register_occluder("ranch_house", Rect2(Vector2(-130, -262), Vector2(170, 142)))
 	# fixed showcase zone near the ranch (Ant, 7-nov-2026): additive overlay,
 	# no effect on chunk seeds, streaming or saves
 	var test_zone := TestZoneScript.new()
@@ -90,6 +103,7 @@ func _process(delta: float) -> void:
 	_update_chunks()
 	_tick_taming(delta)
 	_tick_lasso(delta)
+	_tick_rider_marker()
 	_tick_pigs(delta)
 	_tick_hoofbeats(delta)
 	_tick_stamina(delta)
@@ -104,6 +118,31 @@ func _process(delta: float) -> void:
 	if _save_timer >= SAVE_EVERY:
 		_save_timer = 0.0
 		SaveData.save_world_state(player.position)
+
+func register_occluder(owner, rect: Rect2) -> void:
+	if not _occluders.has(owner):
+		_occluders[owner] = []
+	_occluders[owner].append(rect)
+
+func _tick_rider_marker() -> void:
+	var hidden: bool = false
+	for owner in _occluders:
+		for r in _occluders[owner]:
+			if (r as Rect2).has_point(player.position):
+				hidden = true
+				break
+		if hidden:
+			break
+	_marker.visible = hidden
+	if hidden:
+		var bob: float = absf(sin(Time.get_ticks_msec() / 220.0)) * 8.0
+		_marker.position = player.position + Vector2(0, -70 - bob)
+		_marker.queue_redraw()
+
+func _draw_rider_marker(n: Node2D) -> void:
+	var tri := PackedVector2Array([Vector2(-11, -8), Vector2(11, -8), Vector2(0, 8)])
+	n.draw_colored_polygon(tri, Color("201b1c"))
+	n.draw_colored_polygon(PackedVector2Array([Vector2(-7, -6), Vector2(7, -6), Vector2(0, 5)]), Color("ffd23d"))
 
 func _tick_lasso(delta: float) -> void:
 	_lasso_cooldown = maxf(0.0, _lasso_cooldown - delta)
@@ -192,6 +231,7 @@ func _update_chunks() -> void:
 					e.queue_free()
 			_chunk_entities.erase(key)
 			_herd_horses.erase(key)
+		_occluders.erase(key)
 
 func _ensure_chunk(cx: int, cy: int) -> void:
 	var key: String = WorldMap.chunk_key(cx, cy)
@@ -216,6 +256,9 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 		decor.position = d["pos"] + Vector2(0, boff)
 		add_child(decor)
 		entities.append(decor)
+		var occ: Rect2 = DecorScript.occluder_box(d["kind"], d["pos"], d["scale"])
+		if occ.has_area():
+			register_occluder(key, occ)
 		var box: Rect2 = DecorScript.solid_box(d["kind"], d["pos"], d["scale"])
 		if box.has_area():
 			entities.append(Physics.add_box(self, box))
@@ -620,9 +663,11 @@ class DiscoveryMap extends Control:
 		var close := Button.new()
 		close.text = "X"
 		close.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-		close.position = Vector2(size.x - 84, 20)
-		close.size = Vector2(64, 64)
-		close.add_theme_font_size_override("font_size", 34)
+		close.offset_left = -90
+		close.offset_top = 16
+		close.offset_right = -16
+		close.offset_bottom = 88
+		close.add_theme_font_size_override("font_size", 40)
 		close.pressed.connect(world._toggle_map)
 		add_child(close)
 		var minus := Button.new()

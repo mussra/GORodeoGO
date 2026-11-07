@@ -47,3 +47,16 @@ func test_house_door_and_walls() -> void:
 	await _drive(world, "move_up", 20)
 	assert_lt(world.player.position.y, -105.0, "rider moved to the wall")
 	assert_gt(world.player.position.y, -130.0, "front wall blocks")
+
+func test_marker_shows_when_rider_hidden() -> void:
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	world.player.position = Vector2(0, 260)
+	await wait_physics_frames(3)
+	assert_false(world._marker.visible, "marker hidden out in the open")
+	world.player.position = Vector2(-60, -150)
+	await wait_physics_frames(3)
+	assert_true(world._marker.visible, "marker shows when the house covers the rider")
+	world.player.position = Vector2(0, 260)
+	await wait_physics_frames(3)
+	assert_false(world._marker.visible, "marker hides again once visible")
