@@ -33,10 +33,23 @@ func test_chosen_color_leads_and_stays_readable()->void:
    if absf(chosen.get_luminance()-bg)>=.34:assert_eq(fg,chosen,"color %d kept when it already contrasts"%ci)
 func test_badge_dialog_title_matches_skill()->void:
  var dodge:=JumpBadge.new();dodge.skill="dodge";dodge.capable=true
- var dialog:=dodge.make_explanation()
- assert_eq(dialog.title,tr("DODGE_BADGE_TITLE"));assert_eq(dialog.dialog_text,tr("DODGE_CAPABLE"))
- dialog.free();dodge.free()
+ assert_eq(dodge.explanation_title(),tr("DODGE_BADGE_TITLE"));assert_eq(dodge.explanation_text(),tr("DODGE_CAPABLE"))
+ dodge.free()
  var jump:=JumpBadge.new();jump.capable=true
- var dialog2:=jump.make_explanation()
- assert_eq(dialog2.title,tr("JUMP_BADGE_TITLE"));assert_eq(dialog2.dialog_text,tr("JUMP_CAPABLE"))
- dialog2.free();jump.free()
+ assert_eq(jump.explanation_title(),tr("JUMP_BADGE_TITLE"));assert_eq(jump.explanation_text(),tr("JUMP_CAPABLE"))
+ jump.free()
+
+func test_badge_notice_never_blocks_stable_buttons()->void:
+ var badge:=JumpBadge.new();badge.skill="dodge";badge.capable=true
+ add_child_autofree(badge);badge.size=Vector2(64,56)
+ badge.show_explanation()
+ await wait_frames(3)
+ var notice:PanelContainer=null
+ for n in get_tree().root.get_children():
+  if n is PanelContainer:notice=n
+ assert_true(notice!=null and notice.visible,"notice shows at scene root")
+ assert_eq(notice.mouse_filter,Control.MOUSE_FILTER_IGNORE,"notice never sees input")
+ var lb:Label=notice.get_child(0)
+ assert_eq(lb.mouse_filter,Control.MOUSE_FILTER_IGNORE)
+ assert_true(lb.text.begins_with(tr("DODGE_BADGE_TITLE")+": "))
+ badge.free()

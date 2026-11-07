@@ -7,11 +7,29 @@ func _ready()->void:
  pressed.connect(show_explanation)
  tooltip_text=tr("DODGE_CAPABLE" if capable else "DODGE_GROUNDED") if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"))
  queue_redraw()
-func make_explanation()->AcceptDialog:
- var explanation:=AcceptDialog.new();explanation.title=tr("DODGE_BADGE_TITLE" if skill=="dodge" else "JUMP_BADGE_TITLE");explanation.dialog_text=(tr("DODGE_CAPABLE") if capable else tr("DODGE_GROUNDED")) if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"));explanation.min_size=Vector2i(460,120)
- return explanation
+func explanation_text()->String:
+ return (tr("DODGE_CAPABLE") if capable else tr("DODGE_GROUNDED")) if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"))
+func explanation_title()->String:
+ return tr("DODGE_BADGE_TITLE" if skill=="dodge" else "JUMP_BADGE_TITLE")
+## Non-blocking notice: the modal dialog made the whole stable look frozen on
+## the phone and hid the FICHA the rider was trying to open. This is a plain
+## visual overlay: it never sees input, so FICHA and every other button keep
+## responding, and it fades out by itself.
+func make_notice()->PanelContainer:
+ var notice:=PanelContainer.new();notice.top_level=true;notice.mouse_filter=Control.MOUSE_FILTER_IGNORE;notice.z_index=4096;notice.z_as_relative=false
+ notice.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252dd9"),Color("f4cf67"),8))
+ var lb:=Label.new();lb.text=explanation_title()+": "+explanation_text();lb.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;lb.custom_minimum_size=Vector2(280,0);lb.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ notice.add_child(lb)
+ return notice
 func show_explanation()->void:
- var explanation:=make_explanation();add_child(explanation);explanation.confirmed.connect(explanation.queue_free);explanation.canceled.connect(explanation.queue_free);explanation.popup_centered()
+ var notice:=make_notice()
+ get_tree().root.add_child(notice) # outside the scroll hierarchy: no clipping, no input grab
+ notice.size=notice.get_combined_minimum_size()
+ var at:=global_position+Vector2(size.x+8,-64.0)
+ var view:=get_viewport_rect().size
+ at.x=clampf(at.x,8.0,view.x-notice.size.x-8.0);at.y=clampf(at.y,8.0,view.y-notice.size.y-8.0)
+ notice.global_position=at
+ var tween:=create_tween();tween.tween_interval(2.2);tween.tween_property(notice,"modulate:a",0.0,0.4);tween.tween_callback(notice.queue_free)
 func _draw()->void:
  var ink:Color=Color("f4cf67") if capable else Color("c8d3d5")
  draw_style_box(RanchTheme.box(Color("10252d"),ink,8),Rect2(0,0,64,56))
