@@ -41,15 +41,15 @@ static func stamp_letters(image:Image,config:Dictionary)->void:
   if not ResourceLoader.exists(path):continue
   var g:Image=load(path).get_image()
   if g.is_compressed():g.decompress()
-  glyphs.append(g);total_w+=g.get_width()*19/g.get_height()+4
+  glyphs.append(g);total_w+=g.get_width()*13/g.get_height()+3
  if glyphs.is_empty():return
- total_w-=4
+ total_w-=3
  var x:=50-total_w/2
  for g:Image in glyphs:
-  var w:=g.get_width()*19/g.get_height()
-  g.resize(w,19,Image.INTERPOLATE_LANCZOS)
-  image.blit_rect(g,Rect2i(0,0,w,19),Vector2i(x,17))
-  x+=w+4
+  var w:=g.get_width()*13/g.get_height()
+  g.resize(w,13,Image.INTERPOLATE_LANCZOS)
+  image.blit_rect(g,Rect2i(0,0,w,13),Vector2i(x,20))
+  x+=w+3
 ## Wraps the emblem over the rump: columns fall away toward the rear (x=0) with a
 ## smooth quadratic, so the mark follows the thigh volume instead of floating flat.
 static func warp_columns(ink:Image,amount:float)->Image:
