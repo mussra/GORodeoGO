@@ -30,44 +30,93 @@ var _jump_from:Vector2
 var _jump_sprite_base:Vector2
 var _jump_cooldown:float=0.0
 
-var dodge_recharge_seconds:float=2.5
 var jump_recovery_multiplier:float=1.0
-const DODGE_RECHARGE_SECONDS: float = 2.5  # provisional feel setting, preview before APK
-var _dodge_cooldown: float = 0.0
 
-const DODGE_SECONDS: float = .18
-const DODGE_SPEED_FACTOR: float = 2.2
-const DODGE_COAST_SECONDS: float = .18  # short soft stop, preview tuning
-const DODGE_COAST_SPEED_FACTOR: float = .8
-var _dodge_coast_remaining: float = 0.0
-const MOVE_REPRESS_WINDOW_SECONDS: float = .3
-var _move_tap: DoubleTapDetector = DoubleTapDetector.new(MOVE_REPRESS_WINDOW_SECONDS)
-var _running_release_at: float = -INF
-const DRAW_TIME_SCALE: float = .24
-var _run_after_dodge: Vector2 = Vector2.ZERO
-var dodge_available: bool = true
-var dodge_path_limit: float = 260.0
-var _drawing_real_started: float = 0.0
-var _drawing_dodge: bool = false
-var _draw_screen_start: Vector2 = Vector2.ZERO
-var _draw_pointer_previous:Vector2=Vector2.ZERO
-var _draw_virtual:Vector2=Vector2.ZERO
-var _draw_heading:Vector2=Vector2.ZERO
-const DRAW_EDGE_MARGIN:float=28.0
-const DRAW_EDGE_SPEED:float=300.0
-const DRAW_EDGE_DWELL:float=.18
-var _draw_edge_elapsed:float=0.0
-var _draw_edge_active:bool=false
-var _last_touch_index: int = -1
-var _draw_touch_index: int = -1
-var _skid_trail: Array[Vector2] = []
-var _trail_fade: float = 0.0
-var _last_pointer: Vector2 = Vector2.ZERO
-var _draw_points: PackedVector2Array = PackedVector2Array()
-var _dodge_path: Array[Vector2] = []
-var _move_pressed_at: float = 0.0
-var _dodge_remaining: float = 0.0
-var _dodge_direction: Vector2 = Vector2.ZERO
+## The dodge/regate lives in the shared DodgeController (same component the open
+## world uses); these forwards keep the existing names/tests working.
+const DODGE_RECHARGE_SECONDS: float = 2.5  # provisional feel setting, preview before APK
+const DODGE_SECONDS: float = DodgeController.DODGE_SECONDS
+const DODGE_SPEED_FACTOR: float = DodgeController.DODGE_SPEED_FACTOR
+const DODGE_COAST_SECONDS: float = DodgeController.DODGE_COAST_SECONDS
+const DODGE_COAST_SPEED_FACTOR: float = DodgeController.DODGE_COAST_SPEED_FACTOR
+const MOVE_REPRESS_WINDOW_SECONDS: float = DodgeController.MOVE_REPRESS_WINDOW_SECONDS
+const DRAW_TIME_SCALE: float = DodgeController.DRAW_TIME_SCALE
+const DRAW_EDGE_MARGIN: float = DodgeController.DRAW_EDGE_MARGIN
+const DRAW_EDGE_SPEED: float = DodgeController.DRAW_EDGE_SPEED
+const DRAW_EDGE_DWELL: float = DodgeController.DRAW_EDGE_DWELL
+var dodge: DodgeController = null
+var dodge_recharge_seconds: float:
+	get: return 2.5 if dodge == null else dodge.recharge_seconds
+	set(v): if dodge != null: dodge.recharge_seconds = v
+var dodge_available: bool:
+	get: return true if dodge == null else dodge.available
+	set(v): if dodge != null: dodge.available = v
+var dodge_path_limit: float:
+	get: return 260.0 if dodge == null else dodge.path_limit
+	set(v): if dodge != null: dodge.path_limit = v
+var _dodge_cooldown: float:
+	get: return 0.0 if dodge == null else dodge.cooldown
+	set(v): if dodge != null: dodge.cooldown = v
+var _dodge_coast_remaining: float:
+	get: return 0.0 if dodge == null else dodge.coast_remaining
+	set(v): if dodge != null: dodge.coast_remaining = v
+var _drawing_dodge: bool:
+	get: return false if dodge == null else dodge.drawing
+	set(v): if dodge != null: dodge.drawing = v
+var _drawing_real_started: float:
+	get: return 0.0 if dodge == null else dodge.drawing_real_started
+	set(v): if dodge != null: dodge.drawing_real_started = v
+var _draw_points: PackedVector2Array:
+	get: return PackedVector2Array() if dodge == null else dodge.draw_points
+	set(v): if dodge != null: dodge.draw_points = v
+var _dodge_path: Array[Vector2]:
+	get: return [] if dodge == null else dodge.path
+	set(v): if dodge != null: dodge.path = v
+var _dodge_remaining: float:
+	get: return 0.0 if dodge == null else dodge.remaining
+	set(v): if dodge != null: dodge.remaining = v
+var _dodge_direction: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.direction
+	set(v): if dodge != null: dodge.direction = v
+var _run_after_dodge: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.run_after_dodge
+	set(v): if dodge != null: dodge.run_after_dodge = v
+var _skid_trail: Array[Vector2]:
+	get: return [] if dodge == null else dodge.skid_trail
+	set(v): if dodge != null: dodge.skid_trail = v
+var _trail_fade: float:
+	get: return 0.0 if dodge == null else dodge.trail_fade
+	set(v): if dodge != null: dodge.trail_fade = v
+var _draw_screen_start: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.draw_screen_start
+	set(v): if dodge != null: dodge.draw_screen_start = v
+var _draw_virtual: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.draw_virtual
+	set(v): if dodge != null: dodge.draw_virtual = v
+var _draw_heading: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.draw_heading
+	set(v): if dodge != null: dodge.draw_heading = v
+var _draw_edge_elapsed: float:
+	get: return 0.0 if dodge == null else dodge.draw_edge_elapsed
+	set(v): if dodge != null: dodge.draw_edge_elapsed = v
+var _draw_edge_active: bool:
+	get: return false if dodge == null else dodge.draw_edge_active
+	set(v): if dodge != null: dodge.draw_edge_active = v
+var _draw_pointer_previous: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.draw_pointer_previous
+	set(v): if dodge != null: dodge.draw_pointer_previous = v
+var _last_pointer: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.last_pointer
+	set(v): if dodge != null: dodge.last_pointer = v
+var _last_touch_index: int:
+	get: return -1 if dodge == null else dodge.last_touch_index
+	set(v): if dodge != null: dodge.last_touch_index = v
+var _move_pressed_at: float:
+	get: return 0.0 if dodge == null else dodge.move_pressed_at
+	set(v): if dodge != null: dodge.move_pressed_at = v
+var _running_release_at: float:
+	get: return -INF if dodge == null else dodge.running_release_at
+	set(v): if dodge != null: dodge.running_release_at = v
 
 const ART_ROOT: String = "res://art/player/"
 const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "stunned", "jump_side", "jump_up", "jump_down", "jump_diag_down", "jump_diag_up"]
@@ -126,6 +175,18 @@ func _ready() -> void:
 	lasso.prey_captured.connect(func(prey: Node2D): prey_captured.emit(prey))
 	lasso.throw_blocked.connect(func(): throw_blocked.emit())
 	lasso.release_requested.connect(func(): release_requested.emit())
+	dodge = DodgeController.new()
+	dodge.owner_body = self
+	dodge.can_start = func() -> bool: return _jump_time <= 0 and _stun_time_remaining <= 0.0
+	dodge.speed_scale = func() -> float: return dual_capture_speed_multiplier if _active_capture_count >= 2 else 1.0
+	dodge.moving_with_input = func() -> bool: return velocity.length() > 1.0 and _stun_time_remaining <= 0.0
+	dodge.resumed = func(dir: Vector2) -> void: _resume_running_after_dodge(dir)
+	dodge.on_moved = func() -> void: _on_dodge_moved()
+	dodge.drawing_started.connect(func(): dodge_drawing_started.emit())
+	dodge.drawing_finished.connect(func(): dodge_drawing_finished.emit())
+	dodge.dodge_started.connect(func(): dodge_started.emit())
+	dodge.dodge_finished.connect(func(): dodge_finished.emit())
+	add_child(dodge)
 	add_child(lasso)
 	var cue:=DodgeEdgeCue.new()
 	cue.player=self
@@ -159,108 +220,28 @@ func set_aim_joystick(aim_joystick: VirtualJoystick) -> void:
 
 ## Movement and lasso gestures have independent detectors.
 func set_move_joystick(stick: VirtualJoystick) -> void:
-	stick.pressed.connect(_on_move_pressed)
-	stick.released.connect(_on_move_released)
+	dodge.set_move_joystick(stick)
 
 func _on_move_pressed() -> void:
-	_move_pressed_at = _now_seconds()
-	var running_repress: bool = _move_pressed_at - _running_release_at <= MOVE_REPRESS_WINDOW_SECONDS
-	_running_release_at = -INF
-	var double_press: bool = _move_tap.register_tap(_move_pressed_at)
-	if _jump_time<=0 and dodge_available and (running_repress or double_press) and _dodge_cooldown <= 0.0 and _stun_time_remaining <= 0.0:
-		_move_tap.reset()
-		_drawing_dodge = true
-		_drawing_real_started = _now_seconds()
-		Engine.time_scale = DRAW_TIME_SCALE
-		dodge_drawing_started.emit()
-		_draw_touch_index = _last_touch_index
-		_draw_screen_start = _last_pointer
-		_draw_pointer_previous=_last_pointer
-		_draw_virtual=Vector2.ZERO
-		_draw_heading=Vector2.ZERO
-		_draw_edge_elapsed=0.0
-		_draw_edge_active=false
-		_draw_points = PackedVector2Array([Vector2.ZERO])
-		velocity = Vector2.ZERO
+	dodge.on_move_pressed()
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventScreenTouch and event.pressed:
-		_last_pointer = event.position
-		_last_touch_index = event.index
-	elif event is InputEventScreenDrag:
-		if _drawing_dodge and event.index == _draw_touch_index:
-			_last_pointer=event.position
-			var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
-			var delta:Vector2=event.position-_draw_pointer_previous
-			_draw_pointer_previous=event.position
-			if delta.length()>1:_draw_heading=delta.normalized()
-			_draw_virtual+=delta/zoom
-			_append_draw_point()
+	dodge.handle_input(event)
 
-func _append_draw_point()->void:
-	if _draw_points.is_empty():return
-	if _draw_points[-1].distance_to(_draw_virtual)>5 and _draw_points.size()<120:
-		_draw_points.append(_draw_virtual)
-	queue_redraw()
+func _append_draw_point() -> void:
+	dodge.append_draw_point()
 
-func _extend_drawing_at_edge(real_delta:float)->void:
-	var size:Vector2=get_viewport_rect().size
-	var outward:bool=(_last_pointer.x<DRAW_EDGE_MARGIN and _draw_heading.x<-.1) or (_last_pointer.x>size.x-DRAW_EDGE_MARGIN and _draw_heading.x>.1) or (_last_pointer.y<DRAW_EDGE_MARGIN and _draw_heading.y<-.1) or (_last_pointer.y>size.y-DRAW_EDGE_MARGIN and _draw_heading.y>.1)
-	if not outward or _draw_heading.is_zero_approx():
-		_draw_edge_elapsed=0.0
-		_draw_edge_active=false
-		return
-	_draw_edge_elapsed+=minf(real_delta,.05)
-	_draw_edge_active=_draw_edge_elapsed>=DRAW_EDGE_DWELL
-	if not _draw_edge_active:return
-	var zoom:float=get_viewport().get_camera_2d().zoom.x if get_viewport().get_camera_2d()!=null else 1.0
-	# Preserve full latest heading, including diagonals at a single edge/corner.
-	# Inward drag stops continuation without snapping accumulated virtual offset.
-	_draw_virtual+=_draw_heading*DRAW_EDGE_SPEED*minf(real_delta,.05)/zoom
-	_append_draw_point()
+func _extend_drawing_at_edge(real_delta: float) -> void:
+	dodge.extend_drawing_at_edge(real_delta)
 
-func _on_move_released(_direction: Vector2) -> void:
-	_running_release_at = -INF
-	_run_after_dodge = Vector2.ZERO
-	if _drawing_dodge:
-		_drawing_dodge = false
-		Engine.time_scale = 1.0
-		dodge_drawing_finished.emit()
-		request_dodge_path(_draw_points)
-		_draw_points = PackedVector2Array()
-		_move_tap.reset()
-	elif not _direction.is_zero_approx() and velocity.length() > 1.0 and _stun_time_remaining <= 0.0 and _dodge_path.is_empty():
-		# A running hold is the first press. Only the gap after release is timed.
-		_running_release_at = _now_seconds()
-		_move_tap.reset()
-	elif _now_seconds() - _move_pressed_at > .22:
-		_move_tap.reset()
+func _on_move_released(direction: Vector2) -> void:
+	dodge.on_move_released(direction)
 
 func request_dodge_path(points: PackedVector2Array) -> bool:
-	if _jump_time>0 or not dodge_available or _stun_time_remaining > 0.0 or _dodge_cooldown > 0.0 or points.size() < 2:
-		return false
-	var preview: PackedVector2Array = dodge_preview_points(points)
-	if preview.size()<2: return false
-	_dodge_path.clear()
-	_run_after_dodge = Vector2.ZERO
-	_dodge_coast_remaining = 0.0
-	_skid_trail.clear()
-	_skid_trail.append(global_position)
-	_trail_fade = .7
-	for i in range(1, preview.size()):
-		_dodge_path.append(global_position + preview[i])
-	_dodge_cooldown = dodge_recharge_seconds
-	_dodge_remaining = 1.0
-	dodge_started.emit()
-	return true
+	return dodge.request_path(points)
 
 func request_dodge(direction: Vector2) -> bool:
-	if _jump_time>0 or not dodge_available or _stun_time_remaining > 0.0 or _dodge_remaining > 0.0 or _dodge_cooldown > 0.0 or direction.length() < .2 or not is_physics_processing():
-		return false
-	_dodge_direction = direction.normalized()
-	_dodge_remaining = DODGE_SECONDS
-	_dodge_cooldown = dodge_recharge_seconds
-	return true
+	return dodge.request_dash(direction)
 
 
 ## Two quick taps (press+release near the centre) emit release_requested instead (D038).
@@ -283,10 +264,9 @@ func stun(duration: float) -> void:
 	cancel_input()
 
 func _physics_process(delta: float) -> void:
+	dodge.world_bounds = world_bounds
 	# Ground trail keeps fading even while jump/stun branches return early.
-	if _dodge_path.is_empty() and _trail_fade>0:
-		_trail_fade=maxf(0.0,_trail_fade-delta)
-		if _trail_fade<=0:_skid_trail.clear()
+	if dodge.fade_trail(delta):
 		queue_redraw()
 	_jump_cooldown=maxf(0,_jump_cooldown-delta)
 	if _jump_time>0:
@@ -302,82 +282,17 @@ func _physics_process(delta: float) -> void:
 			modulate = Color.WHITE
 		return
 
-	if _drawing_dodge:
-		_extend_drawing_at_edge(delta/maxf(Engine.time_scale,.01))
-		if _now_seconds()-_drawing_real_started > 2.0:
-			_on_move_released(Vector2.ZERO)
-		velocity = Vector2.ZERO
-		queue_redraw()
+	# Dodge branches run in the shared DodgeController (same code as the world).
+	if dodge.drawing:
+		dodge.process_drawing(delta/maxf(Engine.time_scale,.01))
 		return
-	if not _dodge_path.is_empty():
-		var distance_left:float=global_position.distance_to(_dodge_path[0])
-		for i in range(1,_dodge_path.size()): distance_left+=_dodge_path[i-1].distance_to(_dodge_path[i])
-		# Ease to running speed, not to a standstill, at the traced endpoint.
-		var budget: float = minf(max_speed*DODGE_SPEED_FACTOR,maxf(max_speed,distance_left*14.0))*delta
-		if _active_capture_count >= 2:
-			budget *= dual_capture_speed_multiplier
-		var collision_free: bool = true
-		while budget > .01 and not _dodge_path.is_empty():
-			var offset: Vector2 = _dodge_path[0] - global_position
-			var step: Vector2 = offset.limit_length(budget)
-			if not offset.is_zero_approx(): _dodge_direction = offset.normalized()
-			var collision: KinematicCollision2D = move_and_collide(step)
-			_skid_trail.append(global_position)
-			budget -= step.length()
-			if collision != null:
-				collision_free = false
-				_dodge_path.clear()
-				break
-			if offset.length() <= step.length() + .1:
-				_dodge_path.pop_front()
-		# The special trace ends here; ordinary running immediately takes over.
-		if _dodge_path.is_empty():
-			dodge_finished.emit()
-			_dodge_coast_remaining = 0.0
-			if collision_free:
-				_resume_running_after_dodge()
-			else:
-				_run_after_dodge = Vector2.ZERO
-				velocity = Vector2.ZERO
-		else:
-			velocity = _dodge_direction * max_speed * DODGE_SPEED_FACTOR
-		var facing: Array = SpriteSwap.direction_suffix(velocity if not velocity.is_zero_approx() else _dodge_direction)
-		_sprite_swap.play("walk_" + facing[0])
-		_sprite_swap.set_flip_h(facing[1])
-		_sprite_swap.set_motion_speed(velocity.length(), 260.0)
-		global_position = global_position.clamp(world_bounds.position, world_bounds.end)
-		_dodge_remaining = 0.0 if _dodge_path.is_empty() else 1.0
-		queue_redraw()
+	if dodge.step_path(max_speed, delta):
 		return
-	if _dodge_coast_remaining > 0.0:
-		if not Input.get_vector("move_left", "move_right", "move_up", "move_down").is_zero_approx():
-			_dodge_coast_remaining = 0.0
-			velocity = Vector2.ZERO  # fresh input takes control without automatic coast
-		else:
-			var coast_step: float = minf(delta, _dodge_coast_remaining)
-			var next_remaining: float = maxf(0.0, _dodge_coast_remaining - coast_step)
-			var average_speed: float = max_speed * DODGE_COAST_SPEED_FACTOR * (_dodge_coast_remaining + next_remaining) / (2.0 * DODGE_COAST_SECONDS)
-			var hit: KinematicCollision2D = move_and_collide(_dodge_direction * average_speed * coast_step)
-			_dodge_coast_remaining = next_remaining if hit == null else 0.0
-			velocity = _dodge_direction * max_speed * DODGE_COAST_SPEED_FACTOR * _dodge_coast_remaining / DODGE_COAST_SECONDS
-			global_position = global_position.clamp(world_bounds.position, world_bounds.end)
-			queue_redraw()
-			return
-	if _dodge_remaining > 0.0:
-		_dodge_remaining = maxf(0.0, _dodge_remaining - delta)
-		var speed: float = max_speed * DODGE_SPEED_FACTOR
-		if _active_capture_count >= 2:
-			speed *= dual_capture_speed_multiplier
-		velocity = _dodge_direction * speed
-		move_and_slide()
-		global_position = global_position.clamp(world_bounds.position, world_bounds.end)
-		if _dodge_remaining <= 0.0: _resume_running_after_dodge()
-		var direction: Array = SpriteSwap.direction_suffix(_dodge_direction)
-		_sprite_swap.play("walk_" + direction[0])
-		_sprite_swap.set_flip_h(direction[1])
-		_sprite_swap.set_motion_speed(velocity.length(), 260.0)
-		queue_redraw()
+	if dodge.step_coast(max_speed, delta):
 		return
+	if dodge.step_dash(max_speed, delta):
+		return
+
 	queue_redraw()
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var is_moving: bool = input_dir.length() > 0.0
@@ -407,12 +322,24 @@ func _physics_process(delta: float) -> void:
 		release_requested.emit()
 	_process_throw_input(delta)
 
-func _resume_running_after_dodge() -> void:
+## Called by the DodgeController when a traced path or dash ends cleanly
+## (no argument = keep the controller's current dodge direction).
+func _resume_running_after_dodge(dir: Vector2 = Vector2.INF) -> void:
+	if dir == Vector2.INF:
+		dir = dodge.direction
 	# Keep the endpoint tangent, never replace it with fresh input or automatic cruise.
 	# Normal acceleration/friction controls braking and turning from the next frame.
 	_run_after_dodge = Vector2.ZERO
 	var speed: float = max_speed * (dual_capture_speed_multiplier if _active_capture_count >= 2 else 1.0)
-	velocity = _dodge_direction * speed
+	velocity = dir * speed
+
+## Called by the DodgeController after each dodge step: sprite facing + redraw.
+func _on_dodge_moved() -> void:
+	var facing: Array = SpriteSwap.direction_suffix(velocity if not velocity.is_zero_approx() else dodge.direction)
+	_sprite_swap.play("walk_" + facing[0])
+	_sprite_swap.set_flip_h(facing[1])
+	_sprite_swap.set_motion_speed(velocity.length(), 260.0)
+	queue_redraw()
 
 func _process_throw_input(delta: float) -> void:
 	lasso.process_throw_input(delta)
@@ -432,16 +359,7 @@ func cancel_all_actions() -> void:
 	lasso.cancel_all_actions()
 
 func cancel_input() -> void:
-	_running_release_at = -INF
-	_run_after_dodge = Vector2.ZERO
-	if _drawing_dodge: dodge_drawing_finished.emit()
-	Engine.time_scale = 1.0
-	_dodge_coast_remaining = 0.0
-	_dodge_remaining = 0.0
-	_dodge_path.clear()
-	_drawing_dodge = false
-	_draw_points = PackedVector2Array()
-	_move_tap.reset()
+	dodge.cancel()
 	lasso.cancel_input()
 	velocity = Vector2.ZERO
 
@@ -512,7 +430,7 @@ func _exit_tree() -> void:
 
 ## One projection shared by drawing and execution: never show unscaled reach.
 func dodge_preview_points(points: PackedVector2Array) -> PackedVector2Array:
-	return DodgeCurve.smooth(points,dodge_path_limit)
+	return dodge.preview_points(points)
 
 # Auto-jump only over explicitly marked internal fences. Perimeter and rocks stay solid.
 func _try_fence_ahead()->bool:
