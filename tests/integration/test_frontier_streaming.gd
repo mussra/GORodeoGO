@@ -11,6 +11,8 @@ func _fresh_world() -> Node2D:
 	SaveData.world_pigs.clear()
 	SaveData.world_edits.clear()
 	SaveData.horse_collection.seed_trial()
+	# hermetic: spawn at the ranch regardless of what previous runs saved on disk
+	SaveData.world_position = Vector2(0, 160)
 	var world: Node2D = load("res://src/Presentation/frontier_world.tscn").instantiate()
 	add_child_autofree(world)
 	return world
