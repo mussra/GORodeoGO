@@ -203,6 +203,26 @@ def rebuild(anim, frame, out_base=None, out_mask=None):
                     kept.pop((x, y), None)
                     px[x, y] = (0, 0, 0, 0)
 
+    # -- stirrup-leather sweep: mid-tone tack remnant under the belly --------
+    # The boot is leather brown, classified "coat", so the dark-only passes
+    # above skip it; it hangs at x46-59 below the belly fill, mask-free, and
+    # recolors badly on light coats. Erase non-covered, non-bright pixels
+    # there; keep hooves, which always sit next to a bright sock.
+    for y in range(58, 76):
+        for x in range(46, 60):
+            if not kept.get((x, y)) or px[x, y][3] == 0:
+                continue
+            if max(mk[x, y][0], mk[x, y][1]) >= 6:
+                continue  # real body/leg (mask-covered)
+            if cls(px[x, y]) == "white":
+                continue  # white sock
+            near_bright = any(kept.get((x + dx, y + dy)) and cls(px[x + dx, y + dy]) == "white"
+                              for dx in range(-3, 4) for dy in range(-3, 4))
+            if near_bright:
+                continue  # hoof beside a white sock
+            kept.pop((x, y), None)
+            px[x, y] = (0, 0, 0, 0)
+
     # -- component cleanup: drop small fragments detached from the body ------
     seen = {}
     comps = []

@@ -9,6 +9,7 @@ const DecorScript := preload("res://src/Presentation/world_decor.gd")
 const RanchScript := preload("res://src/Presentation/world_ranch.gd")
 const PigScript := preload("res://src/Presentation/wild_pig.gd")
 const TrailScript := preload("res://src/Presentation/frontier_trail.gd")
+const TestZoneScript := preload("res://src/Presentation/world_test_zone.gd")
 
 const BOARD_POS := Vector2(145, -20)
 const HOME_POS := Vector2(0, 160)
@@ -56,6 +57,9 @@ func _ready() -> void:
 	camera.make_current()
 	var ranch := RanchScript.new()
 	add_child(ranch)
+	# fixed showcase zone near the ranch (Ant, 7-nov-2026): additive overlay,
+	# no effect on chunk seeds, streaming or saves
+	add_child(TestZoneScript.new())
 	_build_hud()
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
