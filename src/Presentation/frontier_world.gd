@@ -264,6 +264,11 @@ func _tick_hoofbeats(delta: float) -> void:
 
 func _toggle_edit() -> void:
 	_edit_mode = not _edit_mode
+	# the native joystick eats touches in its zone; in edit mode taps place
+	# decor, so park the touch controls until the palette closes
+	var touch: Node = get_node_or_null("TouchControls")
+	if touch != null:
+		touch.visible = not _edit_mode
 	if _edit_mode:
 		_open_edit_palette()
 	elif is_instance_valid(_edit_panel):
