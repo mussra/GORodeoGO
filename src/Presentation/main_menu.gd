@@ -7,6 +7,7 @@ var _hero: Control
 var _drawer: Panel
 var _play: Button
 var _equipment_button:Button
+var _world_button:Button
 var _equipment_panel:EquipmentPanel
 var _missions: Button
 var _caption: Label
@@ -110,6 +111,14 @@ func _build_menu() -> void:
 	_equipment_button.text=tr("UI_004")
 	_equipment_button.pressed.connect(_show_equipment)
 	_hero.add_child(_equipment_button)
+	_world_button=Button.new()
+	_world_button.text=tr("WORLD_ENTER")
+	_world_button.add_theme_font_size_override("font_size",18)
+	_world_button.pressed.connect(func():
+		if _transitioning:return
+		_transitioning=true
+		get_tree().change_scene_to_file("res://src/Presentation/frontier_world.tscn"))
+	_hero.add_child(_world_button)
 	_equipment_panel=EquipmentPanel.new()
 	_equipment_panel.visible=false
 	add_child(_equipment_panel)
@@ -200,12 +209,14 @@ func _layout() -> void:
 	_hero.get_node("Description").position = Vector2(70,310)
 	_play.position = Vector2(68,411)
 	_play.size = Vector2(418,70)
-	_missions.position = Vector2(68,498)
-	_missions.size = Vector2(270,54)
+	_world_button.position = Vector2(68,493)
+	_world_button.size = Vector2(418,52)
+	_missions.position = Vector2(68,557)
+	_missions.size = Vector2(270,50)
 	_missions.add_theme_font_size_override("font_size",13)
-	_equipment_button.position=Vector2(350,498)
-	_equipment_button.size=Vector2(136,54)
-	_caption.position = Vector2(70,580)
+	_equipment_button.position=Vector2(350,557)
+	_equipment_button.size=Vector2(136,50)
+	_caption.position = Vector2(70,620)
 	_hero.get_node("Rider").position = Vector2(912,355)
 	_hero.get_node("Rider").scale = Vector2.ONE
 	_hero.get_node("Bull").position = Vector2(1056,466)

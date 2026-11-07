@@ -351,3 +351,18 @@ EMBLEM_SAVED,Escudo guardado.,Shield saved.
 EMBLEM_DRAFT,Vista previa. Guarda para aplicar a este caballo.,Preview. Save to apply to this horse.
 EMBLEM_DISCARD,Hay cambios sin guardar. ¿Salir y descartarlos?,Unsaved changes. Leave and discard them?
 EMBLEM_DISCARD_YES,Descartar cambios,Discard changes
+WORLD_ENTER,Frontera,Frontier
+WORLD_MAP,Mapa,Map
+WORLD_HOME,Volver a casa,Back home
+WORLD_MENU,Menú,Menu
+WORLD_BOARD,Tablón de encargos,Job board
+WORLD_GAIT_PASO,Paso,Walk
+WORLD_GAIT_TROTE,Trote,Trot
+WORLD_GAIT_GALOPE,Galope,Gallop
+WORLD_FOUND,"Misión descubierta: manada salvaje","Mission found: wild herd"
+WORLD_TAMED,¡Caballo domado! Se une a tu cuadra,Horse tamed! It joins your herd
+WORLD_ENCARGO_DONE,¡Encargo cumplido!,Job done!
+WORLD_MISSIONS,"Misiones: %d activas · %d hechas","Missions: %d active · %d done"
+WORLD_BOARD_NONE,No hay encargos cerca. Explora la frontera.,No jobs nearby. Explore the frontier.
+WORLD_BOARD_ACTIVE,"Encargo activo: manada salvaje %s (%d m)","Active job: wild herd %s (%d m)"
+WORLD_CLOSE,Cerrar,Close

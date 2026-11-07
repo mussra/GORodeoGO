@@ -1059,3 +1059,47 @@ msgstr "Unsaved changes. Leave and discard them?"
 
 msgid "EMBLEM_DISCARD_YES"
 msgstr "Discard changes"
+msgid "WORLD_ENTER"
+msgstr "Frontier"
+
+msgid "WORLD_MAP"
+msgstr "Map"
+
+msgid "WORLD_HOME"
+msgstr "Back home"
+
+msgid "WORLD_MENU"
+msgstr "Menu"
+
+msgid "WORLD_BOARD"
+msgstr "Job board"
+
+msgid "WORLD_GAIT_PASO"
+msgstr "Walk"
+
+msgid "WORLD_GAIT_TROTE"
+msgstr "Trot"
+
+msgid "WORLD_GAIT_GALOPE"
+msgstr "Gallop"
+
+msgid "WORLD_FOUND"
+msgstr "Mission found: wild herd"
+
+msgid "WORLD_TAMED"
+msgstr "Horse tamed! It joins your herd"
+
+msgid "WORLD_ENCARGO_DONE"
+msgstr "Job done!"
+
+msgid "WORLD_MISSIONS"
+msgstr "Missions: %d active · %d done"
+
+msgid "WORLD_BOARD_NONE"
+msgstr "No jobs nearby. Explore the frontier."
+
+msgid "WORLD_BOARD_ACTIVE"
+msgstr "Active job: wild herd %s (%d m)"
+
+msgid "WORLD_CLOSE"
+msgstr "Close"

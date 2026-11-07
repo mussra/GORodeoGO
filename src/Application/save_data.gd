@@ -37,7 +37,7 @@ var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
-var world_missions: Dictionary = {}  # mission id -> "offered" / "done"
+var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
 # Overridden only by isolated persistence tests; production retains its original path.
 var save_path: String = NORMAL_SAVE_PATH
 
@@ -383,7 +383,7 @@ func mark_world_tamed(key: String) -> void:
 		world_tamed.append(key)
 
 func set_world_mission(id: String, state: String) -> bool:
-	if id.is_empty() or state not in ["offered", "done"]:
+	if id.is_empty() or state not in ["offered","encargo","done"]:
 		return false
 	world_missions[id] = state
 	return true

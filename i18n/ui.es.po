@@ -1059,3 +1059,47 @@ msgstr "Hay cambios sin guardar. ¿Salir y descartarlos?"
 
 msgid "EMBLEM_DISCARD_YES"
 msgstr "Descartar cambios"
+msgid "WORLD_ENTER"
+msgstr "Frontera"
+
+msgid "WORLD_MAP"
+msgstr "Mapa"
+
+msgid "WORLD_HOME"
+msgstr "Volver a casa"
+
+msgid "WORLD_MENU"
+msgstr "Menú"
+
+msgid "WORLD_BOARD"
+msgstr "Tablón de encargos"
+
+msgid "WORLD_GAIT_PASO"
+msgstr "Paso"
+
+msgid "WORLD_GAIT_TROTE"
+msgstr "Trote"
+
+msgid "WORLD_GAIT_GALOPE"
+msgstr "Galope"
+
+msgid "WORLD_FOUND"
+msgstr "Misión descubierta: manada salvaje"
+
+msgid "WORLD_TAMED"
+msgstr "¡Caballo domado! Se une a tu cuadra"
+
+msgid "WORLD_ENCARGO_DONE"
+msgstr "¡Encargo cumplido!"
+
+msgid "WORLD_MISSIONS"
+msgstr "Misiones: %d activas · %d hechas"
+
+msgid "WORLD_BOARD_NONE"
+msgstr "No hay encargos cerca. Explora la frontera."
+
+msgid "WORLD_BOARD_ACTIVE"
+msgstr "Encargo activo: manada salvaje %s (%d m)"
+
+msgid "WORLD_CLOSE"
+msgstr "Cerrar"
