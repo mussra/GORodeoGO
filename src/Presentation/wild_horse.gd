@@ -26,6 +26,12 @@ var wander_speed: float = 55.0
 ## Roped by the rider's lasso: stays in place while trust fills; when the
 ## timer runs out it is captured (or bolts if released first).
 var roped: bool = false
+
+## The sprite stands with its hooves at the node origin (offset -80), so the
+## shared hold visuals must lift their anchor to the body or the rope and the
+## ring float below the horse (Ant: "el lazo cuando captura no se ve bien").
+## Bulls/pigs draw around their origin and keep the default 0.
+const ROPE_ANCHOR_Y: float = -55.0
 var rider: Node2D = null
 ## Seconds left roped; while > 0 the horse cannot flee or wander.
 var held: float = 0.0
@@ -97,11 +103,11 @@ func _physics_process(delta: float) -> void:
 ## (walk-up taming) the same trust bar shows progress.
 func _draw() -> void:
 	if roped and is_instance_valid(rider):
-		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), false)
+		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), false, ROPE_ANCHOR_Y)
 	else:
 		var progress: float = float(state.get("progress", 0.0))
 		if progress > 0.01:
-			HeldVisuals.draw_progress(self, progress)
+			HeldVisuals.draw_progress(self, progress, ROPE_ANCHOR_Y)
 
 ## The rider drops the rope (double tap or a stun): the horse bolts, keeping
 ## the trust it had — same transition as the corral's release_by_player (D027),
