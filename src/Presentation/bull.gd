@@ -25,7 +25,6 @@ const PLAYER_TOUCH_RADIUS: float = 18.0
 const CHASER_BLOCKED_SECONDS: float = 1.0  # stuck this long -> pass the baton (D036)
 const CHASER_BLOCKED_PROGRESS_RATIO: float = 0.25  # moving < 25% of the intended step counts as blocked
 const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
-const TOW_CATCHUP_MARGIN: float = 80.0  # extra speed over the player's own while closing the leash gap
 const ART_ROOT: String = "res://art/bull/"
 const ANIM_NAMES: Array = ["idle", "flee_side", "flee_up", "flee_down", "flee_diag_down", "flee_diag_up", "captured", "calming", "controlled", "drinking"]
 
@@ -44,9 +43,8 @@ var _touching_player: bool = false
 var _touch_grace_remaining: float = 0.0
 
 ## Set by Level0 when this bull is captured: higher = captured more recently (D038).
-var _tow_path: Array[Vector2] = []
-var _tow_last_sample: Vector2 = Vector2.ZERO
-var _tow_blocked_seconds: float = 0.0
+## Tow movement lives in TowFollower (shared with the open world's captures).
+var _tow := TowFollower.new()
 
 var capture_order: int = 0
 var pen_number: int = 0
@@ -198,43 +196,14 @@ func _physics_process(delta: float) -> void:
 
 ## Follow the rider's travelled path, leaving a spatial leash behind, rather
 ## than copying velocity at an arbitrary side/front offset or cutting corners.
+## The movement itself is TowFollower — the same code the open world uses.
 func _apply_tow_movement() -> void:
 	var delta: float = get_physics_process_delta_time()
-	var player_position: Vector2 = _player.global_position
-	if _tow_path.is_empty():
-		_tow_path.append(player_position)
-		_tow_last_sample = player_position
-	elif player_position.distance_to(_tow_last_sample) > .5:
-		_tow_path.append(player_position)
-		_tow_last_sample = player_position
-	var remaining: float = global_position.distance_to(_tow_path[0])
-	for i in range(1,_tow_path.size()):
-		remaining += _tow_path[i-1].distance_to(_tow_path[i])
-	var excess: float = maxf(0.0,remaining-controller.tuning().leash_distance)
 	var player_speed: float = _player.velocity.length() if _player is CharacterBody2D else 0.0
-	var speed: float = player_speed + minf(TOW_CATCHUP_MARGIN,excess*4)
-	if player_speed < 1.0: speed = minf(controller.tuning().tow_speed,excess*8)
-	var budget: float = minf(excess,speed*delta)
-	var before: Vector2 = global_position
-	while budget > .01 and not _tow_path.is_empty():
-		var offset: Vector2 = _tow_path[0]-global_position
-		if offset.length() < .1:
-			if _tow_path.size() == 1: break
-			_tow_path.pop_front()
-			continue
-		var step: Vector2 = offset.limit_length(budget)
-		var collision: KinematicCollision2D = move_and_collide(step)
-		budget -= step.length()
-		if collision != null:
-			_tow_blocked_seconds += delta
-			if _tow_blocked_seconds >= .2:
-				_recover_tow_route()
-				_tow_blocked_seconds=0.0
-			break
-		_tow_blocked_seconds=0.0
-		if offset.length() <= step.length()+.1 and _tow_path.size()>1:
-			_tow_path.pop_front()
-	velocity = (global_position-before)/delta
+	velocity = _tow.step(self, _player.global_position, player_speed, controller.tuning().leash_distance, controller.tuning().tow_speed, delta)
+	if _tow.blocked_seconds >= .2:
+		_recover_tow_route()
+		_tow.blocked_seconds = 0.0
 
 ## Direction is computed by FleeSteering (Application, unit tested): away from the player,
 ## or toward it while this bull is the designated chaser or won its secondary chase roll.
@@ -372,8 +341,7 @@ func _on_state_changed(new_state: BullState.State) -> void:
 		_is_chaser=false
 		_random_chase.reset()
 	if new_state == BullState.State.CAPTURED or not controller.is_held():
-		_tow_path.clear()
-		_tow_blocked_seconds=0.0
+		_tow.reset()
 	if controller.is_held():
 		if _courier_active:
 			courier_interrupted.emit(self)
@@ -484,15 +452,9 @@ func _draw() -> void:
 		draw_circle(Vector2(0, -48), 10, Color("244b40"))
 		draw_string(ThemeDB.fallback_font, Vector2(-7, -43), str(pen_number), HORIZONTAL_ALIGNMENT_CENTER, 14, 13, Color("fff2d2"))
 	if controller.is_held() and is_instance_valid(_player):
-		var color: Color = Color("74c9a0") if controller.current_state() == BullState.State.CONTROLLED else Color("eec879")
-		draw_line(Vector2(0, 12), to_local(_player.global_position) + Vector2(0, 12), Color("86613e"), 3.0, true)
-		draw_arc(Vector2(0, 25), 29, 0, TAU, 40, color, 2.5, true)
-		if controller.current_state() != BullState.State.CONTROLLED:
-			var amount: float = controller.current_nerves() / NervesValue.MAX_VALUE
-			draw_line(Vector2(-25, -48), Vector2(25, -48), Color("554335"), 6, true)
-			draw_line(Vector2(-25, -48), Vector2(-25 + 50 * (1.0 - amount), -48), Color("84d5a5"), 6, true)
-		else:
-			draw_polyline(PackedVector2Array([Vector2(-7, -47), Vector2(-1, -41), Vector2(10, -54)]), color, 3, true)
+		# Same rope visuals the open world draws on its captures (HeldVisuals).
+		var trust: float = 1.0 - controller.current_nerves() / NervesValue.MAX_VALUE
+		HeldVisuals.draw_hold(self, _player.global_position, trust, controller.current_state() == BullState.State.CONTROLLED)
 	elif _distraction.active():
 		var label: String = tr("Bebiendo...") if _distraction.kind == "water" else tr("Comiendo...")
 		draw_style_box(RanchTheme.box(Color("244b40"), Color("9dd5af"), 6), Rect2(-50, -73, 100, 25))
@@ -594,8 +556,8 @@ func _recover_tow_route() -> void:
 	query.shape=$CollisionShape2D.shape
 	query.collision_mask=collision_mask
 	query.exclude=[get_rid()]
-	for i in range(_tow_path.size()-1,-1,-1):
-		var target: Vector2=_tow_path[i]
+	for i in range(_tow.path.size()-1,-1,-1):
+		var target: Vector2=_tow.path[i]
 		if global_position.distance_to(target)<64: continue
 		# Grid endpoints must themselves fit the larger bull footprint.
 		var cell_target: Vector2=Vector2(round(target.x/16),round(target.y/16))*16
@@ -615,8 +577,8 @@ func _recover_tow_route() -> void:
 			cell_target=best
 		var route: PackedVector2Array=_courier_detour(cell_target)
 		if route.is_empty(): continue
-		_tow_path.clear()
-		for step in range(route.size()-1,-1,-1): _tow_path.push_front(route[step])
+		_tow.path.clear()
+		for step in range(route.size()-1,-1,-1): _tow.path.push_front(route[step])
 		return
 
 func _update_release_overlaps()->void:

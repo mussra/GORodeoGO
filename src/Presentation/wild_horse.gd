@@ -3,8 +3,22 @@ extends CharacterBody2D
 ## deterministic traits from WorldMap, taming driven by WorldTaming. Herd horses
 ## graze in place; showcase horses (test zone, Ant 7-nov-2026) set wander=true
 ## to amble around home so the walk gait is visible.
+##
+## Once roped it follows the corral post-capture flow exactly (Ant: mismo
+## codigo): the same TowFollower leash the corral bulls use, the same rope
+## visuals (HeldVisuals), trust fills while held, and the horse stays roped
+## (controlled) until the rider leads it to the ranch for delivery.
 
 const Art := preload("res://src/Presentation/wild_horse_art.gd")
+
+## Contact radii mirror the corral (bull.hit_radius + bull.PLAYER_TOUCH_RADIUS).
+const BODY_RADIUS: float = 28.0
+const RIDER_TOUCH_RADIUS: float = 18.0
+## A just-released horse can't stun the rider who let it go (corral D038 grace).
+const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
+## Tow numbers match BullTuning so a roped horse feels like a roped bull.
+const TOW_LEASH: float = 50.0
+const TOW_SPEED: float = 240.0
 
 var herd: Dictionary = {}
 var state: Dictionary = {}
@@ -12,8 +26,14 @@ var home: Vector2 = Vector2.ZERO
 var wander: bool = false
 var wander_radius: float = 70.0
 var wander_speed: float = 55.0
-## Seconds left roped by the rider's lasso; while > 0 the horse cannot flee or wander.
-var held: float = 0.0
+## Roped by the rider's lasso: follows the rider while trust fills; once tamed
+## it stays roped (controlled) until delivered at the ranch.
+var roped: bool = false
+var controlled: bool = false
+var rider: Node2D = null
+var follower := TowFollower.new()
+var touch_grace: float = 0.0
+var _touching_rider: bool = false
 var _art: Node2D
 var _bob: float = 0.0
 var _graze_timer: float = 0.0
@@ -41,13 +61,18 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_bob += delta
-	if held > 0.0:
-		held -= delta
-		velocity = Vector2.ZERO
+	touch_grace = maxf(0.0, touch_grace - delta)
+	if roped and is_instance_valid(rider):
+		# Same tow movement as a captured corral bull.
+		var rider_speed: float = rider.velocity.length() if rider is CharacterBody2D else 0.0
+		velocity = follower.step(self, rider.global_position, rider_speed, TOW_LEASH, TOW_SPEED, delta)
 		_flee = Vector2.ZERO
 		_art.grazing = false
-		move_and_slide()
+		if velocity.length() > 5.0:
+			_art.flip_h = velocity.x < 0.0
+			_art.set_walk_direction(velocity)
 		_art.position.y = sin(_bob * 1.6) * 1.5
+		queue_redraw()
 		return
 	if _flee.length() > 0.0:
 		var target: Vector2 = position + _flee * delta
@@ -66,6 +91,28 @@ func _physics_process(delta: float) -> void:
 			_art.grazing = not _art.grazing
 	move_and_slide()
 	_art.position.y = sin(_bob * 1.6) * 1.5
+	queue_redraw()
+
+## Rope visuals identical to a held corral bull; while trust builds unroped
+## (walk-up taming) the same trust bar shows progress.
+func _draw() -> void:
+	if roped and is_instance_valid(rider):
+		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), controlled)
+	else:
+		var progress: float = float(state.get("progress", 0.0))
+		if progress > 0.01:
+			HeldVisuals.draw_progress(self, progress)
+
+## The rider drops the rope (double tap or a stun): the horse bolts, keeping
+## the trust it had — same transition as the corral's release_by_player (D027),
+## including the grace so it can't instantly stun the rider who released it.
+func release() -> void:
+	roped = false
+	controlled = false
+	rider = null
+	follower.reset()
+	touch_grace = RELEASE_TOUCH_GRACE_SECONDS
+	_touching_rider = false
 
 func _wander_vel(delta: float) -> Vector2:
 	if _wander_pause > 0.0:
@@ -105,6 +152,6 @@ func face_towards(point: Vector2) -> void:
 ## Same capture rule as the corral bulls (Ant: mismo codigo): the LassoController
 ## resolves nearest-first and each prey accepts landings within body + tolerance.
 func try_capture(landing_point: Vector2) -> bool:
-	if held > 0.0:
+	if roped:
 		return false
 	return global_position.distance_to(landing_point) <= LassoController.PREY_HIT_RADIUS + LassoController.PREY_CAPTURE_TOLERANCE

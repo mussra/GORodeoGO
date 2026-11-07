@@ -1089,6 +1089,9 @@ msgstr "Misión descubierta: manada salvaje"
 msgid "WORLD_TAMED"
 msgstr "¡Caballo domado! Se une a tu cuadra"
 
+msgid "WORLD_LEAD_HOME"
+msgstr "¡Lo tienes! Llévalo al rancho"
+
 msgid "WORLD_ENCARGO_DONE"
 msgstr "¡Encargo cumplido!"
 

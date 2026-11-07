@@ -1,6 +1,9 @@
 extends CharacterBody2D
-## Ranch rider for the open-world test: movement, gaits and horse art only.
-## Lasso, dodge and jump stay in the corral levels.
+## Ranch rider for the open-world test: movement, gaits and horse art.
+## Lasso is the shared LassoController (same as the corral); stun uses the
+## same API and rules as the corral rider.
+
+signal stunned
 
 const ART_ROOT: String = "res://art/player/"
 const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up"]
@@ -21,12 +24,16 @@ var _dodge_remaining: float = 0.0
 var _dodge_direction: Vector2 = Vector2.ZERO
 var _skid_trail: Array[Vector2] = []
 var _trail_fade: float = 0.0
+## Stun: same API, duration and red-tint fallback as the corral rider.
+const STUN_SECONDS: float = 2.0
+var stun_resistance_multiplier: float = 1.0
+var _stun_time_remaining: float = 0.0
 var _sprite_swap: SpriteSwap
 var lasso: LassoController = null
 
 func _ready() -> void:
 	lasso = LassoController.new()
-	lasso.throw_guard = func() -> bool: return is_physics_processing()
+	lasso.throw_guard = func() -> bool: return _stun_time_remaining <= 0.0 and is_physics_processing()
 	add_child(lasso)
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()
@@ -45,6 +52,12 @@ func _ready() -> void:
 		if _sprite_swap.has_sprite():
 			HorseAppearance.apply(_sprite_swap._frames, horse.traits)
 	_sprite_swap.play("idle")
+
+func stun(duration: float = STUN_SECONDS) -> void:
+	if _stun_time_remaining <= 0.0:
+		stunned.emit()
+	_stun_time_remaining = maxf(_stun_time_remaining, duration * stun_resistance_multiplier)
+	modulate = Color(1.0, 0.5, 0.5, 1.0)  # no stun art in the world yet: corral's red-tint fallback
 
 func calm() -> float:
 	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
@@ -75,6 +88,14 @@ func _physics_process(delta: float) -> void:
 		_trail_fade = maxf(0.0, _trail_fade - delta)
 		if _trail_fade <= 0.0:
 			_skid_trail.clear()
+	if _stun_time_remaining > 0.0:
+		_stun_time_remaining -= delta
+		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
+		move_and_slide()
+		if _stun_time_remaining <= 0.0:
+			modulate = Color.WHITE
+		_update_animation(delta)
+		return
 	var wish := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	gait = mini(WorldGait.update(gait, wish.length()), gait_cap)
 	var gait_speed: float = WorldGait.speed_for(gait, max_speed)

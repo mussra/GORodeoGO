@@ -361,6 +361,7 @@ WORLD_GAIT_TROTE,Trote,Trot
 WORLD_GAIT_GALOPE,Galope,Gallop
 WORLD_FOUND,"Misión descubierta: manada salvaje","Mission found: wild herd"
 WORLD_TAMED,¡Caballo domado! Se une a tu cuadra,Horse tamed! It joins your herd
+WORLD_LEAD_HOME,"¡Lo tienes! Llévalo al rancho","Got it! Lead it to the ranch"
 WORLD_ENCARGO_DONE,¡Encargo cumplido!,Job done!
 WORLD_MISSIONS,"Misiones: %d activas · %d hechas","Missions: %d active · %d done"
 WORLD_BOARD_NONE,No hay encargos cerca. Explora la frontera.,No jobs nearby. Explore the frontier.

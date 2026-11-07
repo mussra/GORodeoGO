@@ -28,9 +28,9 @@ func test_dodge_and_lasso_cannot_start_in_midair()->void:
 
 func test_roped_bull_recovers_path_around_both_ends_of_solid_fence()->void:
  var scene:Node=load("res://src/Presentation/level_0.tscn").instantiate();var bull:Node=scene.get_node("Bull").duplicate();scene.free();bull.position=Vector2(-85,0);bull.world_bounds=Rect2(-400,-250,800,500);add_child_autofree(bull);bull.set_physics_process(false);bull._update_collision(BullState.State.CONTROLLED);await get_tree().physics_frame
- bull._tow_path.assign([Vector2(85,0)]);bull._recover_tow_route();assert_gt(bull._tow_path.size(),1)
+ bull._tow.path.assign([Vector2(85,0)]);bull._recover_tow_route();assert_gt(bull._tow.path.size(),1)
  var previous:Vector2=bull.global_position
- for point:Vector2 in bull._tow_path:
+ for point:Vector2 in bull._tow.path:
   assert_false(bull.test_move(Transform2D(0,previous),point-previous),"each route segment remains solid-collision safe");previous=point
 
 func test_overhead_bar_follows_jump_and_restores_on_land_and_cancel()->void:

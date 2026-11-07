@@ -42,10 +42,10 @@ func test_recovery_targets_recent_position_not_stale_trail()->void:
  var l:Node=await setup_level();var b:Node=l._active_bulls[0]
  b.global_position=Vector2(-200,100);l.player.global_position=Vector2(120,100)
  b.try_capture(b.global_position)
- b._tow_path.assign([Vector2(-150,200),Vector2(-50,200),Vector2(100,200),Vector2(120,100)])
+ b._tow.path.assign([Vector2(-150,200),Vector2(-50,200),Vector2(100,200),Vector2(120,100)])
  b._recover_tow_route()
- assert_gt(b._tow_path.size(),0);assert_lt(b._tow_path[0].y,150.0,"does not start toward old southern breadcrumb")
- assert_lt(b._tow_path[-1].distance_to(l.player.global_position),25.0)
+ assert_gt(b._tow.path.size(),0);assert_lt(b._tow.path[0].y,150.0,"does not start toward old southern breadcrumb")
+ assert_lt(b._tow.path[-1].distance_to(l.player.global_position),25.0)
 func test_normal_pen_overlap_delivers_and_no_safe_chaser()->void:
  var l:Node=await setup_level();var b:Node=l._active_bulls[0]
  l.player.global_position=l.pen.global_position+Vector2(-110,0);b.global_position=l.pen.global_position+Vector2(90,0)

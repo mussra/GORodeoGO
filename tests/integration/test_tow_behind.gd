@@ -19,7 +19,7 @@ func test_tow_follows_behind_and_retains_corner_path() -> void:
 	Input.action_release("move_right")
 	Input.action_press("move_up")
 	await wait_physics_frames(10)
-	assert_gt(bull._tow_path.size(),2,"corner retained as path, not cut with parallel velocity")
+	assert_gt(bull._tow.path.size(),2,"corner retained as path, not cut with parallel velocity")
 	await wait_physics_frames(30)
 	assert_gt(bull.global_position.y,level.player.global_position.y+25,"bull follows behind upward turn")
 	Input.action_release("move_up")
@@ -43,7 +43,7 @@ func test_bull_follows_z_dodge_in_order_without_shortcut_or_release() -> void:
 	level.player.dodge_available=true
 	assert_true(level.player.request_dodge_path(PackedVector2Array([Vector2.ZERO,Vector2(80,0),Vector2(0,60),Vector2(80,60)])))
 	await wait_physics_frames(10)
-	assert_gt(bull._tow_path.size(),2,"bull remembers rapid trace rather than velocity copy")
+	assert_gt(bull._tow.path.size(),2,"bull remembers rapid trace rather than velocity copy")
 	await wait_physics_frames(90)
 	assert_true(bull.controller.is_held(),"dodge itself does not drop capture")
 	assert_gt(bull.global_position.x,start.x+20)
