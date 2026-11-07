@@ -26,6 +26,8 @@ var _chunks: Dictionary = {}
 var _chunk_entities: Dictionary = {}
 var _herd_horses: Dictionary = {}
 var _hud: CanvasLayer
+var _audio: RanchAudio
+var aim_joystick: VirtualJoystick  # named like the levels so JoystickAppearance.apply works
 var _gait_label: Label
 var _missions_label: Label
 var _toast_label: Label
@@ -307,6 +309,7 @@ func _tick_taming(delta: float) -> void:
 			horse.state = st
 			if not horse.controlled and WorldTaming.tamed(st):
 				horse.controlled = true
+				_audio.play("calm")
 				_toast(tr("WORLD_LEAD_HOME"))
 			continue
 		st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta)
@@ -340,6 +343,7 @@ func _deliver_horse(c: Vector2i, horse: Node2D) -> void:
 	h["name"] = SaveData.horse_collection.suggest_name(traits)
 	SaveData.horse_collection.horses.append(h)
 	WorldMissions.complete(mission_id)
+	_audio.play("return")
 	horse.queue_free()
 	SaveData.save_world_state(player.position)
 	_refresh_missions()
@@ -365,10 +369,12 @@ func _tick_pigs(delta: float) -> void:
 				pig.state = WorldPigs.hold_tick(pig.state, delta)
 				if not pig.controlled and WorldPigs.captured(pig.state):
 					pig.controlled = true
+					_audio.play("calm")
 					_toast(tr("WORLD_LEAD_HOME"))
 				if pig.controlled and pig.position.distance_to(HOME_POS) <= DELIVERY_RADIUS:
 					if pig == _lasso_horse:
 						_end_lasso()
+					_audio.play("return")
 					pig.queue_free()
 				else:
 					all_captured = false
@@ -393,6 +399,7 @@ func _tick_pigs(delta: float) -> void:
 			_on_pigs_captured(Vector2i(node.get_meta("c")), pen)
 
 func _on_pigs_captured(c: Vector2i, pen: Node2D) -> void:
+	_audio.play("win")
 	SaveData.world_pigs.append(_pen_id_for(c))
 	pen.queue_free()
 	SaveData.save_world_state(player.position)
@@ -583,7 +590,20 @@ func _build_hud() -> void:
 	var aim_joy: VirtualJoystick = touch.get_node("AimJoystick")
 	aim_joy.anchor_top = 0.32
 	player.lasso.set_aim_joystick(aim_joy)
+	aim_joystick = aim_joy
+	JoystickAppearance.apply(self)  # same horse-themed sticks as the levels
 	player.dodge.set_move_joystick(joy)
+	# Same cues as the levels (Ant: same sounds) — one shared RanchAudio.
+	_audio = RanchAudio.new()
+	_audio.enabled = GameState.sound_enabled
+	add_child(_audio)
+	player.dodge.drawing_started.connect(func(): _audio.play("bullet_in"))
+	player.dodge.drawing_finished.connect(func(): _audio.play("bullet_out"))
+	player.dodge.dodge_started.connect(func(): _audio.play("dodge"))
+	player.dodge.dodge_finished.connect(func(): _audio.play("skid"))
+	player.stunned.connect(func(): _audio.play("stun"))
+	player.lasso.lasso_thrown.connect(func(_o: Vector2, _p: Vector2): _audio.play("throw"))
+	player.lasso.prey_captured.connect(func(_p: Node2D): _audio.play("capture"))
 	player.lasso.prey_provider = func() -> Array:
 		var out: Array = []
 		for key in _herd_horses:
