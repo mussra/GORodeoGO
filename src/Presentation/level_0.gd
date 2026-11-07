@@ -115,6 +115,15 @@ func _ready() -> void:
 	hud.hide_nerves_slot(0)
 	hud.hide_nerves_slot(1)
 	hud.restart_requested.connect(_on_restart_requested)
+	# clock-fill ability gauges (Ant 11:40): indicators only, no balance change
+	for spec in [["dodge", player.dodge_available], ["jump", player.can_jump]]:
+		var g := RadialGauge.new()
+		g.skill = spec[0]
+		g.position = Vector2(1130 if spec[0] == "dodge" else 1214, 636)
+		g.size = Vector2(76, 76)
+		g.set_state(spec[1], 1.0)
+		hud.add_child(g)
+		_level_gauges[spec[0]] = g
 	hud.next_requested.connect(_on_next_requested)
 	hud.sound_toggled.connect(_on_sound_toggled)
 	player.lasso_released.connect(func(): _audio.play("throw"))
@@ -355,7 +364,12 @@ func _apply_unlocked_upgrades() -> void:
 	_max_simultaneous_captures = maxi(2,_upgrades.max_simultaneous_captures) if GameState.debug_cheats_active() else _upgrades.max_simultaneous_captures
 	player.set_max_captures(_max_simultaneous_captures)
 
+var _level_gauges: Dictionary = {}
+
 func _process(delta: float) -> void:
+	if not _level_gauges.is_empty():
+		_level_gauges["dodge"].set_state(player.dodge_available, 1.0 - player._dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds) if player.dodge_available else 0.0)
+		_level_gauges["jump"].set_state(player.can_jump, 1.0 - player._jump_cooldown / maxf(0.01, 1.2 * player.jump_recovery_multiplier) if player.can_jump else 0.0)
 	if _arena_scale>1.0:_update_follow_camera()
 	if _game_over:
 		return
