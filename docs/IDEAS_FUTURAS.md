@@ -35,3 +35,37 @@ Fuente: mensaje de voz `wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzhCQTE1MEE5QzVGQzk1RD
 
 ### Actualización 2.0, 6 de noviembre de 2026
 Los nombres editables y sugeridos pasan a implementados en esta versión. Se conservan los nombres anteriores y los elegidos por el jugador. Los nuevos caballos reciben un nombre por pelaje/patrón con sufijo numérico si ya existe. Las pruebas aisladas siguen sin guardar cambios en la colección real.
+
+## Mundo abierto con misiones y doma (7 de noviembre de 2026)
+
+Dirección confirmada por Antonio en conversación de WhatsApp. Es una dirección de diseño, no una función implementada ni un plan cerrado. No sustituye los niveles actuales: los corrales y retos existentes seguirían como desafíos dentro del mundo.
+
+Confirmado por Antonio:
+
+- Mundo abierto: el rancho como base y una comarca para recorrer a caballo, encontrar animales, entrenar y visitar mercados. Antonio: "podemos tener un mundo abierto?", "Ke encantaría".
+- Mundo que se va autogenerando al explorar. Lo descubierto se conserva: el rancho, los caminos y los lugares conocidos no cambian al volver. Antonio: "Y poder ver un mundo que se va auto generando".
+- Misiones por las dos vías: encargos que llegan al rancho y misiones que se descubren explorando. Antonio: "Que lleguen misiones por encargo o encontrarlas" y "Correcto" a la propuesta de combinarlas.
+- Doma de caballos salvajes: encontrar un caballo nuevo y domarlo. Antonio: "Caballo nuevo y domarlo". La mecánica concreta (acercamiento, calma, temperamento) es una propuesta nuestra pendiente de su visto bueno.
+- Nuevo atributo de los caballos: la velocidad con la que calman toros y otros caballos. Antonio: "un atributo de los caballos la velocidad con la que calma toros y otros caballos". Nombre propuesto por nosotros, "Serenidad", pendiente de confirmación. Sin valores ni números definidos.
+
+Propuestas nuestras pendientes de confirmar:
+
+- Primera prueba jugable en rama aparte: una zona pequeña conectada, salir del rancho, explorar, un reto de captura y volver. Antonio aún no ha respondido a prepararla.
+- Mezclar terreno generado con lugares diseñados a mano, para que haya sorpresas sin que todo parezca aleatorio.
+- La doma como pequeño reto de acercamiento y calma, con dificultad según el temperamento, distinta de comprar o criar.
+- Serenidad separada de la velocidad de carrera, útil en capturas y domas, con un límite para que ayude sin volverlas instantáneas.
+
+Sin definir: tamaño del mundo, generación concreta, estructura de misiones, economía y recompensas, y cómo se integra con la progresión actual. La pregunta abierta sobre rareza del linaje y herencia (3 niveles distintos del 5 en adelante) sigue sin respuesta y es independiente de esta dirección.
+
+Fuentes: mensajes de WhatsApp del 7 de noviembre de 2026, 8:58 a 9:01 CET:
+`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzU5OTQzMDcwREQ4RTZERDA2MzlDMEQ1QjQwQUMxNgA=` (mundo abierto),
+`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzJBNjkzQTlGMjNCQTg2Njg4QTQ4NUY5MENCMkFFRgA=` (encantaría),
+`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQ0Q0MDUzMkU3ODdGM0YxOEQ5MDBCQUM0NTlCNzYzMwA=` (misiones por encargo o encontradas),
+`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzZGRTQyMEQ3NTA0RDYzNDk5M0Q3Qjc5RDAyQzUxQgA=` (mundo autogenerado),
+`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQ0I4REI0MkQxNTk3NzRDQzBFRkZCOTU4MUQ1RjJBOQA=` (correcto a misiones),
+`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzRBRjBDMjY5QjlBMkU1Q0MxQjQ0QjhGMTRFRDlBNwA=` (caballo nuevo y domarlo),
+`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzRFRTQ2MjUyRTEyNkQxRkVERDI4QkM2NUQxMjE5RAA=` (atributo de calma).
+
+### Autorización de implementación (7 de noviembre de 2026, 9:00-9:02 CET)
+
+Antonio pidió implementarlo: "Impleméntalo, añádelo al menú principal" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQ0IzRTFENUNFMDlGMjIzRDRCRDFDRDA3OTMzMjBBNwA=`) y confirmó el alcance con "Y crea un mundo para probarlo" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzU5OEQ3NUM3OUU4MTQ2QjEzNzdGNDg1ODQ5M0RENAA=`). Alcance autorizado: primera prueba jugable de mundo con entrada desde el menú principal, doma de caballos salvajes y el atributo de calma, en rama aparte, sin sustituir los niveles actuales ni perder progreso.
