@@ -60,3 +60,17 @@ func test_marker_shows_when_rider_hidden() -> void:
 	world.player.position = Vector2(0, 260)
 	await wait_physics_frames(3)
 	assert_false(world._marker.visible, "marker hides again once visible")
+
+func test_map_is_small_and_expands() -> void:
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	world._toggle_map()
+	await wait_process_frames(2)
+	var map: Control = world._map_overlay
+	assert_false(map.expanded, "map opens small like the arena minimap")
+	assert_eq(map.size, Vector2(180, 112), "small corner size matches the arena minimap")
+	map.expanded = true
+	await wait_process_frames(2)
+	assert_gt(map.size.x, 400.0, "expanded map is large")
+	world._toggle_map()
+	assert_false(map.visible, "map closes")

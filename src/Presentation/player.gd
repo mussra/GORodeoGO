@@ -89,8 +89,7 @@ var _lasso_in_flight: bool = false
 var _flight_generation: int = 0
 var _flight_line: Node2D = null
 var _flight_tween: Tween = null
-var _aim_pressed_at_seconds: float = 0.0
-var _double_tap: DoubleTapDetector = DoubleTapDetector.new(LassoAim.DOUBLE_TAP_WINDOW_SECONDS)
+var _lasso_gesture: LassoGesture = LassoGesture.new()
 var _charge_distance: float = 0.0
 var _charge_visual: Line2D = null
 var _sprite_swap: SpriteSwap
@@ -244,7 +243,7 @@ func _on_aim_pressed() -> void:
 	if _jump_time>0 or _stun_time_remaining > 0.0 or not is_physics_processing():
 		return
 	_touch_aim_active = true
-	_aim_pressed_at_seconds = _now_seconds()
+	_lasso_gesture.press(_now_seconds())
 	if not _is_charging and not _lasso_in_flight:
 		if _has_free_lasso_slot():
 			_start_charging()
@@ -263,17 +262,16 @@ func _on_aim_released(input_vector: Vector2) -> void:
 	if not _touch_aim_active:
 		return
 	_touch_aim_active = false
-	var now: float = _now_seconds()
-	if LassoAim.is_tap(input_vector, now - _aim_pressed_at_seconds):
-		if _double_tap.register_tap(now):
-			release_requested.emit()
-	else:
-		_double_tap.reset()
+	# Shared gesture machine (src/Application/lasso_gesture.gd) — the same code
+	# the open world uses; only the effects differ (corral vs world).
+	var decision: Dictionary = _lasso_gesture.release(input_vector, _now_seconds(), _is_charging, max_throw_distance)
+	if decision.double_tap:
+		release_requested.emit()
 	if not _is_charging:
 		return
-	if LassoAim.is_cancel(input_vector):
+	if decision.action == LassoGesture.Action.CANCEL:
 		_cancel_charge()
-	else:
+	elif decision.action == LassoGesture.Action.THROW:
 		_release_throw(input_vector)
 
 ## Called by an unroped, nervous bull on contact (GAMEPLAY_SPEC.md #Failure feedback).
@@ -513,7 +511,7 @@ func cancel_input() -> void:
 	_draw_points = PackedVector2Array()
 	_move_tap.reset()
 	_touch_aim_active = false
-	_double_tap.reset()
+	_lasso_gesture.reset()
 	_cancel_charge()
 	velocity = Vector2.ZERO
 

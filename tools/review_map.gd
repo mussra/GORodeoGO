@@ -20,6 +20,9 @@ func _initialize() -> void:
 	print("step4")
 	await process_frame
 	print("step5")
-	root.get_texture().get_image().save_png("/downloads/map-279.png")
-	print("step6")
+	root.get_texture().get_image().save_png("/downloads/map-small.png")
+	world._map_overlay.expanded = true
+	for i in 4:
+		await process_frame
+	root.get_texture().get_image().save_png("/downloads/map-expanded.png")
 	quit()

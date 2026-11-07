@@ -119,4 +119,6 @@ func test_lasso_captures_pig_and_counts() -> void:
 		if not is_instance_valid(pig):
 			break
 	assert_false(is_instance_valid(pig), "roped pig is captured")
+	# the pen registers the capture one frame after the pig node is freed
+	await wait_physics_frames(6)
 	assert_gt(SaveData.world_pigs.size(), before, "pig counts in the counter")

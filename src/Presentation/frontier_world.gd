@@ -57,8 +57,7 @@ var _charge_keyboard: bool = false
 var _charge_distance: float = 0.0
 var _charge_visual: Line2D = null
 var _aim_dir: Vector2 = Vector2.RIGHT
-var _aim_pressed_at: float = 0.0
-var _lasso_double_tap: DoubleTapDetector = null
+var _lasso_gesture: LassoGesture = LassoGesture.new()
 var _lasso: Node2D = null
 var _lasso_state: String = ""
 var _lasso_flight: float = 0.0
@@ -78,6 +77,7 @@ func _ready() -> void:
 	y_sort_enabled = true
 	SaveData.ensure_world_seed()
 	var base := ColorRect.new()
+	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	base.color = Color("2e5d33")
 	base.size = Vector2(262144, 262144)
 	base.position = -base.size / 2
@@ -110,7 +110,6 @@ func _ready() -> void:
 	test_zone.name = "test_zone"
 	add_child(test_zone)
 	_build_hud()
-	_lasso_double_tap = DoubleTapDetector.new(LassoAim.DOUBLE_TAP_WINDOW_SECONDS)
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
 	_hoof_player.volume_db = -12.0
@@ -222,23 +221,21 @@ func _tick_lasso(delta: float) -> void:
 		_start_charge(true)
 
 func _on_aim_pressed() -> void:
-	_aim_pressed_at = Time.get_ticks_msec() / 1000.0
+	_lasso_gesture.press(Time.get_ticks_msec() / 1000.0)
 	if not _lasso_charging and _lasso_state == "":
 		_start_charge(false)
 
+## Same gesture machine as the corral (src/Application/lasso_gesture.gd) — the
+## identical press/tap/drag/cancel/double-tap code; only the effects differ.
 func _on_aim_released(input_vector: Vector2) -> void:
-	var now: float = Time.get_ticks_msec() / 1000.0
-	if LassoAim.is_tap(input_vector, now - _aim_pressed_at):
-		if _lasso_double_tap != null and _lasso_double_tap.register_tap(now):
-			_release_held_horse()
-	elif _lasso_double_tap != null:
-		_lasso_double_tap.reset()
+	var decision: Dictionary = _lasso_gesture.release(input_vector, Time.get_ticks_msec() / 1000.0, _lasso_charging, LASSO_MAX_THROW)
+	if decision.double_tap:
+		_release_held_horse()
 	if not _lasso_charging:
 		return
 	_stop_charge()
-	if LassoAim.is_cancel(input_vector):
-		return
-	_throw_lasso(input_vector.normalized(), LassoAim.throw_distance(input_vector, LASSO_MAX_THROW))
+	if decision.action == LassoGesture.Action.THROW:
+		_throw_lasso(input_vector.normalized(), decision.distance)
 
 func _start_charge(keyboard: bool) -> void:
 	_lasso_charging = true
@@ -357,6 +354,7 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 	var node := Node2D.new()
 	node.set_meta("c", Vector2i(cx, cy))
 	var ground := ColorRect.new()
+	ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ground.color = Color("32653a").lerp(Color("3a7142"), float(absi(hash(key)) % 100) / 220.0)
 	ground.size = Vector2(WorldMap.CHUNK_SIZE, WorldMap.CHUNK_SIZE)
 	ground.position = Vector2(cx, cy) * WorldMap.CHUNK_SIZE
@@ -627,6 +625,7 @@ func _build_hud() -> void:
 	_hud = CanvasLayer.new()
 	add_child(_hud)
 	var bar := ColorRect.new()
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bar.color = Color(0.06, 0.15, 0.17, 0.85)
 	bar.size = Vector2(1280, 46)
 	_hud.add_child(bar)
@@ -650,6 +649,7 @@ func _build_hud() -> void:
 	var abilities: Array = [["stamina", true], ["dodge", HorseTraining.knows(horse, "dodge")], ["jump", HorseJump.capable(horse)]]
 	for i in abilities.size():
 		var g := RadialGauge.new()
+		g.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		g.skill = abilities[i][0]
 		g.position = Vector2(1046 + i * 84, 636)
 		g.size = Vector2(76, 76)
@@ -688,7 +688,6 @@ func _build_hud() -> void:
 	_hud.add_child(_dodge_button)
 	_map_overlay = DiscoveryMap.new()
 	_map_overlay.world = self
-	_map_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_map_overlay.visible = false
 	_hud.add_child(_map_overlay)
 	var touch := CanvasLayer.new()
@@ -697,6 +696,7 @@ func _build_hud() -> void:
 	add_child(touch)
 	var joy := VirtualJoystick.new()
 	joy.name = "MoveJoystick"
+	joy.anchor_top = 0.32
 	joy.anchor_right = 0.5
 	joy.anchor_bottom = 1.0
 	joy.joystick_mode = 2
@@ -710,6 +710,7 @@ func _build_hud() -> void:
 	touch.add_child(joy)
 	var aim_joy := VirtualJoystick.new()
 	aim_joy.name = "AimJoystick"
+	aim_joy.anchor_top = 0.32
 	aim_joy.anchor_left = 0.5
 	aim_joy.anchor_right = 1.0
 	aim_joy.anchor_bottom = 1.0
@@ -771,17 +772,32 @@ class DiscoveryMap extends Control:
 	## ranch, trees/rocks, seen pig pens and missions; unseen stays hidden; player
 	## marker; drag to scroll, +/- to zoom. Content comes from the persisted
 	## discovered chunks, so it is saved with the game. Cartoon style.
+	## Small corner minimap like the arena one (Ant 17:54: "pequeño como el otro"):
+	## tap the small map to expand it; X / back / Mapa button closes.
 	var world: Node2D
+	var expanded: bool = false
 	var zoom: float = 1.0
 	var pan: Vector2 = Vector2.ZERO
 	var _dragging: bool = false
 	var _drag_from: Vector2 = Vector2.ZERO
 	var _pan_from: Vector2 = Vector2.ZERO
 	var _pulse: float = 0.0
+	var _close_btn: Button = null
+	var _zoom_btns: Array = []
+
+	func _layout() -> void:
+		var viewport: Vector2 = get_viewport_rect().size
+		size = Vector2(minf(700, viewport.x - 80), minf(410, viewport.y - 180)) if expanded else Vector2(180, 112)
+		position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x - size.x - 18, 84)
 
 	func _process(delta: float) -> void:
 		if visible:
 			_pulse += delta
+			_layout()
+			if _close_btn != null:
+				_close_btn.visible = expanded
+			for b in _zoom_btns:
+				b.visible = expanded
 			queue_redraw()
 
 	func _ready() -> void:
@@ -798,18 +814,21 @@ class DiscoveryMap extends Control:
 		close.add_theme_font_size_override("font_size", 40)
 		close.pressed.connect(world._toggle_map)
 		add_child(close)
+		_close_btn = close
 		var minus := Button.new()
 		minus.text = "-"
 		minus.position = Vector2(24, size.y - 84)
 		minus.size = Vector2(56, 56)
 		minus.pressed.connect(func(): _set_zoom(zoom / 1.4))
 		add_child(minus)
+		_zoom_btns.append(minus)
 		var plus := Button.new()
 		plus.text = "+"
 		plus.position = Vector2(96, size.y - 84)
 		plus.size = Vector2(56, 56)
 		plus.pressed.connect(func(): _set_zoom(zoom * 1.4))
 		add_child(plus)
+		_zoom_btns.append(plus)
 
 	func _set_zoom(z: float) -> void:
 		zoom = clampf(z, 0.5, 3.0)
@@ -823,13 +842,16 @@ class DiscoveryMap extends Control:
 				_pan_from = pan
 			else:
 				if _dragging and (event.position - _drag_from).length() < 12.0:
-					world._toggle_map()
+					if expanded:
+						world._toggle_map()
+					else:
+						expanded = true
 				_dragging = false
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			_set_zoom(zoom * 1.15)
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			_set_zoom(zoom / 1.15)
-		elif event is InputEventMouseMotion and _dragging:
+		elif event is InputEventMouseMotion and _dragging and expanded:
 			pan = _pan_from + (event.position - _drag_from)
 			queue_redraw()
 
@@ -858,8 +880,12 @@ class DiscoveryMap extends Control:
 		return origin + (pos / WorldMap.CHUNK_SIZE - Vector2(mins)) * cell
 
 	func _draw() -> void:
-		# parchment backdrop: unseen world stays hidden under it
-		draw_rect(Rect2(Vector2.ZERO, size), Color("1d2a26"), true)
+		# same shell as the arena minimap: dark framed box, content inside
+		draw_style_box(RanchTheme.box(Color(0.04, 0.13, 0.17, 0.94), Color("89bdb7"), 9), Rect2(Vector2.ZERO, size))
+		var area: Rect2 = Rect2(Vector2(12, 12), size - Vector2(24, 24))
+		if area.size.x <= 0.0 or area.size.y <= 0.0:
+			return
+		draw_rect(area, Color("1d2a26"), true)
 		var data: Dictionary = _cells()
 		if (data.cells as Array).is_empty():
 			return
@@ -867,8 +893,8 @@ class DiscoveryMap extends Control:
 		var maxs: Vector2i = data.maxs
 		var cols: int = maxs.x - mins.x + 1
 		var rows: int = maxs.y - mins.y + 1
-		var cell: float = minf(72.0, minf((size.x - 160.0) / cols, (size.y - 160.0) / rows)) * zoom
-		var origin: Vector2 = (size - Vector2(cols, rows) * cell) / 2.0 + pan
+		var cell: float = minf(72.0, minf((area.size.x - 16.0) / cols, (area.size.y - 16.0) / rows)) * (zoom if expanded else 1.0)
+		var origin: Vector2 = area.position + (area.size - Vector2(cols, rows) * cell) / 2.0 + (pan if expanded else Vector2.ZERO)
 		var font: Font = get_theme_default_font()
 		for c in data.cells:
 			var r: Rect2 = _chunk_rect(c, mins, cell, origin)
