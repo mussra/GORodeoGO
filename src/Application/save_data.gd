@@ -152,7 +152,7 @@ func load_progress() -> void:
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
-			if typeof(id)==TYPE_STRING and wm[id] in ["offered","done"]:world_missions[id]=wm[id]
+			if typeof(id)==TYPE_STRING and wm[id] in ["offered","encargo","done"]:world_missions[id]=wm[id]
 
 ## One credit for the deducible first win of each completed level. Repeated wins
 ## before this update were not stored. A missing reward definition postpones migration.

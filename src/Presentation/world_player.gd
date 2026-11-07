@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Ranch rider for the open-world test: movement and horse art only.
+## Ranch rider for the open-world test: movement, gaits and horse art only.
 ## Lasso, dodge and jump stay in the corral levels.
 
 const ART_ROOT: String = "res://art/player/"
@@ -8,6 +8,7 @@ const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_di
 var max_speed: float = 260.0
 var acceleration: float = 900.0
 var friction: float = 700.0
+var gait: int = WorldGait.PASO
 var _sprite_swap: SpriteSwap
 
 func _ready() -> void:
@@ -23,22 +24,30 @@ func _ready() -> void:
 			HorseAppearance.apply(_sprite_swap._frames, horse.traits)
 	_sprite_swap.play("idle")
 
+func calm() -> float:
+	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
+	return HorseStats.read(horse).calm if not horse.is_empty() else 1.0
+
 func _physics_process(delta: float) -> void:
 	var wish := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	gait = WorldGait.update(gait, wish.length())
+	var gait_speed: float = WorldGait.speed_for(gait, max_speed)
 	if wish.length() > 0.1:
-		velocity = velocity.move_toward(wish.normalized() * max_speed, acceleration * delta)
+		velocity = velocity.move_toward(wish.normalized() * gait_speed * clampf(wish.length(), 0.0, 1.0), acceleration * delta)
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	move_and_slide()
-	_update_animation()
+	_update_animation(delta)
 
-func _update_animation() -> void:
+func _update_animation(delta: float) -> void:
 	if _sprite_swap == null or not _sprite_swap.has_sprite():
 		return
 	if velocity.length() < 12.0:
 		_sprite_swap.stop_on_idle()
+		_sprite_swap.set_gait_pose(Vector2.ZERO, delta, false)
 		return
 	var facing: Array = SpriteSwap.direction_suffix(velocity)
 	_sprite_swap.play("walk_" + facing[0])
 	_sprite_swap.set_flip_h(facing[1])
-	_sprite_swap.set_motion_speed(velocity.length(), max_speed)
+	_sprite_swap.set_motion_speed(velocity.length(), max_speed / WorldGait.pace_for(gait))
+	_sprite_swap.set_gait_pose(WorldGait.pose_for(gait), delta, true)

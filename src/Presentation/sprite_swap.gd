@@ -142,6 +142,16 @@ func stop_on_idle(fallback: String = "flee_down") -> void:
 static func _is_gait(animation: String) -> bool:
 	return animation.begins_with("walk_") or animation.begins_with("flee_")
 
+## Gait body language on top of the shared walk art: lean and bob per gait.
+## pose = Vector2(lean_radians, bob_amplitude_px); call every frame while riding.
+var _gait_bob: float = 0.0
+func set_gait_pose(pose: Vector2, delta: float, moving: bool) -> void:
+	if _sprite == null:
+		return
+	_gait_bob += delta * (6.0 + pose.y * 2.0)
+	_sprite.rotation = pose.x * (1.0 if not _sprite.flip_h else -1.0)
+	_sprite.position.y = -absf(sin(_gait_bob)) * pose.y if moving else 0.0
+
 func set_motion_speed(speed: float, reference_speed: float) -> void:
 	if _sprite == null:
 		return
