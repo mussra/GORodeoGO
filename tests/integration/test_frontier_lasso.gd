@@ -40,8 +40,8 @@ func test_lasso_holds_and_tames_wild_horse() -> void:
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	var horse: Node2D = _plant_horse(world, Vector2(150, 160))
-	world._throw_lasso(Vector2.RIGHT, 140.0)
-	assert_eq(world._lasso_state, "flight", "rope in flight after the throw")
+	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
+	assert_true(world.player.lasso._lasso_in_flight, "rope in flight after the throw")
 	for i in range(40):
 		await wait_physics_frames(3)
 	assert_eq(world._lasso_state, "hold", "landed rope holds the horse")
@@ -59,41 +59,43 @@ func test_lasso_miss_recovers() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
-	world._throw_lasso(Vector2.RIGHT, 140.0)
+	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
 	for i in range(17):
 		await wait_physics_frames(3)
-	assert_eq(world._lasso_state, "", "missed rope retracts")
-	assert_gt(world._lasso_cooldown, 0.0, "short cooldown after a miss")
+	assert_eq(world._lasso_state, "", "missed rope holds nothing")
+	assert_false(world.player.lasso._lasso_in_flight, "missed rope retracts")
+	world.player.lasso._on_aim_pressed()
+	assert_true(world.player.lasso._is_charging, "no cooldown: a new charge starts right away (corral behavior)")
 
 func test_aim_stick_charge_and_release_throws() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
-	world.lasso._on_aim_pressed()
-	assert_true(world._lasso_charging, "pressing the aim stick starts the charge")
-	world.lasso._on_aim_released(Vector2(1, 0) * 0.8)
-	assert_eq(world._lasso_state, "flight", "releasing with direction throws the rope")
-	assert_gt(world._lasso.progress, -1.0)
+	world.player.lasso._on_aim_pressed()
+	assert_true(world.player.lasso._is_charging, "pressing the aim stick starts the charge")
+	world.player.lasso._on_aim_released(Vector2(1, 0) * 0.8)
+	assert_true(world.player.lasso._lasso_in_flight, "releasing with direction throws the rope")
 
 func test_aim_release_near_center_cancels() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
-	world.lasso._on_aim_pressed()
-	world.lasso._on_aim_released(Vector2(0.05, 0.0))
+	world.player.lasso._on_aim_pressed()
+	world.player.lasso._on_aim_released(Vector2(0.05, 0.0))
 	assert_eq(world._lasso_state, "", "short release cancels, no throw")
+	assert_false(world.player.lasso._lasso_in_flight, "no rope in flight after a cancel")
 
 func test_double_tap_releases_held_horse() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	var horse: Node2D = _plant_horse(world, Vector2(150, 160))
-	world._throw_lasso(Vector2.RIGHT, 140.0)
+	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
 	for i in range(30):
 		await wait_physics_frames(3)
 	assert_eq(world._lasso_state, "hold", "rope holding")
-	world.lasso._on_aim_pressed()
-	world.lasso._on_aim_released(Vector2.ZERO)
-	world.lasso._on_aim_pressed()
-	world.lasso._on_aim_released(Vector2.ZERO)
+	world.player.lasso._on_aim_pressed()
+	world.player.lasso._on_aim_released(Vector2.ZERO)
+	world.player.lasso._on_aim_pressed()
+	world.player.lasso._on_aim_released(Vector2.ZERO)
 	assert_eq(world._lasso_state, "", "double tap drops the roped horse")
 	assert_eq(horse.held <= 0.0, true, "horse free to bolt")
 
@@ -113,7 +115,7 @@ func test_lasso_captures_pig_and_counts() -> void:
 	var bar := ProgressBar.new()
 	bar.name = "bar"
 	pig.add_child(bar)
-	world._throw_lasso(Vector2.RIGHT, 140.0)
+	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
 	for i in range(80):
 		await wait_physics_frames(3)
 		if not is_instance_valid(pig):

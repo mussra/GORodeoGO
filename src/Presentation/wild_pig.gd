@@ -55,3 +55,10 @@ func _draw() -> void:
 		draw_rect(Rect2(lx - 3, 14 + bounce * 0.4, 7, 12), Color("e3899d"))
 	# curly tail
 	draw_arc(Vector2(-24 * d, -6 + bounce), 6.0, 0.0, PI * 1.6, 10, Color("e3899d"), 3.0)
+
+## Same capture rule as the corral bulls (Ant: mismo codigo): the LassoController
+## resolves nearest-first and each prey accepts landings within body + tolerance.
+func try_capture(landing_point: Vector2) -> bool:
+	if held > 0.0:
+		return false
+	return global_position.distance_to(landing_point) <= LassoController.PREY_HIT_RADIUS + LassoController.PREY_CAPTURE_TOLERANCE

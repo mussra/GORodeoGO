@@ -69,12 +69,12 @@ func test_touch_aim_zone_charges_lasso() -> void:
 	await wait_process_frames(4)
 	_touch(Vector2(1000, 500), true)
 	await wait_process_frames(4)
-	assert_true(world._lasso_charging, "touch in the aim zone starts the charge")
+	assert_true(world.player.lasso._is_charging, "touch in the aim zone starts the charge")
 	_drag(Vector2(1080, 480))
 	await wait_process_frames(3)
 	_touch(Vector2(1080, 480), false)
 	await wait_process_frames(3)
-	assert_eq(world._lasso_state, "flight", "drag release throws the rope")
+	assert_true(world.player.lasso._lasso_in_flight, "drag release throws the rope")
 
 func test_top_buttons_not_covered_by_joystick() -> void:
 	var world := _fresh_world()

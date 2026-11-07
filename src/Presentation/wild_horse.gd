@@ -101,3 +101,10 @@ func flee_from(from: Vector2, _delta: float) -> void:
 
 func face_towards(point: Vector2) -> void:
 	_art.flip_h = point.x < position.x
+
+## Same capture rule as the corral bulls (Ant: mismo codigo): the LassoController
+## resolves nearest-first and each prey accepts landings within body + tolerance.
+func try_capture(landing_point: Vector2) -> bool:
+	if held > 0.0:
+		return false
+	return global_position.distance_to(landing_point) <= LassoController.PREY_HIT_RADIUS + LassoController.PREY_CAPTURE_TOLERANCE

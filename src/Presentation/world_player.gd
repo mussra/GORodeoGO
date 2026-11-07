@@ -22,8 +22,12 @@ var _dodge_direction: Vector2 = Vector2.ZERO
 var _skid_trail: Array[Vector2] = []
 var _trail_fade: float = 0.0
 var _sprite_swap: SpriteSwap
+var lasso: LassoController = null
 
 func _ready() -> void:
+	lasso = LassoController.new()
+	lasso.throw_guard = func() -> bool: return is_physics_processing()
+	add_child(lasso)
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()
 	fr.size = Vector2(18, 10)
@@ -58,6 +62,7 @@ func request_dodge(direction: Vector2) -> bool:
 	return true
 
 func _physics_process(delta: float) -> void:
+	lasso.process_throw_input(delta)
 	dodge_cooldown = maxf(0.0, dodge_cooldown - delta)
 	if _dodge_remaining > 0.0:
 		_dodge_remaining -= delta

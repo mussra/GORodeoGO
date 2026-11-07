@@ -13,6 +13,11 @@ extends Node2D
 ## - can_capture: consulted at resolution time (corral: free capture slot).
 ## - rope_parent: node the flight rope and landing flash are added to.
 
+## Capture rule shared by every prey (bulls keep it as @exports with these same
+## defaults): the landing must fall within body radius + forgiveness tolerance.
+const PREY_HIT_RADIUS: float = 28.0
+const PREY_CAPTURE_TOLERANCE: float = 30.0
+
 signal lasso_released
 signal lasso_thrown(throw_origin: Vector2, landing_point: Vector2)
 signal prey_captured(prey: Node2D)

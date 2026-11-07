@@ -48,20 +48,10 @@ var _clop_a: AudioStream = load("res://art/audio/hoof_a.wav")
 ## after "no puedo apuntar" 17:52): SAME gesture as the levels — press the aim
 ## stick to charge (the rope line extends with the stick), release to throw,
 ## release near the centre cancels, double tap drops the roped horse.
-const LASSO_MAX_THROW: float = 220.0
-const LASSO_FLIGHT_TIME: float = 0.8
-const LASSO_CHARGE_SPEED: float = 300.0
-const LASSO_COOLDOWN: float = 0.8
-var _lasso_charging: bool = false
-var _charge_keyboard: bool = false
-var _charge_distance: float = 0.0
-var _charge_visual: Line2D = null
-var _aim_dir: Vector2 = Vector2.RIGHT
-var _lasso_gesture: LassoGesture = LassoGesture.new()
-var _lasso: Node2D = null
+## Lasso state lives in the shared LassoController on the player (Ant 20:02:
+## "Quiero que se use el mismo código"); the world only keeps the HOLD session
+## of the captured animal.
 var _lasso_state: String = ""
-var _lasso_flight: float = 0.0
-var _lasso_cooldown: float = 0.0
 var _lasso_horse: Node2D = null
 
 ## Occluder rects (owner -> Array[Rect2]): when the rider's feet are inside one,
@@ -182,79 +172,20 @@ func _draw_rider_marker(n: Node2D) -> void:
 	n.draw_colored_polygon(tri, Color("201b1c"))
 	n.draw_colored_polygon(PackedVector2Array([Vector2(-7, -6), Vector2(7, -6), Vector2(0, 5)]), Color("ffd23d"))
 
-func _tick_lasso(delta: float) -> void:
-	_lasso_cooldown = maxf(0.0, _lasso_cooldown - delta)
-	if _lasso_state == "flight":
-		_lasso_flight += delta
-		_lasso.progress = clampf(_lasso_flight / LASSO_FLIGHT_TIME, 0.0, 1.0)
-		if _lasso_flight >= LASSO_FLIGHT_TIME:
-			_resolve_lasso()
-	elif _lasso_state == "hold":
+func _tick_lasso(_delta: float) -> void:
+	if _lasso_state == "hold":
 		if not is_instance_valid(_lasso_horse):
 			_end_lasso()
-		else:
-			_lasso.landing = _lasso_horse.position
-			if _lasso_horse.held <= 0.0:
-				var st: Dictionary = _lasso_horse.state
-				if st.has("flee"):
-					st["flee"] = true
-				else:
-					st["spook"] = WorldTaming.SPOOK_SECONDS
-				_lasso_horse.state = st
-				_end_lasso()
-		return
-	if _lasso_charging:
-		if _charge_keyboard:
-			_charge_distance = minf(LASSO_MAX_THROW, _charge_distance + LASSO_CHARGE_SPEED * delta)
-			if player.velocity.length() > 12.0:
-				_aim_dir = player.velocity.normalized()
-		else:
-			var av: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
-			if av.length() >= LassoAim.CANCEL_THRESHOLD:
-				_aim_dir = av.normalized()
-				_charge_distance = LassoAim.throw_distance(av, LASSO_MAX_THROW)
-		_update_charge_visual()
-		if _charge_keyboard and Input.is_action_just_released("throw_lasso"):
-			_stop_charge()
-			_throw_lasso(_aim_dir, _charge_distance)
-	elif _lasso_state == "" and Input.is_action_just_pressed("throw_lasso"):
-		_start_charge(true)
+		elif _lasso_horse.held <= 0.0:
+			var st: Dictionary = _lasso_horse.state
+			if st.has("flee"):
+				st["flee"] = true
+			else:
+				st["spook"] = WorldTaming.SPOOK_SECONDS
+			_lasso_horse.state = st
+			_end_lasso()
 
-func _on_aim_pressed() -> void:
-	_lasso_gesture.press(Time.get_ticks_msec() / 1000.0)
-	if not _lasso_charging and _lasso_state == "":
-		_start_charge(false)
 
-## Same gesture machine as the corral (src/Application/lasso_gesture.gd) — the
-## identical press/tap/drag/cancel/double-tap code; only the effects differ.
-func _on_aim_released(input_vector: Vector2) -> void:
-	var decision: Dictionary = _lasso_gesture.release(input_vector, Time.get_ticks_msec() / 1000.0, _lasso_charging, LASSO_MAX_THROW)
-	if decision.double_tap:
-		_release_held_horse()
-	if not _lasso_charging:
-		return
-	_stop_charge()
-	if decision.action == LassoGesture.Action.THROW:
-		_throw_lasso(input_vector.normalized(), decision.distance)
-
-func _start_charge(keyboard: bool) -> void:
-	_lasso_charging = true
-	_charge_keyboard = keyboard
-	_charge_distance = 0.0
-	_charge_visual = Line2D.new()
-	_charge_visual.width = 3.0
-	_charge_visual.default_color = Color(0.85, 0.65, 0.2, 1.0)
-	player.add_child(_charge_visual)
-
-func _stop_charge() -> void:
-	_lasso_charging = false
-	if is_instance_valid(_charge_visual):
-		_charge_visual.queue_free()
-	_charge_visual = null
-
-func _update_charge_visual() -> void:
-	if _charge_visual != null:
-		_charge_visual.points = PackedVector2Array([Vector2.ZERO, _aim_dir * _charge_distance])
 
 func _release_held_horse() -> void:
 	if _lasso_state != "hold" or not is_instance_valid(_lasso_horse):
@@ -267,44 +198,8 @@ func _release_held_horse() -> void:
 	_lasso_horse.state = st
 	_lasso_horse.held = 0.0
 	_end_lasso()
-	_lasso_cooldown = LASSO_COOLDOWN
 
-func _throw_lasso(dir: Vector2, dist: float) -> void:
-	if _lasso_state != "" or _lasso_cooldown > 0.0:
-		return
-	_lasso = LassoRope.new()
-	_lasso.rider = player
-	_lasso.start = player.position
-	_lasso.landing = player.position + dir * dist
-	_lasso.progress = 0.0
-	add_child(_lasso)
-	_lasso_state = "flight"
-	_lasso_flight = 0.0
 
-func _resolve_lasso() -> void:
-	var best: Node2D = null
-	var best_dist: float = _lasso.landing_radius
-	for key in _herd_horses:
-		var raw = _herd_horses[key]
-		if not is_instance_valid(raw):
-			continue
-		var horse: Node2D = raw
-		var d: float = _lasso.landing.distance_to(horse.position)
-		if d < best_dist:
-			best = horse
-			best_dist = d
-	for pig in _lasso_pigs():
-		var dp: float = _lasso.landing.distance_to(pig.position)
-		if dp < best_dist:
-			best = pig
-			best_dist = dp
-	if best == null:
-		_end_lasso()
-		_lasso_cooldown = LASSO_COOLDOWN
-		return
-	_lasso_horse = best
-	best.held = WorldTaming.HOLD_SECONDS
-	_lasso_state = "hold"
 
 func _lasso_pigs() -> Array:
 	var out: Array = []
@@ -318,11 +213,17 @@ func _lasso_pigs() -> Array:
 	return out
 
 func _end_lasso() -> void:
-	if is_instance_valid(_lasso):
-		_lasso.queue_free()
-	_lasso = null
 	_lasso_horse = null
 	_lasso_state = ""
+	player.lasso.set_active_capture_count(0)
+
+## The shared controller resolved a capture: start the hold session (trust
+## fills while the animal is held; it flees/spooks when the hold ends).
+func _on_lasso_prey_captured(prey: Node2D) -> void:
+	_lasso_horse = prey
+	prey.held = WorldTaming.HOLD_SECONDS
+	_lasso_state = "hold"
+	player.lasso.set_active_capture_count(1)
 
 func _toast(text: String) -> void:
 	_toast_label.text = text
@@ -699,8 +600,17 @@ func _build_hud() -> void:
 	joy.anchor_top = 0.32
 	var aim_joy: VirtualJoystick = touch.get_node("AimJoystick")
 	aim_joy.anchor_top = 0.32
-	aim_joy.pressed.connect(_on_aim_pressed)
-	aim_joy.released.connect(_on_aim_released)
+	player.lasso.set_aim_joystick(aim_joy)
+	player.lasso.prey_provider = func() -> Array:
+		var out: Array = []
+		for key in _herd_horses:
+			if is_instance_valid(_herd_horses[key]):
+				out.append(_herd_horses[key])
+		out.append_array(_lasso_pigs())
+		return out
+	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
+	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
+	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _toggle_map() -> void:
 	_map_overlay.visible = not _map_overlay.visible
