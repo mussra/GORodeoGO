@@ -838,6 +838,9 @@ msgstr "Fence jumping: no, go around the ends"
 msgid "GEN_RELATION_HINT"
 msgstr "Gold: all ancestors and descendants. Tap the same horse to clear selection. Filters remain active."
 
+msgid "DODGE_BADGE_TITLE"
+msgstr "Dodge"
+
 msgid "JUMP_BADGE_TITLE"
 msgstr "Fence jumping"
 
@@ -1034,7 +1037,7 @@ msgid "EMBLEM_GOLD"
 msgstr "Gold"
 
 msgid "EMBLEM_CONTRAST"
-msgstr "Ink contrasts with the coat; color identifies the card."
+msgstr "Your color shows on the horse; if it blends with the coat, it shifts to stay visible."
 
 msgid "EMBLEM_COSMETIC"
 msgstr "Customization does not change rarity, price or ancestry."

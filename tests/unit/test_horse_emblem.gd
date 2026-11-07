@@ -23,3 +23,20 @@ func test_all_shapes_and_symbols_render()->void:
   for division in 3:
    for symbol in 5:
     var cfg:=HorseEmblem.DEFAULT.duplicate();cfg.shape=shape;cfg.division=division;cfg.left=symbol;assert_false(HorseEmblem.mask(cfg).get_image().is_empty())
+func test_chosen_color_leads_and_stays_readable()->void:
+ for ci in HorseEmblem.COLORS.size():
+  var cfg:=HorseEmblem.DEFAULT.duplicate();cfg.color=ci
+  var chosen:=Color(HorseEmblem.COLORS[ci])
+  for bg in [0.05,0.3,0.5,0.7,0.95]:
+   var pair:Array=HorseEmblem.ink(cfg,bg);var fg:Color=pair[0]
+   assert_gt(absf(fg.get_luminance()-bg),.3,"color %d readable on bg %.2f"%[ci,bg])
+   if absf(chosen.get_luminance()-bg)>=.34:assert_eq(fg,chosen,"color %d kept when it already contrasts"%ci)
+func test_badge_dialog_title_matches_skill()->void:
+ var dodge:=JumpBadge.new();dodge.skill="dodge";dodge.capable=true
+ var dialog:=dodge.make_explanation()
+ assert_eq(dialog.title,tr("DODGE_BADGE_TITLE"));assert_eq(dialog.dialog_text,tr("DODGE_CAPABLE"))
+ dialog.free();dodge.free()
+ var jump:=JumpBadge.new();jump.capable=true
+ var dialog2:=jump.make_explanation()
+ assert_eq(dialog2.title,tr("JUMP_BADGE_TITLE"));assert_eq(dialog2.dialog_text,tr("JUMP_CAPABLE"))
+ dialog2.free();jump.free()

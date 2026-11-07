@@ -46,7 +46,7 @@ func _refresh()->void:
   if not SaveData.save_progress():SaveData.horse_collection.restore(before);message=tr("UI_086");refresh();return
   parent_b=added[0].id;page="collection";scroll_to_newest=true;message=tr("UI_078")%SaveData.horse_collection.horses.size();refresh(),230)
  random_button.visible=SaveData.debug_mode or SaveData.trial_session_active
- var trial_note:=label(tr("MARKET_NORMAL_RULES") if not SaveData.debug_mode and not SaveData.trial_session_active else tr("UI_079"),Vector2(30,138),18);trial_note.size=Vector2(470,28);trial_note.clip_text=true
+ var trial_note:=label(tr("MARKET_NORMAL_RULES") if not SaveData.debug_mode and not SaveData.trial_session_active else tr("UI_079"),Vector2(30,138),18);trial_note.clip_text=true;trial_note.size=Vector2(470,28)
  match page:
   "collection":collection_view()
   "breed":breed_view()
@@ -69,10 +69,10 @@ func collection_view()->void:
   var row:=HBoxContainer.new();row.custom_minimum_size.y=100;rows.add_child(row)
   var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits) if not SaveData.horse_collection.is_adult(h.id) else HorsePortrait.ART;tex.material=HorsePortrait.material_for(h.traits,SaveData.hat_color) if SaveData.horse_collection.is_adult(h.id) else null;tex.custom_minimum_size=Vector2(96,96);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
   var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;row.add_child(l)
-  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
-  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");row.add_child(dodge_badge)
+  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.size_flags_vertical=Control.SIZE_SHRINK_CENTER;row.add_child(badge)
+  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.size_flags_vertical=Control.SIZE_SHRINK_CENTER;row.add_child(dodge_badge)
   if HorseEmblem.valid(h.traits.get("emblem")):
-   var emblem:=TextureRect.new();emblem.texture=HorseEmblem.mask(h.traits.emblem);emblem.modulate=Color(HorseEmblem.COLORS[h.traits.emblem.color]);emblem.custom_minimum_size=Vector2(45,45);emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(emblem)
+   var emblem:=TextureRect.new();emblem.texture=HorseEmblem.mask(h.traits.emblem);emblem.modulate=Color(HorseEmblem.COLORS[h.traits.emblem.color]);emblem.custom_minimum_size=Vector2(45,45);emblem.mouse_filter=Control.MOUSE_FILTER_IGNORE;emblem.size_flags_vertical=Control.SIZE_SHRINK_CENTER;emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(emblem)
   var eq:=Button.new();eq.text=tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_059");eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
    message=(tr("UI_084") if SaveData.trial_session_active else tr("UI_085")) if SaveData.select_horse(h.id) else tr("UI_086");refresh())
   var fam:=Button.new();fam.text=tr("FICHA");row.add_child(fam);fam.pressed.connect(func():focus_id=h.id;show_page("detail"))
@@ -134,7 +134,7 @@ func detail_view()->void:
   var purchase:=button(tr("MARKET_BUY")%(0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h)),Vector2(450,440),func():confirm_trade(h,false),400);purchase.disabled=not SaveData.debug_mode and not SaveData.trial_session_active and (SaveData.equipment_points<HorseMarket.buy_price(h) or not HorseMarket.available(SaveData.horse_collection,h,SaveData.highest_level_completed))
   button(tr("UI_106"),Vector2(450,510),func():show_page("atlas"),340)
   return
- var title:=label(h.name,Vector2(40,175),27);title.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;title.size.x=365;title.clip_text=true
+ var title:=label(h.name,Vector2(40,175),27);title.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;title.clip_text=true;title.size.x=365
  sprite(h,Vector2(70,250),235)
  var name_edit:=LineEdit.new();name_edit.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;name_edit.text=h.name;name_edit.placeholder_text=tr("UI_107");name_edit.max_length=60;name_edit.position=Vector2(40,485);name_edit.size=Vector2(200,48);content.add_child(name_edit)
  button(tr("UI_108"),Vector2(245,485),func():
@@ -192,7 +192,7 @@ func atlas_view()->void:
   var entry:Dictionary=entries[n];var h:Dictionary=entry.horse;var t:Dictionary=h.traits
   var x:float=35+(j%4)*305;var y:float=250+int(j/4)*160
   sprite(h,Vector2(x,y),90)
-  var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat]))),Vector2(x+92,y),18);title.size=Vector2(205,30);title.clip_text=true
+  var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat]))),Vector2(x+92,y),18);title.clip_text=true;title.size=Vector2(205,30)
   label(tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]),Vector2(x+92,y+32),16)
   var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(295,130);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
   label(tr(HorseCollection.RARITIES[HorseMarket.tier(h)]),Vector2(x+92,y+58),16)

@@ -1,5 +1,6 @@
 shader_type canvas_item;
 uniform bool emblem_enabled=false;
+uniform vec3 emblem_color:source_color=vec3(1.,.95,.85);
 uniform sampler2D emblem_mask: filter_linear;
 uniform sampler2D eye_mask: filter_linear;
 uniform vec4 eye_color: source_color = vec4(.6,.3,.1,1);
@@ -86,7 +87,7 @@ void fragment(){
  if(emblem_enabled){
   vec2 step_uv=1./vec2(936.,983.);float ink=texture(emblem_mask,UV).a;float edge=ink;
   for(int y=-1;y<=1;y++){for(int x=-1;x<=1;x++){edge=max(edge,texture(emblem_mask,UV+vec2(float(x),float(y))*step_uv).a);}}
-  vec3 sample_col=texture(TEXTURE,vec2(.29,.63)).rgb;float lum=original_horse?.25:dot(coat_color.rgb,vec3(.2126,.7152,.0722));vec3 fg=lum>.46?vec3(.125,.106,.11):vec3(1.,.95,.85);vec3 opposite=lum>.46?vec3(1.,.95,.85):vec3(.125,.106,.11);
+  float lum=original_horse?.25:dot(coat_color.rgb,vec3(.2126,.7152,.0722));vec3 fg=emblem_color;for(int i=0;i<2;i++){float d=dot(fg,vec3(.2126,.7152,.0722));if(abs(d-lum)>=.34)break;vec3 up=mix(fg,vec3(1.),.55);vec3 down=mix(fg,vec3(0.),.55);fg=abs(dot(up,vec3(.2126,.7152,.0722))-lum)>=abs(dot(down,vec3(.2126,.7152,.0722))-lum)?up:down;}vec3 opposite=lum>.46?vec3(.125,.106,.11):vec3(1.,.95,.85);
   col=mix(col,opposite,edge*.9);col=mix(col,fg,ink);
  }
  COLOR=vec4(col,src.a);

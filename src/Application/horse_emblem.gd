@@ -35,6 +35,17 @@ static func portrait_mask(config:Dictionary)->Texture2D:
   for x in range(224,327):
    var c:=image.get_pixel(x,y);c.a*=area.get_pixel(x,y).a;image.set_pixel(x,y,c)
  var texture:=ImageTexture.create_from_image(image);cache[key]=texture;return texture
+## Ink for a chosen color over a background luminance: the picked color leads, and
+## only when it would disappear against the coat it moves just enough to read (0.34
+## luminance delta), keeping the opposite rim so edges survive pattern boundaries.
+static func ink(config:Dictionary,bg_luminance:float)->Array:
+ var fg:Color=Color(COLORS[int(config.get("color",0))%COLORS.size()])
+ for i in 2:
+  if absf(fg.get_luminance()-bg_luminance)>=.34:break
+  var up:Color=fg.lightened(.55);var down:Color=fg.darkened(.55)
+  fg=up if absf(up.get_luminance()-bg_luminance)>=absf(down.get_luminance()-bg_luminance) else down
+ var edge:=Color("201b1c") if bg_luminance>=.46 else Color("fff2d9")
+ return [fg,edge]
 static func stamp(image:Image,zone:Image,config:Dictionary)->void:
  var rect:Rect2i=zone.get_used_rect()
  # Zone images are transparent outside the independently editable region.
@@ -45,8 +56,7 @@ static func stamp(image:Image,zone:Image,config:Dictionary)->void:
   for x in range(rect.position.x,rect.end.x):
    if zone.get_pixel(x,y).a<.5:continue
    var bg:=image.get_pixel(x,y);luminance+=bg.get_luminance();count+=1
- var light:bool=luminance/maxi(count,1)<.46
- var fg:=Color("fff2d9") if light else Color("201b1c");var edge:=Color("201b1c") if light else Color("fff2d9")
+ var pair:Array=ink(config,luminance/maxi(count,1));var fg:Color=pair[0];var edge:Color=pair[1]
  var before:Image=image.duplicate()
  for y in range(rect.size.y):
   for x in range(rect.size.x):

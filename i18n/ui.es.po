@@ -838,6 +838,9 @@ msgstr "Salto de vallas: no, rodea los extremos"
 msgid "GEN_RELATION_HINT"
 msgstr "Dorado: antepasados y descendientes completos. Toca el mismo caballo para quitar la selección. Los filtros siguen activos."
 
+msgid "DODGE_BADGE_TITLE"
+msgstr "Regate"
+
 msgid "JUMP_BADGE_TITLE"
 msgstr "Salto de vallas"
 
@@ -1034,7 +1037,7 @@ msgid "EMBLEM_GOLD"
 msgstr "Oro"
 
 msgid "EMBLEM_CONTRAST"
-msgstr "La tinta contrasta con el pelaje; el color identifica la ficha."
+msgstr "El color elegido se ve sobre el caballo; si pega poco con el pelaje, se ajusta para que contraste."
 
 msgid "EMBLEM_COSMETIC"
 msgstr "Personalizar no cambia rareza, precio ni ascendencia."

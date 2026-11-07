@@ -7,8 +7,11 @@ func _ready()->void:
  pressed.connect(show_explanation)
  tooltip_text=tr("DODGE_CAPABLE" if capable else "DODGE_GROUNDED") if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"))
  queue_redraw()
+func make_explanation()->AcceptDialog:
+ var explanation:=AcceptDialog.new();explanation.title=tr("DODGE_BADGE_TITLE" if skill=="dodge" else "JUMP_BADGE_TITLE");explanation.dialog_text=(tr("DODGE_CAPABLE") if capable else tr("DODGE_GROUNDED")) if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"));explanation.min_size=Vector2i(460,120)
+ return explanation
 func show_explanation()->void:
- var explanation:=AcceptDialog.new();explanation.title=tr("JUMP_BADGE_TITLE");explanation.dialog_text=(tr("DODGE_CAPABLE") if capable else tr("DODGE_GROUNDED")) if skill=="dodge" else (tr("JUMP_CAPABLE") if capable else tr("JUMP_GROUNDED"));explanation.min_size=Vector2i(460,120);add_child(explanation);explanation.confirmed.connect(explanation.queue_free);explanation.canceled.connect(explanation.queue_free);explanation.popup_centered()
+ var explanation:=make_explanation();add_child(explanation);explanation.confirmed.connect(explanation.queue_free);explanation.canceled.connect(explanation.queue_free);explanation.popup_centered()
 func _draw()->void:
  var ink:Color=Color("f4cf67") if capable else Color("c8d3d5")
  draw_style_box(RanchTheme.box(Color("10252d"),ink,8),Rect2(0,0,64,56))
