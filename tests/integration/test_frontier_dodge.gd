@@ -44,3 +44,22 @@ func test_dodge_needs_a_direction() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
 	assert_false(world.player.request_dodge(Vector2.ZERO), "no dash without direction")
+
+func test_dodge_requires_a_trained_horse_like_the_levels() -> void:
+	var world := _fresh_world()
+	# Ant 7-nov-2026 21:33 "Igual": skills need training in the world too.
+	SaveData.horse_collection.horses[0]["can_dodge"] = false
+	await wait_physics_frames(4)
+	assert_false(world.player.dodge_available, "untrained horse: dodge unavailable")
+	var dodge = world.player.dodge
+	dodge.on_move_pressed()
+	dodge.on_move_released(Vector2.ZERO)
+	dodge.on_move_pressed()
+	await wait_physics_frames(2)
+	assert_false(dodge.drawing, "double-press does not arm bullet-time without training")
+	assert_eq(Engine.time_scale, 1.0, "no bullet-time without training")
+	assert_false(world.player.request_dodge(Vector2(1, 0)), "no dash without training")
+	# training the horse unlocks it, same rule as the corral
+	SaveData.horse_collection.horses[0]["can_dodge"] = true
+	await wait_physics_frames(2)
+	assert_true(world.player.dodge_available, "trained horse: dodge available")

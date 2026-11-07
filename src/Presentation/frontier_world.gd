@@ -109,7 +109,12 @@ func _process(delta: float) -> void:
 	_tick_lasso(delta)
 	_tick_rider_marker()
 	if _gauges.has("dodge"):
-		_gauges["dodge"].set_state(true, 1.0 - player.dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds))
+		# Same rule as the levels (Ant 7-nov-2026 21:33 "Igual"): the dodge needs
+		# a trained horse; recomputed so switching horses at the board updates it.
+		var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
+		player.dodge_available = HorseTraining.knows(horse, "dodge")
+		player.dodge_recharge_seconds = 2.5 * HorseTraining.recovery(horse, "dodge")
+		_gauges["dodge"].set_state(player.dodge_available, 1.0 - player.dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds))
 	_tick_pigs(delta)
 	_tick_hoofbeats(delta)
 	_tick_stamina(delta)

@@ -25,6 +25,9 @@ var _stun_time_remaining: float = 0.0
 ## world's HUD, trail drawing and the edge cue working with the corral names.
 const DRAW_EDGE_DWELL: float = DodgeController.DRAW_EDGE_DWELL
 var dodge: DodgeController = null
+var dodge_available: bool:
+	get: return false if dodge == null else dodge.available
+	set(v): if dodge != null: dodge.available = v
 var dodge_recharge_seconds: float:
 	get: return 2.5 if dodge == null else dodge.recharge_seconds
 	set(v): if dodge != null: dodge.recharge_seconds = v
@@ -145,7 +148,8 @@ func _draw() -> void:
 	DodgeVisuals.draw_trail(self, dodge.skid_trail, dodge.trail_fade)
 	if dodge.drawing:
 		DodgeVisuals.draw_drawing(self, dodge.preview_points(dodge.draw_points))
-	DodgeVisuals.draw_recharge(self, Vector2(0, -59), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
+	if dodge_available:
+		DodgeVisuals.draw_recharge(self, Vector2(0, -59), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
 	if dodge.remaining > 0.0:
 		DodgeVisuals.draw_dash_dust(self, dodge.direction)
 
