@@ -39,7 +39,8 @@ func _rope_horse(world: Node2D) -> void:
 	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
 	assert_true(world.player.lasso._lasso_in_flight, "rope in flight after the throw")
 
-func test_lasso_ropes_tows_and_delivers_wild_horse() -> void:
+func test_lasso_holds_horse_in_place_then_captures() -> void:
+	# Ant 21:47: the roped horse does NOT follow; after the hold timer it is captured.
 	var world := _fresh_world()
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
@@ -51,19 +52,36 @@ func test_lasso_ropes_tows_and_delivers_wild_horse() -> void:
 			break
 	assert_eq(world._lasso_state, "hold", "landed rope holds the horse")
 	assert_true(horse.roped, "horse is roped")
-	# the roped horse is not frozen: it follows the rider on the corral tow leash
+	# the roped horse stays in place even when the rider walks away
+	var planted_at: Vector2 = horse.position
+	Input.action_press("move_right")
 	for i in range(30):
 		await wait_physics_frames(3)
-		if horse.position.distance_to(world.player.position) < 80.0:
+		if not is_instance_valid(horse):
 			break
-	assert_lt(horse.position.distance_to(world.player.position), 80.0, "roped horse tows to the rider")
-	# trust fills while roped; once tamed it stays roped and is delivered at the ranch
+	Input.action_release("move_right")
+	if is_instance_valid(horse):
+		assert_almost_eq(horse.position.x, planted_at.x, 4.0, "roped horse does not follow the rider")
+		assert_almost_eq(horse.position.y, planted_at.y, 4.0, "roped horse does not follow the rider")
+	# the hold timer captures it (trust fills while held, then it joins the cuadra)
 	for i in range(120):
 		await wait_physics_frames(3)
 		if not is_instance_valid(horse):
 			break
-	assert_true(SaveData.world_tamed.has(WorldMap.herd_mission_id(99, 99)), "tamed horse delivered at the ranch joins the cuadra")
-	assert_eq(world._lasso_state, "", "lasso session ends on delivery")
+	assert_true(SaveData.world_tamed.has(WorldMap.herd_mission_id(99, 99)), "timer-captured horse joins the cuadra")
+	assert_eq(world._lasso_state, "", "lasso session ends on capture")
+
+func test_rider_not_blocked_by_horse() -> void:
+	# Ant 21:48: bumping into a horse must never block the rider.
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	world.player.position = Vector2(0, 160)
+	world.player.velocity = Vector2.ZERO
+	_plant_horse(world, Vector2(60, 160))  # calm horse right in the rider's path
+	Input.action_press("move_right")
+	await wait_physics_frames(90)
+	Input.action_release("move_right")
+	assert_gt(world.player.position.x, 100.0, "the rider walks straight through a calm horse")
 
 func test_lasso_miss_recovers() -> void:
 	var world := _fresh_world()
@@ -132,7 +150,7 @@ func test_bolting_horse_stuns_rider_and_drops_capture() -> void:
 	assert_eq(world._lasso_state, "", "the stun drops the roped horse")
 	assert_false(horse.roped, "dropped horse is free")
 
-func test_lasso_ropes_pig_and_delivers_at_ranch() -> void:
+func test_lasso_ropes_pig_and_timer_captures() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
 	var before: int = SaveData.world_pigs.size()
@@ -150,7 +168,7 @@ func test_lasso_ropes_pig_and_delivers_at_ranch() -> void:
 		await wait_physics_frames(3)
 		if not is_instance_valid(pig):
 			break
-	assert_false(is_instance_valid(pig), "roped pig delivered at the ranch")
+	assert_false(is_instance_valid(pig), "roped pig captured when the hold timer fills")
 	# the pen registers the capture one frame after the pig node is freed
 	await wait_physics_frames(6)
 	assert_gt(SaveData.world_pigs.size(), before, "pig counts in the counter")

@@ -382,11 +382,8 @@ func _draw() -> void:
 	draw_set_transform(Vector2(0, 33), 0.0, Vector2(1.0, 0.3))
 	draw_circle(Vector2.ZERO, 27, Color(0.15, 0.12, 0.08, 0.2))
 	draw_set_transform(Vector2.ZERO)
-	if lasso.is_charging() and lasso.charge_distance() > 1.0:
-		var target: Vector2 = aim_direction * lasso.charge_distance()
-		draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
-		draw_arc(target, capture_area_visual_radius, 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
-		draw_circle(target, 3.0, Color(1.0, 0.92, 0.7))
+	# Charge-aim circle: shared with the world rider (LassoController).
+	lasso.draw_charge_aim(self)
 
 func _exit_tree() -> void:
 	Engine.time_scale = 1.0

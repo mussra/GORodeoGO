@@ -4,10 +4,10 @@ extends CharacterBody2D
 ## graze in place; showcase horses (test zone, Ant 7-nov-2026) set wander=true
 ## to amble around home so the walk gait is visible.
 ##
-## Once roped it follows the corral post-capture flow exactly (Ant: mismo
-## codigo): the same TowFollower leash the corral bulls use, the same rope
-## visuals (HeldVisuals), trust fills while held, and the horse stays roped
-## (controlled) until the rider leads it to the ranch for delivery.
+## Roped by the lasso it STAYS IN PLACE while trust fills over a few seconds
+## and then it is captured (Ant 21:47: "Me gustaba que el caballo no me seguia
+## cuando lo tenia con el lazo y al pasar el tiempo ya era capturado"). Rope
+## visuals are the shared HeldVisuals. It never blocks the rider (no collision).
 
 const Art := preload("res://src/Presentation/wild_horse_art.gd")
 
@@ -16,9 +16,6 @@ const BODY_RADIUS: float = 28.0
 const RIDER_TOUCH_RADIUS: float = 18.0
 ## A just-released horse can't stun the rider who let it go (corral D038 grace).
 const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
-## Tow numbers match BullTuning so a roped horse feels like a roped bull.
-const TOW_LEASH: float = 50.0
-const TOW_SPEED: float = 240.0
 
 var herd: Dictionary = {}
 var state: Dictionary = {}
@@ -26,12 +23,12 @@ var home: Vector2 = Vector2.ZERO
 var wander: bool = false
 var wander_radius: float = 70.0
 var wander_speed: float = 55.0
-## Roped by the rider's lasso: follows the rider while trust fills; once tamed
-## it stays roped (controlled) until delivered at the ranch.
+## Roped by the rider's lasso: stays in place while trust fills; when the
+## timer runs out it is captured (or bolts if released first).
 var roped: bool = false
-var controlled: bool = false
 var rider: Node2D = null
-var follower := TowFollower.new()
+## Seconds left roped; while > 0 the horse cannot flee or wander.
+var held: float = 0.0
 var touch_grace: float = 0.0
 var _touching_rider: bool = false
 var _art: Node2D
@@ -53,6 +50,11 @@ func _ready() -> void:
 	feet.shape = fr
 	feet.position = Vector2(0, -2)
 	add_child(feet)
+	# Ant 21:48: bumping into a horse must never block the rider. Taming,
+	# capture and the bolting-contact stun are all distance-based, so the
+	# body simply doesn't collide.
+	collision_layer = 0
+	collision_mask = 0
 	_art = Art.new()
 	_art.traits = herd.get("traits", {})
 	add_child(_art)
@@ -62,15 +64,13 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_bob += delta
 	touch_grace = maxf(0.0, touch_grace - delta)
-	if roped and is_instance_valid(rider):
-		# Same tow movement as a captured corral bull.
-		var rider_speed: float = rider.velocity.length() if rider is CharacterBody2D else 0.0
-		velocity = follower.step(self, rider.global_position, rider_speed, TOW_LEASH, TOW_SPEED, delta)
+	if roped:
+		# Roped: stays in place while the hold timer runs (no tow, Ant 21:47).
+		held = maxf(0.0, held - delta)
+		velocity = Vector2.ZERO
 		_flee = Vector2.ZERO
 		_art.grazing = false
-		if velocity.length() > 5.0:
-			_art.flip_h = velocity.x < 0.0
-			_art.set_walk_direction(velocity)
+		move_and_slide()
 		_art.position.y = sin(_bob * 1.6) * 1.5
 		queue_redraw()
 		return
@@ -97,7 +97,7 @@ func _physics_process(delta: float) -> void:
 ## (walk-up taming) the same trust bar shows progress.
 func _draw() -> void:
 	if roped and is_instance_valid(rider):
-		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), controlled)
+		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), false)
 	else:
 		var progress: float = float(state.get("progress", 0.0))
 		if progress > 0.01:
@@ -108,9 +108,8 @@ func _draw() -> void:
 ## including the grace so it can't instantly stun the rider who released it.
 func release() -> void:
 	roped = false
-	controlled = false
 	rider = null
-	follower.reset()
+	held = 0.0
 	touch_grace = RELEASE_TOUCH_GRACE_SECONDS
 	_touching_rider = false
 

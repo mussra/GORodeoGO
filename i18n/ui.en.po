@@ -1089,8 +1089,6 @@ msgstr "Mission found: wild herd"
 msgid "WORLD_TAMED"
 msgstr "Horse tamed! It joins your herd"
 
-msgid "WORLD_LEAD_HOME"
-msgstr "Got it! Lead it to the ranch"
 
 msgid "WORLD_ENCARGO_DONE"
 msgstr "Job done!"

@@ -2,28 +2,24 @@ extends Node2D
 ## A wild pig in the frontier. Code-drawn cartoon art (round, pink, silly), the
 ## same placeholder spirit as the wild horses until final art exists.
 ##
-## Once roped it follows the corral post-capture flow exactly (Ant: mismo
-## codigo): the same TowFollower leash the corral bulls use, the same rope
-## visuals (HeldVisuals), trust fills while held, and the pig stays roped
-## (controlled) until the rider leads it to the ranch for delivery.
+## Once roped it STAYS IN PLACE while trust fills and then it counts as
+## captured (Ant 21:47: no follow, timer captures). Rope visuals are the
+## shared HeldVisuals. It never blocks the rider (no collision).
 
 ## Contact radii mirror the corral (bull.hit_radius + bull.PLAYER_TOUCH_RADIUS).
 const BODY_RADIUS: float = 28.0
 const RIDER_TOUCH_RADIUS: float = 18.0
 ## A just-released pig can't stun the rider who let it go (corral D038 grace).
 const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
-## Tow numbers match BullTuning so a roped pig feels like a roped bull.
-const TOW_LEASH: float = 50.0
-const TOW_SPEED: float = 240.0
 
 var pen: Dictionary = {}
 var state: Dictionary = {}
-## Roped by the rider's lasso: follows the rider while trust fills; once caught
-## it stays roped (controlled) until delivered at the ranch.
+## Roped by the rider's lasso: stays in place while trust fills; when the
+## timer runs out it counts as captured (or bolts if released first).
 var roped: bool = false
-var controlled: bool = false
 var rider: Node2D = null
-var follower := TowFollower.new()
+## Seconds left roped; while > 0 the pig cannot flee.
+var held: float = 0.0
 var touch_grace: float = 0.0
 var _touching_rider: bool = false
 var home: Vector2 = Vector2.ZERO
@@ -41,21 +37,17 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_bob += delta
 	touch_grace = maxf(0.0, touch_grace - delta)
-	if roped and is_instance_valid(rider):
-		# Same tow movement as a captured corral bull.
-		var rider_speed: float = rider.velocity.length() if rider is CharacterBody2D else 0.0
-		var vel: Vector2 = follower.step(self, rider.global_position, rider_speed, TOW_LEASH, TOW_SPEED, delta)
-		if vel.length() > 5.0:
-			flip_h = vel.x < 0.0
+	if roped:
+		# Roped: stays in place while the hold timer runs (no tow, Ant 21:47).
+		held = maxf(0.0, held - delta)
 	queue_redraw()
 
 ## The rider drops the rope (double tap or a stun): the pig bolts, keeping the
 ## trust it had — same transition as the corral's release_by_player (D027).
 func release() -> void:
 	roped = false
-	controlled = false
 	rider = null
-	follower.reset()
+	held = 0.0
 	touch_grace = RELEASE_TOUCH_GRACE_SECONDS
 	_touching_rider = false
 
@@ -75,7 +67,7 @@ func _draw() -> void:
 	# Rope visuals identical to a held corral bull; while trust builds unroped
 	# (walk-up capture) the same trust bar shows progress.
 	if roped and is_instance_valid(rider):
-		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), controlled)
+		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), false)
 	else:
 		var progress: float = float(state.get("progress", 0.0))
 		if progress > 0.01:

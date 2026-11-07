@@ -140,6 +140,17 @@ func _update_charge_visual() -> void:
 	if _charge_visual != null:
 		_charge_visual.points = PackedVector2Array([Vector2.ZERO, aim_direction * _charge_distance])
 
+## The charge-aim target circle, drawn identically by the corral rider and the
+## world rider (Ant 21:47: "El círculo de apuntar el lazo no aparece" — the
+## world was missing it). Call from the rider's _draw.
+func draw_charge_aim(canvas: Node2D) -> void:
+	if not is_charging() or charge_distance() <= 1.0:
+		return
+	var target: Vector2 = aim_direction * charge_distance()
+	canvas.draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
+	canvas.draw_arc(target, capture_area_visual_radius, 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
+	canvas.draw_circle(target, 3.0, Color(1.0, 0.92, 0.7))
+
 func cancel_input() -> void:
 	_touch_aim_active = false
 	_lasso_gesture.reset()

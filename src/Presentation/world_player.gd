@@ -152,6 +152,8 @@ func _draw() -> void:
 		DodgeVisuals.draw_recharge(self, Vector2(0, -59), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
 	if dodge.remaining > 0.0:
 		DodgeVisuals.draw_dash_dust(self, dodge.direction)
+	# Charge-aim circle: shared with the corral rider (Ant 21:47, it was missing here).
+	lasso.draw_charge_aim(self)
 
 func _update_animation(delta: float) -> void:
 	if _sprite_swap == null or not _sprite_swap.has_sprite():

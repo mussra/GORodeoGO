@@ -15,9 +15,6 @@ const DrawNode := preload("res://src/Presentation/world_draw_node.gd")
 
 const BOARD_POS := Vector2(145, -20)
 const HOME_POS := Vector2(0, 160)
-## Ranch doorstep: a roped, tamed animal led this close is delivered (joins the
-## cuadra / counts as captured) — the corral's deliver-to-the-pen flow.
-const DELIVERY_RADIUS: float = 110.0
 const SAVE_EVERY := 4.0
 const ARROWS: Array[String] = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"]
 
@@ -157,10 +154,20 @@ func _draw_rider_marker(n: Node2D) -> void:
 	n.draw_colored_polygon(PackedVector2Array([Vector2(-7, -6), Vector2(7, -6), Vector2(0, 5)]), Color("ffd23d"))
 
 func _tick_lasso(_delta: float) -> void:
-	# No hold timer: like the corral, a roped animal stays roped until it is
-	# delivered, released (double tap) or dropped by a stun.
-	if _lasso_state == "hold" and not is_instance_valid(_lasso_horse):
-		_end_lasso()
+	# Ant 21:47: the roped animal stays put and the hold timer captures it —
+	# if the timer runs out first, it bolts (release path cancels the session).
+	if _lasso_state == "hold":
+		if not is_instance_valid(_lasso_horse):
+			_end_lasso()
+		elif _lasso_horse.held <= 0.0:
+			var st: Dictionary = _lasso_horse.state
+			if st.has("flee"):
+				st["flee"] = true
+			else:
+				st["spook"] = WorldTaming.SPOOK_SECONDS
+			_lasso_horse.state = st
+			_lasso_horse.release()
+			_end_lasso()
 
 
 
@@ -194,16 +201,13 @@ func _end_lasso() -> void:
 	_lasso_state = ""
 	player.lasso.set_active_capture_count(0)
 
-## The shared controller resolved a capture: the animal is roped and follows
-## the rider with the corral's tow movement while trust fills; once tamed it
-## stays roped (controlled) until delivered at the ranch — same flow as the
-## corral, no timer and no auto-join.
+## The shared controller resolved a capture: start the hold session (trust
+## fills while the animal is held in place; it flees/spooks when the hold ends).
 func _on_lasso_prey_captured(prey: Node2D) -> void:
 	_lasso_horse = prey
 	prey.roped = true
-	prey.controlled = false
 	prey.rider = player
-	prey.follower.reset()
+	prey.held = WorldTaming.HOLD_SECONDS
 	_lasso_state = "hold"
 	player.lasso.set_active_capture_count(1)
 
@@ -302,26 +306,20 @@ func _tick_taming(delta: float) -> void:
 			continue
 		var horse: Node2D = raw
 		var dist: float = player.position.distance_to(horse.position)
-		if dist > 700.0 and not horse.roped:
-			continue
-		# A roped, tamed horse led to the ranch is delivered (joins the cuadra).
-		if horse.roped and horse.controlled and horse.position.distance_to(HOME_POS) <= DELIVERY_RADIUS:
-			_deliver_horse(horse.get_meta("c"), horse)
+		if dist > 700.0:
 			continue
 		var st: Dictionary
 		if horse.roped:
+			# Roped: trust fills fast while the horse stays put (Ant 21:47).
 			st = WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta)
-			horse.state = st
-			if not horse.controlled and WorldTaming.tamed(st):
-				horse.controlled = true
-				_audio.play("calm")
-				_toast(tr("WORLD_LEAD_HOME"))
-			continue
-		st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta)
+		else:
+			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta)
 		horse.state = st
 		if WorldTaming.tamed(st):
 			_deliver_horse(horse.get_meta("c"), horse)
 			continue
+		if horse.roped:
+			continue  # held horses can't bolt
 		# "Que suelte" (Ant, 7-nov-2026 19:58, the corral rule): contact with a
 		# bolting wild animal stuns the rider and drops the roped capture.
 		var touching: bool = dist <= horse.BODY_RADIUS + horse.RIDER_TOUCH_RADIUS
@@ -368,28 +366,22 @@ func _tick_pigs(delta: float) -> void:
 			if dist > 700.0 and not pig.roped:
 				all_captured = false
 				continue
+			var st: Dictionary
 			if pig.roped:
-				# Lasso'd pig: corral flow — trust fills while roped; it counts
-				# when led back to the ranch, not before.
-				pig.state = WorldPigs.hold_tick(pig.state, delta)
-				if not pig.controlled and WorldPigs.captured(pig.state):
-					pig.controlled = true
-					_audio.play("calm")
-					_toast(tr("WORLD_LEAD_HOME"))
-				if pig.controlled and pig.position.distance_to(HOME_POS) <= DELIVERY_RADIUS:
-					if pig == _lasso_horse:
-						_end_lasso()
-					_audio.play("return")
-					pig.queue_free()
-				else:
-					all_captured = false
-				continue
-			var st: Dictionary = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
+				# Roped: trust fills fast while the pig stays put (Ant 21:47).
+				st = WorldPigs.hold_tick(pig.state, delta)
+			else:
+				st = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
 			pig.state = st
 			if WorldPigs.captured(st):
-				pig.queue_free()  # walk-up capture counts right away (unchanged)
+				if pig == _lasso_horse:
+					_end_lasso()
+				_audio.play("return")
+				pig.queue_free()  # captured: counts right away (roped or walk-up)
 			else:
 				all_captured = false
+				if pig.roped:
+					continue  # held pigs can't bolt
 				# "Que suelte": a bolting pig stuns on contact, like a wild bull.
 				var touching: bool = dist <= pig.BODY_RADIUS + pig.RIDER_TOUCH_RADIUS
 				if st.get("flee", false):
