@@ -1141,3 +1141,6 @@ msgstr "Pigs"
 
 msgid "WORLD_ERASE"
 msgstr "Erase"
+
+msgid "WORLD_HORSE_TIRED"
+msgstr "The horse takes a breather"

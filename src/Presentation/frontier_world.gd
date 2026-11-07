@@ -29,6 +29,9 @@ var _save_timer: float = 0.0
 var _last_gait: int = -1
 var _pigs_label: Label
 var _edit_mode: bool = false
+var _stamina: Dictionary = {}
+var _gauges: Dictionary = {}
+var _pant: AudioStream = load("res://art/audio/pant.wav")
 var _edit_tool: String = "tree"
 var _edit_panel: Control
 var _hoof_player: AudioStreamPlayer
@@ -54,6 +57,7 @@ func _ready() -> void:
 	var ranch := RanchScript.new()
 	add_child(ranch)
 	_build_hud()
+	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
 	_hoof_player.volume_db = -12.0
 	_hoof_player.bus = &"SFX" if AudioServer.get_bus_index("SFX") >= 0 else &"Master"
@@ -65,6 +69,7 @@ func _process(delta: float) -> void:
 	_tick_taming(delta)
 	_tick_pigs(delta)
 	_tick_hoofbeats(delta)
+	_tick_stamina(delta)
 	if player.gait != _last_gait:
 		_last_gait = player.gait
 		_gait_label.text = tr(WorldGait.gait_names()[_last_gait])
@@ -307,6 +312,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		_chunks.clear()
 		_update_chunks()
 
+func _tick_stamina(delta: float) -> void:
+	var before: Dictionary = _stamina
+	_stamina = WorldStamina.tick(_stamina, player.gait, player.velocity.length() > 12.0, delta)
+	player.gait_cap = WorldStamina.cap_gait(_stamina, WorldGait.GALOPE)
+	if WorldStamina.just_tired(before, _stamina):
+		_toast(tr("WORLD_HORSE_TIRED"))
+		_hoof_player.stream = _pant
+		_hoof_player.pitch_scale = 1.0
+		_hoof_player.play()
+	_gauges["stamina"].set_state(true, WorldStamina.ratio(_stamina))
+
 func _refresh_missions() -> void:
 	var counts: Dictionary = WorldMissions.counts()
 	_missions_label.text = tr("WORLD_MISSIONS") % [counts.get("offered", 0) + counts.get("encargo", 0), counts.get("done", 0)]
@@ -346,6 +362,18 @@ func _build_hud() -> void:
 	_pigs_label.add_theme_font_size_override("font_size", 18)
 	_pigs_label.text = tr("WORLD_PIGS") % SaveData.world_pigs.size()
 	_hud.add_child(_pigs_label)
+	# clock-fill gauges (Ant 11:39/11:40): stamina + ability reminders, bottom
+	# right so they never cover the touch joystick
+	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
+	var abilities: Array = [["stamina", true], ["dodge", HorseTraining.knows(horse, "dodge")], ["jump", HorseJump.capable(horse)]]
+	for i in abilities.size():
+		var g := RadialGauge.new()
+		g.skill = abilities[i][0]
+		g.position = Vector2(1046 + i * 84, 636)
+		g.size = Vector2(76, 76)
+		g.set_state(abilities[i][1], 1.0)
+		_gauges[abilities[i][0]] = g
+		_hud.add_child(g)
 	var specs: Array = [["WORLD_MAP", 760, Callable(self, "_toggle_map")], ["WORLD_EDIT", 870, Callable(self, "_toggle_edit")], ["WORLD_HOME", 980, Callable(self, "_home")], ["WORLD_MENU", 1150, Callable(self, "_menu")]]
 	for spec in specs:
 		var b := Button.new()

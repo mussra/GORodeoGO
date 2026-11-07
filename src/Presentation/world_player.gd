@@ -9,6 +9,7 @@ var max_speed: float = 260.0
 var acceleration: float = 900.0
 var friction: float = 700.0
 var gait: int = WorldGait.PASO
+var gait_cap: int = WorldGait.GALOPE  # stamina caps this; the world sets it
 var _sprite_swap: SpriteSwap
 
 func _ready() -> void:
@@ -30,7 +31,7 @@ func calm() -> float:
 
 func _physics_process(delta: float) -> void:
 	var wish := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	gait = WorldGait.update(gait, wish.length())
+	gait = mini(WorldGait.update(gait, wish.length()), gait_cap)
 	var gait_speed: float = WorldGait.speed_for(gait, max_speed)
 	if wish.length() > 0.1:
 		velocity = velocity.move_toward(wish.normalized() * gait_speed * clampf(wish.length(), 0.0, 1.0), acceleration * delta)

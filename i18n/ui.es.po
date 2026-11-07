@@ -1141,3 +1141,6 @@ msgstr "Cerdos"
 
 msgid "WORLD_ERASE"
 msgstr "Borrar"
+
+msgid "WORLD_HORSE_TIRED"
+msgstr "El caballo se toma un respiro"
