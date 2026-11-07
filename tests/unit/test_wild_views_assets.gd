@@ -15,6 +15,6 @@ func test_directional_masks_exist():
 const Art := preload("res://src/Presentation/wild_horse_art.gd")
 
 func test_wild_art_exposes_direction_anims():
-	var frames: SpriteFrames = Art._build_frames({})
+	var frames: SpriteFrames = Art._build_frames({"coat": 10, "pattern": 0, "mane": 0, "eyes": 0, "finish": "normal"})
 	for a in ["walk_down", "walk_up", "walk_diag_down", "walk_diag_up", "walk", "idle"]:
 		assert_true(frames.has_animation(a), "missing anim " + a)
