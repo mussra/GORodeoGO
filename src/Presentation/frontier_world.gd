@@ -690,41 +690,17 @@ func _build_hud() -> void:
 	_map_overlay.world = self
 	_map_overlay.visible = false
 	_hud.add_child(_map_overlay)
-	var touch := CanvasLayer.new()
-	touch.name = "TouchControls"
+	# Same TouchControls scene as the levels (Ant 18:17: "No una copia") — one
+	# shared system; the world only adjusts layer and the bounded aim zone.
+	var touch: CanvasLayer = load("res://src/Presentation/touch_controls.tscn").instantiate()
 	touch.layer = 0
 	add_child(touch)
-	var joy := VirtualJoystick.new()
-	joy.name = "MoveJoystick"
+	var joy: VirtualJoystick = touch.get_node("MoveJoystick")
 	joy.anchor_top = 0.32
-	joy.anchor_right = 0.5
-	joy.anchor_bottom = 1.0
-	joy.joystick_mode = 2
-	joy.visibility_mode = 1
-	joy.joystick_size = 220.0
-	joy.tip_size = 80.0
-	joy.action_left = &"move_left"
-	joy.action_right = &"move_right"
-	joy.action_up = &"move_up"
-	joy.action_down = &"move_down"
-	touch.add_child(joy)
-	var aim_joy := VirtualJoystick.new()
-	aim_joy.name = "AimJoystick"
+	var aim_joy: VirtualJoystick = touch.get_node("AimJoystick")
 	aim_joy.anchor_top = 0.32
-	aim_joy.anchor_left = 0.5
-	aim_joy.anchor_right = 1.0
-	aim_joy.anchor_bottom = 1.0
-	aim_joy.joystick_mode = 2
-	aim_joy.visibility_mode = 1
-	aim_joy.joystick_size = 220.0
-	aim_joy.tip_size = 80.0
-	aim_joy.action_left = &"aim_left"
-	aim_joy.action_right = &"aim_right"
-	aim_joy.action_up = &"aim_up"
-	aim_joy.action_down = &"aim_down"
 	aim_joy.pressed.connect(_on_aim_pressed)
 	aim_joy.released.connect(_on_aim_released)
-	touch.add_child(aim_joy)
 
 func _toggle_map() -> void:
 	_map_overlay.visible = not _map_overlay.visible

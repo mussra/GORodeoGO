@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://src/Presentation/level_0.gd" id="1"]
 [ext_resource type="Script" path="res://src/Presentation/player.gd" id="2"]
 [ext_resource type="Script" path="res://src/Presentation/bull.gd" id="3"]
 [ext_resource type="Script" path="res://src/Presentation/pen.gd" id="4"]
 [ext_resource type="Script" path="res://src/Presentation/hud.gd" id="5"]
+[ext_resource type="PackedScene" path="res://src/Presentation/touch_controls.tscn" id="10"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(24, 36)
@@ -338,30 +339,4 @@ offset_right = 472.0
 offset_bottom = 230.0
 text = "Menú principal"
 
-[node name="TouchControls" type="CanvasLayer" parent="."]
-layer = 1
-
-[node name="MoveJoystick" type="VirtualJoystick" parent="TouchControls"]
-anchor_right = 0.5
-anchor_bottom = 1.0
-joystick_mode = 2
-visibility_mode = 1
-joystick_size = 220.0
-tip_size = 80.0
-action_left = &"move_left"
-action_right = &"move_right"
-action_up = &"move_up"
-action_down = &"move_down"
-
-[node name="AimJoystick" type="VirtualJoystick" parent="TouchControls"]
-anchor_left = 0.5
-anchor_right = 1.0
-anchor_bottom = 1.0
-joystick_mode = 2
-visibility_mode = 1
-joystick_size = 220.0
-tip_size = 80.0
-action_left = &"aim_left"
-action_right = &"aim_right"
-action_up = &"aim_up"
-action_down = &"aim_down"
+[node name="TouchControls" parent="." instance=ExtResource("10")]
