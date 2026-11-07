@@ -278,6 +278,9 @@ func test_a_bull_released_on_purpose_cannot_stun_the_player_right_away() -> void
 
 var _intro_shown: bool
 func before_each() -> void:
+	# the phone applies Spanish from the menu; the bare level spawn skips that,
+	# so set it here or the guidance cues come out in English (OS locale)
+	TranslationServer.set_locale("es")
 	_intro_shown = SaveData.dual_lasso_intro_shown
 	SaveData.dual_lasso_intro_shown = true  # smoke wiring tests, not the one-shot intro
 
@@ -408,13 +411,12 @@ func test_pause_clears_native_joystick_actions() -> void:
 	level.resume_game()
 
 func test_escape_on_always_processing_hud_resumes_pause() -> void:
+	# Escape reaches the level through GameState.request_back() -> navigate_back()
+	# (safe Back navigation, 1486bd3); the HUD no longer handles ui_cancel itself.
 	var level: Node = await _spawn_level(1)
 	level.pause_game()
 	assert_eq(level.hud.process_mode, Node.PROCESS_MODE_ALWAYS)
-	var event := InputEventKey.new()
-	event.keycode = KEY_ESCAPE
-	event.pressed = true
-	level.hud._unhandled_key_input(event)
+	level.navigate_back()
 	assert_false(get_tree().paused)
 	assert_false(level.hud._pause_panel.visible)
 
