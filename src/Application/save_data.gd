@@ -30,6 +30,14 @@ var points_legacy_credit_applied: bool = false
 ## One-shot flag: the "¡Has conseguido el doble lazo!" intro plays the first time the
 ## upgrade applies (entering a level with dual capture unlocked), never again after.
 var dual_lasso_intro_shown: bool = false
+
+## Frontera: bounded open-world test (Ant, 7-nov-2026). Seed 0 = world not created yet.
+## Discovered chunks never change once seen; tamed herds never respawn.
+var world_seed: int = 0
+var world_discovered: Array[String] = []
+var world_tamed: Array[String] = []
+var world_position: Vector2 = Vector2(0, 160)
+var world_missions: Dictionary = {}  # mission id -> "offered" / "done"
 # Overridden only by isolated persistence tests; production retains its original path.
 var save_path: String = NORMAL_SAVE_PATH
 
@@ -63,6 +71,11 @@ func save_progress() -> bool:
 	config.set_value("appearance", "hat_color", hat_color)
 	if horse_collection.horses.is_empty():horse_collection.seed_trial()
 	config.set_value("horses_trial", "state", horse_collection.export_state())
+	config.set_value("world", "seed", world_seed)
+	config.set_value("world", "discovered", world_discovered)
+	config.set_value("world", "tamed", world_tamed)
+	config.set_value("world", "position", world_position)
+	config.set_value("world", "missions", world_missions)
 	config.set_value("equipment", "points", equipment_points)
 	config.set_value("equipment", "owned", equipment_owned)
 	config.set_value("equipment", "equipped", equipment_equipped)
@@ -90,6 +103,11 @@ func load_progress() -> void:
 	equipment_owned.clear()
 	equipment_equipped.clear()
 	points_legacy_credit_applied = false
+	world_seed = 0
+	world_discovered.clear()
+	world_tamed.clear()
+	world_position = Vector2(0, 160)
+	world_missions.clear()
 	var config := ConfigFile.new()
 	var source_path:String=load_source_path(save_path,LEGACY_2_SAVE_PATH) if save_path==SAVE_PATH else save_path
 	if save_path==NORMAL_SAVE_PATH and not FileAccess.file_exists(save_path):source_path=load_source_path(SAVE_PATH,LEGACY_2_SAVE_PATH)
@@ -122,6 +140,19 @@ func load_progress() -> void:
 		for slot in equipped:
 			if typeof(slot)==TYPE_STRING and typeof(equipped[slot])==TYPE_STRING:equipment_equipped[slot]=equipped[slot]
 	points_legacy_credit_applied=config.get_value("equipment","legacy_credit_applied",false)==true
+	var wseed:Variant=config.get_value("world","seed",0)
+	if typeof(wseed)==TYPE_INT and wseed>0:world_seed=wseed
+	for pair in [["discovered",world_discovered],["tamed",world_tamed]]:
+		var raw:Variant=config.get_value("world",pair[0],[])
+		if raw is Array or raw is PackedStringArray:
+			for item in raw:
+				if typeof(item)==TYPE_STRING and not pair[1].has(item):pair[1].append(item)
+	var wpos:Variant=config.get_value("world","position",world_position)
+	if typeof(wpos)==TYPE_VECTOR2 and wpos.is_finite():world_position=wpos
+	var wm:Variant=config.get_value("world","missions",{})
+	if typeof(wm)==TYPE_DICTIONARY:
+		for id in wm:
+			if typeof(id)==TYPE_STRING and wm[id] in ["offered","done"]:world_missions[id]=wm[id]
 
 ## One credit for the deducible first win of each completed level. Repeated wins
 ## before this update were not stored. A missing reward definition postpones migration.
@@ -330,3 +361,46 @@ func set_horse_emblem(id:String,config:Dictionary)->bool:
 	else:horse.traits["emblem"]=config.duplicate(true)
 	if save_progress():return true
 	horse_collection.restore(before);return false
+
+## --- Frontera (bounded open-world test) ---
+
+func ensure_world_seed() -> int:
+	if world_seed == 0:
+		world_seed = int(randi()) + 1
+		save_progress()
+	return world_seed
+
+func save_world_state(pos: Vector2) -> bool:
+	world_position = pos
+	return save_progress()
+
+func mark_world_discovered(key: String) -> void:
+	if not world_discovered.has(key):
+		world_discovered.append(key)
+
+func mark_world_tamed(key: String) -> void:
+	if not world_tamed.has(key):
+		world_tamed.append(key)
+
+func set_world_mission(id: String, state: String) -> bool:
+	if id.is_empty() or state not in ["offered", "done"]:
+		return false
+	world_missions[id] = state
+	return true
+
+## A tamed wild horse joins the stable as an adult and keeps its own Serenidad.
+## Rolls back on a failed save, like every other mutation here.
+func adopt_wild_horse(herd: Dictionary) -> Dictionary:
+	if not herd.get("traits") is Dictionary or not horse_collection.valid_traits(herd.traits):
+		return {}
+	var before: Dictionary = horse_collection.export_state()
+	var n: int = 1
+	while not horse_collection.find("wild_%d" % n).is_empty():
+		n += 1
+	var horse: Dictionary = {"id": "wild_%d" % n, "parents": [], "stage": "adult", "traits": herd.traits.duplicate(true), "stats": {"calm": clampf(HorseStats.number(herd.get("calm", 1.0), 1.0), 0.5, 2.0)}}
+	horse.name = horse_collection.suggest_name(horse.traits)
+	horse_collection.horses.append(horse)
+	if save_progress():
+		return horse
+	horse_collection.restore(before)
+	return {}

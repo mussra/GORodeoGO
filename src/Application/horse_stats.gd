@@ -1,7 +1,7 @@
 class_name HorseStats
 extends RefCounted
 ## Demo tuning, not final balance. No relation to color or rarity.
-const BASE={"speed":260.0,"handling":900.0,"power":0.6,"dodge":1.0}
+const BASE={"speed":260.0,"handling":900.0,"power":0.6,"dodge":1.0,"calm":1.0}
 static func read(h:Dictionary)->Dictionary:
  var raw:Variant=h.get("stats",BASE)
  var s:Dictionary=raw if raw is Dictionary else BASE
@@ -10,6 +10,8 @@ static func read(h:Dictionary)->Dictionary:
  out.handling=clampf(number(s.get("handling",900.0),900.0),600,1500)
  out.power=clampf(number(s.get("power",0.6),0.6),0.5,0.9)
  out.dodge=clampf(number(s.get("dodge",1.0),1.0),0.75,1.0)
+ # Serenidad (Ant, 7-nov-2026): how fast the horse calms bulls and wild horses.
+ out.calm=clampf(number(s.get("calm",1.0),1.0),0.5,2.0)
  return out
 static func inherit(a:Dictionary,b:Dictionary)->Dictionary:
  var x:=read(a);var y:=read(b);var out:Dictionary={}
