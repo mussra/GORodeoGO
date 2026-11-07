@@ -3,6 +3,8 @@ extends RefCounted
 const COLORS=["74cbb2","db9a5b","6da8de","d18dbe","f2d987"]
 const DEFAULT={"shape":0,"division":0,"left":0,"right":1,"color":0}
 static var cache:Dictionary={}
+## Rump wrap strength: fraction of the zone height the rear edge drops by.
+static var warp_amount:=0.12
 static func valid(v:Variant)->bool:
  if not v is Dictionary:return false
  for key in DEFAULT:
@@ -24,16 +26,32 @@ static func mask(config:Dictionary)->Texture2D:
  if config.division==2:inside='<path d="M20 64 L80 22"/>'+symbol(config.left,35,32,12)+symbol(config.right,64,59,12)
  var svg:String='<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">'+shape+inside+'</g></svg>'
  var image:=Image.new();image.load_svg_from_string(svg);var texture:=ImageTexture.create_from_image(image);cache[key]=texture;return texture
+## Wraps the emblem over the rump: columns fall away toward the rear (x=0) with a
+## smooth quadratic, so the mark follows the thigh volume instead of floating flat.
+static func warp_columns(ink:Image,amount:float)->Image:
+ var w:=ink.get_width();var h:=ink.get_height()
+ var out:=Image.create(w,h,false,Image.FORMAT_RGBA8);out.fill(Color.TRANSPARENT)
+ var max_dy:=amount*h
+ for x in w:
+  var t:=float(x)/maxf(w-1,1.0)
+  var dy:=int(round(max_dy*(1.0-t)*(1.0-t)))
+  for y in h:
+   if y+dy<h:out.set_pixel(x,y+dy,ink.get_pixel(x,y))
+ return out
 static func portrait_mask(config:Dictionary)->Texture2D:
  var key:="portrait"+JSON.stringify(config)
  if cache.has(key):return cache[key]
  var image:=Image.create(936,983,false,Image.FORMAT_RGBA8);image.fill(Color.TRANSPARENT)
- var ink:Image=mask(config).get_image();ink.resize(102,110,Image.INTERPOLATE_LANCZOS);image.blit_rect(ink,Rect2i(0,0,102,110),Vector2i(224,563))
  var area:Image=load("res://art/lineage_masks/portrait/adult.png").get_image()
  if area.is_compressed():area.decompress()
- for y in range(563,674):
-  for x in range(224,327):
-   var c:=image.get_pixel(x,y);c.a*=area.get_pixel(x,y).a;image.set_pixel(x,y,c)
+ var rect:Rect2i=area.get_used_rect()
+ if rect.size.x>=2 and rect.size.y>=2:
+  var ink:Image=mask(config).get_image();ink.resize(rect.size.x,rect.size.y,Image.INTERPOLATE_LANCZOS)
+  ink=warp_columns(ink,warp_amount)
+  image.blit_rect(ink,Rect2i(0,0,rect.size.x,rect.size.y),rect.position)
+  for y in range(rect.position.y,rect.end.y):
+   for x in range(rect.position.x,rect.end.x):
+    var c:=image.get_pixel(x,y);c.a*=area.get_pixel(x,y).a;image.set_pixel(x,y,c)
  var texture:=ImageTexture.create_from_image(image);cache[key]=texture;return texture
 ## Ink for a chosen color over a background luminance: the picked color leads, and
 ## only when it would disappear against the coat it moves just enough to read (0.34
@@ -51,6 +69,7 @@ static func stamp(image:Image,zone:Image,config:Dictionary)->void:
  # Zone images are transparent outside the independently editable region.
  if rect.size.x<2 or rect.size.y<2:return
  var ink:Image=mask(config).get_image();ink.resize(rect.size.x,rect.size.y,Image.INTERPOLATE_LANCZOS)
+ ink=warp_columns(ink,warp_amount)
  var luminance:float=0.;var count:int=0
  for y in range(rect.position.y,rect.end.y):
   for x in range(rect.position.x,rect.end.x):

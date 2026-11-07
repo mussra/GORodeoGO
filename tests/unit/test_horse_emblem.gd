@@ -76,3 +76,12 @@ func test_badge_notice_only_without_equipped_whip()->void:
  for n in get_tree().root.get_children():
   if n is PanelContainer:found=true;n.queue_free()
  assert_true(found,"jump badge keeps its explanation")
+
+func test_emblem_warp_follows_the_rump()->void:
+ var ink:=Image.create(4,10,false,Image.FORMAT_RGBA8);ink.fill(Color.TRANSPARENT)
+ for y in 10:
+  ink.set_pixel(0,y,Color.WHITE);ink.set_pixel(3,y,Color.WHITE)
+ var w:Image=HorseEmblem.warp_columns(ink,0.2)
+ assert_eq(w.get_pixel(0,0).a,0.0,"rear column drops")
+ assert_true(w.get_pixel(0,2).a>0.5,"rear content lands lower")
+ assert_true(w.get_pixel(3,0).a>0.5,"front column stays put")

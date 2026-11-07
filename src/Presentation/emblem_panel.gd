@@ -38,7 +38,10 @@ func build()->void:
  pick("color",tr("EMBLEM_COLOR"),["EMBLEM_TEAL","EMBLEM_COPPER","EMBLEM_BLUE","EMBLEM_LILAC","EMBLEM_GOLD"],Vector2(560,320))
  var swatch:=ColorRect.new();swatch.color=Color(HorseEmblem.COLORS[config.color]);swatch.position=Vector2(920,350);swatch.size=Vector2(55,45);content.add_child(swatch)
  var badge:=TextureRect.new();badge.texture=HorseEmblem.mask(config);badge.modulate=Color(HorseEmblem.COLORS[config.color]);badge.position=Vector2(1030,330);badge.size=Vector2(90,90);badge.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;content.add_child(badge)
- label(tr("EMBLEM_CONTRAST"),Vector2(560,445),20);label(tr("EMBLEM_COSMETIC"),Vector2(560,485),19)
+ var contrast:=label(tr("EMBLEM_CONTRAST"),Vector2(560,445),20)
+ contrast.clip_text=true;contrast.size=Vector2(660,64);contrast.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ var cosmetic:=label(tr("EMBLEM_COSMETIC"),Vector2(560,513),19)
+ cosmetic.clip_text=true;cosmetic.size=Vector2(660,28);cosmetic.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  button(tr("EMBLEM_SAVE"),Vector2(560,550),func():
   if SaveData.set_horse_emblem(horse_id,config):dirty=false;note=tr("EMBLEM_SAVED");saved.emit()
   else:note=tr("MARKET_FAILED")
