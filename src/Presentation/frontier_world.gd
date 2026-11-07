@@ -435,54 +435,165 @@ func _open_board() -> void:
 	_board_panel.add_child(close)
 
 class DiscoveryMap extends Control:
-	## Self-drawing discovery map: only chunks the rider has seen appear.
+	## Self-drawing discovery map (Ant 11:29): explored chunks show their caminos,
+	## ranch, trees/rocks, seen pig pens and missions; unseen stays hidden; player
+	## marker; drag to scroll, +/- to zoom. Content comes from the persisted
+	## discovered chunks, so it is saved with the game. Cartoon style.
 	var world: Node2D
+	var zoom: float = 1.0
+	var pan: Vector2 = Vector2.ZERO
+	var _dragging: bool = false
+	var _drag_from: Vector2 = Vector2.ZERO
+	var _pan_from: Vector2 = Vector2.ZERO
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		var minus := Button.new()
+		minus.text = "-"
+		minus.position = Vector2(24, size.y - 84)
+		minus.size = Vector2(56, 56)
+		minus.pressed.connect(func(): _set_zoom(zoom / 1.4))
+		add_child(minus)
+		var plus := Button.new()
+		plus.text = "+"
+		plus.position = Vector2(96, size.y - 84)
+		plus.size = Vector2(56, 56)
+		plus.pressed.connect(func(): _set_zoom(zoom * 1.4))
+		add_child(plus)
+
+	func _set_zoom(z: float) -> void:
+		zoom = clampf(z, 0.5, 3.0)
+		queue_redraw()
 
 	func _gui_input(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed:
-			hide()
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+			_dragging = event.pressed
+			_drag_from = event.position
+			_pan_from = pan
+		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			_set_zoom(zoom * 1.15)
+		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			_set_zoom(zoom / 1.15)
+		elif event is InputEventMouseMotion and _dragging:
+			pan = _pan_from + (event.position - _drag_from)
+			queue_redraw()
 
-	func _draw() -> void:
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0.03, 0.08, 0.1, 0.88), true)
-		var keys: Array = SaveData.world_discovered.duplicate()
-		if keys.is_empty():
-			return
+	func _cells() -> Dictionary:
+		var out: Dictionary = {"cells": [], "mins": Vector2i.ZERO, "maxs": Vector2i.ZERO}
 		var mins := Vector2i(1 << 30, 1 << 30)
 		var maxs := Vector2i(-(1 << 30), -(1 << 30))
-		var cells: Array[Vector2i] = []
-		for key in keys:
-			var p := str(key).split(",")
-			if p.size() != 2:
+		for key in SaveData.world_discovered:
+			var parts := str(key).split(",")
+			if parts.size() != 2:
 				continue
-			var c := Vector2i(int(p[0]), int(p[1]))
-			cells.append(c)
+			var c := Vector2i(int(parts[0]), int(parts[1]))
+			out.cells.append(c)
 			mins = Vector2i(mini(mins.x, c.x), mini(mins.y, c.y))
 			maxs = Vector2i(maxi(maxs.x, c.x), maxi(maxs.y, c.y))
 		mins = Vector2i(mini(mins.x, 0), mini(mins.y, 0))
+		maxs = Vector2i(maxi(maxs.x, 0), maxi(maxs.y, 0))
+		out.mins = mins
+		out.maxs = maxs
+		return out
+
+	func _chunk_rect(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2) -> Rect2:
+		return Rect2(origin + Vector2(c - mins) * cell, Vector2.ONE * cell)
+
+	func _to_map(pos: Vector2, mins: Vector2i, cell: float, origin: Vector2) -> Vector2:
+		return origin + (pos / WorldMap.CHUNK_SIZE - Vector2(mins)) * cell
+
+	func _draw() -> void:
+		# parchment backdrop: unseen world stays hidden under it
+		draw_rect(Rect2(Vector2.ZERO, size), Color("1d2a26"), true)
+		var data: Dictionary = _cells()
+		if (data.cells as Array).is_empty():
+			return
+		var mins: Vector2i = data.mins
+		var maxs: Vector2i = data.maxs
 		var cols: int = maxs.x - mins.x + 1
 		var rows: int = maxs.y - mins.y + 1
-		var cell: float = minf(56.0, minf((size.x - 240.0) / cols, (size.y - 200.0) / rows))
-		var origin: Vector2 = (size - Vector2(cols, rows) * cell) / 2.0
+		var cell: float = minf(72.0, minf((size.x - 160.0) / cols, (size.y - 160.0) / rows)) * zoom
+		var origin: Vector2 = (size - Vector2(cols, rows) * cell) / 2.0 + pan
 		var font: Font = get_theme_default_font()
-		for c in cells:
-			var r := Rect2(origin + Vector2(c - mins) * cell, Vector2.ONE * (cell - 2.0))
+		for c in data.cells:
+			var r: Rect2 = _chunk_rect(c, mins, cell, origin)
+			# cartoon ground tile with a soft rim
+			draw_rect(r.grow(1.0), Color("24513c"), true)
 			draw_rect(r, Color("3f7a45"), true)
-			draw_rect(r, Color("63a06b"), false, 2.0)
+			var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, c.x, c.y), SaveData.world_edits, c.x, c.y)
+			_draw_trails(c, mins, cell, origin, r)
+			_draw_decor(chunk, mins, cell, origin, r)
 			if WorldMap.is_ranch_chunk(c.x, c.y):
-				draw_rect(r.grow(-4), Color("8a5a33"), true)
-			var mission_id: String = WorldMap.herd_mission_id(c.x, c.y)
-			var state: String = SaveData.world_missions.get(mission_id, "")
-			if SaveData.world_tamed.has(mission_id) or state == "done":
-				draw_string(font, r.position + Vector2(cell * 0.3, cell * 0.68), "✓", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.7), Color("b3f6df"))
-			elif state == "encargo":
-				draw_string(font, r.position + Vector2(cell * 0.36, cell * 0.7), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.75), Color("f2d987"))
-			elif state == "offered":
-				draw_string(font, r.position + Vector2(cell * 0.3, cell * 0.7), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.7), Color("ffffff"))
-		var pc: Vector2i = WorldMap.chunk_at(world.player.position)
-		var inside: Vector2 = (world.player.position - Vector2(pc) * WorldMap.CHUNK_SIZE) / WorldMap.CHUNK_SIZE
-		var dot: Vector2 = origin + Vector2(pc - mins) * cell + inside * cell - Vector2(1, 1)
-		draw_circle(dot, cell * 0.18, Color("f8edce"))
-		draw_circle(dot, cell * 0.18, Color("201b1c"), false, 2.0)
+				_draw_ranch(r)
+			var pen: Dictionary = chunk.get("pigs", {})
+			if not pen.is_empty():
+				var pid: String = WorldEdits.edited_pen_id(pen.get("pos", Vector2.ZERO)) if pen.get("edited", false) else WorldMap.pig_id(c.x, c.y)
+				var pc: Vector2 = _to_map(pen.get("pos", Vector2.ZERO), mins, cell, origin)
+				var col: Color = Color("f2a7b8") if not SaveData.world_pigs.has(pid) else Color("f2a7b866")
+				draw_circle(pc, maxf(3.0, cell * 0.07), col)
+			_mission_mark(c, r, font, cell)
+		# player marker: warm dot with a dark ring
+		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
+		draw_circle(ppos, cell * 0.16, Color("201b1c"))
+		draw_circle(ppos, cell * 0.12, Color("f8edce"))
+		draw_circle(ppos, cell * 0.05, Color("d94f3d"))
+
+	func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
+		# clip every dot to its own discovered tile: unseen world stays hidden
+		var seed: int = SaveData.world_seed
+		var worigin: Vector2 = Vector2(c) * WorldMap.CHUNK_SIZE
+		var col := Color("a5825a")
+		var dot: float = maxf(2.0, cell * 0.055)
+		var clip: Rect2 = r.grow(dot * 0.5)
+		for i in range(0, 9):
+			var wx: float = worigin.x + i * WorldMap.CHUNK_SIZE / 8.0
+			var p1 := Vector2(wx, WorldMap.trail_y_at(seed, wx))
+			var m1: Vector2 = _to_map(p1, mins, cell, origin)
+			if clip.has_point(m1):
+				draw_circle(m1, dot, col)
+			var wy: float = worigin.y + i * WorldMap.CHUNK_SIZE / 8.0
+			var p2 := Vector2(WorldMap.branch_x_at(seed, wy), wy)
+			var m2: Vector2 = _to_map(p2, mins, cell, origin)
+			if clip.has_point(m2):
+				draw_circle(m2, dot, col)
+
+	func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
+		var dot: float = maxf(1.6, cell * 0.035)
+		for d in chunk.get("decor", []):
+			var p: Vector2 = _to_map(d["pos"], mins, cell, origin)
+			if not r.grow(4.0).has_point(p):
+				continue
+			match d.get("kind", ""):
+				"tree", "fruit_tree":
+					draw_circle(p, dot * 1.4, Color("2f5d33"))
+				"pine":
+					draw_colored_polygon(PackedVector2Array([p + Vector2(-dot * 1.4, dot), p + Vector2(0, -dot * 1.6), p + Vector2(dot * 1.4, dot)]), Color("2f5d33"))
+				"rock":
+					draw_circle(p, dot, Color("9fabb6"))
+				"bush":
+					draw_circle(p, dot, Color("63a06b"))
+				"cactus":
+					draw_rect(Rect2(p - Vector2(dot * 0.5, dot), Vector2(dot, dot * 2.0)), Color("3e7d46"))
+				"flower":
+					draw_circle(p, dot, Color("e86a8a"))
+
+	func _draw_ranch(r: Rect2) -> void:
+		# little house: brown body + red roof, cartoon icon for home
+		var center: Vector2 = r.position + Vector2(r.size.x * 0.16, r.size.y * 0.2)
+		var s: float = maxf(4.0, r.size.x * 0.09)
+		draw_rect(Rect2(center - Vector2(s, s * 0.4), Vector2(s * 2.0, s * 1.2)), Color("8a5a33"))
+		draw_colored_polygon(PackedVector2Array([center + Vector2(-s * 1.2, -s * 0.4), center + Vector2(0, -s * 1.3), center + Vector2(s * 1.2, -s * 0.4)]), Color("b4452f"))
+
+	func _mission_mark(c: Vector2i, r: Rect2, font: Font, cell: float) -> void:
+		var mission_id: String = WorldMap.herd_mission_id(c.x, c.y)
+		var state: String = SaveData.world_missions.get(mission_id, "")
+		var pos: Vector2 = r.position + Vector2(r.size.x - cell * 0.34, r.size.y - cell * 0.1)
+		if SaveData.world_tamed.has(mission_id) or state == "done":
+			draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("b3f6df"))
+			draw_string(font, pos - Vector2(cell * 0.22, cell * 0.14), "✓", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+		elif state == "encargo":
+			draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("f2d987"))
+			draw_string(font, pos - Vector2(cell * 0.17, cell * 0.14), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+		elif state == "offered":
+			draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("ffffff"))
+			draw_string(font, pos - Vector2(cell * 0.2, cell * 0.14), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
