@@ -1062,3 +1062,13 @@ msgstr "Unsaved changes. Leave and discard them?"
 
 msgid "EMBLEM_DISCARD_YES"
 msgstr "Discard changes"
+msgid "EMBLEM_LETTERS"
+msgstr "Initials"
+
+msgid "EMBLEM_LETTERS_HINT"
+msgstr "E.g.: ALV"
+msgid "EMBLEM_FONT_BLOCK"
+msgstr "Block"
+
+msgid "EMBLEM_FONT_ENGRAVED"
+msgstr "Engraved"

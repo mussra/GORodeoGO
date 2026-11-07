@@ -1062,3 +1062,13 @@ msgstr "Hay cambios sin guardar. ¿Salir y descartarlos?"
 
 msgid "EMBLEM_DISCARD_YES"
 msgstr "Descartar cambios"
+msgid "EMBLEM_LETTERS"
+msgstr "Iniciales"
+
+msgid "EMBLEM_LETTERS_HINT"
+msgstr "Ej.: ALV"
+msgid "EMBLEM_FONT_BLOCK"
+msgstr "Bloque"
+
+msgid "EMBLEM_FONT_ENGRAVED"
+msgstr "Grabada"

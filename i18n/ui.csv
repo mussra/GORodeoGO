@@ -344,6 +344,10 @@ EMBLEM_LILAC,Lila,Lilac
 EMBLEM_GOLD,Oro,Gold
 EMBLEM_CONTRAST,El color elegido se ve sobre el caballo; si pega poco con el pelaje, se ajusta para que contraste.,Your color shows on the horse; if it blends with the coat, it shifts to stay visible.
 EMBLEM_COSMETIC,"Personalizar no cambia rareza, precio ni ascendencia.","Customization does not change rarity, price or ancestry."
+EMBLEM_LETTERS,Iniciales,Initials
+EMBLEM_LETTERS_HINT,"Ej.: ALV","E.g.: ALV"
+EMBLEM_FONT_BLOCK,Bloque,Block
+EMBLEM_FONT_ENGRAVED,Grabada,Engraved
 EMBLEM_SAVE,Guardar escudo,Save shield
 EMBLEM_REMOVE,Quitar escudo,Remove shield
 EMBLEM_REMOVE_ASK,¿Quitar la marca de este caballo? No cambia su ascendencia.,Remove this horse's mark? Its ancestry stays the same.
