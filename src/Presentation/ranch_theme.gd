@@ -35,4 +35,15 @@ static func create() -> Theme:
 	theme.set_stylebox("panel", "PanelContainer", box(Color("112d3b"), Color("496f7c"), 18))
 	theme.set_stylebox("background", "ProgressBar", box(Color("102733"), Color.TRANSPARENT, 6))
 	theme.set_stylebox("fill", "ProgressBar", box(GOLD, Color.TRANSPARENT, 6))
+	# AcceptDialog / ConfirmationDialog (Ant 22:50: "Todos los mensajes" con el
+	# estilo de los menús — the default gray Godot dialogs clashed).
+	theme.set_stylebox("panel", "AcceptDialog", box(Color("112d3b"), Color("547e86"), 18))
+	# Embedded window title bar (the gray band Ant flagged in "Salir del juego").
+	theme.set_stylebox("embedded_border", "Window", box(Color("0e2a36"), Color("547e86"), 18))
+	theme.set_color("title_color", "Window", CREAM)
+	theme.set_font_size("title_font_size", "Window", 20)
 	return theme
+
+## Applies the menus' palette to a popup dialog (Salir, confirmaciones, avisos).
+static func style_dialog(dialog: AcceptDialog) -> void:
+	dialog.theme = create()

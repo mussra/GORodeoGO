@@ -55,6 +55,10 @@ var lasso: LassoController = null
 func _ready() -> void:
 	lasso = LassoController.new()
 	lasso.throw_guard = func() -> bool: return _stun_time_remaining <= 0.0 and is_physics_processing()
+	# Ant 22:55 ("el lazo no vuela en el modo frontera"): the flight rope and the
+	# landing flash use WORLD coordinates, so they must hang from the world (like
+	# the corral's level), not from the moving rider.
+	lasso.rope_parent = func() -> Node: return get_parent()
 	add_child(lasso)
 	dodge = DodgeController.new()
 	dodge.owner_body = self

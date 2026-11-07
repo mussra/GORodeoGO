@@ -44,11 +44,11 @@ func build()->void:
   else:note=tr("MARKET_FAILED")
   build.call_deferred(),300)
  button(tr("EMBLEM_REMOVE"),Vector2(900,550),func():
-  var dialog:=ConfirmationDialog.new();dialog.dialog_text=tr("EMBLEM_REMOVE_ASK");add_child(dialog);dialog.confirmed.connect(func():
+  var dialog:=ConfirmationDialog.new();dialog.dialog_text=tr("EMBLEM_REMOVE_ASK");add_child(dialog);RanchTheme.style_dialog(dialog);dialog.confirmed.connect(func():
    if SaveData.set_horse_emblem(horse_id,{}):dirty=false;saved.emit();queue_free()
    else:note=tr("MARKET_FAILED");build.call_deferred()
    dialog.queue_free());dialog.canceled.connect(dialog.queue_free);dialog.popup_centered(),300)
  label(note if not note.is_empty() else tr("EMBLEM_DRAFT"),Vector2(560,625),20)
 func request_close()->void:
  if not dirty:queue_free();return
- var dialog:=ConfirmationDialog.new();dialog.dialog_text=tr("EMBLEM_DISCARD");dialog.get_ok_button().text=tr("EMBLEM_DISCARD_YES");add_child(dialog);dialog.confirmed.connect(queue_free);dialog.canceled.connect(dialog.queue_free);dialog.popup_centered()
+ var dialog:=ConfirmationDialog.new();dialog.dialog_text=tr("EMBLEM_DISCARD");dialog.get_ok_button().text=tr("EMBLEM_DISCARD_YES");add_child(dialog);RanchTheme.style_dialog(dialog);dialog.confirmed.connect(queue_free);dialog.canceled.connect(dialog.queue_free);dialog.popup_centered()

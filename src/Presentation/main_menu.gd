@@ -231,22 +231,17 @@ func _layout() -> void:
 	level_grid.size = _drawer.size-Vector2(48,144)
 
 func _animate_intro() -> void:
+	# Ant 22:50 ("que aparezca todo homogéneo"): ONE shared entrance for the whole
+	# menu — every element fades in together over the same .6s, same easing, no
+	# staggered delays; the hero block keeps a single gentle group slide.
+	modulate.a = 0.0
+	_hero.modulate.a = 0.0
 	_intro = create_tween().set_parallel(true)
+	_intro.tween_property(self,"modulate:a",1.0,.6)
 	_intro.tween_property(_hero,"modulate:a",1.0,.6)
 	var target: Vector2 = _hero.position
 	_hero.position.x -= 90
-	_intro.tween_property(_hero,"position",target,.85).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	for index in range(2):
-		var animal: Node2D = _hero.get_node("Rider" if index == 0 else "Bull")
-		animal.modulate.a = 0.0
-		_intro.tween_property(animal, "modulate:a", 1.0, .55).set_delay(.2 + index * .18)
-	for index in range(2):
-		var button: Button = _play if index == 0 else _missions
-		var final: Vector2 = button.position
-		button.position.x -= 200
-		button.modulate.a = 0
-		_intro.tween_property(button,"position",final,.65).set_delay(.25+index*.13).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		_intro.tween_property(button,"modulate:a",1.0,.5).set_delay(.25+index*.13)
+	_intro.tween_property(_hero,"position",target,.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _process(delta: float) -> void:
 	_elapsed += delta

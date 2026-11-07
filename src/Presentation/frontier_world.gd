@@ -460,7 +460,7 @@ func _open_edit_palette() -> void:
 		_edit_panel.add_child(b)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if _map_overlay.visible and event.is_action_pressed("ui_cancel"):
+	if _map_overlay.expanded and event.is_action_pressed("ui_cancel"):
 		_toggle_map()
 		get_viewport().set_input_as_handled()
 		return
@@ -575,7 +575,9 @@ func _build_hud() -> void:
 	# move stick), handled by the shared DodgeController on the player.
 	_map_overlay = DiscoveryMap.new()
 	_map_overlay.world = self
-	_map_overlay.visible = false
+	# Ant 22:49 ("el mapa pequeño no puedo recuperarlo tras cerrarlo"): like the
+	# arena minimap, the small map is ALWAYS there; closing only collapses it.
+	_map_overlay.visible = true
 	_hud.add_child(_map_overlay)
 	# Same TouchControls scene as the levels (Ant 18:17: "No una copia") — one
 	# shared system; the world only adjusts layer and the bounded aim zone.
@@ -613,9 +615,10 @@ func _build_hud() -> void:
 	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _toggle_map() -> void:
-	_map_overlay.visible = not _map_overlay.visible
-	if _map_overlay.visible:
-		_map_overlay.queue_redraw()
+	# Toggles collapsed <-> expanded; the small map never disappears (Ant 22:49).
+	_map_overlay.visible = true
+	_map_overlay.expanded = not _map_overlay.expanded
+	_map_overlay.queue_redraw()
 
 func _open_board() -> void:
 	if is_instance_valid(_board_panel):
@@ -688,6 +691,8 @@ class DiscoveryMap extends Control:
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		# Ant 22:54 ("el mapa se sale con el zoom"): never paint outside the box.
+		clip_contents = true
 		# clear close affordances (Ant 7-nov-2026: "no lo puedo cerrar"):
 		# X button, tap without drag, or Android back (ui_cancel in the world)
 		var close := Button.new()
@@ -780,7 +785,13 @@ class DiscoveryMap extends Control:
 		var cols: int = maxs.x - mins.x + 1
 		var rows: int = maxs.y - mins.y + 1
 		var cell: float = minf(72.0, minf((area.size.x - 16.0) / cols, (area.size.y - 16.0) / rows)) * (zoom if expanded else 1.0)
-		var origin: Vector2 = area.position + (area.size - Vector2(cols, rows) * cell) / 2.0 + (pan if expanded else Vector2.ZERO)
+		# Ant 22:54: clamp the pan so the zoomed map always keeps content in view.
+		var content: Vector2 = Vector2(cols, rows) * cell
+		var limit: Vector2 = ((content - area.size) / 2.0) + Vector2(48, 48)
+		limit.x = maxf(limit.x, 0.0)
+		limit.y = maxf(limit.y, 0.0)
+		pan = pan.clamp(-limit, limit)
+		var origin: Vector2 = area.position + (area.size - content) / 2.0 + (pan if expanded else Vector2.ZERO)
 		var font: Font = get_theme_default_font()
 		for c in data.cells:
 			var r: Rect2 = _chunk_rect(c, mins, cell, origin)
