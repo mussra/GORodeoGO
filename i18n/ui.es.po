@@ -1103,3 +1103,8 @@ msgstr "Encargo activo: manada salvaje %s (%d m)"
 
 msgid "WORLD_CLOSE"
 msgstr "Cerrar"
+msgid "WORLD_PIGS"
+msgstr "Cerdos: %d"
+
+msgid "WORLD_PIG_CAPTURED"
+msgstr "¡Cerdo capturado! Llevas %d"

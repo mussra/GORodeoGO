@@ -9,7 +9,7 @@ func run()->void:
  var SD:Node=root.get_node("SaveData")
  SD.save_path="user://frontier-review-save.dat"
  TranslationServer.set_locale("es")
- SD.world_seed=0;SD.world_discovered.clear();SD.world_tamed.clear();SD.world_missions.clear()
+ SD.world_seed=0;SD.world_discovered.clear();SD.world_tamed.clear();SD.world_missions.clear();SD.world_pigs.clear()
  var c=SD.horse_collection
  c.seed_trial()
  DirAccess.make_dir_recursive_absolute("/tmp/frontier")
@@ -46,6 +46,22 @@ func run()->void:
  await create_timer(.25).timeout
  await _snap("/downloads/frontier-board.png")
  if is_instance_valid(world._board_panel):world._board_panel.queue_free()
+ # pigs + trail: find the closest pig pen and approach it calmly
+ var pig_pos:=Vector2.ZERO
+ var found_pigs:=false
+ for radius in range(1,5):
+  for cx in range(-radius,radius+1):
+   for cy in range(-radius,radius+1):
+    var chunk:Dictionary=WorldMap.generate(SD.world_seed,cx,cy)
+    if not chunk.get("pigs",{}).is_empty():
+     pig_pos=chunk.pigs.pos;found_pigs=true;break
+   if found_pigs:break
+  if found_pigs:break
+ if found_pigs:
+  world.player.position=pig_pos+Vector2(90,30)
+  await create_timer(1.2).timeout
+  await _snap("/downloads/frontier-pigs.png")
+ print("pigs found: ",found_pigs)
  # gait frames: paso, trote, galope
  var strengths:Array=[0.2,0.6,1.0]
  var names:Array=["paso","trote","galope"]

@@ -7,6 +7,8 @@ const PlayerScript := preload("res://src/Presentation/world_player.gd")
 const WildHorseScript := preload("res://src/Presentation/wild_horse.gd")
 const DecorScript := preload("res://src/Presentation/world_decor.gd")
 const RanchScript := preload("res://src/Presentation/world_ranch.gd")
+const PigScript := preload("res://src/Presentation/wild_pig.gd")
+const TrailScript := preload("res://src/Presentation/frontier_trail.gd")
 
 const BOARD_POS := Vector2(145, -20)
 const HOME_POS := Vector2(0, 160)
@@ -25,6 +27,12 @@ var _board_button: Button
 var _board_panel: Control
 var _save_timer: float = 0.0
 var _last_gait: int = -1
+var _pigs_label: Label
+var _hoof_player: AudioStreamPlayer
+var _step_timer: float = 0.0
+var _step_alt: bool = false
+var _clop_a: AudioStream = load("res://art/audio/hoof_a.wav")
+var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
 	SaveData.ensure_world_seed()
@@ -43,11 +51,17 @@ func _ready() -> void:
 	var ranch := RanchScript.new()
 	add_child(ranch)
 	_build_hud()
+	_hoof_player = AudioStreamPlayer.new()
+	_hoof_player.volume_db = -12.0
+	_hoof_player.bus = &"SFX" if AudioServer.get_bus_index("SFX") >= 0 else &"Master"
+	player.add_child(_hoof_player)
 	_update_chunks()
 
 func _process(delta: float) -> void:
 	_update_chunks()
 	_tick_taming(delta)
+	_tick_pigs(delta)
+	_tick_hoofbeats(delta)
 	if player.gait != _last_gait:
 		_last_gait = player.gait
 		_gait_label.text = tr(WorldGait.gait_names()[_last_gait])
@@ -111,6 +125,30 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 		bar.show_percentage = false
 		bar.visible = false
 		horse.add_child(bar)
+	var trail := TrailScript.new()
+	trail.c = Vector2i(cx, cy)
+	node.add_child(trail)
+	var pigs: Dictionary = chunk.get("pigs", {})
+	var pig_id: String = WorldMap.pig_id(cx, cy)
+	if not pigs.is_empty() and not SaveData.world_pigs.has(pig_id):
+		var pen := Node2D.new()
+		pen.name = "pigs"
+		var base: Vector2 = pigs["pos"]
+		for i in int(pigs.get("count", 2)):
+			var pig := PigScript.new()
+			pig.name = "pig%d" % i
+			pig.setup({"pos": base + Vector2(cos(i * TAU / maxf(1.0, float(pigs.get("count", 2)))), sin(i * TAU / maxf(1.0, float(pigs.get("count", 2))))) * 44.0})
+			pen.add_child(pig)
+			var pbar := ProgressBar.new()
+			pbar.name = "bar"
+			pbar.min_value = 0.0
+			pbar.max_value = 1.0
+			pbar.size = Vector2(48, 7)
+			pbar.position = Vector2(-24, -44)
+			pbar.show_percentage = false
+			pbar.visible = false
+			pig.add_child(pbar)
+		node.add_child(pen)
 	add_child(node)
 	_chunks[key] = node
 	if not SaveData.world_discovered.has(key):
@@ -158,6 +196,58 @@ func _on_tamed(c: Vector2i, horse: Node2D) -> void:
 	_refresh_missions()
 	_toast(tr("WORLD_TAMED") + (" " + tr("WORLD_ENCARGO_DONE") if was_encargo else ""))
 
+func _tick_pigs(delta: float) -> void:
+	for key in _chunks:
+		var node: Node2D = _chunks[key]
+		var pen: Node2D = node.get_node_or_null("pigs")
+		if pen == null:
+			continue
+		var all_captured: bool = true
+		for pig in pen.get_children():
+			if pig.name == "bar":
+				continue
+			var dist: float = player.position.distance_to(pig.position)
+			if dist > 700.0:
+				all_captured = false
+				continue
+			var st: Dictionary = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
+			pig.state = st
+			var bar: ProgressBar = pig.get_node("bar")
+			bar.value = st.get("progress", 0.0)
+			bar.visible = bar.value > 0.01
+			if WorldPigs.captured(st):
+				pig.queue_free()
+			else:
+				all_captured = false
+				if st.get("flee", false):
+					pig.flee_from(player.position, delta)
+				elif dist < WorldPigs.CAPTURE_RANGE * 1.5:
+					pig.face_towards(player.position)
+		if all_captured and pen.get_child_count() == 0:
+			_on_pigs_captured(Vector2i(node.get_meta("c")), pen)
+
+func _on_pigs_captured(c: Vector2i, pen: Node2D) -> void:
+	SaveData.world_pigs.append(WorldMap.pig_id(c.x, c.y))
+	pen.queue_free()
+	SaveData.save_world_state(player.position)
+	_pigs_label.text = tr("WORLD_PIGS") % SaveData.world_pigs.size()
+	_toast(tr("WORLD_PIG_CAPTURED") % SaveData.world_pigs.size())
+
+func _tick_hoofbeats(delta: float) -> void:
+	var speed: float = player.velocity.length()
+	if speed < 12.0:
+		_step_timer = 0.10
+		return
+	_step_timer -= delta
+	if _step_timer > 0.0:
+		return
+	var intervals: Array[float] = [0.50, 0.33, 0.23]
+	_step_timer = intervals[clampi(player.gait, 0, 2)] * clampf(WorldGait.speed_for(player.gait, player.max_speed) / maxf(speed, 1.0), 0.8, 1.6)
+	_step_alt = not _step_alt
+	_hoof_player.stream = _clop_a if _step_alt else _clop_b
+	_hoof_player.pitch_scale = randf_range(0.92, 1.08) * (0.94 if player.gait == WorldGait.GALOPE else 1.0)
+	_hoof_player.play()
+
 func _refresh_missions() -> void:
 	var counts: Dictionary = WorldMissions.counts()
 	_missions_label.text = tr("WORLD_MISSIONS") % [counts.get("offered", 0) + counts.get("encargo", 0), counts.get("done", 0)]
@@ -192,6 +282,11 @@ func _build_hud() -> void:
 	_missions_label.add_theme_font_size_override("font_size", 18)
 	_hud.add_child(_missions_label)
 	_refresh_missions()
+	_pigs_label = Label.new()
+	_pigs_label.position = Vector2(430, 12)
+	_pigs_label.add_theme_font_size_override("font_size", 18)
+	_pigs_label.text = tr("WORLD_PIGS") % SaveData.world_pigs.size()
+	_hud.add_child(_pigs_label)
 	var specs: Array = [["WORLD_MAP", 880, Callable(self, "_toggle_map")], ["WORLD_HOME", 990, Callable(self, "_home")], ["WORLD_MENU", 1150, Callable(self, "_menu")]]
 	for spec in specs:
 		var b := Button.new()

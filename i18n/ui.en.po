@@ -1103,3 +1103,8 @@ msgstr "Active job: wild herd %s (%d m)"
 
 msgid "WORLD_CLOSE"
 msgstr "Close"
+msgid "WORLD_PIGS"
+msgstr "Pigs: %d"
+
+msgid "WORLD_PIG_CAPTURED"
+msgstr "Pig captured! You have %d"
