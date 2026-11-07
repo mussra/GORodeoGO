@@ -294,7 +294,15 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 	_jump_cooldown=maxf(0,_jump_cooldown-delta)
 	if _jump_time>0:
-		_process_jump(delta);return
+		_process_jump(delta)
+		# Keep the skid trail whole across the arc and skip the route stretch it covers,
+		# so the ride resumes ahead of the landing instead of backtracking.
+		while not _dodge_path.is_empty() and (_dodge_path[0]-global_position).dot(_jump_direction)<8.0:
+			_dodge_path.pop_front()
+		if not _skid_trail.is_empty():
+			_skid_trail.append(global_position)
+			queue_redraw()
+		return
 	if can_jump and velocity.length()>60 and _try_fence_ahead():return
 	_dodge_cooldown = maxf(0.0, _dodge_cooldown - delta)
 	if _stun_time_remaining > 0.0:
@@ -641,7 +649,10 @@ func request_jump(direction:Vector2)->bool:
 		query.transform=Transform2D(0,global_position.lerp(landing,float(i)/8))
 		if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return false
 	_jump_direction=direction.normalized();_jump_from=global_position;_jump_time=HorseJump.DURATION;_jump_mask=collision_mask;collision_mask&=~32;_jump_cooldown=1.2*jump_recovery_multiplier
+	# A fence jump mid-dodge must not abandon the traced route: keep it across the arc.
+	var saved_path:=_dodge_path.duplicate()
 	cancel_input();_jump_time=HorseJump.DURATION
+	_dodge_path=saved_path
 	if _sprite_swap.has_sprite():_jump_sprite_base=_sprite_swap._sprite.position
 	jump_started.emit();return true
 func _overhead_bar_anchor()->Vector2:
