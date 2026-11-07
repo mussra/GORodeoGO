@@ -1,4 +1,4 @@
-extends Node2D
+extends CharacterBody2D
 ## A wild horse in the frontier: real riderless sprites (art/world/wild_base),
 ## deterministic traits from WorldMap, taming driven by WorldTaming. Herd horses
 ## graze in place; showcase horses (test zone, Ant 7-nov-2026) set wander=true
@@ -25,52 +25,67 @@ func setup(p_herd: Dictionary) -> void:
 
 func _ready() -> void:
 	position = home
+	var feet := CollisionShape2D.new()
+	var fr := RectangleShape2D.new()
+	fr.size = Vector2(24, 12)
+	feet.shape = fr
+	feet.position = Vector2(0, -2)
+	add_child(feet)
 	_art = Art.new()
 	_art.traits = herd.get("traits", {})
 	add_child(_art)
 	if wander:
 		_pick_wander_target()
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	_bob += delta
-	if wander:
-		_wander(delta)
+	if _flee.length() > 0.0:
+		var target: Vector2 = position + _flee * delta
+		if home.distance_to(target) < WorldTaming.FLEE_LEASH:
+			velocity = _flee
+		else:
+			velocity = Vector2.ZERO
+		_flee = Vector2.ZERO
+	elif wander:
+		velocity = _wander_vel(delta)
 	else:
+		velocity = Vector2.ZERO
 		_graze_timer -= delta
 		if _graze_timer <= 0.0:
 			_graze_timer = randf_range(2.0, 5.0)
 			_art.grazing = not _art.grazing
+	move_and_slide()
 	_art.position.y = sin(_bob * 1.6) * 1.5
 
-func _wander(delta: float) -> void:
+func _wander_vel(delta: float) -> Vector2:
 	if _wander_pause > 0.0:
 		_wander_pause -= delta
 		_art.grazing = true
 		if _wander_pause <= 0.0:
 			_pick_wander_target()
-		return
+		return Vector2.ZERO
 	_art.grazing = false
 	var to: Vector2 = _wander_target - position
 	if to.length() < 6.0:
 		_wander_pause = randf_range(1.6, 3.6)
-		return
-	var step: Vector2 = to.normalized() * wander_speed * delta
-	position += step
+		return Vector2.ZERO
+	var step: Vector2 = to.normalized() * wander_speed
 	_art.flip_h = step.x < 0.0
 	_art.set_walk_direction(step)
+	return step
 
 func _pick_wander_target() -> void:
 	var a: float = randf() * TAU
 	var r: float = randf_range(wander_radius * 0.35, wander_radius)
 	_wander_target = home + Vector2(cos(a), sin(a)) * r
 
-func flee_from(from: Vector2, delta: float) -> void:
+var _flee: Vector2 = Vector2.ZERO
+
+func flee_from(from: Vector2, _delta: float) -> void:
 	var away: Vector2 = position - from
 	if away.length() < 1.0:
 		away = Vector2.RIGHT
-	var target: Vector2 = position + away.normalized() * 230.0 * delta
-	if home.distance_to(target) < WorldTaming.FLEE_LEASH:
-		position = target
+	_flee = away.normalized() * 230.0
 	_art.flip_h = away.x < 0.0
 	_art.grazing = false
 

@@ -4,12 +4,36 @@ extends Node2D
 
 var kind: String = "tree"
 var size_scale: float = 1.0
+var draw_offset: Vector2 = Vector2.ZERO
+
+static func base_offset(p_kind: String, sc: float) -> float:
+	match p_kind:
+		"tree", "pine", "fruit_tree", "cactus":
+			return 20.0 * sc
+		"rock":
+			return 10.0 * sc
+		"bush", "flower":
+			return 8.0 * sc
+	return 0.0
+
+static func solid_box(p_kind: String, pos: Vector2, sc: float) -> Rect2:
+	match p_kind:
+		"tree", "fruit_tree":
+			return Rect2(pos + Vector2(-5, 4) * sc, Vector2(10, 16) * sc)
+		"pine":
+			return Rect2(pos + Vector2(-4, 2) * sc, Vector2(8, 18) * sc)
+		"cactus":
+			return Rect2(pos + Vector2(-5, 8) * sc, Vector2(10, 12) * sc)
+		"rock":
+			return Rect2(pos + Vector2(-14, 0) * sc, Vector2(28, 10) * sc)
+	return Rect2()
 
 func _ready() -> void:
 	scale = Vector2.ONE * size_scale
 	queue_redraw()
 
 func _draw() -> void:
+	draw_set_transform(draw_offset)
 	match kind:
 		"tree":
 			draw_rect(Rect2(-5, -6, 10, 26), Color("6d4a2f"))

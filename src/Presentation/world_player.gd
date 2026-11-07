@@ -13,6 +13,12 @@ var gait_cap: int = WorldGait.GALOPE  # stamina caps this; the world sets it
 var _sprite_swap: SpriteSwap
 
 func _ready() -> void:
+	var feet := CollisionShape2D.new()
+	var fr := RectangleShape2D.new()
+	fr.size = Vector2(18, 10)
+	feet.shape = fr
+	feet.position = Vector2(0, -2)
+	add_child(feet)
 	var placeholder := Polygon2D.new()
 	placeholder.polygon = PackedVector2Array([Vector2(-20, -14), Vector2(20, -14), Vector2(20, 14), Vector2(-20, 14)])
 	placeholder.color = Color("c8b994")

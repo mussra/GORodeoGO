@@ -24,10 +24,7 @@ func run()->void:
  await create_timer(2.4).timeout
  await _snap("/downloads/testzone-horses.png")
  # directional walks: force targets north and diagonal (Ant's reference views)
- var zone:Node2D=world.get_node("test_zone")
- var horses:Array=[]
- for c in zone.get_children():
-  if c.get("wander")!=null:horses.append(c)
+ var horses:Array=get_nodes_in_group("test_zone")
  if horses.size()>=2:
   horses[0]._wander_pause=0.0
   horses[0]._wander_target=horses[0].position+Vector2(0,-70)

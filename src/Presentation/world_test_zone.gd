@@ -29,45 +29,99 @@ const TRAILS := [
 ]
 const PIGS: Array[Vector2] = [Vector2(155, -5), Vector2(215, 30)]
 
+const DrawNode := preload("res://src/Presentation/world_draw_node.gd")
+const Physics := preload("res://src/Presentation/world_physics.gd")
+const RAIL := Color("7a5230")
+
 func _ready() -> void:
 	position = ZONE_POS
+	z_index = -8  # trails stay at ground level under the y-sorted entities
+	var world: Node2D = get_parent()
 	for h in HORSES:
 		var horse := WildHorseScript.new()
-		horse.setup({"pos": h["home"], "traits": h["traits"]})
+		horse.setup({"pos": h["home"] + ZONE_POS, "traits": h["traits"]})
 		horse.wander = true
 		horse.wander_radius = 60.0
-		add_child(horse)
+		horse.add_to_group("test_zone")
+		world.add_child(horse)
 	for t in TREES:
-		var tree := DecorScript.new()
-		tree.kind = "tree"
-		tree.size_scale = 1.0
-		tree.position = t
-		add_child(tree)
+		_add_decor(world, "tree", t)
 	for c in CACTI:
-		var cactus := DecorScript.new()
-		cactus.kind = "cactus"
-		cactus.size_scale = 1.0
-		cactus.position = c
-		add_child(cactus)
+		_add_decor(world, "cactus", c)
 	for p in PIGS:
 		var pig := PigScript.new()
-		pig.setup({"pos": p})
-		add_child(pig)
+		pig.setup({"pos": p + ZONE_POS})
+		world.add_child(pig)
+		Physics.add_box(world, Rect2(p + ZONE_POS + Vector2(-12, -6), Vector2(24, 12)))
+	for h in HOUSES:
+		_add_house(world, h)
+	# meadow fence with a gate on the east side; pig pen with a gate on the west
+	_rail_nodes_h(world, MEADOW.position.y, MEADOW.position.x, MEADOW.end.x)
+	_rail_nodes_h(world, MEADOW.end.y, MEADOW.position.x, MEADOW.end.x)
+	_rail_nodes_v(world, MEADOW.position.x, MEADOW.position.y, MEADOW.end.y)
+	_rail_nodes_v(world, MEADOW.end.x, MEADOW.position.y, MEADOW.end.y, Vector2(-20, 30))
+	_rail_nodes_h(world, PEN.position.y, PEN.position.x, PEN.end.x)
+	_rail_nodes_h(world, PEN.end.y, PEN.position.x, PEN.end.x)
+	_rail_nodes_v(world, PEN.position.x, PEN.position.y, PEN.end.y, Vector2(-10, 30))
+	_rail_nodes_v(world, PEN.end.x, PEN.position.y, PEN.end.y)
+
+func _add_decor(world: Node2D, kind: String, pos: Vector2) -> void:
+	var decor := DecorScript.new()
+	decor.kind = kind
+	decor.size_scale = 1.0
+	var boff: float = DecorScript.base_offset(kind, 1.0)
+	decor.draw_offset = Vector2(0, -boff)
+	decor.position = ZONE_POS + pos + Vector2(0, boff)
+	world.add_child(decor)
+	var box: Rect2 = DecorScript.solid_box(kind, ZONE_POS + pos, 1.0)
+	if box.has_area():
+		Physics.add_box(world, box)
+
+func _add_house(world: Node2D, h: Dictionary) -> void:
+	var base: Vector2 = ZONE_POS + h["pos"]
+	var node := DrawNode.new()
+	node.position = base + Vector2(60, 70)
+	node.draw_origin = Vector2(-60, -70)
+	node.draw_fn = func(n):
+		n.draw_rect(Rect2(Vector2.ZERO, Vector2(120, 70)), h["body"])
+		n.draw_colored_polygon(PackedVector2Array([Vector2(-10, 0), Vector2(60, -40), Vector2(130, 0)]), h["roof"])
+		n.draw_rect(Rect2(Vector2(47, 28), Vector2(26, 42)), Color("4c3b2a"))
+		n.draw_rect(Rect2(Vector2(14, 14), Vector2(22, 18)), Color("f2e3b3"))
+		n.draw_rect(Rect2(Vector2(86, 14), Vector2(22, 18)), Color("f2e3b3"))
+	world.add_child(node)
+	# walls: back, sides, front split at the door gap (x 47..73); interior open
+	Physics.add_box(world, Rect2(base + Vector2(0, 0), Vector2(120, 8)))
+	Physics.add_box(world, Rect2(base + Vector2(0, 8), Vector2(8, 54)))
+	Physics.add_box(world, Rect2(base + Vector2(112, 8), Vector2(8, 54)))
+	Physics.add_box(world, Rect2(base + Vector2(0, 60), Vector2(47, 10)))
+	Physics.add_box(world, Rect2(base + Vector2(73, 60), Vector2(47, 10)))
+
+func _rail_seg(world: Node2D, pos: Vector2, horizontal: bool) -> void:
+	var size := Vector2(28, 8) if horizontal else Vector2(8, 28)
+	var node := DrawNode.new()
+	node.position = ZONE_POS + pos + Vector2(0, 4)
+	node.draw_origin = Vector2(0, -4)
+	node.draw_fn = func(n): n.draw_rect(Rect2(-size / 2, size), RAIL)
+	world.add_child(node)
+	Physics.add_box(world, Rect2(ZONE_POS + pos - size / 2, size))
+
+func _rail_nodes_h(world: Node2D, y: float, x0: float, x1: float, gap := Vector2(-1, -1)) -> void:
+	var x := x0
+	while x < x1:
+		if gap.x < 0.0 or x + 14.0 < gap.x or x - 14.0 > gap.y:
+			_rail_seg(world, Vector2(x, y), true)
+		x += 30.0
+
+func _rail_nodes_v(world: Node2D, x: float, y0: float, y1: float, gap := Vector2(-1, -1)) -> void:
+	var y := y0
+	while y < y1:
+		if gap.x < 0.0 or y + 4.0 < gap.x or y - 4.0 > gap.y:
+			_rail_seg(world, Vector2(x, y), false)
+		y += 30.0
 
 func _draw() -> void:
 	for t in TRAILS:
 		_draw_trail(t["from"], t["to"])
-	for h in HOUSES:
-		_draw_house(h)
-	# meadow fence with a gate on the east side; pig pen with a gate on the west
-	_rail_h(MEADOW.position.y, MEADOW.position.x, MEADOW.end.x)
-	_rail_h(MEADOW.end.y, MEADOW.position.x, MEADOW.end.x)
-	_rail_v(MEADOW.position.x, MEADOW.position.y, MEADOW.end.y)
-	_rail_v(MEADOW.end.x, MEADOW.position.y, MEADOW.end.y, Vector2(-20, 30))
-	_rail_h(PEN.position.y, PEN.position.x, PEN.end.x)
-	_rail_h(PEN.end.y, PEN.position.x, PEN.end.x)
-	_rail_v(PEN.position.x, PEN.position.y, PEN.end.y, Vector2(-10, 30))
-	_rail_v(PEN.end.x, PEN.position.y, PEN.end.y)
 
 func _draw_trail(a: Vector2, b: Vector2) -> void:
 	var dist: float = a.distance_to(b)
@@ -88,16 +142,3 @@ func _draw_house(h: Dictionary) -> void:
 	draw_rect(Rect2(p + Vector2(14, 14), Vector2(22, 18)), Color("f2e3b3"))
 	draw_rect(Rect2(p + Vector2(86, 14), Vector2(22, 18)), Color("f2e3b3"))
 
-func _rail_h(y: float, x0: float, x1: float, gap := Vector2(-1, -1)) -> void:
-	var x := x0
-	while x < x1:
-		if gap.x < 0.0 or x + 14.0 < gap.x or x - 14.0 > gap.y:
-			draw_rect(Rect2(x - 14, y - 4, 28, 8), Color("7a5230"))
-		x += 30.0
-
-func _rail_v(x: float, y0: float, y1: float, gap := Vector2(-1, -1)) -> void:
-	var y := y0
-	while y < y1:
-		if gap.x < 0.0 or y + 4.0 < gap.x or y - 4.0 > gap.y:
-			draw_rect(Rect2(x - 4, y - 14, 8, 28), Color("7a5230"))
-		y += 30.0

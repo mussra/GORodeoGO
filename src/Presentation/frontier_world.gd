@@ -10,6 +10,7 @@ const RanchScript := preload("res://src/Presentation/world_ranch.gd")
 const PigScript := preload("res://src/Presentation/wild_pig.gd")
 const TrailScript := preload("res://src/Presentation/frontier_trail.gd")
 const TestZoneScript := preload("res://src/Presentation/world_test_zone.gd")
+const Physics := preload("res://src/Presentation/world_physics.gd")
 
 const BOARD_POS := Vector2(145, -20)
 const HOME_POS := Vector2(0, 160)
@@ -18,6 +19,8 @@ const ARROWS: Array[String] = ["↑", "↗", "→", "↘", "↓", "↙", "←", 
 
 var player: CharacterBody2D
 var _chunks: Dictionary = {}
+var _chunk_entities: Dictionary = {}
+var _herd_horses: Dictionary = {}
 var _hud: CanvasLayer
 var _gait_label: Label
 var _missions_label: Label
@@ -42,6 +45,7 @@ var _clop_a: AudioStream = load("res://art/audio/hoof_a.wav")
 var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
+	y_sort_enabled = true
 	SaveData.ensure_world_seed()
 	var base := ColorRect.new()
 	base.color = Color("2e5d33")
@@ -103,6 +107,11 @@ func _update_chunks() -> void:
 		if absi(c.x - pc.x) > 2 or absi(c.y - pc.y) > 2:
 			_chunks[key].queue_free()
 			_chunks.erase(key)
+			for e in _chunk_entities.get(key, []):
+				if is_instance_valid(e):
+					e.queue_free()
+			_chunk_entities.erase(key)
+			_herd_horses.erase(key)
 
 func _ensure_chunk(cx: int, cy: int) -> void:
 	var key: String = WorldMap.chunk_key(cx, cy)
@@ -117,19 +126,29 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 	ground.position = Vector2(cx, cy) * WorldMap.CHUNK_SIZE
 	ground.z_index = -9
 	node.add_child(ground)
+	var entities: Array = []
 	for d in chunk.get("decor", []):
 		var decor := DecorScript.new()
 		decor.kind = d["kind"]
 		decor.size_scale = d["scale"]
-		decor.position = d["pos"]
-		node.add_child(decor)
+		var boff: float = DecorScript.base_offset(d["kind"], d["scale"])
+		decor.draw_offset = Vector2(0, -boff)
+		decor.position = d["pos"] + Vector2(0, boff)
+		add_child(decor)
+		entities.append(decor)
+		var box: Rect2 = DecorScript.solid_box(d["kind"], d["pos"], d["scale"])
+		if box.has_area():
+			entities.append(Physics.add_box(self, box))
 	var herd: Dictionary = chunk.get("herd", {})
 	var mission_id: String = WorldMap.herd_mission_id(cx, cy)
 	if not herd.is_empty() and not SaveData.world_tamed.has(mission_id):
 		var horse := WildHorseScript.new()
 		horse.name = "herd"
 		horse.setup(herd)
-		node.add_child(horse)
+		horse.set_meta("c", Vector2i(cx, cy))
+		add_child(horse)
+		entities.append(horse)
+		_herd_horses[key] = horse
 		var bar := ProgressBar.new()
 		bar.name = "bar"
 		bar.min_value = 0.0
@@ -145,14 +164,14 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 	var pigs: Dictionary = chunk.get("pigs", {})
 	var pig_id: String = WorldEdits.edited_pen_id(pigs.get("pos", Vector2.ZERO)) if pigs.get("edited", false) else WorldMap.pig_id(cx, cy)
 	if not pigs.is_empty() and not SaveData.world_pigs.has(pig_id):
-		var pen := Node2D.new()
-		pen.name = "pigs"
 		var base: Vector2 = pigs["pos"]
 		for i in int(pigs.get("count", 2)):
 			var pig := PigScript.new()
 			pig.name = "pig%d" % i
 			pig.setup({"pos": base + Vector2(cos(i * TAU / maxf(1.0, float(pigs.get("count", 2)))), sin(i * TAU / maxf(1.0, float(pigs.get("count", 2))))) * 44.0})
-			pen.add_child(pig)
+			add_child(pig)
+			entities.append(pig)
+			entities.append(Physics.add_box(self, Rect2(pig.position + Vector2(-12, -6), Vector2(24, 12))))
 			var pbar := ProgressBar.new()
 			pbar.name = "bar"
 			pbar.min_value = 0.0
@@ -162,9 +181,9 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 			pbar.show_percentage = false
 			pbar.visible = false
 			pig.add_child(pbar)
-		node.add_child(pen)
 	add_child(node)
 	_chunks[key] = node
+	_chunk_entities[key] = entities
 	if not SaveData.world_discovered.has(key):
 		SaveData.mark_world_discovered(key)
 		if not herd.is_empty() and not SaveData.world_tamed.has(mission_id) and not SaveData.world_missions.has(mission_id):
@@ -174,10 +193,9 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 			SaveData.save_world_state(player.position)
 
 func _tick_taming(delta: float) -> void:
-	for key in _chunks:
-		var node: Node2D = _chunks[key]
-		var horse: Node2D = node.get_node_or_null("herd")
-		if horse == null:
+	for key in _herd_horses:
+		var horse: Node2D = _herd_horses[key]
+		if not is_instance_valid(horse):
 			continue
 		var dist: float = player.position.distance_to(horse.position)
 		if dist > 700.0:
@@ -188,7 +206,7 @@ func _tick_taming(delta: float) -> void:
 		bar.value = st.get("progress", 0.0)
 		bar.visible = bar.value > 0.01
 		if WorldTaming.tamed(st):
-			_on_tamed(Vector2i(node.get_meta("c")), horse)
+			_on_tamed(horse.get_meta("c"), horse)
 		elif WorldTaming.should_flee(st, dist):
 			horse.flee_from(player.position, delta)
 		elif dist < WorldTaming.CALM_RANGE * 1.5:
