@@ -12,6 +12,8 @@ var home: Vector2 = Vector2.ZERO
 var wander: bool = false
 var wander_radius: float = 70.0
 var wander_speed: float = 55.0
+## Seconds left roped by the rider's lasso; while > 0 the horse cannot flee or wander.
+var held: float = 0.0
 var _art: Node2D
 var _bob: float = 0.0
 var _graze_timer: float = 0.0
@@ -39,6 +41,14 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_bob += delta
+	if held > 0.0:
+		held -= delta
+		velocity = Vector2.ZERO
+		_flee = Vector2.ZERO
+		_art.grazing = false
+		move_and_slide()
+		_art.position.y = sin(_bob * 1.6) * 1.5
+		return
 	if _flee.length() > 0.0:
 		var target: Vector2 = position + _flee * delta
 		if home.distance_to(target) < WorldTaming.FLEE_LEASH:

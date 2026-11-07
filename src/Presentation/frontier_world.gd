@@ -42,6 +42,18 @@ var _hoof_player: AudioStreamPlayer
 var _step_timer: float = 0.0
 var _step_alt: bool = false
 var _clop_a: AudioStream = load("res://art/audio/hoof_a.wav")
+
+## Lasso in the open world (Ant, 7-nov-2026 16:20): aim stick charges direction,
+## release throws; a landed rope holds a wild horse while trust fills fast.
+const LASSO_MAX_THROW: float = 240.0
+const LASSO_FLIGHT_TIME: float = 0.45
+const LASSO_COOLDOWN: float = 0.8
+var _lasso_aim: Vector2 = Vector2.ZERO
+var _lasso: Node2D = null
+var _lasso_state: String = ""
+var _lasso_flight: float = 0.0
+var _lasso_cooldown: float = 0.0
+var _lasso_horse: Node2D = null
 var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
@@ -77,6 +89,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_update_chunks()
 	_tick_taming(delta)
+	_tick_lasso(delta)
 	_tick_pigs(delta)
 	_tick_hoofbeats(delta)
 	_tick_stamina(delta)
@@ -91,6 +104,73 @@ func _process(delta: float) -> void:
 	if _save_timer >= SAVE_EVERY:
 		_save_timer = 0.0
 		SaveData.save_world_state(player.position)
+
+func _tick_lasso(delta: float) -> void:
+	_lasso_cooldown = maxf(0.0, _lasso_cooldown - delta)
+	if _lasso_state == "flight":
+		_lasso_flight += delta
+		_lasso.progress = clampf(_lasso_flight / LASSO_FLIGHT_TIME, 0.0, 1.0)
+		if _lasso_flight >= LASSO_FLIGHT_TIME:
+			_resolve_lasso()
+	elif _lasso_state == "hold":
+		if not is_instance_valid(_lasso_horse):
+			_end_lasso()
+		else:
+			_lasso.landing = _lasso_horse.position
+			if _lasso_horse.held <= 0.0:
+				var st: Dictionary = _lasso_horse.state
+				st["spook"] = WorldTaming.SPOOK_SECONDS
+				_lasso_horse.state = st
+				_end_lasso()
+		return
+	var aim: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
+	if aim.length() >= LassoAim.CANCEL_THRESHOLD:
+		_lasso_aim = aim
+	elif _lasso_aim.length() >= LassoAim.CANCEL_THRESHOLD:
+		_throw_lasso(_lasso_aim.normalized(), LassoAim.throw_distance(_lasso_aim, LASSO_MAX_THROW))
+		_lasso_aim = Vector2.ZERO
+	if Input.is_action_just_pressed("throw_lasso"):
+		var dir: Vector2 = player.velocity.normalized() if player.velocity.length() > 12.0 else Vector2.RIGHT
+		_throw_lasso(dir, LASSO_MAX_THROW * 0.8)
+
+func _throw_lasso(dir: Vector2, dist: float) -> void:
+	if _lasso_state != "" or _lasso_cooldown > 0.0:
+		return
+	_lasso = LassoRope.new()
+	_lasso.rider = player
+	_lasso.start = player.position
+	_lasso.landing = player.position + dir * dist
+	_lasso.progress = 0.0
+	add_child(_lasso)
+	_lasso_state = "flight"
+	_lasso_flight = 0.0
+
+func _resolve_lasso() -> void:
+	var best: Node2D = null
+	var best_dist: float = _lasso.landing_radius
+	for key in _herd_horses:
+		var raw = _herd_horses[key]
+		if not is_instance_valid(raw):
+			continue
+		var horse: Node2D = raw
+		var d: float = _lasso.landing.distance_to(horse.position)
+		if d < best_dist:
+			best = horse
+			best_dist = d
+	if best == null:
+		_end_lasso()
+		_lasso_cooldown = LASSO_COOLDOWN
+		return
+	_lasso_horse = best
+	best.held = WorldTaming.HOLD_SECONDS
+	_lasso_state = "hold"
+
+func _end_lasso() -> void:
+	if is_instance_valid(_lasso):
+		_lasso.queue_free()
+	_lasso = null
+	_lasso_horse = null
+	_lasso_state = ""
 
 func _toast(text: String) -> void:
 	_toast_label.text = text
@@ -194,20 +274,25 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 
 func _tick_taming(delta: float) -> void:
 	for key in _herd_horses:
-		var horse: Node2D = _herd_horses[key]
-		if not is_instance_valid(horse):
+		var raw = _herd_horses[key]
+		if not is_instance_valid(raw):
 			continue
+		var horse: Node2D = raw
 		var dist: float = player.position.distance_to(horse.position)
 		if dist > 700.0:
 			continue
-		var st: Dictionary = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta)
+		var st: Dictionary
+		if horse.held > 0.0:
+			st = WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta)
+		else:
+			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta)
 		horse.state = st
 		var bar: ProgressBar = horse.get_node("bar")
 		bar.value = st.get("progress", 0.0)
 		bar.visible = bar.value > 0.01
 		if WorldTaming.tamed(st):
 			_on_tamed(horse.get_meta("c"), horse)
-		elif WorldTaming.should_flee(st, dist):
+		elif horse.held <= 0.0 and WorldTaming.should_flee(st, dist):
 			horse.flee_from(player.position, delta)
 		elif dist < WorldTaming.CALM_RANGE * 1.5:
 			horse.face_towards(player.position)
@@ -323,6 +408,10 @@ func _open_edit_palette() -> void:
 		_edit_panel.add_child(b)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _map_overlay.visible and event.is_action_pressed("ui_cancel"):
+		_toggle_map()
+		get_viewport().set_input_as_handled()
+		return
 	if not _edit_mode:
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -450,6 +539,20 @@ func _build_hud() -> void:
 	joy.action_up = &"move_up"
 	joy.action_down = &"move_down"
 	touch.add_child(joy)
+	var aim_joy := VirtualJoystick.new()
+	aim_joy.name = "AimJoystick"
+	aim_joy.anchor_left = 0.5
+	aim_joy.anchor_right = 1.0
+	aim_joy.anchor_bottom = 1.0
+	aim_joy.joystick_mode = 2
+	aim_joy.visibility_mode = 1
+	aim_joy.joystick_size = 220.0
+	aim_joy.tip_size = 80.0
+	aim_joy.action_left = &"aim_left"
+	aim_joy.action_right = &"aim_right"
+	aim_joy.action_up = &"aim_up"
+	aim_joy.action_down = &"aim_down"
+	touch.add_child(aim_joy)
 
 func _toggle_map() -> void:
 	_map_overlay.visible = not _map_overlay.visible
@@ -503,9 +606,25 @@ class DiscoveryMap extends Control:
 	var _dragging: bool = false
 	var _drag_from: Vector2 = Vector2.ZERO
 	var _pan_from: Vector2 = Vector2.ZERO
+	var _pulse: float = 0.0
+
+	func _process(delta: float) -> void:
+		if visible:
+			_pulse += delta
+			queue_redraw()
 
 	func _ready() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		# clear close affordances (Ant 7-nov-2026: "no lo puedo cerrar"):
+		# X button, tap without drag, or Android back (ui_cancel in the world)
+		var close := Button.new()
+		close.text = "X"
+		close.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		close.position = Vector2(size.x - 84, 20)
+		close.size = Vector2(64, 64)
+		close.add_theme_font_size_override("font_size", 34)
+		close.pressed.connect(world._toggle_map)
+		add_child(close)
 		var minus := Button.new()
 		minus.text = "-"
 		minus.position = Vector2(24, size.y - 84)
@@ -525,9 +644,14 @@ class DiscoveryMap extends Control:
 
 	func _gui_input(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-			_dragging = event.pressed
-			_drag_from = event.position
-			_pan_from = pan
+			if event.pressed:
+				_dragging = true
+				_drag_from = event.position
+				_pan_from = pan
+			else:
+				if _dragging and (event.position - _drag_from).length() < 12.0:
+					world._toggle_map()
+				_dragging = false
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			_set_zoom(zoom * 1.15)
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
@@ -590,11 +714,21 @@ class DiscoveryMap extends Control:
 				var col: Color = Color("f2a7b8") if not SaveData.world_pigs.has(pid) else Color("f2a7b866")
 				draw_circle(pc, maxf(3.0, cell * 0.07), col)
 			_mission_mark(c, r, font, cell)
-		# player marker: warm dot with a dark ring
+		# player marker (Ant 7-nov-2026: "ver claramente donde esta mi vaquero"):
+		# pulsing ring, high-contrast dot and facing arrow
 		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
+		var ring: float = cell * (0.20 + 0.06 * sin(_pulse * 4.0))
+		draw_arc(ppos, ring, 0, TAU, 40, Color("ffd23d"), 3.0, true)
 		draw_circle(ppos, cell * 0.16, Color("201b1c"))
 		draw_circle(ppos, cell * 0.12, Color("f8edce"))
 		draw_circle(ppos, cell * 0.05, Color("d94f3d"))
+		var face: Vector2 = world.player.velocity
+		if face.length() < 12.0:
+			face = Vector2.DOWN
+		face = face.normalized()
+		var tip: Vector2 = ppos + face * cell * 0.34
+		var side: Vector2 = Vector2(-face.y, face.x) * cell * 0.10
+		draw_colored_polygon(PackedVector2Array([tip, ppos + face * cell * 0.12 + side, ppos + face * cell * 0.12 - side]), Color("ffd23d"))
 
 	func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		# clip every dot to its own discovered tile: unseen world stays hidden

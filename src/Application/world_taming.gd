@@ -35,3 +35,15 @@ static func tamed(state:Dictionary)->bool:
 
 static func should_flee(state:Dictionary,dist:float)->bool:
  return float(state.get("spook",0.0))>0.0 and dist<CALM_RANGE*1.6
+
+## Lasso on fleeing wild horses (Ant, 7-nov-2026 16:20): a landed rope holds the
+## horse in place for HOLD_SECONDS; trust fills fast while held. Skittish
+## temperaments resist the fill. If the hold ends before taming, the horse bolts.
+const HOLD_SECONDS:float=4.0
+const HOLD_FILL:float=0.30
+
+static func hold_tick(state:Dictionary,temperament:float,delta:float)->Dictionary:
+ var out:Dictionary=state.duplicate()
+ var rate:float=HOLD_FILL*(1.0-clampf(temperament,0.0,1.0)*0.5)
+ out.progress=minf(1.0,float(out.get("progress",0.0))+rate*delta)
+ return out
