@@ -1,6 +1,50 @@
 extends Node2D
-## Code-drawn frontier decoration, in the same cartoon spirit as the arena art.
+## Frontier decoration from Ant's cartoon art sheets (7-nov-2026 23:01/23:06).
+## Trees, bushes, rocks and flowers are sprites cut from the sheets; cactus
+## stays code-drawn until Ant provides its art.
 ## Deterministic per chunk via WorldMap; kinds: tree, rock, bush, cactus.
+
+const OAK_TEX: Texture2D = preload("res://art/world/cartoon/oak.png")
+const TREE2_TEX: Texture2D = preload("res://art/world/cartoon/tree2.png")
+const PINE_TEX: Texture2D = preload("res://art/world/cartoon/pine.png")
+const APPLE_TEX: Texture2D = preload("res://art/world/cartoon/apple.png")
+const BUSH_TEXS: Array[Texture2D] = [
+	preload("res://art/world/cartoon/bush1.png"),
+	preload("res://art/world/cartoon/bush2.png"),
+]
+const ROCK_TEXS: Array[Texture2D] = [
+	preload("res://art/world/cartoon/rock1.png"),
+	preload("res://art/world/cartoon/rock2.png"),
+]
+const FLOWER_TEXS: Array[Texture2D] = [
+	preload("res://art/world/cartoon/flower_1.png"),
+	preload("res://art/world/cartoon/flower_2.png"),
+	preload("res://art/world/cartoon/flower_3.png"),
+	preload("res://art/world/cartoon/flower_4.png"),
+	preload("res://art/world/cartoon/flower_5.png"),
+	preload("res://art/world/cartoon/flower_6.png"),
+	preload("res://art/world/cartoon/f_daisy1.png"),
+	preload("res://art/world/cartoon/f_daisy2.png"),
+	preload("res://art/world/cartoon/f_daisy3.png"),
+	preload("res://art/world/cartoon/f_red1.png"),
+	preload("res://art/world/cartoon/f_red2.png"),
+	preload("res://art/world/cartoon/f_red3.png"),
+	preload("res://art/world/cartoon/f_sun1.png"),
+	preload("res://art/world/cartoon/f_sun2.png"),
+	preload("res://art/world/cartoon/f_blue1.png"),
+	preload("res://art/world/cartoon/f_blue2.png"),
+	preload("res://art/world/cartoon/f_violet.png"),
+	preload("res://art/world/cartoon/f_purple.png"),
+	preload("res://art/world/cartoon/f_tulip1.png"),
+	preload("res://art/world/cartoon/f_tulip2.png"),
+]
+## Sprite heights in world px, matched to the old code-drawn bodies so the
+## solid/occluder boxes and the depth sorting keep working unchanged.
+const TREE_H := 76.0
+const PINE_H := 68.0
+const BUSH_H := 22.0
+const ROCK_W := 30.0
+const FLOWER_H := 30.0
 
 var kind: String = "tree"
 var size_scale: float = 1.0
@@ -44,39 +88,31 @@ func _ready() -> void:
 	scale = Vector2.ONE * size_scale
 	queue_redraw()
 
+## Deterministic per-spot pick so each instance can differ (Ant: vary them).
+func _variant(count: int) -> int:
+	return int(abs(position.x * 31.0 + position.y * 17.0)) % count
+
+func _draw_tex(tex: Texture2D, base_y: float, h: float) -> void:
+	var w := h * tex.get_width() / float(tex.get_height())
+	draw_texture_rect(tex, Rect2(-w * 0.5, base_y - h, w, h), false)
+
 func _draw() -> void:
 	draw_set_transform(draw_offset)
 	match kind:
 		"tree":
-			draw_rect(Rect2(-5, -6, 10, 26), Color("6d4a2f"))
-			draw_circle(Vector2(-12, -18), 16, Color("3f7031"))
-			draw_circle(Vector2(12, -16), 14, Color("477c37"))
-			draw_circle(Vector2(0, -30), 18, Color("528b3f"))
-		"rock":
-			draw_colored_polygon(PackedVector2Array([Vector2(-16, 10), Vector2(-12, -6), Vector2(0, -12), Vector2(14, -4), Vector2(16, 10)]), Color("8b96a0"))
-			draw_colored_polygon(PackedVector2Array([Vector2(-12, -6), Vector2(0, -12), Vector2(14, -4), Vector2(4, 2)]), Color("9fabb6"))
-		"bush":
-			draw_circle(Vector2(-8, 2), 10, Color("3f7031"))
-			draw_circle(Vector2(7, 0), 12, Color("477c37"))
-			draw_circle(Vector2(0, -8), 9, Color("528b3f"))
-		"pine":
-			draw_rect(Rect2(-4, 2, 8, 18), Color("6d4a2f"))
-			draw_colored_polygon(PackedVector2Array([Vector2(-22, 8), Vector2(0, -18), Vector2(22, 8)]), Color("2f5d33"))
-			draw_colored_polygon(PackedVector2Array([Vector2(-17, -8), Vector2(0, -30), Vector2(17, -8)]), Color("386d3b"))
-			draw_colored_polygon(PackedVector2Array([Vector2(-12, -22), Vector2(0, -42), Vector2(12, -22)]), Color("417d44"))
+			_draw_tex(OAK_TEX if _variant(2) == 0 else TREE2_TEX, 20.0, TREE_H)
 		"fruit_tree":
-			draw_rect(Rect2(-5, -6, 10, 26), Color("6d4a2f"))
-			draw_circle(Vector2(-10, -16), 15, Color("3f7031"))
-			draw_circle(Vector2(11, -14), 13, Color("477c37"))
-			draw_circle(Vector2(0, -28), 16, Color("528b3f"))
-			for apple in [Vector2(-8, -20), Vector2(6, -30), Vector2(12, -14), Vector2(-2, -12)]:
-				draw_circle(apple, 3.5, Color("d94f3d"))
+			_draw_tex(APPLE_TEX, 20.0, TREE_H)
+		"pine":
+			_draw_tex(PINE_TEX, 20.0, PINE_H)
+		"bush":
+			_draw_tex(BUSH_TEXS[_variant(BUSH_TEXS.size())], 8.0, BUSH_H)
+		"rock":
+			var tex := ROCK_TEXS[_variant(ROCK_TEXS.size())]
+			var h := ROCK_W * tex.get_height() / float(tex.get_width())
+			draw_texture_rect(tex, Rect2(-ROCK_W * 0.5, 10.0 - h, ROCK_W, h), false)
 		"flower":
-			for f in [Vector2(-8, 0), Vector2(6, -4), Vector2(0, 6)]:
-				for p in 5:
-					var a: float = p * TAU / 5.0
-					draw_circle(f + Vector2(cos(a), sin(a)) * 4.0, 2.6, Color("e86a8a"))
-				draw_circle(f, 2.4, Color("f2d987"))
+			_draw_tex(FLOWER_TEXS[_variant(FLOWER_TEXS.size())], 8.0, FLOWER_H)
 		"cactus":
 			draw_rect(Rect2(-5, -26, 10, 46), Color("3e7d46"))
 			draw_rect(Rect2(-16, -14, 8, 18), Color("3e7d46"))

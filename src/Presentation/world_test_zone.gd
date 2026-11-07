@@ -32,6 +32,12 @@ const PIGS: Array[Vector2] = [Vector2(155, -5), Vector2(215, 30)]
 const DrawNode := preload("res://src/Presentation/world_draw_node.gd")
 const Physics := preload("res://src/Presentation/world_physics.gd")
 const RAIL := Color("7a5230")
+## House sprite cut from Ant's cartoon art sheet (7-nov-2026 23:01); fence
+## and road tiles from the extended sheet (23:06).
+const HOUSE_TEX: Texture2D = preload("res://art/world/cartoon/house.png")
+const FENCE_TEX: Texture2D = preload("res://art/world/cartoon/fence_2rail.png")
+const RAILS_TEX: Texture2D = preload("res://art/world/cartoon/rails.png")
+const POST_TEX: Texture2D = preload("res://art/world/cartoon/post.png")
 
 func _ready() -> void:
 	position = ZONE_POS
@@ -82,12 +88,10 @@ func _add_house(world: Node2D, h: Dictionary) -> void:
 	var node := DrawNode.new()
 	node.position = base + Vector2(60, 70)
 	node.draw_origin = Vector2(-60, -70)
+	# 140x116 covers the old 120x70 body + roof and the registered occluder;
+	# walls and door gap physics below stay exactly as they were
 	node.draw_fn = func(n):
-		n.draw_rect(Rect2(Vector2.ZERO, Vector2(120, 70)), h["body"])
-		n.draw_colored_polygon(PackedVector2Array([Vector2(-10, 0), Vector2(60, -40), Vector2(130, 0)]), h["roof"])
-		n.draw_rect(Rect2(Vector2(47, 28), Vector2(26, 42)), Color("4c3b2a"))
-		n.draw_rect(Rect2(Vector2(14, 14), Vector2(22, 18)), Color("f2e3b3"))
-		n.draw_rect(Rect2(Vector2(86, 14), Vector2(22, 18)), Color("f2e3b3"))
+		n.draw_texture_rect(HOUSE_TEX, Rect2(Vector2(-10, -114), Vector2(140, 116)), false)
 	world.add_child(node)
 	world.register_occluder("zone_house_%s" % str(base), Rect2(base + Vector2(-10, -110), Vector2(140, 110)))
 	# walls: back, sides, front split at the door gap (x 47..73); interior open
@@ -99,10 +103,17 @@ func _add_house(world: Node2D, h: Dictionary) -> void:
 
 func _rail_seg(world: Node2D, pos: Vector2, horizontal: bool) -> void:
 	var size := Vector2(28, 8) if horizontal else Vector2(8, 28)
+	# upright post + rails along the run direction (only the rails rotate)
 	var node := DrawNode.new()
 	node.position = ZONE_POS + pos + Vector2(0, 4)
 	node.draw_origin = Vector2(0, -4)
-	node.draw_fn = func(n): n.draw_rect(Rect2(-size / 2, size), RAIL)
+	var ang := 0.0 if horizontal else PI * 0.5
+	node.draw_fn = func(n):
+		n.draw_set_transform(Vector2(0, -16), ang, Vector2.ONE)
+		n.draw_texture_rect(RAILS_TEX, Rect2(Vector2(-17, -9), Vector2(34, 18)), false)
+		n.draw_set_transform(Vector2.ZERO)
+		var pw := 34.0 * POST_TEX.get_width() / float(POST_TEX.get_height())
+		n.draw_texture_rect(POST_TEX, Rect2(Vector2(-pw * 0.5, -30), Vector2(pw, 34)), false)
 	world.add_child(node)
 	Physics.add_box(world, Rect2(ZONE_POS + pos - size / 2, size))
 
@@ -125,21 +136,7 @@ func _draw() -> void:
 		_draw_trail(t["from"], t["to"])
 
 func _draw_trail(a: Vector2, b: Vector2) -> void:
-	var dist: float = a.distance_to(b)
-	var n: int = maxi(1, int(dist / 16.0))
-	var dir: Vector2 = (b - a).normalized()
-	var perp := Vector2(-dir.y, dir.x)
-	for i in n + 1:
-		var p: Vector2 = a.lerp(b, float(i) / float(n))
-		var wob: float = sin(float(i) * 1.7) * 4.0
-		draw_circle(p + perp * wob, 5.0, Color("a5825a"))
-		draw_circle(p + perp * (wob + 7.0), 3.5, Color("96754c"))
+	# narrow lane via the shared RoadTiles component (same art as the world)
+	RoadTiles.stamp_polyline(self, PackedVector2Array([a, b]), 40.0, 32.0)
 
-func _draw_house(h: Dictionary) -> void:
-	var p: Vector2 = h["pos"]
-	draw_rect(Rect2(p, Vector2(120, 70)), h["body"])
-	draw_colored_polygon(PackedVector2Array([p + Vector2(-10, 0), p + Vector2(60, -40), p + Vector2(130, 0)]), h["roof"])
-	draw_rect(Rect2(p + Vector2(47, 28), Vector2(26, 42)), Color("4c3b2a"))
-	draw_rect(Rect2(p + Vector2(14, 14), Vector2(22, 18)), Color("f2e3b3"))
-	draw_rect(Rect2(p + Vector2(86, 14), Vector2(22, 18)), Color("f2e3b3"))
 

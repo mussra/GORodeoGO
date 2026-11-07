@@ -1,9 +1,13 @@
 extends Node2D
 ## Draws the seeded dirt caminos crossing one chunk (Ant: caminos, 7-nov-2026).
-## Purely decorative - the rider can always leave the path.
+## Road tiles via the shared RoadTiles component (art sheet 23:06) stamped
+## along the seeded wander. Purely decorative - the rider can leave the path.
+
+## In-game stamp length along the path; dirt band lands at ~48px wide.
+const LENGTH := 62.0
+const SAMPLE := 24.0
 
 var c: Vector2i = Vector2i.ZERO
-var _ready_drawn: bool = false
 
 func _ready() -> void:
 	z_index = -8
@@ -16,29 +20,18 @@ func _draw() -> void:
 	_stamp_axis(origin, false, seed)
 
 func _stamp_axis(origin: Vector2, main: bool, seed: int) -> void:
-	var step: float = 26.0
-	var n: int = int(WorldMap.CHUNK_SIZE / step) + 1
+	var n: int = int(WorldMap.CHUNK_SIZE / SAMPLE) + 5
+	var pts := PackedVector2Array()
 	for i in n:
-		var t: float = i * step
+		var t: float = (i - 2) * SAMPLE
 		var center: Vector2
 		if main:
 			center = Vector2(origin.x + t, WorldMap.trail_y_at(seed, origin.x + t))
 		else:
 			center = Vector2(WorldMap.branch_x_at(seed, origin.y + t), origin.y + t)
-		if center.y < origin.y - 60 or center.y > origin.y + WorldMap.CHUNK_SIZE + 60:
+		if center.y < origin.y - 80.0 or center.y > origin.y + WorldMap.CHUNK_SIZE + 80.0:
 			continue
-		if center.x < origin.x - 60 or center.x > origin.x + WorldMap.CHUNK_SIZE + 60:
+		if center.x < origin.x - 80.0 or center.x > origin.x + WorldMap.CHUNK_SIZE + 80.0:
 			continue
-		draw_circle(center, WorldMap.TRAIL_WIDTH * 0.55, Color("8a6b45"))
-	for i in n:
-		var t: float = i * step
-		var center: Vector2
-		if main:
-			center = Vector2(origin.x + t, WorldMap.trail_y_at(seed, origin.x + t))
-		else:
-			center = Vector2(WorldMap.branch_x_at(seed, origin.y + t), origin.y + t)
-		if center.y < origin.y - 60 or center.y > origin.y + WorldMap.CHUNK_SIZE + 60:
-			continue
-		if center.x < origin.x - 60 or center.x > origin.x + WorldMap.CHUNK_SIZE + 60:
-			continue
-		draw_circle(center, WorldMap.TRAIL_WIDTH * 0.34, Color("97795052"))
+		pts.append(center)
+	RoadTiles.stamp_polyline(self, pts, LENGTH, LENGTH * 0.8)
