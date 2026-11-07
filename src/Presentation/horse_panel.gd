@@ -70,7 +70,7 @@ func collection_view()->void:
   var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits) if not SaveData.horse_collection.is_adult(h.id) else HorsePortrait.ART;tex.material=HorsePortrait.material_for(h.traits,SaveData.hat_color) if SaveData.horse_collection.is_adult(h.id) else null;tex.custom_minimum_size=Vector2(96,96);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
   var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;row.add_child(l)
   var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.size_flags_vertical=Control.SIZE_SHRINK_CENTER;row.add_child(badge)
-  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.size_flags_vertical=Control.SIZE_SHRINK_CENTER;row.add_child(dodge_badge)
+  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.whip_equipped=SaveData.equipped_whip_reach()>0.0;dodge_badge.size_flags_vertical=Control.SIZE_SHRINK_CENTER;row.add_child(dodge_badge)
   var badge_gap:=Control.new();badge_gap.custom_minimum_size=Vector2(14,1);badge_gap.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(badge_gap)
   if HorseEmblem.valid(h.traits.get("emblem")):
    var emblem:=TextureRect.new();emblem.texture=HorseEmblem.mask(h.traits.emblem);emblem.modulate=Color(HorseEmblem.COLORS[h.traits.emblem.color]);emblem.custom_minimum_size=Vector2(45,45);emblem.mouse_filter=Control.MOUSE_FILTER_IGNORE;emblem.size_flags_vertical=Control.SIZE_SHRINK_CENTER;emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(emblem)
@@ -148,7 +148,7 @@ func detail_view()->void:
  button(tr("EMBLEM_TITLE"),Vector2(420,450),func():
   var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor),360).disabled=not SaveData.horse_collection.is_adult(h.id)
  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(1120,225);badge.size=Vector2(64,56);content.add_child(badge)
- var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.position=Vector2(1120,290);dodge_badge.size=Vector2(64,56);content.add_child(dodge_badge)
+ var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.whip_equipped=SaveData.equipped_whip_reach()>0.0;dodge_badge.position=Vector2(1120,290);dodge_badge.size=Vector2(64,56);content.add_child(dodge_badge)
  var st:Dictionary=HorseStats.read(h)
  label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,340),22)
  if not SaveData.horse_collection.is_adult(h.id):

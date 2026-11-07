@@ -2,6 +2,8 @@ class_name JumpBadge
 extends Button
 var capable:bool=false
 var skill:String="jump"
+## Only the whip case ever notifies: dodge learned and no whip equipped.
+var whip_equipped:bool=true
 func _ready()->void:
  custom_minimum_size=Vector2(64,56);flat=true
  pressed.connect(show_explanation)
@@ -22,6 +24,9 @@ func make_notice()->PanelContainer:
  notice.add_child(lb)
  return notice
 func show_explanation()->void:
+ # Antonio 10:02: no whip nagging. The dodge badge only explains the missing
+ # whip; with a whip equipped (or dodge not learned) a tap shows nothing.
+ if skill=="dodge" and (not capable or whip_equipped):return
  var notice:=make_notice()
  get_tree().root.add_child(notice) # outside the scroll hierarchy: no clipping, no input grab
  notice.size=notice.get_combined_minimum_size()
@@ -29,7 +34,8 @@ func show_explanation()->void:
  var view:=get_viewport_rect().size
  at.x=clampf(at.x,8.0,view.x-notice.size.x-8.0);at.y=clampf(at.y,8.0,view.y-notice.size.y-8.0)
  notice.global_position=at
- var tween:=create_tween();tween.tween_interval(2.2);tween.tween_property(notice,"modulate:a",0.0,0.4);tween.tween_callback(notice.queue_free)
+ var tween:=notice.create_tween() # bound to the notice: row rebuilds free the badge, not the fade
+ tween.tween_interval(2.2);tween.tween_property(notice,"modulate:a",0.0,0.4);tween.tween_callback(notice.queue_free)
 func _draw()->void:
  var ink:Color=Color("f4cf67") if capable else Color("c8d3d5")
  draw_style_box(RanchTheme.box(Color("10252d"),ink,8),Rect2(0,0,64,56))

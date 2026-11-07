@@ -40,7 +40,7 @@ func test_badge_dialog_title_matches_skill()->void:
  jump.free()
 
 func test_badge_notice_never_blocks_stable_buttons()->void:
- var badge:=JumpBadge.new();badge.skill="dodge";badge.capable=true
+ var badge:=JumpBadge.new();badge.skill="dodge";badge.capable=true;badge.whip_equipped=false
  add_child_autofree(badge);badge.size=Vector2(64,56)
  badge.show_explanation()
  await wait_frames(3)
@@ -53,3 +53,26 @@ func test_badge_notice_never_blocks_stable_buttons()->void:
  assert_eq(lb.mouse_filter,Control.MOUSE_FILTER_IGNORE)
  assert_true(lb.text.begins_with(tr("DODGE_BADGE_TITLE")+": "))
  badge.free()
+
+func test_badge_notice_only_without_equipped_whip()->void:
+ for n in get_tree().root.get_children():
+  if n is PanelContainer:n.queue_free()
+ await wait_frames(2)
+ for capable in [true,false]:
+  var quiet:=JumpBadge.new();quiet.skill="dodge";quiet.capable=capable;quiet.whip_equipped=true
+  add_child_autofree(quiet);quiet.show_explanation()
+  await wait_frames(2)
+  for n in get_tree().root.get_children():assert_false(n is PanelContainer,"whip equipped: no notice (capable=%s)"%capable)
+  quiet.free()
+ var untrained:=JumpBadge.new();untrained.skill="dodge";untrained.capable=false;untrained.whip_equipped=false
+ add_child_autofree(untrained);untrained.show_explanation()
+ await wait_frames(2)
+ for n in get_tree().root.get_children():assert_false(n is PanelContainer,"dodge not learned: no notice")
+ untrained.free()
+ var jump:=JumpBadge.new();jump.skill="jump";jump.capable=true
+ add_child_autofree(jump);jump.show_explanation()
+ await wait_frames(2)
+ var found:=false
+ for n in get_tree().root.get_children():
+  if n is PanelContainer:found=true;n.queue_free()
+ assert_true(found,"jump badge keeps its explanation")
