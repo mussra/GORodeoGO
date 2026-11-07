@@ -25,7 +25,31 @@ static func mask(config:Dictionary)->Texture2D:
  if config.division==1:inside='<path d="M50 13 V85"/>'+symbol(config.left,32,44,13)+symbol(config.right,68,44,13)
  if config.division==2:inside='<path d="M20 64 L80 22"/>'+symbol(config.left,35,32,12)+symbol(config.right,64,59,12)
  var svg:String='<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">'+shape+inside+'</g></svg>'
- var image:=Image.new();image.load_svg_from_string(svg);var texture:=ImageTexture.create_from_image(image);cache[key]=texture;return texture
+ var image:=Image.new();image.load_svg_from_string(svg)
+ stamp_letters(image,config)
+ var texture:=ImageTexture.create_from_image(image);cache[key]=texture;return texture
+## Up to 3 initials over the shield's upper band, pre-rendered white glyphs
+## (stamp and the portrait shader color them through the ink's alpha).
+static func stamp_letters(image:Image,config:Dictionary)->void:
+ var letters:String=str(config.get("letters","")).to_upper().left(3)
+ if letters.is_empty():return
+ var font_dir:String=["graduate","cinzel"][int(config.get("letters_font",0))%2]
+ var glyphs:Array=[]
+ var total_w:=0
+ for i in letters.length():
+  var path:String="res://art/emblem/letters/%s/%s.png"%[font_dir,letters[i]]
+  if not ResourceLoader.exists(path):continue
+  var g:Image=load(path).get_image()
+  if g.is_compressed():g.decompress()
+  glyphs.append(g);total_w+=g.get_width()*19/g.get_height()+4
+ if glyphs.is_empty():return
+ total_w-=4
+ var x:=50-total_w/2
+ for g:Image in glyphs:
+  var w:=g.get_width()*19/g.get_height()
+  g.resize(w,19,Image.INTERPOLATE_LANCZOS)
+  image.blit_rect(g,Rect2i(0,0,w,19),Vector2i(x,17))
+  x+=w+4
 ## Wraps the emblem over the rump: columns fall away toward the rear (x=0) with a
 ## smooth quadratic, so the mark follows the thigh volume instead of floating flat.
 static func warp_columns(ink:Image,amount:float)->Image:

@@ -85,3 +85,22 @@ func test_emblem_warp_follows_the_rump()->void:
  assert_eq(w.get_pixel(0,0).a,0.0,"rear column drops")
  assert_true(w.get_pixel(0,2).a>0.5,"rear content lands lower")
  assert_true(w.get_pixel(3,0).a>0.5,"front column stays put")
+
+func test_emblem_letters_render_and_truncate()->void:
+ var band:=func(img:Image)->int:
+  var n:=0
+  for y in img.get_height():
+   for x in img.get_width():
+    if img.get_pixel(x,y).a>.5:n+=1
+  return n
+ var plain:Image=HorseEmblem.mask(HorseEmblem.DEFAULT).get_image()
+ var cfg:Dictionary=HorseEmblem.DEFAULT.duplicate();cfg["letters"]="ALV"
+ var with_letters:Image=HorseEmblem.mask(cfg).get_image()
+ assert_true(band.call(with_letters)>band.call(plain),"letters ink the upper band")
+ cfg["letters"]="ALVZ"
+ var truncated:Image=HorseEmblem.mask(cfg).get_image()
+ assert_eq(truncated.get_data(),with_letters.get_data(),"letters cap at 3")
+ cfg["letters"]="ALV";cfg["letters_font"]=1
+ var cinzel:Image=HorseEmblem.mask(cfg).get_image()
+ assert_true(band.call(cinzel)>band.call(plain),"second font also renders")
+ assert_ne(cinzel.get_data(),with_letters.get_data(),"fonts differ")
