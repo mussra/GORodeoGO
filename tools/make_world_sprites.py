@@ -120,9 +120,33 @@ def pig():
     d.arc([20*S, 84*S, 48*S, 112*S], start=270, end=180+360, fill=OUTLINE, width=5*S)  # curly tail
     return finish(im)
 
+COAT = (196, 120, 54, 255)      # base warm coat; runtime tint can recolor
+COAT_D = (168, 96, 40, 255)
+MANE = (240, 216, 168, 255)     # cream mane/tail like the ridden horses
+
+def wild_horse():
+    im, d = canvas()
+    # legs (back pair darker)
+    for lx, col in [(66, COAT_D), (96, COAT_D), (78, COAT), (108, COAT)]:
+        ol_rect(d, [lx*S, 128*S, (lx+13)*S, 182*S], col, 4)
+    # body
+    ol_ellipse(d, [44*S, 78*S, 138*S, 144*S], COAT)
+    # neck + head
+    ol_poly(d, [(x*S, y*S) for x, y in [(118, 128), (132, 62), (152, 66), (140, 130)]], COAT)
+    ol_ellipse(d, [128*S, 44*S, 172*S, 84*S], COAT)                      # head
+    ol_ellipse(d, [154*S, 62*S, 178*S, 90*S], COAT_D)                    # muzzle
+    d.ellipse([162*S, 74*S, 170*S, 82*S], fill=OUTLINE)                  # nostril
+    ol_poly(d, [(x*S, y*S) for x, y in [(134, 50), (138, 32), (148, 48)]], COAT_D, 4)  # ear
+    d.ellipse([140*S, 58*S, 150*S, 68*S], fill=OUTLINE)                  # eye
+    # mane along the neck + forelock
+    ol_poly(d, [(x*S, y*S) for x, y in [(116, 96), (128, 52), (136, 44), (124, 100)]], MANE, 4)
+    # tail
+    ol_poly(d, [(x*S, y*S) for x, y in [(48, 92), (26, 118), (34, 152), (52, 108)]], MANE, 4)
+    return finish(im)
+
 ITEMS = [("house", house), ("board", board), ("tree", tree), ("pine", pine),
          ("fruit_tree", fruit_tree), ("bush", bush), ("rock", rock),
-         ("cactus", cactus), ("flower", flower), ("pig", pig)]
+         ("cactus", cactus), ("flower", flower), ("pig", pig), ("wild_horse", wild_horse)]
 
 def main():
     cols = 5
