@@ -1,7 +1,9 @@
 extends CharacterBody2D
 ## Ranch rider for the open-world test: movement, gaits and horse art.
-## Lasso is the shared LassoController (same as the corral); stun uses the
-## same API and rules as the corral rider.
+## Lasso is the shared LassoController and dodge/regate the shared
+## DodgeController + DodgeVisuals (exactly the corral's gesture, bullet-time,
+## trail and recharge bar — Ant: mismo codigo); stun uses the same API and
+## rules as the corral rider.
 
 signal stunned
 
@@ -14,20 +16,36 @@ var friction: float = 700.0
 var gait: int = WorldGait.PASO
 var gait_cap: int = WorldGait.GALOPE  # stamina caps this; the world sets it
 
-## Regate in the open world (Ant, 7-nov-2026 16:21): quick dash in the current
-## direction with the dodge trail (estela), same feel as the corral dodge.
-const DODGE_SECONDS: float = 0.18
-const DODGE_SPEED_FACTOR: float = 2.2
-var dodge_recharge_seconds: float = 2.5
-var dodge_cooldown: float = 0.0
-var _dodge_remaining: float = 0.0
-var _dodge_direction: Vector2 = Vector2.ZERO
-var _skid_trail: Array[Vector2] = []
-var _trail_fade: float = 0.0
 ## Stun: same API, duration and red-tint fallback as the corral rider.
 const STUN_SECONDS: float = 2.0
 var stun_resistance_multiplier: float = 1.0
 var _stun_time_remaining: float = 0.0
+
+## The dodge lives in the shared DodgeController; these forwards keep the
+## world's HUD, trail drawing and the edge cue working with the corral names.
+const DRAW_EDGE_DWELL: float = DodgeController.DRAW_EDGE_DWELL
+var dodge: DodgeController = null
+var dodge_recharge_seconds: float:
+	get: return 2.5 if dodge == null else dodge.recharge_seconds
+	set(v): if dodge != null: dodge.recharge_seconds = v
+var dodge_cooldown: float:
+	get: return 0.0 if dodge == null else dodge.cooldown
+	set(v): if dodge != null: dodge.cooldown = v
+var _skid_trail: Array[Vector2]:
+	get: return [] if dodge == null else dodge.skid_trail
+var _trail_fade: float:
+	get: return 0.0 if dodge == null else dodge.trail_fade
+var _drawing_dodge: bool:
+	get: return false if dodge == null else dodge.drawing
+var _draw_edge_elapsed: float:
+	get: return 0.0 if dodge == null else dodge.draw_edge_elapsed
+var _draw_edge_active: bool:
+	get: return false if dodge == null else dodge.draw_edge_active
+var _last_pointer: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.last_pointer
+var _draw_heading: Vector2:
+	get: return Vector2.ZERO if dodge == null else dodge.draw_heading
+
 var _sprite_swap: SpriteSwap
 var lasso: LassoController = null
 
@@ -35,6 +53,20 @@ func _ready() -> void:
 	lasso = LassoController.new()
 	lasso.throw_guard = func() -> bool: return _stun_time_remaining <= 0.0 and is_physics_processing()
 	add_child(lasso)
+	dodge = DodgeController.new()
+	dodge.owner_body = self
+	dodge.can_start = func() -> bool: return _stun_time_remaining <= 0.0 and is_physics_processing()
+	dodge.resumed = func(dir: Vector2) -> void: velocity = dir * max_speed
+	dodge.on_moved = func() -> void:
+		_update_animation(get_physics_process_delta_time())
+		queue_redraw()
+	add_child(dodge)
+	var cue_layer := CanvasLayer.new()
+	cue_layer.layer = 16
+	add_child(cue_layer)
+	var cue := DodgeEdgeCue.new()
+	cue.player = self
+	cue_layer.add_child(cue)
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()
 	fr.size = Vector2(18, 10)
@@ -58,36 +90,26 @@ func stun(duration: float = STUN_SECONDS) -> void:
 		stunned.emit()
 	_stun_time_remaining = maxf(_stun_time_remaining, duration * stun_resistance_multiplier)
 	modulate = Color(1.0, 0.5, 0.5, 1.0)  # no stun art in the world yet: corral's red-tint fallback
+	dodge.cancel()  # same as the corral's cancel_input on stun
 
 func calm() -> float:
 	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
 	return HorseStats.read(horse).calm if not horse.is_empty() else 1.0
 
+func _input(event: InputEvent) -> void:
+	dodge.handle_input(event)
+
 func request_dodge(direction: Vector2) -> bool:
-	if _dodge_remaining > 0.0 or dodge_cooldown > 0.0 or direction.length() < 0.2:
-		return false
-	_dodge_direction = direction.normalized()
-	_dodge_remaining = DODGE_SECONDS
-	dodge_cooldown = dodge_recharge_seconds
-	_skid_trail.clear()
-	_skid_trail.append(global_position)
-	_trail_fade = 0.7
-	return true
+	return dodge.request_dash(direction)
+
+func request_dodge_path(points: PackedVector2Array) -> bool:
+	return dodge.request_path(points)
 
 func _physics_process(delta: float) -> void:
 	lasso.process_throw_input(delta)
-	dodge_cooldown = maxf(0.0, dodge_cooldown - delta)
-	if _dodge_remaining > 0.0:
-		_dodge_remaining -= delta
-		velocity = _dodge_direction * max_speed * DODGE_SPEED_FACTOR
-		move_and_slide()
-		_skid_trail.append(global_position)
-		_update_animation(delta)
-		return
-	if _trail_fade > 0.0:
-		_trail_fade = maxf(0.0, _trail_fade - delta)
-		if _trail_fade <= 0.0:
-			_skid_trail.clear()
+	dodge.cooldown = maxf(0.0, dodge.cooldown - delta)
+	if dodge.fade_trail(delta):
+		queue_redraw()
 	if _stun_time_remaining > 0.0:
 		_stun_time_remaining -= delta
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
@@ -95,6 +117,16 @@ func _physics_process(delta: float) -> void:
 		if _stun_time_remaining <= 0.0:
 			modulate = Color.WHITE
 		_update_animation(delta)
+		return
+	# Dodge branches run in the shared DodgeController (same code as the corral).
+	if dodge.drawing:
+		dodge.process_drawing(delta / maxf(Engine.time_scale, .01))
+		return
+	if dodge.step_path(max_speed, delta):
+		return
+	if dodge.step_coast(max_speed, delta):
+		return
+	if dodge.step_dash(max_speed, delta):
 		return
 	var wish := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	gait = mini(WorldGait.update(gait, wish.length()), gait_cap)
@@ -105,6 +137,17 @@ func _physics_process(delta: float) -> void:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	move_and_slide()
 	_update_animation(delta)
+	queue_redraw()
+
+## Same dodge drawing as the corral rider (DodgeVisuals): trail, bullet-time
+## preview, recharge bar and dust.
+func _draw() -> void:
+	DodgeVisuals.draw_trail(self, dodge.skid_trail, dodge.trail_fade)
+	if dodge.drawing:
+		DodgeVisuals.draw_drawing(self, dodge.preview_points(dodge.draw_points))
+	DodgeVisuals.draw_recharge(self, Vector2(0, -59), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
+	if dodge.remaining > 0.0:
+		DodgeVisuals.draw_dash_dust(self, dodge.direction)
 
 func _update_animation(delta: float) -> void:
 	if _sprite_swap == null or not _sprite_swap.has_sprite():

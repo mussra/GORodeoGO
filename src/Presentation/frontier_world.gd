@@ -62,8 +62,6 @@ var _lasso_horse: Node2D = null
 ## (Ant 7-nov-2026 16:50: "necesito ver claramente donde esta mi vaquero").
 var _occluders: Dictionary = {}
 var _marker: Node2D = null
-var _dodge_button: Button = null
-var _trail_node: Node2D = null
 var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
@@ -84,13 +82,6 @@ func _ready() -> void:
 	_marker.z_index = 60
 	_marker.visible = false
 	add_child(_marker)
-	# dodge trail (estela de regate): drawn on the stationary world node, not on
-	# the moving player, so every dot renders where the hoof stepped
-	_trail_node = DrawNode.new()
-	_trail_node.draw_fn = _draw_dodge_trail
-	_trail_node.z_index = 60
-	_trail_node.visible = false
-	add_child(_trail_node)
 	var camera := Camera2D.new()
 	player.add_child(camera)
 	camera.make_current()
@@ -115,11 +106,6 @@ func _process(delta: float) -> void:
 	_tick_taming(delta)
 	_tick_lasso(delta)
 	_tick_rider_marker()
-	if Input.is_action_just_pressed("world_dodge"):
-		_try_dodge()
-	_trail_node.visible = player._trail_fade > 0.0
-	if _trail_node.visible:
-		_trail_node.queue_redraw()
 	if _gauges.has("dodge"):
 		_gauges["dodge"].set_state(true, 1.0 - player.dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds))
 	_tick_pigs(delta)
@@ -136,13 +122,6 @@ func _process(delta: float) -> void:
 	if _save_timer >= SAVE_EVERY:
 		_save_timer = 0.0
 		SaveData.save_world_state(player.position)
-
-func _try_dodge() -> void:
-	var wish: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var dir: Vector2 = wish
-	if dir.length() < 0.2 and player.velocity.length() > 12.0:
-		dir = player.velocity.normalized()
-	player.request_dodge(dir)
 
 func register_occluder(owner, rect: Rect2) -> void:
 	if not _occluders.has(owner):
@@ -164,11 +143,6 @@ func _tick_rider_marker() -> void:
 		_marker.position = player.position + Vector2(0, -70 - bob)
 		_marker.queue_redraw()
 
-func _draw_dodge_trail(n: Node2D) -> void:
-	var a: float = player._trail_fade / 0.7
-	for p in player._skid_trail:
-		n.draw_circle(p + Vector2(0, 6), 7.0, Color(0.98, 0.8, 0.42, 0.5 * a))
-		n.draw_circle(p + Vector2(0, 6), 3.5, Color(1.0, 0.95, 0.78, 0.85 * a))
 
 func _draw_rider_marker(n: Node2D) -> void:
 	var tri := PackedVector2Array([Vector2(-11, -8), Vector2(11, -8), Vector2(0, 8)])
@@ -593,12 +567,8 @@ func _build_hud() -> void:
 	_board_button.visible = false
 	_board_button.pressed.connect(_open_board)
 	_hud.add_child(_board_button)
-	_dodge_button = Button.new()
-	_dodge_button.text = tr("WORLD_DODGE")
-	_dodge_button.position = Vector2(1090, 540)
-	_dodge_button.size = Vector2(170, 54)
-	_dodge_button.pressed.connect(_try_dodge)
-	_hud.add_child(_dodge_button)
+	# No dodge button: the regate is the corral's gesture (double-press the
+	# move stick), handled by the shared DodgeController on the player.
 	_map_overlay = DiscoveryMap.new()
 	_map_overlay.world = self
 	_map_overlay.visible = false
@@ -613,6 +583,7 @@ func _build_hud() -> void:
 	var aim_joy: VirtualJoystick = touch.get_node("AimJoystick")
 	aim_joy.anchor_top = 0.32
 	player.lasso.set_aim_joystick(aim_joy)
+	player.dodge.set_move_joystick(joy)
 	player.lasso.prey_provider = func() -> Array:
 		var out: Array = []
 		for key in _herd_horses:
