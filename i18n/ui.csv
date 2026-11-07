@@ -366,6 +366,7 @@ WORLD_MISSIONS,"Misiones: %d activas · %d hechas","Missions: %d active · %d do
 WORLD_BOARD_NONE,No hay encargos cerca. Explora la frontera.,No jobs nearby. Explore the frontier.
 WORLD_BOARD_ACTIVE,"Encargo activo: manada salvaje %s (%d m)","Active job: wild herd %s (%d m)"
 WORLD_CLOSE,Cerrar,Close
+WORLD_DODGE,Regate,Dodge
 WORLD_PIGS,"Cerdos: %d","Pigs: %d"
 WORLD_PIG_CAPTURED,"¡Cerdo capturado! Llevas %d","Pig captured! You have %d"
 WORLD_EDIT,"Editar","Edit"

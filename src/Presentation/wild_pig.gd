@@ -4,6 +4,8 @@ extends Node2D
 
 var pen: Dictionary = {}
 var state: Dictionary = {}
+## Seconds left roped by the rider's lasso; while > 0 the pig cannot flee.
+var held: float = 0.0
 var home: Vector2 = Vector2.ZERO
 var flip_h: bool = false
 var _bob: float = 0.0

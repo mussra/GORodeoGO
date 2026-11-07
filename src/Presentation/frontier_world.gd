@@ -44,12 +44,21 @@ var _step_timer: float = 0.0
 var _step_alt: bool = false
 var _clop_a: AudioStream = load("res://art/audio/hoof_a.wav")
 
-## Lasso in the open world (Ant, 7-nov-2026 16:20): aim stick charges direction,
-## release throws; a landed rope holds a wild horse while trust fills fast.
-const LASSO_MAX_THROW: float = 240.0
-const LASSO_FLIGHT_TIME: float = 0.45
+## Lasso in the open world (Ant, 7-nov-2026 16:20; unified with the corral control
+## after "no puedo apuntar" 17:52): SAME gesture as the levels — press the aim
+## stick to charge (the rope line extends with the stick), release to throw,
+## release near the centre cancels, double tap drops the roped horse.
+const LASSO_MAX_THROW: float = 220.0
+const LASSO_FLIGHT_TIME: float = 0.8
+const LASSO_CHARGE_SPEED: float = 300.0
 const LASSO_COOLDOWN: float = 0.8
-var _lasso_aim: Vector2 = Vector2.ZERO
+var _lasso_charging: bool = false
+var _charge_keyboard: bool = false
+var _charge_distance: float = 0.0
+var _charge_visual: Line2D = null
+var _aim_dir: Vector2 = Vector2.RIGHT
+var _aim_pressed_at: float = 0.0
+var _lasso_double_tap: DoubleTapDetector = null
 var _lasso: Node2D = null
 var _lasso_state: String = ""
 var _lasso_flight: float = 0.0
@@ -61,6 +70,8 @@ var _lasso_horse: Node2D = null
 ## (Ant 7-nov-2026 16:50: "necesito ver claramente donde esta mi vaquero").
 var _occluders: Dictionary = {}
 var _marker: Node2D = null
+var _dodge_button: Button = null
+var _trail_node: Node2D = null
 var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
@@ -80,6 +91,13 @@ func _ready() -> void:
 	_marker.z_index = 60
 	_marker.visible = false
 	add_child(_marker)
+	# dodge trail (estela de regate): drawn on the stationary world node, not on
+	# the moving player, so every dot renders where the hoof stepped
+	_trail_node = DrawNode.new()
+	_trail_node.draw_fn = _draw_dodge_trail
+	_trail_node.z_index = 60
+	_trail_node.visible = false
+	add_child(_trail_node)
 	var camera := Camera2D.new()
 	player.add_child(camera)
 	camera.make_current()
@@ -92,6 +110,7 @@ func _ready() -> void:
 	test_zone.name = "test_zone"
 	add_child(test_zone)
 	_build_hud()
+	_lasso_double_tap = DoubleTapDetector.new(LassoAim.DOUBLE_TAP_WINDOW_SECONDS)
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
 	_hoof_player.volume_db = -12.0
@@ -104,6 +123,13 @@ func _process(delta: float) -> void:
 	_tick_taming(delta)
 	_tick_lasso(delta)
 	_tick_rider_marker()
+	if Input.is_action_just_pressed("world_dodge"):
+		_try_dodge()
+	_trail_node.visible = player._trail_fade > 0.0
+	if _trail_node.visible:
+		_trail_node.queue_redraw()
+	if _gauges.has("dodge"):
+		_gauges["dodge"].set_state(true, 1.0 - player.dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds))
 	_tick_pigs(delta)
 	_tick_hoofbeats(delta)
 	_tick_stamina(delta)
@@ -118,6 +144,13 @@ func _process(delta: float) -> void:
 	if _save_timer >= SAVE_EVERY:
 		_save_timer = 0.0
 		SaveData.save_world_state(player.position)
+
+func _try_dodge() -> void:
+	var wish: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var dir: Vector2 = wish
+	if dir.length() < 0.2 and player.velocity.length() > 12.0:
+		dir = player.velocity.normalized()
+	player.request_dodge(dir)
 
 func register_occluder(owner, rect: Rect2) -> void:
 	if not _occluders.has(owner):
@@ -139,6 +172,12 @@ func _tick_rider_marker() -> void:
 		_marker.position = player.position + Vector2(0, -70 - bob)
 		_marker.queue_redraw()
 
+func _draw_dodge_trail(n: Node2D) -> void:
+	var a: float = player._trail_fade / 0.7
+	for p in player._skid_trail:
+		n.draw_circle(p + Vector2(0, 6), 7.0, Color(0.98, 0.8, 0.42, 0.5 * a))
+		n.draw_circle(p + Vector2(0, 6), 3.5, Color(1.0, 0.95, 0.78, 0.85 * a))
+
 func _draw_rider_marker(n: Node2D) -> void:
 	var tri := PackedVector2Array([Vector2(-11, -8), Vector2(11, -8), Vector2(0, 8)])
 	n.draw_colored_polygon(tri, Color("201b1c"))
@@ -158,19 +197,80 @@ func _tick_lasso(delta: float) -> void:
 			_lasso.landing = _lasso_horse.position
 			if _lasso_horse.held <= 0.0:
 				var st: Dictionary = _lasso_horse.state
-				st["spook"] = WorldTaming.SPOOK_SECONDS
+				if st.has("flee"):
+					st["flee"] = true
+				else:
+					st["spook"] = WorldTaming.SPOOK_SECONDS
 				_lasso_horse.state = st
 				_end_lasso()
 		return
-	var aim: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
-	if aim.length() >= LassoAim.CANCEL_THRESHOLD:
-		_lasso_aim = aim
-	elif _lasso_aim.length() >= LassoAim.CANCEL_THRESHOLD:
-		_throw_lasso(_lasso_aim.normalized(), LassoAim.throw_distance(_lasso_aim, LASSO_MAX_THROW))
-		_lasso_aim = Vector2.ZERO
-	if Input.is_action_just_pressed("throw_lasso"):
-		var dir: Vector2 = player.velocity.normalized() if player.velocity.length() > 12.0 else Vector2.RIGHT
-		_throw_lasso(dir, LASSO_MAX_THROW * 0.8)
+	if _lasso_charging:
+		if _charge_keyboard:
+			_charge_distance = minf(LASSO_MAX_THROW, _charge_distance + LASSO_CHARGE_SPEED * delta)
+			if player.velocity.length() > 12.0:
+				_aim_dir = player.velocity.normalized()
+		else:
+			var av: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
+			if av.length() >= LassoAim.CANCEL_THRESHOLD:
+				_aim_dir = av.normalized()
+				_charge_distance = LassoAim.throw_distance(av, LASSO_MAX_THROW)
+		_update_charge_visual()
+		if _charge_keyboard and Input.is_action_just_released("throw_lasso"):
+			_stop_charge()
+			_throw_lasso(_aim_dir, _charge_distance)
+	elif _lasso_state == "" and Input.is_action_just_pressed("throw_lasso"):
+		_start_charge(true)
+
+func _on_aim_pressed() -> void:
+	_aim_pressed_at = Time.get_ticks_msec() / 1000.0
+	if not _lasso_charging and _lasso_state == "":
+		_start_charge(false)
+
+func _on_aim_released(input_vector: Vector2) -> void:
+	var now: float = Time.get_ticks_msec() / 1000.0
+	if LassoAim.is_tap(input_vector, now - _aim_pressed_at):
+		if _lasso_double_tap != null and _lasso_double_tap.register_tap(now):
+			_release_held_horse()
+	elif _lasso_double_tap != null:
+		_lasso_double_tap.reset()
+	if not _lasso_charging:
+		return
+	_stop_charge()
+	if LassoAim.is_cancel(input_vector):
+		return
+	_throw_lasso(input_vector.normalized(), LassoAim.throw_distance(input_vector, LASSO_MAX_THROW))
+
+func _start_charge(keyboard: bool) -> void:
+	_lasso_charging = true
+	_charge_keyboard = keyboard
+	_charge_distance = 0.0
+	_charge_visual = Line2D.new()
+	_charge_visual.width = 3.0
+	_charge_visual.default_color = Color(0.85, 0.65, 0.2, 1.0)
+	player.add_child(_charge_visual)
+
+func _stop_charge() -> void:
+	_lasso_charging = false
+	if is_instance_valid(_charge_visual):
+		_charge_visual.queue_free()
+	_charge_visual = null
+
+func _update_charge_visual() -> void:
+	if _charge_visual != null:
+		_charge_visual.points = PackedVector2Array([Vector2.ZERO, _aim_dir * _charge_distance])
+
+func _release_held_horse() -> void:
+	if _lasso_state != "hold" or not is_instance_valid(_lasso_horse):
+		return
+	var st: Dictionary = _lasso_horse.state
+	if st.has("flee"):
+		st["flee"] = true
+	else:
+		st["spook"] = WorldTaming.SPOOK_SECONDS
+	_lasso_horse.state = st
+	_lasso_horse.held = 0.0
+	_end_lasso()
+	_lasso_cooldown = LASSO_COOLDOWN
 
 func _throw_lasso(dir: Vector2, dist: float) -> void:
 	if _lasso_state != "" or _lasso_cooldown > 0.0:
@@ -196,6 +296,11 @@ func _resolve_lasso() -> void:
 		if d < best_dist:
 			best = horse
 			best_dist = d
+	for pig in _lasso_pigs():
+		var dp: float = _lasso.landing.distance_to(pig.position)
+		if dp < best_dist:
+			best = pig
+			best_dist = dp
 	if best == null:
 		_end_lasso()
 		_lasso_cooldown = LASSO_COOLDOWN
@@ -203,6 +308,17 @@ func _resolve_lasso() -> void:
 	_lasso_horse = best
 	best.held = WorldTaming.HOLD_SECONDS
 	_lasso_state = "hold"
+
+func _lasso_pigs() -> Array:
+	var out: Array = []
+	for key in _chunks:
+		var pen: Node2D = _chunks[key].get_node_or_null("pigs")
+		if pen == null:
+			continue
+		for pig in pen.get_children():
+			if pig.name != "bar" and is_instance_valid(pig):
+				out.append(pig)
+	return out
 
 func _end_lasso() -> void:
 	if is_instance_valid(_lasso):
@@ -371,7 +487,11 @@ func _tick_pigs(delta: float) -> void:
 			if dist > 700.0:
 				all_captured = false
 				continue
-			var st: Dictionary = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
+			var st: Dictionary
+			if pig.get("held") != null and pig.held > 0.0:
+				st = WorldPigs.hold_tick(pig.state, delta)
+			else:
+				st = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
 			pig.state = st
 			var bar: ProgressBar = pig.get_node("bar")
 			bar.value = st.get("progress", 0.0)
@@ -560,6 +680,12 @@ func _build_hud() -> void:
 	_board_button.visible = false
 	_board_button.pressed.connect(_open_board)
 	_hud.add_child(_board_button)
+	_dodge_button = Button.new()
+	_dodge_button.text = tr("WORLD_DODGE")
+	_dodge_button.position = Vector2(1090, 540)
+	_dodge_button.size = Vector2(170, 54)
+	_dodge_button.pressed.connect(_try_dodge)
+	_hud.add_child(_dodge_button)
 	_map_overlay = DiscoveryMap.new()
 	_map_overlay.world = self
 	_map_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -567,7 +693,7 @@ func _build_hud() -> void:
 	_hud.add_child(_map_overlay)
 	var touch := CanvasLayer.new()
 	touch.name = "TouchControls"
-	touch.layer = 2
+	touch.layer = 0
 	add_child(touch)
 	var joy := VirtualJoystick.new()
 	joy.name = "MoveJoystick"
@@ -595,6 +721,8 @@ func _build_hud() -> void:
 	aim_joy.action_right = &"aim_right"
 	aim_joy.action_up = &"aim_up"
 	aim_joy.action_down = &"aim_down"
+	aim_joy.pressed.connect(_on_aim_pressed)
+	aim_joy.released.connect(_on_aim_released)
 	touch.add_child(aim_joy)
 
 func _toggle_map() -> void:

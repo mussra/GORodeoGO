@@ -1144,3 +1144,6 @@ msgstr "Erase"
 
 msgid "WORLD_HORSE_TIRED"
 msgstr "The horse takes a breather"
+
+msgid "WORLD_DODGE"
+msgstr "Dodge"

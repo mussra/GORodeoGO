@@ -1144,3 +1144,6 @@ msgstr "Borrar"
 
 msgid "WORLD_HORSE_TIRED"
 msgstr "El caballo se toma un respiro"
+
+msgid "WORLD_DODGE"
+msgstr "Regate"

@@ -26,5 +26,14 @@ static func tick(state:Dictionary,dist:float,speed:float,delta:float)->Dictionar
   out.progress=minf(1.0,float(out.progress)+BASE_FILL*delta)
  return out
 
+## Lasso hold (Ant 17:55: the rope must work for pigs too): fast fill while held.
+const HOLD_FILL:float=0.5
+
+static func hold_tick(state:Dictionary,delta:float)->Dictionary:
+ var out:Dictionary=state.duplicate()
+ out.flee=false
+ out.progress=minf(1.0,float(out.get("progress",0.0))+HOLD_FILL*delta)
+ return out
+
 static func captured(state:Dictionary)->bool:
  return float(state.get("progress",0.0))>=1.0

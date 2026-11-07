@@ -60,7 +60,63 @@ func test_lasso_miss_recovers() -> void:
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	world._throw_lasso(Vector2.RIGHT, 140.0)
-	for i in range(11):
+	for i in range(17):
 		await wait_physics_frames(3)
 	assert_eq(world._lasso_state, "", "missed rope retracts")
 	assert_gt(world._lasso_cooldown, 0.0, "short cooldown after a miss")
+
+func test_aim_stick_charge_and_release_throws() -> void:
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	world._on_aim_pressed()
+	assert_true(world._lasso_charging, "pressing the aim stick starts the charge")
+	world._on_aim_released(Vector2(1, 0) * 0.8)
+	assert_eq(world._lasso_state, "flight", "releasing with direction throws the rope")
+	assert_gt(world._lasso.progress, -1.0)
+
+func test_aim_release_near_center_cancels() -> void:
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	world._on_aim_pressed()
+	world._on_aim_released(Vector2(0.05, 0.0))
+	assert_eq(world._lasso_state, "", "short release cancels, no throw")
+
+func test_double_tap_releases_held_horse() -> void:
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	world.player.position = Vector2(0, 160)
+	var horse: Node2D = _plant_horse(world, Vector2(150, 160))
+	world._throw_lasso(Vector2.RIGHT, 140.0)
+	for i in range(30):
+		await wait_physics_frames(3)
+	assert_eq(world._lasso_state, "hold", "rope holding")
+	world._on_aim_pressed()
+	world._on_aim_released(Vector2.ZERO)
+	world._on_aim_pressed()
+	world._on_aim_released(Vector2.ZERO)
+	assert_eq(world._lasso_state, "", "double tap drops the roped horse")
+	assert_eq(horse.held <= 0.0, true, "horse free to bolt")
+
+func test_lasso_captures_pig_and_counts() -> void:
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	var before: int = SaveData.world_pigs.size()
+	world.player.position = Vector2(0, 160)
+	var chunk: Node2D = world._chunks.values()[0]
+	var pen := Node2D.new()
+	pen.name = "pigs"
+	chunk.add_child(pen)
+	var pig: Node2D = world.PigScript.new()
+	pig.setup({"pos": Vector2(150, 160)})
+	pen.add_child(pig)
+	pig.position = Vector2(150, 160)
+	var bar := ProgressBar.new()
+	bar.name = "bar"
+	pig.add_child(bar)
+	world._throw_lasso(Vector2.RIGHT, 140.0)
+	for i in range(80):
+		await wait_physics_frames(3)
+		if not is_instance_valid(pig):
+			break
+	assert_false(is_instance_valid(pig), "roped pig is captured")
+	assert_gt(SaveData.world_pigs.size(), before, "pig counts in the counter")

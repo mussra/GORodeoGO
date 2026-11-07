@@ -10,6 +10,17 @@ var acceleration: float = 900.0
 var friction: float = 700.0
 var gait: int = WorldGait.PASO
 var gait_cap: int = WorldGait.GALOPE  # stamina caps this; the world sets it
+
+## Regate in the open world (Ant, 7-nov-2026 16:21): quick dash in the current
+## direction with the dodge trail (estela), same feel as the corral dodge.
+const DODGE_SECONDS: float = 0.18
+const DODGE_SPEED_FACTOR: float = 2.2
+var dodge_recharge_seconds: float = 2.5
+var dodge_cooldown: float = 0.0
+var _dodge_remaining: float = 0.0
+var _dodge_direction: Vector2 = Vector2.ZERO
+var _skid_trail: Array[Vector2] = []
+var _trail_fade: float = 0.0
 var _sprite_swap: SpriteSwap
 
 func _ready() -> void:
@@ -35,7 +46,30 @@ func calm() -> float:
 	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
 	return HorseStats.read(horse).calm if not horse.is_empty() else 1.0
 
+func request_dodge(direction: Vector2) -> bool:
+	if _dodge_remaining > 0.0 or dodge_cooldown > 0.0 or direction.length() < 0.2:
+		return false
+	_dodge_direction = direction.normalized()
+	_dodge_remaining = DODGE_SECONDS
+	dodge_cooldown = dodge_recharge_seconds
+	_skid_trail.clear()
+	_skid_trail.append(global_position)
+	_trail_fade = 0.7
+	return true
+
 func _physics_process(delta: float) -> void:
+	dodge_cooldown = maxf(0.0, dodge_cooldown - delta)
+	if _dodge_remaining > 0.0:
+		_dodge_remaining -= delta
+		velocity = _dodge_direction * max_speed * DODGE_SPEED_FACTOR
+		move_and_slide()
+		_skid_trail.append(global_position)
+		_update_animation(delta)
+		return
+	if _trail_fade > 0.0:
+		_trail_fade = maxf(0.0, _trail_fade - delta)
+		if _trail_fade <= 0.0:
+			_skid_trail.clear()
 	var wish := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	gait = mini(WorldGait.update(gait, wish.length()), gait_cap)
 	var gait_speed: float = WorldGait.speed_for(gait, max_speed)
