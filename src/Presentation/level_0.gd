@@ -103,7 +103,9 @@ func _ready() -> void:
 
 	_activate_bulls(level_data.pens)
 
-	player.lasso_thrown.connect(_on_lasso_thrown)
+	player.lasso.prey_provider = func() -> Array: return _active_bulls
+	player.lasso.can_capture = func() -> bool: return not _game_over and _held_bulls().size() < _max_simultaneous_captures
+	player.prey_captured.connect(_on_prey_captured)
 	player.release_requested.connect(_on_release_requested)
 	player.throw_blocked.connect(_on_throw_blocked)
 	pen.bull_returned.connect(_on_bull_returned)
@@ -461,29 +463,15 @@ func _update_nerves_hud() -> void:
 	else:
 		hud.hide_nerves_slot(1)
 
-func _on_lasso_thrown(throw_origin: Vector2, landing_point: Vector2) -> void:
-	if _game_over or _held_bulls().size() >= _max_simultaneous_captures:
-		return  # lasso limit reached — can't start another capture right now
-
-	# Nearest-to-landing-point first: with the charge/release mechanic the landing point
-	# itself already encodes aim + distance, so distance-to-landing is what should decide
-	# which bull (if any) got hit.
-	var candidates: Array = _active_bulls.duplicate()
-	candidates.sort_custom(func(a, b): return landing_point.distance_to(a.global_position) < landing_point.distance_to(b.global_position))
-	for bull in candidates:
-		if bull.try_capture(landing_point):
-			bull.capture_order = _next_capture_order
-			_next_capture_order += 1
-			player.set_active_capture_count(_held_bulls().size())
-			return
-		if OS.is_debug_build():
-			# DIAGNOSTIC (reinstated — capture precision still reported as inconsistent):
-			# only logs misses, to keep noise down. Remove once confirmed resolved.
-			print("Lasso MISSED %s: landing=%s bull_pos=%s dist=%.1f effective_radius=%.1f" % [
-				bull.name, landing_point, bull.global_position,
-				landing_point.distance_to(bull.global_position),
-				bull.hit_radius + bull.capture_tolerance
-			])
+## Resolution itself lives in the shared LassoController (same code as the open
+## world, Ant 7-nov 20:02): nearest candidate to the landing point first, each
+## prey's own capture rule. Here only the level bookkeeping: capture order and
+## the player's active-capture count for the towing speed penalty.
+func _on_prey_captured(prey: Node2D) -> void:
+	var bull = prey
+	bull.capture_order = _next_capture_order
+	_next_capture_order += 1
+	player.set_active_capture_count(_held_bulls().size())
 
 ## The player tried to throw with no free lasso slot (Ant, 4-nov: throws are limited to
 ## the available slots — 1 normally, 2 with the dual lasso). The throw is refused in

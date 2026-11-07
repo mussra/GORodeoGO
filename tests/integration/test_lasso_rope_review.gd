@@ -54,19 +54,19 @@ func test_real_flight_samples_moving_bull_at_landing_and_rider_motion_does_not_s
 	var player:Node=level.player
 	player.global_position=Vector2(-200,100)
 	bull.global_position=Vector2(0,100)
-	player._charge_distance=200
+	player.lasso._charge_distance=200
 	player.aim_direction=Vector2.RIGHT
-	player._release_throw()
+	player.lasso._release_throw()
 	player.global_position+=Vector2(0,80)
 	bull.global_position+=Vector2(59,0)
 	await wait_physics_frames(60)
 	assert_true(bull.controller.is_wild(),"near at release, outside at landing is a genuine miss")
-	assert_false(player._lasso_in_flight)
+	assert_false(player.lasso._lasso_in_flight)
 	player.global_position=Vector2(-200,100)
 	bull.global_position=Vector2(80,100)
-	player._charge_distance=200
+	player.lasso._charge_distance=200
 	player.aim_direction=Vector2.RIGHT
-	player._release_throw()
+	player.lasso._release_throw()
 	bull.global_position=Vector2(57,100)
 	await wait_physics_frames(60)
 	assert_false(bull.controller.is_wild(),"outside at release, inside at landing captures")

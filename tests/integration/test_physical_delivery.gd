@@ -23,7 +23,7 @@ func test_real_tow_movement_delivers_without_teleporting_bull_to_pen() -> void:
 	var bull: CharacterBody2D = level._active_bulls[0]
 	# Setup only: place rider within lasso range, with bull at its real spawn.
 	level.player.global_position = bull.global_position + Vector2(-100, 0)
-	level._on_lasso_thrown(level.player.global_position, bull.global_position)
+	level.player.lasso.resolve_capture(bull.global_position)
 	bull.controller.update_hold(100.0, 100.0, 0.0)
 	assert_eq(bull.controller.current_state(), BullState.State.CONTROLLED)
 	Input.action_press("move_left")
@@ -60,7 +60,7 @@ func test_timeout_remains_defeat_if_controlled_bull_overlaps_goal_afterwards() -
 	add_child_autofree(level)
 	await wait_physics_frames(2)
 	var bull: CharacterBody2D = level._active_bulls[0]
-	level._on_lasso_thrown(level.player.global_position, bull.global_position)
+	level.player.lasso.resolve_capture(bull.global_position)
 	bull.controller.update_hold(100.0, 0.0, 0.0)
 	bull.global_position = level.pen.global_position
 	level._trigger_lose("Tiempo agotado")

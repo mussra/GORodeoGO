@@ -68,17 +68,17 @@ func test_lasso_miss_recovers() -> void:
 func test_aim_stick_charge_and_release_throws() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
-	world._on_aim_pressed()
+	world.lasso._on_aim_pressed()
 	assert_true(world._lasso_charging, "pressing the aim stick starts the charge")
-	world._on_aim_released(Vector2(1, 0) * 0.8)
+	world.lasso._on_aim_released(Vector2(1, 0) * 0.8)
 	assert_eq(world._lasso_state, "flight", "releasing with direction throws the rope")
 	assert_gt(world._lasso.progress, -1.0)
 
 func test_aim_release_near_center_cancels() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
-	world._on_aim_pressed()
-	world._on_aim_released(Vector2(0.05, 0.0))
+	world.lasso._on_aim_pressed()
+	world.lasso._on_aim_released(Vector2(0.05, 0.0))
 	assert_eq(world._lasso_state, "", "short release cancels, no throw")
 
 func test_double_tap_releases_held_horse() -> void:
@@ -90,10 +90,10 @@ func test_double_tap_releases_held_horse() -> void:
 	for i in range(30):
 		await wait_physics_frames(3)
 	assert_eq(world._lasso_state, "hold", "rope holding")
-	world._on_aim_pressed()
-	world._on_aim_released(Vector2.ZERO)
-	world._on_aim_pressed()
-	world._on_aim_released(Vector2.ZERO)
+	world.lasso._on_aim_pressed()
+	world.lasso._on_aim_released(Vector2.ZERO)
+	world.lasso._on_aim_pressed()
+	world.lasso._on_aim_released(Vector2.ZERO)
 	assert_eq(world._lasso_state, "", "double tap drops the roped horse")
 	assert_eq(horse.held <= 0.0, true, "horse free to bolt")
 

@@ -35,7 +35,7 @@ func _spawn_level(level_number: int, progress: int) -> Node:
 
 func _capture(level: Node, bull: CharacterBody2D) -> void:
 	level.player.global_position = bull.global_position + Vector2(-80, 0)
-	level._on_lasso_thrown(level.player.global_position, bull.global_position)
+	level.player.lasso.resolve_capture(bull.global_position)
 
 func test_towed_bull_keeps_pace_with_sprinting_player() -> void:
 	var level: Node = await _spawn_level(1, 0)  # base speed, no upgrades
@@ -92,7 +92,7 @@ func test_throw_blocked_without_free_slot_single_lasso() -> void:
 	Input.action_press("throw_lasso")
 	await wait_physics_frames(2)
 	Input.action_release("throw_lasso")
-	assert_false(level.player._is_charging, "no throw starts with every slot occupied")
+	assert_false(level.player.lasso._is_charging, "no throw starts with every slot occupied")
 	assert_signal_emitted(level.player, "throw_blocked")
 	assert_gt(level.hud._flash_hint_until_seconds, Time.get_ticks_msec() / 1000.0, "HUD explains how to free a slot")
 
@@ -102,7 +102,7 @@ func test_throw_allowed_with_dual_lasso_while_one_slot_free() -> void:
 	await wait_physics_frames(2)
 	Input.action_press("throw_lasso")
 	await wait_physics_frames(2)
-	assert_true(level.player._is_charging, "second throw allowed with dual lasso and one slot free")
+	assert_true(level.player.lasso._is_charging, "second throw allowed with dual lasso and one slot free")
 	Input.action_release("throw_lasso")
 	level.player.cancel_all_actions()
 
@@ -116,18 +116,18 @@ func test_throw_blocked_with_dual_lasso_until_double_tap_release_frees_slot() ->
 	Input.action_press("throw_lasso")
 	await wait_physics_frames(2)
 	Input.action_release("throw_lasso")
-	assert_false(level.player._is_charging, "two held bulls with dual lasso: no third throw")
+	assert_false(level.player.lasso._is_charging, "two held bulls with dual lasso: no third throw")
 	assert_signal_emitted(level.player, "throw_blocked")
 	# Double tap on the aim stick drops the most recent capture (D038) and frees a slot.
-	level.player._on_aim_pressed()
-	level.player._on_aim_released(Vector2.ZERO)
-	level.player._on_aim_pressed()
-	level.player._on_aim_released(Vector2.ZERO)
+	level.player.lasso._on_aim_pressed()
+	level.player.lasso._on_aim_released(Vector2.ZERO)
+	level.player.lasso._on_aim_pressed()
+	level.player.lasso._on_aim_released(Vector2.ZERO)
 	await wait_physics_frames(2)
 	assert_eq(level.player._active_capture_count, 1)
 	Input.action_press("throw_lasso")
 	await wait_physics_frames(2)
-	assert_true(level.player._is_charging, "throw works again after releasing one bull")
+	assert_true(level.player.lasso._is_charging, "throw works again after releasing one bull")
 	Input.action_release("throw_lasso")
 	level.player.cancel_all_actions()
 

@@ -12,6 +12,7 @@ signal lasso_thrown(throw_origin: Vector2, landing_point: Vector2)
 signal lasso_released
 signal stunned
 signal release_requested
+signal prey_captured(prey)
 ## The player tried to throw with every lasso slot occupied (Ant, 4-nov: no lanzar sin hueco).
 ## Level0 surfaces it as a HUD hint; the throw itself is simply refused.
 signal throw_blocked
@@ -74,28 +75,35 @@ const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_di
 @export var max_speed: float = 260.0
 @export var acceleration: float = 900.0
 @export var friction: float = 700.0
-@export var max_throw_distance: float = 220.0
-@export var charge_speed: float = 300.0  # units/sec the lasso reaches out while charging (keyboard fallback)
-@export var lasso_travel_time: float = .8  # seconds between release and actual capture resolution
+@export var max_throw_distance: float = 220.0:
+	set(v):
+		max_throw_distance = v
+		if lasso != null: lasso.max_throw_distance = v
+@export var charge_speed: float = 300.0:  # units/sec the lasso reaches out while charging (keyboard fallback)
+	set(v):
+		charge_speed = v
+		if lasso != null: lasso.charge_speed = v
+@export var lasso_travel_time: float = .8:  # seconds between release and actual capture resolution
+	set(v):
+		lasso_travel_time = v
+		if lasso != null: lasso.lasso_travel_time = v
 @export var stun_resistance_multiplier: float = 1.0  # applied to incoming stun duration; upgrade lowers this
 @export var dual_capture_speed_multiplier: float = 0.6  # applied to max_speed while towing 2+ bulls at once (Level 10 unlock)
-@export var capture_area_visual_radius: float = 58.0  # visual only — roughly matches a bull's hit_radius + capture_tolerance defaults; not read from any specific bull, since which bull (if any) gets hit isn't known until resolution
+@export var capture_area_visual_radius: float = 58.0:  # visual only — roughly matches a bull's hit_radius + capture_tolerance defaults; not read from any specific bull, since which bull (if any) gets hit isn't known until resolution
+	set(v):
+		capture_area_visual_radius = v
+		if lasso != null: lasso.capture_area_visual_radius = v
 
-var aim_direction: Vector2 = Vector2.RIGHT
+var lasso: LassoController = null
+var aim_direction: Vector2 = Vector2.RIGHT:
+	set(v):
+		aim_direction = v
+		if lasso != null: lasso.aim_direction = v
 var world_bounds: Rect2 = Rect2(-480, -270, 960, 540)
 var _stun_time_remaining: float = 0.0
-var _is_charging: bool = false
-var _lasso_in_flight: bool = false
-var _flight_generation: int = 0
-var _flight_line: Node2D = null
-var _flight_tween: Tween = null
-var _lasso_gesture: LassoGesture = LassoGesture.new()
-var _charge_distance: float = 0.0
-var _charge_visual: Line2D = null
 var _sprite_swap: SpriteSwap
 var _active_capture_count: int = 0
 var _max_captures: int = 1
-var _touch_aim_active: bool = false
 
 func _ready() -> void:
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), ANIM_NAMES)
@@ -105,6 +113,20 @@ func _ready() -> void:
 	var cue_layer:=CanvasLayer.new()
 	cue_layer.layer=16
 	add_child(cue_layer)
+	lasso = LassoController.new()
+	lasso.max_throw_distance = max_throw_distance
+	lasso.charge_speed = charge_speed
+	lasso.lasso_travel_time = lasso_travel_time
+	lasso.capture_area_visual_radius = capture_area_visual_radius
+	lasso.aim_direction = aim_direction
+	lasso.throw_guard = func() -> bool: return _jump_time <= 0 and _stun_time_remaining <= 0.0 and is_physics_processing()
+	lasso.rope_parent = func() -> Node: return get_parent()
+	lasso.lasso_released.connect(func(): lasso_released.emit())
+	lasso.lasso_thrown.connect(func(o: Vector2, l: Vector2): lasso_thrown.emit(o, l))
+	lasso.prey_captured.connect(func(prey: Node2D): prey_captured.emit(prey))
+	lasso.throw_blocked.connect(func(): throw_blocked.emit())
+	lasso.release_requested.connect(func(): release_requested.emit())
+	add_child(lasso)
 	var cue:=DodgeEdgeCue.new()
 	cue.player=self
 	cue_layer.add_child(cue)
@@ -114,16 +136,18 @@ func _ready() -> void:
 ## a stronger horse trades speed for pulling two at once).
 func set_active_capture_count(count: int) -> void:
 	_active_capture_count = count
+	if lasso != null: lasso.set_active_capture_count(count)
 
 ## Called once by Level0 after applying unlocks: how many bulls may be held at once —
 ## 1 normally, 2 with the dual lasso (PlayerUpgrades.max_simultaneous_captures).
 func set_max_captures(value: int) -> void:
 	_max_captures = maxi(1, value)
+	if lasso != null: lasso.set_max_captures(value)
 
 ## A throw is only possible with a free slot: full hands mean releasing first
 ## (double tap on the aim stick, D038) before throwing again.
 func _has_free_lasso_slot() -> bool:
-	return _active_capture_count < _max_captures
+	return lasso.has_free_lasso_slot()
 
 ## Wires the aim/throw stick (Godot 4.7 native VirtualJoystick, JOYSTICK_FOLLOWING mode —
 ## appears where touched and its base follows the finger, so you never have to drag back
@@ -131,8 +155,7 @@ func _has_free_lasso_slot() -> bool:
 ## movement VirtualJoystick feeds the same move_left/right/up/down actions keyboard
 ## already uses, so Input.get_vector picks it up automatically either way.
 func set_aim_joystick(aim_joystick: VirtualJoystick) -> void:
-	aim_joystick.pressed.connect(_on_aim_pressed)
-	aim_joystick.released.connect(_on_aim_released)
+	lasso.set_aim_joystick(aim_joystick)
 
 ## Movement and lasso gestures have independent detectors.
 func set_move_joystick(stick: VirtualJoystick) -> void:
@@ -239,16 +262,6 @@ func request_dodge(direction: Vector2) -> bool:
 	_dodge_cooldown = dodge_recharge_seconds
 	return true
 
-func _on_aim_pressed() -> void:
-	if _jump_time>0 or _stun_time_remaining > 0.0 or not is_physics_processing():
-		return
-	_touch_aim_active = true
-	_lasso_gesture.press(_now_seconds())
-	if not _is_charging and not _lasso_in_flight:
-		if _has_free_lasso_slot():
-			_start_charging()
-		else:
-			throw_blocked.emit()
 
 ## Two quick taps (press+release near the centre) emit release_requested instead (D038).
 ## Releasing with the stick (almost) back at its centre CANCELS the throw instead of dropping
@@ -258,21 +271,6 @@ func _on_aim_pressed() -> void:
 ## using it directly (instead of the last value polled in _physics_process) avoids a
 ## one-frame staleness that was making the landing point slightly off from where you
 ## actually released, especially noticeable on fast drags.
-func _on_aim_released(input_vector: Vector2) -> void:
-	if not _touch_aim_active:
-		return
-	_touch_aim_active = false
-	# Shared gesture machine (src/Application/lasso_gesture.gd) — the same code
-	# the open world uses; only the effects differ (corral vs world).
-	var decision: Dictionary = _lasso_gesture.release(input_vector, _now_seconds(), _is_charging, max_throw_distance)
-	if decision.double_tap:
-		release_requested.emit()
-	if not _is_charging:
-		return
-	if decision.action == LassoGesture.Action.CANCEL:
-		_cancel_charge()
-	elif decision.action == LassoGesture.Action.THROW:
-		_release_throw(input_vector)
 
 ## Called by an unroped, nervous bull on contact (GAMEPLAY_SPEC.md #Failure feedback).
 func stun(duration: float) -> void:
@@ -389,7 +387,7 @@ func _physics_process(delta: float) -> void:
 		if _active_capture_count >= 2:
 			target_speed *= dual_capture_speed_multiplier
 		velocity = velocity.move_toward(input_dir.normalized() * target_speed, acceleration * delta)
-		if not _is_charging:
+		if not lasso.is_charging():
 			aim_direction = input_dir.normalized()
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
@@ -417,87 +415,21 @@ func _resume_running_after_dodge() -> void:
 	velocity = _dodge_direction * speed
 
 func _process_throw_input(delta: float) -> void:
-	if _is_charging:
-		var aim_vec: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
-		if aim_vec.length() > 0.0:
-			aim_direction = aim_vec.normalized()
-		if _touch_aim_active:
-			_charge_distance = LassoAim.throw_distance(aim_vec, max_throw_distance)
-		else:
-			_charge_distance = minf(max_throw_distance, _charge_distance + charge_speed * delta)
-		_update_charge_visual()
-		if Input.is_action_just_released("throw_lasso"):
-			_release_throw()
-		return
-
-	if not _lasso_in_flight and Input.is_action_just_pressed("throw_lasso"):
-		if _has_free_lasso_slot():
-			_start_charging()
-		else:
-			throw_blocked.emit()
+	lasso.process_throw_input(delta)
 
 func _now_seconds() -> float:
 	return Time.get_ticks_msec() / 1000.0
 
-func _start_charging() -> void:
-	_is_charging = true
-	_charge_distance = 0.0
-	_charge_visual = Line2D.new()
-	_charge_visual.width = 3.0
-	_charge_visual.default_color = Color(0.85, 0.65, 0.2, 1.0)
-	add_child(_charge_visual)
 
-func _update_charge_visual() -> void:
-	if _charge_visual != null:
-		_charge_visual.points = PackedVector2Array([Vector2.ZERO, aim_direction * _charge_distance])
-	queue_redraw()
 
 ## [param final_vector]: when the aim stick provides its exact release vector, use it
 ## directly (fixes the one-frame staleness noted above). Empty/zero means "use whatever
 ## aim_direction/_charge_distance were last set" — the keyboard/mouse fallback path.
-func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
-	if not _has_free_lasso_slot():
-		_cancel_charge()
-		throw_blocked.emit()
-		return
-	if final_vector.length() > 0.0:
-		aim_direction = final_vector.normalized()
-		_charge_distance = LassoAim.throw_distance(final_vector, max_throw_distance)
-
-	var landing_point: Vector2 = global_position + aim_direction * _charge_distance
-	var throw_origin: Vector2 = global_position
-	_cancel_charge()
-
-	# Simulated flight time (GAMEPLAY_SPEC.md #Lanzamiento: "sensación de altura" — the rope
-	# travels before landing; the bull can move away in the meantime). The line animates in
-	# world space: destination stays fixed but the rope origin follows the rider.
-	lasso_released.emit()
-	_lasso_in_flight = true
-	_flight_generation += 1
-	var generation: int = _flight_generation
-	_animate_lasso_flight(throw_origin, landing_point)
-	await get_tree().create_timer(lasso_travel_time, false).timeout  # process_always=false: no landing while paused
-	if generation != _flight_generation:
-		return
-	_lasso_in_flight = false
-
-	lasso_thrown.emit(throw_origin, landing_point)
-	_flash_landing_area(landing_point)
-	# A second touch can begin before first flight lands. Keep held aim usable.
-	if _touch_aim_active and not _is_charging and _has_free_lasso_slot() and _stun_time_remaining<=0:
-		_start_charging()
 
 func cancel_all_actions() -> void:
 	if _jump_time>0:_finish_jump(true)
 	cancel_input()
-	_flight_generation += 1
-	_lasso_in_flight = false
-	if is_instance_valid(_flight_tween):
-		_flight_tween.kill()
-	if is_instance_valid(_flight_line):
-		_flight_line.queue_free()
-	_flight_line = null
-	_flight_tween = null
+	lasso.cancel_all_actions()
 
 func cancel_input() -> void:
 	_running_release_at = -INF
@@ -510,51 +442,14 @@ func cancel_input() -> void:
 	_drawing_dodge = false
 	_draw_points = PackedVector2Array()
 	_move_tap.reset()
-	_touch_aim_active = false
-	_lasso_gesture.reset()
-	_cancel_charge()
+	lasso.cancel_input()
 	velocity = Vector2.ZERO
-
-func _cancel_charge() -> void:
-	if _charge_visual != null:
-		_charge_visual.queue_free()
-		_charge_visual = null
-	_is_charging = false
-	_charge_distance = 0.0
-	queue_redraw()
 
 ## Animates a line from throw_origin to landing_point over lasso_travel_time, in world
 ## space: landing stays fixed, rope origin follows the moving rider.
-func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> void:
-	var rope:=LassoRope.new()
-	_flight_line=rope
-	rope.rider=self
-	rope.start=throw_origin
-	rope.landing=landing_point
-	rope.landing_radius=capture_area_visual_radius
-	get_parent().add_child(rope)
-	var tween:Tween=create_tween()
-	_flight_tween=tween
-	tween.tween_property(rope,"progress",1.0,lasso_travel_time)
-	tween.tween_callback(rope.queue_free)
 
 ## Shows the lasso's effective capture area as a translucent circle where it lands, fading out.
-func _flash_landing_area(landing_point: Vector2) -> void:
-	var marker := Polygon2D.new()
-	marker.polygon = _circle_points(capture_area_visual_radius, 24)
-	marker.color = Color(0.85, 0.65, 0.2, 0.35)
-	get_parent().add_child(marker)
-	marker.global_position = landing_point
-	var tween: Tween = create_tween()
-	tween.tween_property(marker, "modulate:a", 0.0, 0.4)
-	tween.tween_callback(marker.queue_free)
 
-func _circle_points(radius: float, segments: int) -> PackedVector2Array:
-	var points := PackedVector2Array()
-	for i in range(segments):
-		var angle: float = TAU * i / segments
-		points.append(Vector2(cos(angle), sin(angle)) * radius)
-	return points
 
 ## Ring matches the forgiving capture area, not the bull's collision shape.
 func _draw() -> void:
@@ -580,8 +475,8 @@ func _draw() -> void:
 	draw_set_transform(Vector2(0, 33), 0.0, Vector2(1.0, 0.3))
 	draw_circle(Vector2.ZERO, 27, Color(0.15, 0.12, 0.08, 0.2))
 	draw_set_transform(Vector2.ZERO)
-	if _is_charging and _charge_distance > 1.0:
-		var target: Vector2 = aim_direction * _charge_distance
+	if lasso.is_charging() and lasso.charge_distance() > 1.0:
+		var target: Vector2 = aim_direction * lasso.charge_distance()
 		draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
 		draw_arc(target, capture_area_visual_radius, 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
 		draw_circle(target, 3.0, Color(1.0, 0.92, 0.7))

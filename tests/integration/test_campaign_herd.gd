@@ -52,7 +52,7 @@ func test_pair_capture_attempts_use_input_motion_and_leave_live_companion()->voi
 			var target:Node=candidates[0]
 			var offset:Vector2=target.global_position-level.player.global_position
 			if offset.length()<level.player.max_throw_distance-20:
-				level._on_lasso_thrown(level.player.global_position,target.global_position)
+				level.player.lasso.resolve_capture(target.global_position)
 			else:_drive(offset)
 			await wait_physics_frames(1)
 			travel+=1

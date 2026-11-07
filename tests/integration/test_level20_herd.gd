@@ -34,7 +34,7 @@ func test_courier_never_consumes_chaser_even_if_nearest()->void:
 	peer._leaving_corral=false
 	assert_true(level._wild_distances().has(1))
 	# A real lasso capture, not a fabricated held flag, enables the chaser rule.
-	level._on_lasso_thrown(level.player.global_position,level._active_bulls[5].global_position)
+	level.player.lasso.resolve_capture(level._active_bulls[5].global_position)
 	assert_eq(level._held_bulls().size(),1)
 	level._update_chaser(1.1)
 	assert_eq(level._chaser_index,1)
@@ -59,7 +59,7 @@ func test_live_herd_pair_capture_still_creates_real_pursuit()->void:
 		var target:Node=candidates[0]
 		var offset:Vector2=target.global_position-level.player.global_position
 		if offset.length()<level.player.max_throw_distance-20:
-			level._on_lasso_thrown(level.player.global_position,target.global_position)
+			level.player.lasso.resolve_capture(target.global_position)
 		else:
 			_drive(offset)
 		await wait_physics_frames(1)
@@ -85,7 +85,7 @@ func test_master_errand_and_companion_pursuit_run_together()->void:
 	await wait_physics_frames(530)
 	for index in [1,5]:
 		var bull:Node=level._active_bulls[index]
-		level._on_lasso_thrown(level.player.global_position,bull.global_position)
+		level.player.lasso.resolve_capture(bull.global_position)
 	assert_eq(level._held_bulls().size(),2)
 	var simultaneous:bool=false
 	var courier:Node=level._active_bulls[0]

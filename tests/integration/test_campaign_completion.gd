@@ -31,7 +31,7 @@ func test_every_level_can_release_capture_calm_deliver_and_win() -> void:
 		for index in range(level._active_bulls.size()):
 			var bull: Node2D = level._active_bulls[index]
 			assert_true(bull.controller.is_wild(), "level %d bull %d released" % [number, index])
-			level._on_lasso_thrown(level.player.global_position, bull.global_position)
+			level.player.lasso.resolve_capture(bull.global_position)
 			assert_true(bull.controller.is_held(), "level %d bull %d captured" % [number, index])
 			bull.controller.update_hold(100.0, 0.0, 0.0)
 			assert_eq(bull.controller.current_state(), BullState.State.CONTROLLED)

@@ -16,7 +16,7 @@ func test_map_coordinates_modal_pause_and_real_touch_do_not_trigger_throw()->voi
 	assert_eq(map._point(level.world_bounds.end,Rect2(10,10,100,60)),Vector2(110,70))
 	map.set_expanded(true)
 	assert_true(get_tree().paused)
-	assert_false(level.player._lasso_in_flight)
+	assert_false(level.player.lasso._lasso_in_flight)
 	assert_gt(map.size.x,600.0)
 	map.set_expanded(false)
 	assert_false(get_tree().paused)
@@ -38,7 +38,7 @@ func test_actual_screen_touch_opens_and_closes_map_without_aim_charge()->void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_true(map.expanded,"real screen input reaches map control")
-	assert_false(level.player._is_charging)
+	assert_false(level.player.lasso._is_charging)
 	touch=InputEventScreenTouch.new()
 	touch.index=1;touch.pressed=false;touch.position=map.position+map.size/2
 	Input.parse_input_event(touch)
@@ -50,4 +50,4 @@ func test_actual_screen_touch_opens_and_closes_map_without_aim_charge()->void:
 	await get_tree().process_frame
 	assert_false(map.expanded)
 	assert_false(get_tree().paused)
-	assert_false(level.player._is_charging)
+	assert_false(level.player.lasso._is_charging)

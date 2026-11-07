@@ -24,7 +24,7 @@ func test_stun_cancels_jump_and_restores_collision_and_sprite()->void:
  assert_eq(player._jump_time,0.0);assert_eq(player.collision_mask&32,32);assert_eq(player.position,Vector2(-90,0));assert_eq(player._sprite_swap._sprite.scale,Vector2.ONE)
 func test_dodge_and_lasso_cannot_start_in_midair()->void:
  player.dodge_available=true;assert_true(player.request_jump(Vector2.RIGHT));assert_false(player.request_dodge(Vector2.RIGHT));assert_false(player.request_dodge_path(PackedVector2Array([Vector2.ZERO,Vector2(80,0)])))
- player._on_aim_pressed();assert_false(player._touch_aim_active)
+ player.lasso._on_aim_pressed();assert_false(player.lasso._touch_aim_active)
 
 func test_roped_bull_recovers_path_around_both_ends_of_solid_fence()->void:
  var scene:Node=load("res://src/Presentation/level_0.tscn").instantiate();var bull:Node=scene.get_node("Bull").duplicate();scene.free();bull.position=Vector2(-85,0);bull.world_bounds=Rect2(-400,-250,800,500);add_child_autofree(bull);bull.set_physics_process(false);bull._update_collision(BullState.State.CONTROLLED);await get_tree().physics_frame

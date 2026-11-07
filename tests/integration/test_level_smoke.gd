@@ -163,28 +163,28 @@ func test_both_sticks_use_following_mode() -> void:
 func test_releasing_the_aim_stick_near_the_centre_cancels_the_throw() -> void:
 	var level: Node = await _spawn_level(1)
 	var player = level.player
-	player._on_aim_pressed()
-	assert_true(player._is_charging)
-	player._on_aim_released(Vector2(0.05, 0.0))
-	assert_false(player._is_charging)
-	assert_false(player._lasso_in_flight, "a cancelled throw must not spend the lasso")
+	player.lasso._on_aim_pressed()
+	assert_true(player.lasso._is_charging)
+	player.lasso._on_aim_released(Vector2(0.05, 0.0))
+	assert_false(player.lasso._is_charging)
+	assert_false(player.lasso._lasso_in_flight, "a cancelled throw must not spend the lasso")
 
 func test_a_tap_without_moving_cancels_too() -> void:
 	var level: Node = await _spawn_level(1)
 	var player = level.player
-	player._on_aim_pressed()
-	player._on_aim_released(Vector2.ZERO)
-	assert_false(player._is_charging)
-	assert_false(player._lasso_in_flight)
+	player.lasso._on_aim_pressed()
+	player.lasso._on_aim_released(Vector2.ZERO)
+	assert_false(player.lasso._is_charging)
+	assert_false(player.lasso._lasso_in_flight)
 
 func test_releasing_the_aim_stick_beyond_the_zone_throws_at_the_stick_distance() -> void:
 	var level: Node = await _spawn_level(1)
 	var player = level.player
 	watch_signals(player)
 	player.lasso_travel_time = 0.05
-	player._on_aim_pressed()
-	player._on_aim_released(Vector2(0.5, 0.0))
-	assert_true(player._lasso_in_flight)
+	player.lasso._on_aim_pressed()
+	player.lasso._on_aim_released(Vector2(0.5, 0.0))
+	assert_true(player.lasso._lasso_in_flight)
 	await wait_seconds(0.3)
 	assert_signal_emitted(player, "lasso_thrown")
 	var params: Array = get_signal_parameters(player, "lasso_thrown")
@@ -193,13 +193,13 @@ func test_releasing_the_aim_stick_beyond_the_zone_throws_at_the_stick_distance()
 func _capture(level: Node, bull_index: int) -> Node:
 	# Throw like the player: the landing point decides which bull is hit.
 	var bull = level._active_bulls[bull_index]
-	level._on_lasso_thrown(level.player.global_position, bull.global_position)
+	level.player.lasso.resolve_capture(bull.global_position)
 	assert_true(bull.controller.is_held(), "bull %d should be captured" % bull_index)
 	return bull
 
 func _tap(player: Node) -> void:
-	player._on_aim_pressed()
-	player._on_aim_released(Vector2.ZERO)
+	player.lasso._on_aim_pressed()
+	player.lasso._on_aim_released(Vector2.ZERO)
 
 func test_lasso_captures_a_bull_even_with_an_obstacle_in_between() -> void:
 	var level: Node = await _spawn_level(5)
@@ -217,7 +217,7 @@ func test_lasso_captures_a_bull_even_with_an_obstacle_in_between() -> void:
 	wall.position = Vector2(100, 0)
 	level.add_child(wall)
 	await wait_physics_frames(2)
-	level._on_lasso_thrown(level.player.global_position, bull.global_position)
+	level.player.lasso.resolve_capture(bull.global_position)
 	assert_true(bull.controller.is_held(), "obstacles no longer block the lasso (D038)")
 
 func test_double_tap_releases_the_captured_bull() -> void:
@@ -253,8 +253,8 @@ func test_a_throw_between_two_taps_breaks_the_double_tap() -> void:
 	var bull = _capture(level, 0)
 	_tap(level.player)
 	level.player.lasso_travel_time = 5.0
-	level.player._on_aim_pressed()
-	level.player._on_aim_released(Vector2(0.8, 0.0))  # a real throw
+	level.player.lasso._on_aim_pressed()
+	level.player.lasso._on_aim_released(Vector2(0.8, 0.0))  # a real throw
 	_tap(level.player)
 	assert_true(bull.controller.is_held())
 
@@ -291,23 +291,23 @@ func after_each() -> void:
 func test_keyboard_charge_increases_range_without_a_touch_stick() -> void:
 	var level: Node = await _spawn_level(1)
 	var player = level.player
-	player._start_charging()
+	player.lasso._start_charging()
 	player._process_throw_input(0.25)
-	assert_almost_eq(player._charge_distance, player.charge_speed * 0.25, 0.1)
+	assert_almost_eq(player.lasso._charge_distance, player.charge_speed * 0.25, 0.1)
 	player._process_throw_input(5.0)
-	assert_almost_eq(player._charge_distance, player.max_throw_distance, 0.1)
+	assert_almost_eq(player.lasso._charge_distance, player.max_throw_distance, 0.1)
 
 func test_touch_aim_does_not_use_keyboard_charge_growth() -> void:
 	var level: Node = await _spawn_level(1)
-	level.player._on_aim_pressed()
+	level.player.lasso._on_aim_pressed()
 	level.player._process_throw_input(0.5)
-	assert_eq(level.player._charge_distance, 0.0)
+	assert_eq(level.player.lasso._charge_distance, 0.0)
 
 func test_pause_cancels_a_charge_and_hides_touch_input() -> void:
 	var level: Node = await _spawn_level(1)
-	level.player._on_aim_pressed()
+	level.player.lasso._on_aim_pressed()
 	level.pause_game()
-	assert_false(level.player._is_charging)
+	assert_false(level.player.lasso._is_charging)
 	assert_false(level.touch_controls.visible)
 	level.resume_game()
 	assert_true(level.touch_controls.visible)
@@ -333,7 +333,7 @@ func test_end_of_game_stops_door_progress() -> void:
 	var door: PenDoor = _doors(level)[0]
 	level._trigger_lose("test")
 	assert_false(door.is_processing())
-	assert_false(level.player._is_charging)
+	assert_false(level.player.lasso._is_charging)
 
 func test_next_level_button_only_appears_after_winning_before_last_level() -> void:
 	var level: Node = await _spawn_level(1)
@@ -354,9 +354,9 @@ func test_keyboard_release_lands_at_charged_distance() -> void:
 	watch_signals(player)
 	player.lasso_travel_time = 0.02
 	player.aim_direction = Vector2.LEFT
-	player._start_charging()
+	player.lasso._start_charging()
 	player._process_throw_input(0.5)
-	player._release_throw()
+	player.lasso._release_throw()
 	await wait_seconds(0.15)
 	assert_signal_emitted(player, "lasso_thrown")
 	var params: Array = get_signal_parameters(player, "lasso_thrown")
@@ -375,19 +375,19 @@ func test_puzzle_bulls_and_gates_have_matching_numbers() -> void:
 func test_stunned_player_cannot_start_a_touch_throw() -> void:
 	var level: Node = await _spawn_level(1)
 	level.player.stun(1.0)
-	level.player._on_aim_pressed()
-	level.player._on_aim_released(Vector2.RIGHT)
-	assert_false(level.player._is_charging)
-	assert_false(level.player._lasso_in_flight)
+	level.player.lasso._on_aim_pressed()
+	level.player.lasso._on_aim_released(Vector2.RIGHT)
+	assert_false(level.player.lasso._is_charging)
+	assert_false(level.player.lasso._lasso_in_flight)
 
 func test_release_from_before_pause_does_not_throw_after_resume() -> void:
 	var level: Node = await _spawn_level(1)
-	level.player._on_aim_pressed()
+	level.player.lasso._on_aim_pressed()
 	level.pause_game()
 	level.resume_game()
-	level.player._on_aim_released(Vector2.RIGHT)
-	assert_false(level.player._lasso_in_flight)
-	assert_false(level.player._is_charging)
+	level.player.lasso._on_aim_released(Vector2.RIGHT)
+	assert_false(level.player.lasso._lasso_in_flight)
+	assert_false(level.player.lasso._is_charging)
 
 func test_sound_choice_survives_level_instances_in_this_session() -> void:
 	var original: bool = GameState.sound_enabled
@@ -425,13 +425,13 @@ func test_end_game_cancels_a_lasso_already_in_flight() -> void:
 	var player = level.player
 	watch_signals(player)
 	player.lasso_travel_time = 0.1
-	player._start_charging()
-	player._release_throw(Vector2.RIGHT)
-	assert_true(player._lasso_in_flight)
+	player.lasso._start_charging()
+	player.lasso._release_throw(Vector2.RIGHT)
+	assert_true(player.lasso._lasso_in_flight)
 	level._trigger_lose("test")
 	await wait_seconds(0.3)
 	assert_signal_not_emitted(player, "lasso_thrown")
-	assert_false(player._lasso_in_flight)
+	assert_false(player.lasso._lasso_in_flight)
 
 func test_tranquilizer_cannot_be_used_behind_pause_overlay() -> void:
 	var level: Node = await _spawn_level(5)
@@ -481,13 +481,13 @@ func test_lasso_in_flight_waits_through_pause_then_lands_on_resume() -> void:
 	var player = level.player
 	watch_signals(player)
 	player.lasso_travel_time = 0.1
-	player._start_charging()
-	player._release_throw(Vector2.RIGHT)
+	player.lasso._start_charging()
+	player.lasso._release_throw(Vector2.RIGHT)
 	level.pause_game()
 	await get_tree().create_timer(0.25, true).timeout
 	assert_signal_not_emitted(player, "lasso_thrown")
-	assert_true(player._lasso_in_flight)
+	assert_true(player.lasso._lasso_in_flight)
 	level.resume_game()
 	await wait_seconds(0.25)
 	assert_signal_emitted(player, "lasso_thrown")
-	assert_false(player._lasso_in_flight)
+	assert_false(player.lasso._lasso_in_flight)

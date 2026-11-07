@@ -41,7 +41,7 @@ func test_live_herd_capture_evade_and_deliver_without_forced_nerves()->void:
 					var bull:Node=candidates[0]
 					target=bull.global_position
 					if target.distance_to(level.player.global_position)<level.player.max_throw_distance-15:
-						level._on_lasso_thrown(level.player.global_position,target)
+						level.player.lasso.resolve_capture(target)
 						captured_once=captured_once or bull.controller.is_held()
 				else:target=Vector2(0,-100)
 			else:

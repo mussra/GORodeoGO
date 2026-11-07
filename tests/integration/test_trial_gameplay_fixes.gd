@@ -25,13 +25,13 @@ func test_second_aim_held_during_first_flight_starts_after_landing()->void:
  var l:Node=await setup_level();var p:Node=l.player
  p.global_position=Vector2.ZERO
  var b:Node=l._active_bulls[0];b.global_position=Vector2(150,0)
- p._on_aim_pressed();p._on_aim_released(Vector2(150.0/p.max_throw_distance,0))
- assert_true(p._lasso_in_flight)
- p._on_aim_pressed();assert_true(p._touch_aim_active);assert_false(p._is_charging)
+ p.lasso._on_aim_pressed();p.lasso._on_aim_released(Vector2(150.0/p.max_throw_distance,0))
+ assert_true(p.lasso._lasso_in_flight)
+ p.lasso._on_aim_pressed();assert_true(p.lasso._touch_aim_active);assert_false(p.lasso._is_charging)
  await wait_seconds(p.lasso_travel_time+.05)
- assert_true(b.controller.is_held());assert_eq(p._active_capture_count,1);assert_true(p._is_charging,"second held gesture starts when first rope lands")
+ assert_true(b.controller.is_held());assert_eq(p._active_capture_count,1);assert_true(p.lasso._is_charging,"second held gesture starts when first rope lands")
  var second:Node=l._active_bulls[1];second.global_position=Vector2(0,150)
- p._on_aim_released(Vector2(0,150.0/p.max_throw_distance))
+ p.lasso._on_aim_released(Vector2(0,150.0/p.max_throw_distance))
  await wait_seconds(p.lasso_travel_time+.05)
  assert_true(second.controller.is_held());assert_eq(p._active_capture_count,2)
 func test_safe_bull_clears_chaser_flags()->void:
