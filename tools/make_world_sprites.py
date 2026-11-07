@@ -125,28 +125,32 @@ COAT_D = (168, 96, 40, 255)
 MANE = (240, 216, 168, 255)     # cream mane/tail like the ridden horses
 
 def wild_horse():
+    # grayscale base: runtime modulate recolors coat (shading preserved)
+    G = (208, 208, 208, 255); G_D = (170, 170, 170, 255)
     im, d = canvas()
-    # legs (back pair darker)
-    for lx, col in [(66, COAT_D), (96, COAT_D), (78, COAT), (108, COAT)]:
-        ol_rect(d, [lx*S, 128*S, (lx+13)*S, 182*S], col, 4)
-    # body
-    ol_ellipse(d, [44*S, 78*S, 138*S, 144*S], COAT)
-    # neck + head
-    ol_poly(d, [(x*S, y*S) for x, y in [(118, 128), (132, 62), (152, 66), (140, 130)]], COAT)
-    ol_ellipse(d, [128*S, 44*S, 172*S, 84*S], COAT)                      # head
-    ol_ellipse(d, [154*S, 62*S, 178*S, 90*S], COAT_D)                    # muzzle
-    d.ellipse([162*S, 74*S, 170*S, 82*S], fill=OUTLINE)                  # nostril
-    ol_poly(d, [(x*S, y*S) for x, y in [(134, 50), (138, 32), (148, 48)]], COAT_D, 4)  # ear
-    d.ellipse([140*S, 58*S, 150*S, 68*S], fill=OUTLINE)                  # eye
-    # mane along the neck + forelock
-    ol_poly(d, [(x*S, y*S) for x, y in [(116, 96), (128, 52), (136, 44), (124, 100)]], MANE, 4)
-    # tail
-    ol_poly(d, [(x*S, y*S) for x, y in [(48, 92), (26, 118), (34, 152), (52, 108)]], MANE, 4)
+    for lx, col in [(66, G_D), (102, G_D), (80, G), (116, G)]:
+        ol_rect(d, [lx*S, 130*S, (lx+13)*S, 176*S], col, 4)
+        d.rectangle([lx*S, 168*S, (lx+13)*S, 178*S], fill=OUTLINE)
+    ol_ellipse(d, [46*S, 74*S, 142*S, 142*S], G)
+    ol_poly(d, [(x*S, y*S) for x, y in [(118, 128), (128, 66), (148, 62), (146, 128)]], G)
+    ol_ellipse(d, [128*S, 40*S, 174*S, 82*S], G)
+    ol_ellipse(d, [152*S, 58*S, 182*S, 90*S], G_D)
+    d.ellipse([164*S, 72*S, 172*S, 80*S], fill=OUTLINE)
+    ol_poly(d, [(x*S, y*S) for x, y in [(134, 48), (140, 30), (150, 46)]], G_D, 4)
+    d.ellipse([142*S, 56*S, 152*S, 66*S], fill=OUTLINE)
+    return finish(im)
+
+def wild_horse_mane():
+    # grayscale overlay: runtime modulate recolors mane + tail
+    G_M = (235, 235, 235, 255)
+    im, d = canvas()
+    ol_poly(d, [(x*S, y*S) for x, y in [(52, 92), (28, 116), (30, 158), (46, 154), (58, 110)]], G_M)
+    ol_poly(d, [(x*S, y*S) for x, y in [(116, 92), (124, 54), (140, 38), (148, 44), (134, 64), (128, 96)]], G_M, 4)
     return finish(im)
 
 ITEMS = [("house", house), ("board", board), ("tree", tree), ("pine", pine),
          ("fruit_tree", fruit_tree), ("bush", bush), ("rock", rock),
-         ("cactus", cactus), ("flower", flower), ("pig", pig), ("wild_horse", wild_horse)]
+         ("cactus", cactus), ("flower", flower), ("pig", pig), ("wild_horse", wild_horse), ("wild_horse_mane", wild_horse_mane)]
 
 def main():
     cols = 5
