@@ -1072,3 +1072,5 @@ msgstr "Block"
 
 msgid "EMBLEM_FONT_ENGRAVED"
 msgstr "Engraved"
+msgid "EMBLEM_SYMBOL_ADJ"
+msgstr "Symbol: drag it · size"

@@ -6,7 +6,7 @@ func run()->void:
  var bg:=ColorRect.new();bg.set_anchors_preset(Control.PRESET_FULL_RECT);bg.color=Color("16333c");root.add_child(bg)
  for i in range(2):
   var traits:Dictionary={"coat":3,"mane":1,"pattern":0,"finish":"normal","emblem":HorseEmblem.DEFAULT.duplicate()}
-  traits.emblem["letters"]="ALV";traits.emblem["letters_font"]=i
+  traits.emblem["letters"]="MWW";traits.emblem["letters_font"]=i
   var pv:=TextureRect.new();pv.position=Vector2(120+i*720,20);pv.size=Vector2(620,660)
   pv.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;pv.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
   HorsePortrait.apply(pv,traits)

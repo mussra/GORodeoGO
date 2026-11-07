@@ -17,13 +17,24 @@ static func symbol(id:int,cx:float,cy:float,s:float)->String:
   2:return '<path d="M%s %s l%s %s l%s %s l%s %s Z"/>'%[cx,cy-s*.65,s*.5,s*.65,-s*.5,s*.65,-s*.5,-s*.65]
   3:return '<path d="M%s %s v%s M%s %s h%s"/>'%[cx,cy-s*.65,s*1.3,cx-s*.6,cy,s*1.2]
   _:return '<path d="M%s %s q%s %s %s 0 q%s %s %s 0"/>'%[cx-s*.65,cy,s*.33,-s*.75,s*.65,s*.33,s*.75,s*.65]
+## Symbol placement inside the shield, editable by the player (Ant, 7-nov-2026):
+## bounded X/Y offset and scale, defaults keep the symbol clear of the initials.
+const SYMBOL_DX_RANGE:=12
+const SYMBOL_DY_MIN:=-12
+const SYMBOL_DY_MAX:=14
+const SYMBOL_SCALE_MIN:=0.5
+const SYMBOL_SCALE_MAX:=1.0
+static func symbol_dx(config:Dictionary)->int:return clampi(int(config.get("symbol_dx",0)),-SYMBOL_DX_RANGE,SYMBOL_DX_RANGE)
+static func symbol_dy(config:Dictionary)->int:return clampi(int(config.get("symbol_dy",5)),SYMBOL_DY_MIN,SYMBOL_DY_MAX)
+static func symbol_scale(config:Dictionary)->float:return clampf(float(config.get("symbol_scale",0.85)),SYMBOL_SCALE_MIN,SYMBOL_SCALE_MAX)
 static func mask(config:Dictionary)->Texture2D:
  var key:=JSON.stringify(config)
  if cache.has(key):return cache[key]
+ var dx:=symbol_dx(config);var dy:=symbol_dy(config);var sc:=symbol_scale(config)
  var shape:String=['<path d="M14 12 H86 L80 65 L50 88 L20 65 Z"/>','<circle cx="50" cy="49" r="37"/>','<path d="M16 12 H84 V72 L50 88 L16 72 Z"/>'][config.shape]
- var inside:String=symbol(config.left,50,46,23)
- if config.division==1:inside='<path d="M50 13 V85"/>'+symbol(config.left,32,44,13)+symbol(config.right,68,44,13)
- if config.division==2:inside='<path d="M20 64 L80 22"/>'+symbol(config.left,35,32,12)+symbol(config.right,64,59,12)
+ var inside:String=symbol(config.left,50+dx,46+dy,23*sc)
+ if config.division==1:inside='<path d="M50 13 V85"/>'+symbol(config.left,32+dx,44+dy,13*sc)+symbol(config.right,68+dx,44+dy,13*sc)
+ if config.division==2:inside='<path d="M20 64 L80 22"/>'+symbol(config.left,35+dx,32+dy,12*sc)+symbol(config.right,64+dx,59+dy,12*sc)
  var svg:String='<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">'+shape+inside+'</g></svg>'
  var image:=Image.new();image.load_svg_from_string(svg)
  stamp_letters(image,config)
@@ -73,9 +84,15 @@ static func portrait_mask(config:Dictionary)->Texture2D:
   var ink:Image=mask(config).get_image();ink.resize(rect.size.x,rect.size.y,Image.INTERPOLATE_LANCZOS)
   ink=warp_columns(ink,warp_amount)
   image.blit_rect(ink,Rect2i(0,0,rect.size.x,rect.size.y),rect.position)
+  var body:Image=load("res://art/portraits/adult_hd_mask.png").get_image()
+  if body.is_compressed():body.decompress()
   for y in range(rect.position.y,rect.end.y):
    for x in range(rect.position.x,rect.end.x):
-    var c:=image.get_pixel(x,y);c.a*=area.get_pixel(x,y).a;image.set_pixel(x,y,c)
+    var c:=image.get_pixel(x,y);c.a*=area.get_pixel(x,y).a
+    # Hard rule (Ant): the emblem never sits on saddle, tack or rider.
+    var bm:=body.get_pixel(x,y)
+    if maxf(bm.r,bm.g)<.5:c.a=0.0
+    image.set_pixel(x,y,c)
  var texture:=ImageTexture.create_from_image(image);cache[key]=texture;return texture
 ## Ink for a chosen color over a background luminance: the picked color leads, and
 ## only when it would disappear against the coat it moves just enough to read (0.34
@@ -88,7 +105,7 @@ static func ink(config:Dictionary,bg_luminance:float)->Array:
   fg=up if absf(up.get_luminance()-bg_luminance)>=absf(down.get_luminance()-bg_luminance) else down
  var edge:=Color("201b1c") if bg_luminance>=.46 else Color("fff2d9")
  return [fg,edge]
-static func stamp(image:Image,zone:Image,config:Dictionary)->void:
+static func stamp(image:Image,zone:Image,config:Dictionary,body:Image=null)->void:
  var rect:Rect2i=zone.get_used_rect()
  # Zone images are transparent outside the independently editable region.
  if rect.size.x<2 or rect.size.y<2:return
@@ -105,6 +122,9 @@ static func stamp(image:Image,zone:Image,config:Dictionary)->void:
   for x in range(rect.size.x):
    var px:=rect.position+Vector2i(x,y)
    if zone.get_pixelv(px).a<.5 or before.get_pixelv(px).a<.5:continue
+   if body!=null:
+    var bm:=body.get_pixelv(px)
+    if maxf(bm.r,bm.g)<.5:continue
    var a:float=ink.get_pixel(x,y).a;var around:float=a
    for dy in range(-1,2):
     for dx in range(-1,2):around=maxf(around,ink.get_pixel(clampi(x+dx,0,ink.get_width()-1),clampi(y+dy,0,ink.get_height()-1)).a)

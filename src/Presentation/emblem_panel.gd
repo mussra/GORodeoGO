@@ -18,6 +18,13 @@ func label(text:String,pos:Vector2,font:int=22)->Label:
  var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);content.add_child(l);return l
 func button(text:String,pos:Vector2,cb:Callable,width:int=260)->Button:
  var b:=Button.new();b.text=text;b.position=pos;b.size=Vector2(width,48);b.pressed.connect(cb);content.add_child(b);return b
+func _refresh_portrait()->void:
+ var pv:TextureRect=content.find_child("portrait_view",false,false)
+ if pv==null:return
+ var h2:Dictionary=SaveData.horse_collection.find(horse_id)
+ var t2:Dictionary=h2.traits.duplicate(true);t2["emblem"]=config
+ HorsePortrait.apply(pv,t2,SaveData.hat_color)
+
 func pick(key:String,title:String,items:Array,pos:Vector2)->void:
  label(title,pos,21);var option:=OptionButton.new();option.position=pos+Vector2(0,30);option.size=Vector2(300,48)
  for item in items:option.add_item(tr(item))
@@ -37,7 +44,25 @@ func build()->void:
  pick("left",tr("EMBLEM_SYMBOL_A"),symbols,Vector2(560,210));pick("right",tr("EMBLEM_SYMBOL_B"),symbols,Vector2(900,210))
  pick("color",tr("EMBLEM_COLOR"),["EMBLEM_TEAL","EMBLEM_COPPER","EMBLEM_BLUE","EMBLEM_LILAC","EMBLEM_GOLD"],Vector2(560,320))
  var swatch:=ColorRect.new();swatch.color=Color(HorseEmblem.COLORS[config.color]);swatch.position=Vector2(1050,445);swatch.size=Vector2(55,45);content.add_child(swatch)
- var badge:=TextureRect.new();badge.texture=HorseEmblem.mask(config);badge.modulate=Color(HorseEmblem.COLORS[config.color]);badge.position=Vector2(1130,425);badge.size=Vector2(90,90);badge.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;content.add_child(badge)
+ var badge:=TextureRect.new();badge.texture=HorseEmblem.mask(config);badge.modulate=Color(HorseEmblem.COLORS[config.color]);badge.position=Vector2(1120,430);badge.size=Vector2(96,96);badge.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;content.add_child(badge)
+ badge.mouse_filter=Control.MOUSE_FILTER_STOP
+ badge.gui_input.connect(func(e:InputEvent):
+  if e is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+   config["symbol_dx"]=clampi(HorseEmblem.symbol_dx(config)+int(round(e.relative.x*100.0/96.0)),-HorseEmblem.SYMBOL_DX_RANGE,HorseEmblem.SYMBOL_DX_RANGE)
+   config["symbol_dy"]=clampi(HorseEmblem.symbol_dy(config)+int(round(e.relative.y*100.0/96.0)),HorseEmblem.SYMBOL_DY_MIN,HorseEmblem.SYMBOL_DY_MAX)
+   badge.texture=HorseEmblem.mask(config)
+   _refresh_portrait()
+   dirty=true)
+ var adj:=label(tr("EMBLEM_SYMBOL_ADJ"),Vector2(1050,528),14)
+ adj.clip_text=true;adj.size=Vector2(200,36);adj.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ var sizepick:=HSlider.new();sizepick.position=Vector2(1050,568);sizepick.size=Vector2(190,22)
+ sizepick.min_value=HorseEmblem.SYMBOL_SCALE_MIN;sizepick.max_value=HorseEmblem.SYMBOL_SCALE_MAX;sizepick.step=0.05
+ sizepick.value=HorseEmblem.symbol_scale(config);content.add_child(sizepick)
+ sizepick.value_changed.connect(func(v:float):
+  config["symbol_scale"]=v
+  badge.texture=HorseEmblem.mask(config)
+  _refresh_portrait()
+  dirty=true)
  label(tr("EMBLEM_LETTERS"),Vector2(900,320),21)
  var entry:=LineEdit.new();entry.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED
  entry.text=str(config.get("letters",""));entry.max_length=3;entry.placeholder_text=tr("EMBLEM_LETTERS_HINT")
@@ -46,11 +71,7 @@ func build()->void:
   var up:=v.to_upper()
   if entry.text!=up:entry.text=up;entry.caret_column=up.length()
   config["letters"]=up
-  var pv:TextureRect=content.find_child("portrait_view",false,false)
-  if pv!=null:
-   var h2:Dictionary=SaveData.horse_collection.find(horse_id)
-   var t2:Dictionary=h2.traits.duplicate(true);t2["emblem"]=config
-   HorsePortrait.apply(pv,t2,SaveData.hat_color)
+  _refresh_portrait()
   dirty=true)
  var fontpick:=OptionButton.new();fontpick.position=Vector2(1080,350);fontpick.size=Vector2(160,44)
  for f in ["EMBLEM_FONT_BLOCK","EMBLEM_FONT_ENGRAVED"]:fontpick.add_item(tr(f))

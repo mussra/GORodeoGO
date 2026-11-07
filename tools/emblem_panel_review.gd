@@ -10,7 +10,7 @@ func run()->void:
  root.add_child(ep)
  await create_timer(.3).timeout;await RenderingServer.frame_post_draw
  root.get_texture().get_image().save_png("/downloads/emblem-panel-overflow.png")
- ep.config["letters"]="ALV";ep.config["letters_font"]=0;ep.build()
+ ep.config["letters"]="MWW";ep.config["letters_font"]=0;ep.build()
  await create_timer(.2).timeout;await RenderingServer.frame_post_draw
  root.get_texture().get_image().save_png("/downloads/emblem-panel-letters.png")
  quit()

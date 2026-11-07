@@ -1072,3 +1072,5 @@ msgstr "Bloque"
 
 msgid "EMBLEM_FONT_ENGRAVED"
 msgstr "Grabada"
+msgid "EMBLEM_SYMBOL_ADJ"
+msgstr "Símbolo: arrástralo · tamaño"
