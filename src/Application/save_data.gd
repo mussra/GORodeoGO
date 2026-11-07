@@ -39,6 +39,7 @@ var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
 var world_pigs: Array[String] = []  # captured pig-pen ids ("pig_cx_cy")
+var world_edits: Array = []  # world-editor ops (see WorldEdits), layered over the seed
 # Overridden only by isolated persistence tests; production retains its original path.
 var save_path: String = NORMAL_SAVE_PATH
 
@@ -78,6 +79,7 @@ func save_progress() -> bool:
 	config.set_value("world", "position", world_position)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
+	config.set_value("world", "edits", world_edits)
 	config.set_value("equipment", "points", equipment_points)
 	config.set_value("equipment", "owned", equipment_owned)
 	config.set_value("equipment", "equipped", equipment_equipped)
@@ -111,6 +113,7 @@ func load_progress() -> void:
 	world_position = Vector2(0, 160)
 	world_missions.clear()
 	world_pigs.clear()
+	world_edits.clear()
 	var config := ConfigFile.new()
 	var source_path:String=load_source_path(save_path,LEGACY_2_SAVE_PATH) if save_path==SAVE_PATH else save_path
 	if save_path==NORMAL_SAVE_PATH and not FileAccess.file_exists(save_path):source_path=load_source_path(SAVE_PATH,LEGACY_2_SAVE_PATH)
@@ -152,6 +155,11 @@ func load_progress() -> void:
 				if typeof(item)==TYPE_STRING and not pair[1].has(item):pair[1].append(item)
 	var wpos:Variant=config.get_value("world","position",world_position)
 	if typeof(wpos)==TYPE_VECTOR2 and wpos.is_finite():world_position=wpos
+	var we:Variant=config.get_value("world","edits",[])
+	world_edits.clear()
+	if typeof(we)==TYPE_ARRAY:
+		for op in we:
+			if WorldEdits.valid_op(op):world_edits.append(op)
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:

@@ -28,6 +28,9 @@ var _board_panel: Control
 var _save_timer: float = 0.0
 var _last_gait: int = -1
 var _pigs_label: Label
+var _edit_mode: bool = false
+var _edit_tool: String = "tree"
+var _edit_panel: Control
 var _hoof_player: AudioStreamPlayer
 var _step_timer: float = 0.0
 var _step_alt: bool = false
@@ -94,7 +97,7 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 	var key: String = WorldMap.chunk_key(cx, cy)
 	if _chunks.has(key):
 		return
-	var chunk: Dictionary = WorldMap.generate(SaveData.world_seed, cx, cy)
+	var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, cx, cy), SaveData.world_edits, cx, cy)
 	var node := Node2D.new()
 	node.set_meta("c", Vector2i(cx, cy))
 	var ground := ColorRect.new()
@@ -129,7 +132,7 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 	trail.c = Vector2i(cx, cy)
 	node.add_child(trail)
 	var pigs: Dictionary = chunk.get("pigs", {})
-	var pig_id: String = WorldMap.pig_id(cx, cy)
+	var pig_id: String = WorldEdits.edited_pen_id(pigs.get("pos", Vector2.ZERO)) if pigs.get("edited", false) else WorldMap.pig_id(cx, cy)
 	if not pigs.is_empty() and not SaveData.world_pigs.has(pig_id):
 		var pen := Node2D.new()
 		pen.name = "pigs"
@@ -227,11 +230,16 @@ func _tick_pigs(delta: float) -> void:
 			_on_pigs_captured(Vector2i(node.get_meta("c")), pen)
 
 func _on_pigs_captured(c: Vector2i, pen: Node2D) -> void:
-	SaveData.world_pigs.append(WorldMap.pig_id(c.x, c.y))
+	SaveData.world_pigs.append(_pen_id_for(c))
 	pen.queue_free()
 	SaveData.save_world_state(player.position)
 	_pigs_label.text = tr("WORLD_PIGS") % SaveData.world_pigs.size()
 	_toast(tr("WORLD_PIG_CAPTURED") % SaveData.world_pigs.size())
+
+func _pen_id_for(c: Vector2i) -> String:
+	var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, c.x, c.y), SaveData.world_edits, c.x, c.y)
+	var pigs: Dictionary = chunk.get("pigs", {})
+	return WorldEdits.edited_pen_id(pigs.get("pos", Vector2.ZERO)) if pigs.get("edited", false) else WorldMap.pig_id(c.x, c.y)
 
 func _tick_hoofbeats(delta: float) -> void:
 	var speed: float = player.velocity.length()
@@ -247,6 +255,57 @@ func _tick_hoofbeats(delta: float) -> void:
 	_hoof_player.stream = _clop_a if _step_alt else _clop_b
 	_hoof_player.pitch_scale = randf_range(0.92, 1.08) * (0.94 if player.gait == WorldGait.GALOPE else 1.0)
 	_hoof_player.play()
+
+func _toggle_edit() -> void:
+	_edit_mode = not _edit_mode
+	if _edit_mode:
+		_open_edit_palette()
+	elif is_instance_valid(_edit_panel):
+		_edit_panel.queue_free()
+
+func _open_edit_palette() -> void:
+	if is_instance_valid(_edit_panel):
+		_edit_panel.queue_free()
+	_edit_panel = Panel.new()
+	_edit_panel.position = Vector2(20, 56)
+	_edit_panel.size = Vector2(640, 150)
+	_edit_panel.z_index = 40
+	_hud.add_child(_edit_panel)
+	var hint := Label.new()
+	hint.text = tr("WORLD_EDIT_HINT")
+	hint.position = Vector2(14, 8)
+	hint.size = Vector2(610, 26)
+	hint.add_theme_font_size_override("font_size", 16)
+	_edit_panel.add_child(hint)
+	var tools_: Array = [["tree", "WORLD_DECOR_TREE"], ["pine", "WORLD_DECOR_PINE"], ["fruit_tree", "WORLD_DECOR_FRUIT"], ["bush", "WORLD_DECOR_BUSH"], ["rock", "WORLD_DECOR_ROCK"], ["cactus", "WORLD_DECOR_CACTUS"], ["flower", "WORLD_DECOR_FLOWER"], ["pigs", "WORLD_EDIT_PIGS"], ["erase", "WORLD_ERASE"]]
+	for i in tools_.size():
+		var b := Button.new()
+		b.text = tr(tools_[i][1])
+		b.position = Vector2(14 + (i % 5) * 124, 40 + (i / 5) * 52)
+		b.size = Vector2(116, 44)
+		var tool: String = tools_[i][0]
+		b.pressed.connect(func(): _edit_tool = tool)
+		_edit_panel.add_child(b)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _edit_mode:
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var pos: Vector2 = get_global_mouse_position()
+		var op: Dictionary
+		match _edit_tool:
+			"erase":
+				op = {"type": "remove_decor", "pos": pos, "radius": 120.0}
+			"pigs":
+				op = {"type": "add_pigs", "pos": pos, "count": 3}
+			_:
+				op = {"type": "add_decor", "kind": _edit_tool, "pos": pos, "scale": 1.0}
+		SaveData.world_edits.append(op)
+		SaveData.save_world_state(player.position)
+		for key in _chunks.keys():
+			_chunks[key].queue_free()
+		_chunks.clear()
+		_update_chunks()
 
 func _refresh_missions() -> void:
 	var counts: Dictionary = WorldMissions.counts()
@@ -287,7 +346,7 @@ func _build_hud() -> void:
 	_pigs_label.add_theme_font_size_override("font_size", 18)
 	_pigs_label.text = tr("WORLD_PIGS") % SaveData.world_pigs.size()
 	_hud.add_child(_pigs_label)
-	var specs: Array = [["WORLD_MAP", 880, Callable(self, "_toggle_map")], ["WORLD_HOME", 990, Callable(self, "_home")], ["WORLD_MENU", 1150, Callable(self, "_menu")]]
+	var specs: Array = [["WORLD_MAP", 760, Callable(self, "_toggle_map")], ["WORLD_EDIT", 870, Callable(self, "_toggle_edit")], ["WORLD_HOME", 980, Callable(self, "_home")], ["WORLD_MENU", 1150, Callable(self, "_menu")]]
 	for spec in specs:
 		var b := Button.new()
 		b.text = tr(spec[0])

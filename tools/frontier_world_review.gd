@@ -62,6 +62,22 @@ func run()->void:
   await create_timer(1.2).timeout
   await _snap("/downloads/frontier-pigs.png")
  print("pigs found: ",found_pigs)
+ # world editor: open palette, place a fruit tree and a pig pen, erase nearby decor
+ world.player.position=Vector2(145,60)
+ await create_timer(.3).timeout
+ world._toggle_edit()
+ await create_timer(.2).timeout
+ world._edit_tool="fruit_tree"
+ world._unhandled_input(InputEventMouseButton.new())
+ var ev:=InputEventMouseButton.new()
+ ev.pressed=true;ev.button_index=MOUSE_BUTTON_LEFT;ev.position=Vector2(500,420)
+ world._unhandled_input(ev)
+ world._edit_tool="pigs"
+ var ev2:=InputEventMouseButton.new()
+ ev2.pressed=true;ev2.button_index=MOUSE_BUTTON_LEFT;ev2.position=Vector2(760,380)
+ world._unhandled_input(ev2)
+ await create_timer(.4).timeout
+ await _snap("/downloads/frontier-editor.png")
  # gait frames: paso, trote, galope
  var strengths:Array=[0.2,0.6,1.0]
  var names:Array=["paso","trote","galope"]

@@ -1108,3 +1108,36 @@ msgstr "Pigs: %d"
 
 msgid "WORLD_PIG_CAPTURED"
 msgstr "Pig captured! You have %d"
+
+msgid "WORLD_EDIT"
+msgstr "Edit"
+
+msgid "WORLD_EDIT_HINT"
+msgstr "Pick what to place and tap the ground · Edit button to exit"
+
+msgid "WORLD_DECOR_TREE"
+msgstr "Tree"
+
+msgid "WORLD_DECOR_PINE"
+msgstr "Pine"
+
+msgid "WORLD_DECOR_FRUIT"
+msgstr "Fruit tree"
+
+msgid "WORLD_DECOR_BUSH"
+msgstr "Bush"
+
+msgid "WORLD_DECOR_ROCK"
+msgstr "Rock"
+
+msgid "WORLD_DECOR_CACTUS"
+msgstr "Cactus"
+
+msgid "WORLD_DECOR_FLOWER"
+msgstr "Flower"
+
+msgid "WORLD_EDIT_PIGS"
+msgstr "Pigs"
+
+msgid "WORLD_ERASE"
+msgstr "Erase"

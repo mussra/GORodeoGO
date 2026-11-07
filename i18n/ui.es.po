@@ -1108,3 +1108,36 @@ msgstr "Cerdos: %d"
 
 msgid "WORLD_PIG_CAPTURED"
 msgstr "¡Cerdo capturado! Llevas %d"
+
+msgid "WORLD_EDIT"
+msgstr "Editar"
+
+msgid "WORLD_EDIT_HINT"
+msgstr "Elige qué colocar y toca el suelo · botón Editar para salir"
+
+msgid "WORLD_DECOR_TREE"
+msgstr "Árbol"
+
+msgid "WORLD_DECOR_PINE"
+msgstr "Pino"
+
+msgid "WORLD_DECOR_FRUIT"
+msgstr "Frutal"
+
+msgid "WORLD_DECOR_BUSH"
+msgstr "Arbusto"
+
+msgid "WORLD_DECOR_ROCK"
+msgstr "Roca"
+
+msgid "WORLD_DECOR_CACTUS"
+msgstr "Cactus"
+
+msgid "WORLD_DECOR_FLOWER"
+msgstr "Flor"
+
+msgid "WORLD_EDIT_PIGS"
+msgstr "Cerdos"
+
+msgid "WORLD_ERASE"
+msgstr "Borrar"
