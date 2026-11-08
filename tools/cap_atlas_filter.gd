@@ -29,5 +29,8 @@ func _process(_dt: float) -> void:
 			panel._on_atlas_filter(10, "pattern", HorseFilters.properties()[1].values)
 		38:
 			await shot("filter_rojos_rayados")
+			get_window().size = Vector2i(2340, 1080)
+		50:
+			await shot("filter_rojos_rayados_movil")
 			DirAccess.remove_absolute("user://qa-atlas-filter.dat")
 			get_tree().quit()

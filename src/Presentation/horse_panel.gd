@@ -189,7 +189,7 @@ func atlas_entries()->Array[Dictionary]:
 ## del registro HorseFilters (propiedades como datos); "Todos" quita ese
 ## filtro y los activos se combinan en AND. Misma barra en atlas y mercado.
 func _atlas_filter_bar()->void:
- var widths:Array=[150,175,140,175,150]
+ var widths:Array=[145,170,135,170,145]
  var x:float=290.0
  var props:Array=HorseFilters.properties()
  for i in props.size():
@@ -203,8 +203,8 @@ func _atlas_filter_bar()->void:
    if atlas_filters.get(p.id,null)==p.values[j].value:chosen=j+1
   ob.selected=chosen
   ob.item_selected.connect(_on_atlas_filter.bind(p.id,p.values))
-  content.add_child(ob);x+=widths[i]+8
- var clear:=button(tr("FILTER_CLEAR"),Vector2(x,196),func():atlas_filters.clear();atlas_page=0;refresh(),1280-x-35)
+  content.add_child(ob);x+=widths[i]+6
+ var clear:=button(tr("FILTER_CLEAR"),Vector2(x+4,196),func():atlas_filters.clear();atlas_page=0;refresh(),1280-x-39)
  clear.disabled=atlas_filters.is_empty()
 
 func _on_atlas_filter(idx:int,pid:String,values:Array)->void:
@@ -214,7 +214,7 @@ func _on_atlas_filter(idx:int,pid:String,values:Array)->void:
 
 func atlas_view()->void:
  label(tr("MARKET_BALANCE")%SaveData.equipment_points if page=="market" else tr("UI_121"),Vector2(35,200),25)
- if page!="market":button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(1010,222),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),240)
+ if page!="market":button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(1005,575),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),240)
  _atlas_filter_bar()
  label(tr("MARKET_DESIGN_NOTE"),Vector2(35,236),17)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
@@ -234,7 +234,7 @@ func atlas_view()->void:
   if HorseJump.capable(h):
    var jump:=JumpBadge.new();jump.capable=true;jump.position=Vector2(x,y+88);jump.size=Vector2(64,56);content.add_child(jump)
  button(tr("UI_132"),Vector2(35,575),func():atlas_page=maxi(0,atlas_page-1);refresh())
- if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(900,588),17)
+ if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(870,588),17)
  label(tr("UI_128")%[atlas_page+1,pages],Vector2(345,585),23)
  button(tr("UI_133"),Vector2(650,575),func():atlas_page=mini(pages-1,atlas_page+1);refresh())
 
