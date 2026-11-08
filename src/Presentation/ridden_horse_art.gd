@@ -24,9 +24,13 @@ static func build_frames(traits: Dictionary, hat: String = "original") -> Sprite
 	var hat_id: String = HatAppearance.sanitize(hat)
 	var overlays: Dictionary = {}
 	for d in ["side", "down", "up", "diag_down", "diag_up"]:
-		var saddle: Texture2D = load(SADDLE_ROOT + d + ".png")
-		var rider: Texture2D = load(RIDER_ROOT + hat_id + "/" + d + ".png")
-		if rider == null and hat_id != "original":
+		var saddle: Texture2D = null
+		if ResourceLoader.exists(SADDLE_ROOT + d + ".png"):
+			saddle = load(SADDLE_ROOT + d + ".png")
+		var rider: Texture2D = null
+		if ResourceLoader.exists(RIDER_ROOT + hat_id + "/" + d + ".png"):
+			rider = load(RIDER_ROOT + hat_id + "/" + d + ".png")
+		if rider == null and hat_id != "original" and ResourceLoader.exists(RIDER_ROOT + "original/" + d + ".png"):
 			rider = load(RIDER_ROOT + "original/" + d + ".png")
 		if rider != null:
 			var img: Image = rider.get_image()
