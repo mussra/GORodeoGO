@@ -9,6 +9,7 @@ const DecorScript := preload("res://src/Presentation/world_decor.gd")
 const RanchScript := preload("res://src/Presentation/world_ranch.gd")
 const PigScript := preload("res://src/Presentation/wild_pig.gd")
 const TrailScript := preload("res://src/Presentation/frontier_trail.gd")
+const WildHorseArtScript := preload("res://src/Presentation/wild_horse_art.gd")
 const TestZoneScript := preload("res://src/Presentation/world_test_zone.gd")
 const Physics := preload("res://src/Presentation/world_physics.gd")
 const DrawNode := preload("res://src/Presentation/world_draw_node.gd")
@@ -22,6 +23,16 @@ var player: CharacterBody2D
 var _chunks: Dictionary = {}
 var _chunk_entities: Dictionary = {}
 var _herd_horses: Dictionary = {}
+## Streaming amortizado (Ant 8-nov 17:24, tirón al llegar al borde): el contenido
+## del chunk sigue siendo 100% determinista (seed + edits), pero la CONSTRUCCIÓN
+## se reparte en pasos con presupuesto de ms por frame y se adelanta en la
+## dirección de la marcha. El conjunto ACTIVO sigue siendo el 3x3 alrededor del
+## jinete: nodos al árbol, descubrimiento y guardado solo ocurren al activar.
+const CHUNK_BUILD_BUDGET_MS := 6.0
+const CHUNK_LOOKAHEAD_SECONDS := 1.6
+var _chunk_pending: Dictionary = {}  # key -> builder en curso (fuera del árbol)
+var _chunk_built: Dictionary = {}    # key -> builder terminado (caché fuera del árbol)
+var _build_queue: Array = []         # keys pendientes, lo más cercano primero
 var _hud: CanvasLayer
 var _audio: RanchAudio
 var aim_joystick: VirtualJoystick  # named like the levels so JoystickAppearance.apply works
@@ -99,9 +110,15 @@ func _ready() -> void:
 	_hoof_player.bus = &"SFX" if AudioServer.get_bus_index("SFX") >= 0 else &"Master"
 	player.add_child(_hoof_player)
 	_update_chunks()
+	# Primera pintura completa: la 3x3 inicial se construye de una vez (es el
+	# momento de carga); el streaming en marcha ya va repartido por frames.
+	while not _build_queue.is_empty():
+		_step_chunk_build()
+	_update_chunks()
 
 func _process(delta: float) -> void:
 	_update_chunks()
+	_drain_chunk_builds()
 	_tick_taming(delta)
 	_tick_lasso(delta)
 	_tick_rider_marker()
@@ -245,7 +262,15 @@ func _update_chunks() -> void:
 	var pc: Vector2i = WorldMap.chunk_at(player.position)
 	for dx in range(-1, 2):
 		for dy in range(-1, 2):
-			_ensure_chunk(pc.x + dx, pc.y + dy)
+			_activate_or_queue(pc.x + dx, pc.y + dy)
+	# Pregeneración: la manzana hacia la que cabalga el jinete se construye antes.
+	if is_instance_valid(player) and player.velocity.length() > 30.0:
+		var ahead: Vector2i = WorldMap.chunk_at(player.position + player.velocity * CHUNK_LOOKAHEAD_SECONDS)
+		for dx in range(-1, 2):
+			for dy in range(-1, 2):
+				var c := Vector2i(ahead.x + dx, ahead.y + dy)
+				if (c.x != pc.x or c.y != pc.y) and absi(c.x - pc.x) <= 2 and absi(c.y - pc.y) <= 2:
+					_queue_build(c.x, c.y)
 	for key in _chunks.keys():
 		var c: Vector2i = _chunks[key].get_meta("c")
 		if absi(c.x - pc.x) > 2 or absi(c.y - pc.y) > 2:
@@ -256,39 +281,199 @@ func _update_chunks() -> void:
 					e.queue_free()
 			_chunk_entities.erase(key)
 			_herd_horses.erase(key)
-		_occluders.erase(key)
+		_occluders.erase(key)  # ojo: scope original (borra cada frame; bug latente, reportado)
+	_drop_far(pc, _chunk_pending)
+	_drop_far(pc, _chunk_built)
+	_build_queue.sort_custom(func(a, b):
+		var ba: Dictionary = _chunk_pending.get(a, {})
+		var bb: Dictionary = _chunk_pending.get(b, {})
+		if ba.is_empty() or bb.is_empty():
+			return false
+		return absi(int(ba["cx"]) - pc.x) + absi(int(ba["cy"]) - pc.y) < absi(int(bb["cx"]) - pc.x) + absi(int(bb["cy"]) - pc.y))
 
-func _ensure_chunk(cx: int, cy: int) -> void:
+func _drop_far(pc: Vector2i, store: Dictionary) -> void:
+	for key in store.keys():
+		var b: Dictionary = store[key]
+		if absi(int(b["cx"]) - pc.x) > 2 or absi(int(b["cy"]) - pc.y) > 2:
+			_discard_builder(b)
+			store.erase(key)
+			_build_queue.erase(key)
+
+func _discard_builder(b: Dictionary) -> void:
+	if is_instance_valid(b.get("node")):
+		(b["node"] as Node).free()
+	for e in b.get("entities", []):
+		if is_instance_valid(e):
+			(e as Node).free()
+	# Los SpriteFrames del caballo viven en la caché global por genotipo: se quedan.
+
+func _queue_build(cx: int, cy: int) -> void:
+	var key: String = WorldMap.chunk_key(cx, cy)
+	if _chunks.has(key) or _chunk_pending.has(key) or _chunk_built.has(key):
+		return
+	_chunk_pending[key] = {"cx": cx, "cy": cy, "phase": 0, "node": null, "entities": [], "boxes": [], "occluders": [], "decor_todo": [], "pig_todo": [], "pig_idx": 0, "data": {}, "frames": null, "frame_specs": null, "done": false}
+	_build_queue.append(key)
+
+func _activate_or_queue(cx: int, cy: int) -> void:
 	var key: String = WorldMap.chunk_key(cx, cy)
 	if _chunks.has(key):
 		return
-	var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, cx, cy), SaveData.world_edits, cx, cy)
-	var node := Node2D.new()
-	node.set_meta("c", Vector2i(cx, cy))
-	var ground := ColorRect.new()
-	ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ground.color = Color("32653a").lerp(Color("3a7142"), float(absi(hash(key)) % 100) / 220.0)
-	ground.size = Vector2(WorldMap.CHUNK_SIZE, WorldMap.CHUNK_SIZE)
-	ground.position = Vector2(cx, cy) * WorldMap.CHUNK_SIZE
-	ground.z_index = -9
-	node.add_child(ground)
-	var entities: Array = []
-	for d in chunk.get("decor", []):
-		var decor := DecorScript.new()
-		decor.kind = d["kind"]
-		decor.size_scale = d["scale"]
-		var boff: float = DecorScript.base_offset(d["kind"], d["scale"])
-		decor.draw_offset = Vector2(0, -boff)
-		decor.position = d["pos"] + Vector2(0, boff)
-		add_child(decor)
-		entities.append(decor)
-		var occ: Rect2 = DecorScript.occluder_box(d["kind"], d["pos"], d["scale"])
-		if occ.has_area():
-			register_occluder(key, occ)
-		var box: Rect2 = DecorScript.solid_box(d["kind"], d["pos"], d["scale"])
-		if box.has_area():
-			entities.append(Physics.add_box(self, box))
-	var herd: Dictionary = chunk.get("herd", {})
+	if _chunk_built.has(key):
+		_activate_built(key)
+		return
+	_queue_build(cx, cy)
+
+func _drain_chunk_builds() -> void:
+	var start: int = Time.get_ticks_usec()
+	var budget: int = int(CHUNK_BUILD_BUDGET_MS * 1000.0)
+	var first := true
+	while not _build_queue.is_empty():
+		if not first and Time.get_ticks_usec() - start > budget:
+			break
+		first = false
+		_step_chunk_build()
+
+func _step_chunk_build() -> void:
+	if _build_queue.is_empty():
+		return
+	var key: String = _build_queue[0]
+	var b: Dictionary = _chunk_pending.get(key, {})
+	if b.is_empty():
+		_build_queue.pop_front()
+		return
+	_advance_builder(b)
+	if b.get("done", false):
+		_chunk_pending.erase(key)
+		_chunk_built[key] = b
+		_build_queue.pop_front()
+		var pc: Vector2i = WorldMap.chunk_at(player.position)
+		if absi(int(b["cx"]) - pc.x) <= 1 and absi(int(b["cy"]) - pc.y) <= 1:
+			_activate_built(key)
+
+## Un micro-paso de construcción por llamada; el drenaje repite hasta gastar el
+## presupuesto del frame. Contenido idéntico al _ensure_chunk síncrono anterior.
+func _advance_builder(b: Dictionary) -> void:
+	var cx: int = b["cx"]
+	var cy: int = b["cy"]
+	match int(b["phase"]):
+		0:
+			b["data"] = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, cx, cy), SaveData.world_edits, cx, cy)
+			var node := Node2D.new()
+			node.set_meta("c", Vector2i(cx, cy))
+			var ground := ColorRect.new()
+			ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			ground.color = Color("32653a").lerp(Color("3a7142"), float(absi(hash(WorldMap.chunk_key(cx, cy))) % 100) / 220.0)
+			ground.size = Vector2(WorldMap.CHUNK_SIZE, WorldMap.CHUNK_SIZE)
+			ground.position = Vector2(cx, cy) * WorldMap.CHUNK_SIZE
+			ground.z_index = -9
+			node.add_child(ground)
+			b["node"] = node
+			b["decor_todo"] = (b["data"] as Dictionary).get("decor", []).duplicate()
+			b["phase"] = 1
+		1:
+			var todo: Array = b["decor_todo"]
+			if todo.is_empty():
+				b["phase"] = 2
+				return
+			var d: Dictionary = todo.pop_front()
+			var decor := DecorScript.new()
+			decor.kind = d["kind"]
+			decor.size_scale = d["scale"]
+			var boff: float = DecorScript.base_offset(d["kind"], d["scale"])
+			decor.draw_offset = Vector2(0, -boff)
+			decor.position = d["pos"] + Vector2(0, boff)
+			(b["entities"] as Array).append(decor)
+			var occ: Rect2 = DecorScript.occluder_box(d["kind"], d["pos"], d["scale"])
+			if occ.has_area():
+				(b["occluders"] as Array).append(occ)
+			var box: Rect2 = DecorScript.solid_box(d["kind"], d["pos"], d["scale"])
+			if box.has_area():
+				(b["boxes"] as Array).append(box)
+			if todo.is_empty():
+				b["phase"] = 2
+		2:
+			var pigs: Dictionary = (b["data"] as Dictionary).get("pigs", {})
+			var pig_id: String = WorldEdits.edited_pen_id(pigs.get("pos", Vector2.ZERO)) if pigs.get("edited", false) else WorldMap.pig_id(cx, cy)
+			if not pigs.is_empty() and not SaveData.world_pigs.has(pig_id):
+				var todo: Array = b["pig_todo"]
+				if todo.is_empty() and int(b["pig_idx"]) == 0:
+					var base: Vector2 = pigs["pos"]
+					var count: int = int(pigs.get("count", 2))
+					for i in count:
+						todo.append(base + Vector2(cos(i * TAU / maxf(1.0, float(count))), sin(i * TAU / maxf(1.0, float(count)))) * 44.0)
+				if todo.is_empty():
+					b["phase"] = 3
+					return
+				var pos: Vector2 = todo.pop_front()
+				var pig := PigScript.new()
+				pig.name = "pig%d" % int(b["pig_idx"])
+				b["pig_idx"] = int(b["pig_idx"]) + 1
+				pig.setup({"pos": pos})
+				(b["entities"] as Array).append(pig)
+				if not todo.is_empty():
+					return
+			b["phase"] = 3
+		3:
+			var trail := TrailScript.new()
+			trail.c = Vector2i(cx, cy)
+			(b["node"] as Node2D).add_child(trail)
+			b["phase"] = 4
+		4:
+			# Frames del caballo de la manada: una textura recoloreada por paso
+			# (61 en total; es el 90% del coste del chunk). Misma caché por
+			# genotipo que wild_horse_art.gd, así manadas repetidas son gratis.
+			var herd: Dictionary = (b["data"] as Dictionary).get("herd", {})
+			var mission_id: String = WorldMap.herd_mission_id(cx, cy)
+			if herd.is_empty() or SaveData.world_tamed.has(mission_id):
+				b["phase"] = 5
+				return
+			var traits: Dictionary = herd.get("traits", {})
+			var cache_key := str(traits)
+			if WildHorseArtScript.frame_cache.has(cache_key):
+				b["phase"] = 5
+				return
+			if b["frame_specs"] == null:
+				var frames := SpriteFrames.new()
+				b["frames"] = frames
+				var specs: Array = []
+				for spec in [["wild_side", [0], "idle", 3.0], ["wild_walk_side", range(12), "walk", 12.0], ["wild_walk_down", range(12), "walk_down", 12.0], ["wild_walk_up", range(12), "walk_up", 12.0], ["wild_walk_diag_down", range(12), "walk_diag_down", 12.0], ["wild_walk_diag_up", range(12), "walk_diag_up", 12.0]]:
+					for i in spec[1]:
+						specs.append([spec[0], i, spec[2], spec[3]])
+				b["frame_specs"] = specs
+			var step: Array = (b["frame_specs"] as Array).pop_front()
+			var frames: SpriteFrames = b["frames"]
+			if not frames.has_animation(step[2]):
+				frames.add_animation(step[2])
+				frames.set_animation_speed(step[2], step[3])
+			var base: Texture2D = load("res://art/world/wild_base/%s/frame_%02d.png" % [String(step[0]).trim_prefix("wild_"), int(step[1])])
+			frames.add_frame(step[2], HorseAppearance.texture(base, step[0], int(step[1]), traits))
+			if (b["frame_specs"] as Array).is_empty():
+				WildHorseArtScript.frame_cache[cache_key] = frames
+				b["phase"] = 5
+		5:
+			b["done"] = true
+
+## El chunk construido entra en el conjunto activo (3x3): aquí es cuando sus
+## nodos se añaden al árbol y se marca el descubrimiento, igual que antes.
+func _activate_built(key: String) -> void:
+	var b: Dictionary = _chunk_built.get(key, {})
+	if b.is_empty():
+		return
+	_chunk_built.erase(key)
+	var cx: int = b["cx"]
+	var cy: int = b["cy"]
+	var entities: Array = b["entities"]
+	for e in entities:
+		add_child(e)
+	for box in b["boxes"]:
+		entities.append(Physics.add_box(self, box))
+	for e in entities.duplicate():
+		if e is Node2D and String((e as Node2D).name).begins_with("pig"):
+			entities.append(Physics.add_box(self, Rect2((e as Node2D).position + Vector2(-12, -6), Vector2(24, 12))))
+	for occ in b["occluders"]:
+		register_occluder(key, occ)
+	var data: Dictionary = b["data"]
+	var herd: Dictionary = data.get("herd", {})
 	var mission_id: String = WorldMap.herd_mission_id(cx, cy)
 	if not herd.is_empty() and not SaveData.world_tamed.has(mission_id):
 		var horse := WildHorseScript.new()
@@ -298,23 +483,8 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 		add_child(horse)
 		entities.append(horse)
 		_herd_horses[key] = horse
-		# Trust feedback is drawn on the horse itself (HeldVisuals, corral look).
-	var trail := TrailScript.new()
-	trail.c = Vector2i(cx, cy)
-	node.add_child(trail)
-	var pigs: Dictionary = chunk.get("pigs", {})
-	var pig_id: String = WorldEdits.edited_pen_id(pigs.get("pos", Vector2.ZERO)) if pigs.get("edited", false) else WorldMap.pig_id(cx, cy)
-	if not pigs.is_empty() and not SaveData.world_pigs.has(pig_id):
-		var base: Vector2 = pigs["pos"]
-		for i in int(pigs.get("count", 2)):
-			var pig := PigScript.new()
-			pig.name = "pig%d" % i
-			pig.setup({"pos": base + Vector2(cos(i * TAU / maxf(1.0, float(pigs.get("count", 2)))), sin(i * TAU / maxf(1.0, float(pigs.get("count", 2))))) * 44.0})
-			add_child(pig)
-			entities.append(pig)
-			entities.append(Physics.add_box(self, Rect2(pig.position + Vector2(-12, -6), Vector2(24, 12))))
-	add_child(node)
-	_chunks[key] = node
+	add_child(b["node"])
+	_chunks[key] = b["node"]
 	_chunk_entities[key] = entities
 	if not SaveData.world_discovered.has(key):
 		SaveData.mark_world_discovered(key)
@@ -535,6 +705,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		for key in _chunks.keys():
 			_chunks[key].queue_free()
 		_chunks.clear()
+		for k in _chunk_pending:
+			_discard_builder(_chunk_pending[k])
+		_chunk_pending.clear()
+		for k in _chunk_built:
+			_discard_builder(_chunk_built[k])
+		_chunk_built.clear()
+		_build_queue.clear()
+		_update_chunks()
+		while not _build_queue.is_empty():
+			_step_chunk_build()
 		_update_chunks()
 
 func _tick_stamina(delta: float) -> void:

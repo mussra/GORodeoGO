@@ -17,12 +17,24 @@ func _fresh_world() -> Node2D:
 	add_child_autofree(world)
 	return world
 
+## Con la construcción amortizada (2.7.31), un cruce de borde tarda varios
+## frames en completarse: espera a que la cola de construcción se asiente.
+func _settled(world: Node2D, max_frames: int = 300) -> bool:
+	# Idle frames, no physics: el streaming vive en _process. Espera primero a
+	# que reaccione al movimiento y llene la cola, y luego a que la vacíe.
+	await wait_frames(3)
+	for i in max_frames:
+		await wait_frames(1)
+		if world._build_queue.is_empty() and world._chunk_pending.is_empty():
+			return true
+	return false
+
 func test_chunks_stream_with_margin_and_unload() -> void:
 	var world := _fresh_world()
-	await wait_physics_frames(4)
+	assert_true(await _settled(world), "initial 3x3 builds settle")
 	assert_eq(world._chunks.size(), 9, "3x3 around the rider")
 	world.player.position = Vector2(WorldMap.CHUNK_SIZE * 4, 0)
-	await wait_physics_frames(4)
+	assert_true(await _settled(world), "far crossing builds settle")
 	assert_eq(world._chunks.size(), 9, "same budget far from the ranch")
 	var pc: Vector2i = WorldMap.chunk_at(world.player.position)
 	for key in world._chunks:
@@ -31,19 +43,19 @@ func test_chunks_stream_with_margin_and_unload() -> void:
 
 func test_walking_out_and_back_keeps_node_and_memory_budget() -> void:
 	var world := _fresh_world()
-	await wait_physics_frames(4)
+	assert_true(await _settled(world), "initial build settles")
 	Input.action_press("move_right", 1.0)
 	for i in 40:
 		await wait_physics_frames(6)
 	Input.action_release("move_right")
-	await wait_physics_frames(2)
+	assert_true(await _settled(world), "out leg settles")
 	var nodes_far: int = int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
 	var mem_far: float = Performance.get_monitor(Performance.MEMORY_STATIC)
 	Input.action_press("move_left", 1.0)
 	for i in 40:
 		await wait_physics_frames(6)
 	Input.action_release("move_left")
-	await wait_physics_frames(2)
+	assert_true(await _settled(world), "back leg settles")
 	var nodes_back: int = int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
 	var mem_back: float = Performance.get_monitor(Performance.MEMORY_STATIC)
 	# same land, same budget: revisit costs nothing extra
