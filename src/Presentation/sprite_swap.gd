@@ -51,8 +51,7 @@ func _init(host: Node = null, placeholder: CanvasItem = null, art_root: String =
 	host.add_child(_sprite)
 	placeholder.visible = false
 
-## Wraps pre-built SpriteFrames (e.g. RiddenHorseArt: runtime recolor + baked
-## rider layers) in the same play/flip/gait-pose API the loaders return.
+## Wraps pre-built SpriteFrames in the same play/flip/gait-pose API the loaders return.
 static func from_frames(host: Node, placeholder: CanvasItem, frames: SpriteFrames) -> SpriteSwap:
 	var swap := SpriteSwap.new()
 	swap._frames = frames
