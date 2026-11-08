@@ -57,5 +57,6 @@ func request_back()->void:
  confirm_exit()
 func confirm_exit()->void:
  if is_instance_valid(_exit_dialog):return
- _exit_dialog=ConfirmationDialog.new();_exit_dialog.title=tr("BACK_EXIT_TITLE");_exit_dialog.dialog_text=tr("BACK_EXIT_BODY");_exit_dialog.get_cancel_button().text=tr("MARKET_CANCEL");_exit_dialog.min_size=Vector2i(480,150);get_tree().root.add_child(_exit_dialog);RanchTheme.style_dialog(_exit_dialog)
+ _exit_dialog=ConfirmationDialog.new();_exit_dialog.title=tr("BACK_EXIT_TITLE");_exit_dialog.dialog_text=tr("BACK_EXIT_BODY");_exit_dialog.get_cancel_button().text=tr("MARKET_CANCEL");_exit_dialog.dialog_autowrap=true;var vw:int=get_tree().root.size.x;_exit_dialog.min_size=Vector2i(mini(480,vw-48),170);get_tree().root.add_child(_exit_dialog);RanchTheme.style_dialog(_exit_dialog,true)
  _exit_dialog.confirmed.connect(func():get_tree().quit());_exit_dialog.canceled.connect(func():_exit_dialog.queue_free();_exit_dialog=null);_exit_dialog.popup_centered()
+ if _exit_dialog.size.x>vw-32:_exit_dialog.size.x=vw-32;_exit_dialog.position.x=int((vw-_exit_dialog.size.x)*0.5)

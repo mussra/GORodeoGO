@@ -37,13 +37,23 @@ static func create() -> Theme:
 	theme.set_stylebox("fill", "ProgressBar", box(GOLD, Color.TRANSPARENT, 6))
 	# AcceptDialog / ConfirmationDialog (Ant 22:50: "Todos los mensajes" con el
 	# estilo de los menús — the default gray Godot dialogs clashed).
-	theme.set_stylebox("panel", "AcceptDialog", box(Color("112d3b"), Color("547e86"), 18))
-	# Embedded window title bar (the gray band Ant flagged in "Salir del juego").
-	theme.set_stylebox("embedded_border", "Window", box(Color("0e2a36"), Color("547e86"), 18))
-	theme.set_color("title_color", "Window", CREAM)
-	theme.set_font_size("title_font_size", "Window", 20)
+	# Ant 14:55/15:00: wide margins + the rounded panel is the whole frame.
+	var dialog_panel := box(Color("112d3b"), Color("547e86"), 18)
+	dialog_panel.content_margin_left = 28.0
+	dialog_panel.content_margin_right = 28.0
+	dialog_panel.content_margin_top = 20.0
+	dialog_panel.content_margin_bottom = 18.0
+	theme.set_stylebox("panel", "AcceptDialog", dialog_panel)
 	return theme
 
 ## Applies the menus' palette to a popup dialog (Salir, confirmaciones, avisos).
-static func style_dialog(dialog: AcceptDialog) -> void:
+## Ant 15:00: no X close button and no dark rectangle behind the corners, so
+## every styled dialog is borderless and transparent; with show_title the
+## window title (hidden when borderless) is folded into the body as a header
+## line so it stays inside the rounded panel.
+static func style_dialog(dialog: AcceptDialog, show_title: bool = false) -> void:
 	dialog.theme = create()
+	dialog.borderless = true
+	dialog.transparent_bg = true
+	if show_title and not dialog.title.is_empty() and not dialog.dialog_text.begins_with(dialog.title):
+		dialog.dialog_text = dialog.title + "\n\n" + dialog.dialog_text
