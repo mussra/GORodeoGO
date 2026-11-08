@@ -14,7 +14,9 @@ extends RefCounted
 var _sprite: AnimatedSprite2D = null
 var _frames: SpriteFrames = null
 
-func _init(host: Node, placeholder: CanvasItem, art_root: String, animation_names: Array, fps: float = 8.0) -> void:
+func _init(host: Node = null, placeholder: CanvasItem = null, art_root: String = "", animation_names: Array = [], fps: float = 8.0) -> void:
+	if host == null:
+		return  # from_frames fills the fields instead
 	if not DirAccess.dir_exists_absolute(art_root):
 		return
 
@@ -48,6 +50,17 @@ func _init(host: Node, placeholder: CanvasItem, art_root: String, animation_name
 	_sprite.sprite_frames = _frames
 	host.add_child(_sprite)
 	placeholder.visible = false
+
+## Wraps pre-built SpriteFrames (e.g. RiddenHorseArt: runtime recolor + baked
+## tack layers) in the same play/flip/gait-pose API the loaders return.
+static func from_frames(host: Node, placeholder: CanvasItem, frames: SpriteFrames) -> SpriteSwap:
+	var swap := SpriteSwap.new()
+	swap._frames = frames
+	swap._sprite = AnimatedSprite2D.new()
+	swap._sprite.sprite_frames = frames
+	host.add_child(swap._sprite)
+	placeholder.visible = false
+	return swap
 
 func _list_sorted_image_paths(folder: String) -> Array:
 	var paths: Array = []
