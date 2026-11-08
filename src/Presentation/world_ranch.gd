@@ -17,6 +17,18 @@ const BARREL_TEX: Texture2D = preload("res://art/world/cartoon/barrel.png")
 const CRATE_TEX: Texture2D = preload("res://art/world/cartoon/crate.png")
 const CART_TEX: Texture2D = preload("res://art/world/cartoon/cart.png")
 const POND_TEX: Texture2D = preload("res://art/world/cartoon/pond.png")
+const GATE_TEX: Texture2D = preload("res://art/world/cartoon/fence_gate.png")
+const SIGNPOST_TEX: Texture2D = preload("res://art/world/cartoon/signpost.png")
+const STUMP_TEX: Texture2D = preload("res://art/world/cartoon/stump.png")
+const LOG_TEX: Texture2D = preload("res://art/world/cartoon/log.png")
+const HAYBALE_TEX: Texture2D = preload("res://art/world/cartoon/haybale.png")
+const GRASS_TEXES: Array[Texture2D] = [
+	preload("res://art/world/cartoon/grass1.png"),
+	preload("res://art/world/cartoon/grass2.png"),
+	preload("res://art/world/cartoon/grass3.png"),
+	preload("res://art/world/cartoon/grass4.png"),
+	preload("res://art/world/cartoon/grass5.png"),
+]
 ## Barn base spot: inside the corral, south-west meadow — off the roads,
 ## clear of the rails circle, the house (NW), the sign (E) and the gate.
 const BARN_BASE := Vector2(-165, 95)
@@ -82,6 +94,19 @@ func _ready() -> void:
 	_prop(world, CRATE_TEX, Vector2(-26, 106), 26.0, Rect2(-36, 96, 20, 14))
 	_prop(world, CART_TEX, Vector2(-60, 230), 55.0, Rect2(-92, 222, 64, 14))
 	_prop(world, POND_TEX, Vector2(520, 260), 100.0, Rect2(462, 232, 116, 56))
+	# Second props pass: gate leaf at the south opening (hinged on the east
+	# boundary post, swung open inward), signpost by the gate-road junction,
+	# woodcutting corner NW (stump + log), hay bales by the barn and grass
+	# tufts sprinkled over the meadow (decorative, walkable).
+	_draw_gate(world)
+	_prop(world, SIGNPOST_TEX, Vector2(205, 285), 66.0, Rect2(199, 278, 12, 10))
+	_prop(world, STUMP_TEX, Vector2(-200, -60), 34.0, Rect2(-212, -66, 24, 10))
+	_prop(world, LOG_TEX, Vector2(-228, -24), 26.0, Rect2(-240, -30, 44, 10))
+	_prop(world, HAYBALE_TEX, Vector2(-118, 152), 40.0, Rect2(-134, 140, 32, 16))
+	_prop(world, HAYBALE_TEX, Vector2(-86, 170), 32.0, Rect2(-100, 160, 28, 14))
+	var tufts := [Vector2(40, -40), Vector2(90, 20), Vector2(-150, -140), Vector2(60, 140), Vector2(-60, -30), Vector2(160, -120), Vector2(-230, 60), Vector2(120, 220)]
+	for i in tufts.size():
+		_prop(world, GRASS_TEXES[i % GRASS_TEXES.size()], tufts[i], 14.0)
 
 const POST_H := 34.0
 const RAIL_H := 18.0
@@ -101,6 +126,21 @@ func _draw_fence_seg(n: Node2D, p: Vector2, pn: Vector2) -> void:
 	n.draw_texture_rect(RAILS_TEX, Rect2(Vector2(-len * 0.5, -RAIL_H * 0.5), Vector2(len, RAIL_H)), false)
 	n.draw_set_transform(Vector2.ZERO)
 	_draw_post(n)
+
+## The gate leaf: hinged on the east post of the south opening (166.6, 249.9),
+## swung fully open so it rests against the fence line inside (135° from the
+## closed pose); the entrance stays clear and the fence box already covers it.
+func _draw_gate(world: Node2D) -> void:
+	var node := DrawNode.new()
+	node.position = Vector2(166.6, 253.9)
+	node.draw_origin = Vector2(0, -4)
+	node.draw_fn = func(n):
+		var h := 40.0
+		var w := h * GATE_TEX.get_width() / float(GATE_TEX.get_height())
+		n.draw_set_transform(Vector2(0, -h + 4), deg_to_rad(135.0), Vector2.ONE)
+		n.draw_texture_rect(GATE_TEX, Rect2(Vector2(-w, 0), Vector2(w, h)), false)
+		n.draw_set_transform(Vector2.ZERO)
+	world.add_child(node)
 
 ## A small dressing item: y-sorted by its base, optional solid box and occluder.
 func _prop(world: Node2D, tex: Texture2D, base: Vector2, h: float, solid := Rect2(), occ := false) -> void:
