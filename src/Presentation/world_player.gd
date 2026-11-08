@@ -84,18 +84,12 @@ func _ready() -> void:
 	placeholder.polygon = PackedVector2Array([Vector2(-20, -14), Vector2(20, -14), Vector2(20, 14), Vector2(-20, 14)])
 	placeholder.color = Color("c8b994")
 	add_child(placeholder)
+	_sprite_swap = SpriteSwap.new(self, placeholder, HatAppearance.art_root(SaveData.hat_color), ANIM_NAMES)
 	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
-	# Jinete oficial (Ant 8-nov 15:00): wild base recoloreada por genotipo + la
-	# capa del jinete del menu con el sombrero de SaveData.hat_color.
-	# Fallback: legacy art/player (sombreros) si falta el arte nuevo.
-	if not horse.is_empty() and RiddenHorseArt.available():
-		_sprite_swap = SpriteSwap.from_frames(self, placeholder, RiddenHorseArt.build_frames(horse.traits, SaveData.hat_color))
-	else:
-		_sprite_swap = SpriteSwap.new(self, placeholder, HatAppearance.art_root(SaveData.hat_color), ANIM_NAMES)
-		if not horse.is_empty() and _sprite_swap.has_sprite():
-			HorseAppearance.apply(_sprite_swap._frames, horse.traits)
 	if not horse.is_empty():
 		max_speed = HorseStats.read(horse).speed
+		if _sprite_swap.has_sprite():
+			HorseAppearance.apply(_sprite_swap._frames, horse.traits)
 	_sprite_swap.play("idle")
 
 func stun(duration: float = STUN_SECONDS) -> void:
