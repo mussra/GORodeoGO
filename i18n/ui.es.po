@@ -1169,3 +1169,33 @@ msgstr "No se fía de nuestro caballo. Tendremos que buscar uno que se le parezc
 
 msgid "WORLD_STALLION_HINT_3"
 msgstr "Un caballo de pelaje y crin parecidos ganará su confianza... o un Líder de manada."
+
+msgid "FILTER_ALL"
+msgstr "Todos"
+
+msgid "FILTER_COAT"
+msgstr "Color"
+
+msgid "FILTER_PATTERN"
+msgstr "Patrón"
+
+msgid "FILTER_MANE"
+msgstr "Crin"
+
+msgid "FILTER_RARITY"
+msgstr "Rareza"
+
+msgid "FILTER_OWNED"
+msgstr "Estado"
+
+msgid "FILTER_OWNED_YES"
+msgstr "Conseguidos"
+
+msgid "FILTER_OWNED_NO"
+msgstr "Sin conseguir"
+
+msgid "FILTER_CLEAR"
+msgstr "Limpiar"
+
+msgid "FILTER_COUNT"
+msgstr "%d de %d"

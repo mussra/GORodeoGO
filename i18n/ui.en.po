@@ -1169,3 +1169,33 @@ msgstr "It doesn't trust our horse. We'll need one that looks like it."
 
 msgid "WORLD_STALLION_HINT_3"
 msgstr "A horse with a similar coat and mane will earn its trust... or a Pack Leader."
+
+msgid "FILTER_ALL"
+msgstr "All"
+
+msgid "FILTER_COAT"
+msgstr "Color"
+
+msgid "FILTER_PATTERN"
+msgstr "Pattern"
+
+msgid "FILTER_MANE"
+msgstr "Mane"
+
+msgid "FILTER_RARITY"
+msgstr "Rarity"
+
+msgid "FILTER_OWNED"
+msgstr "Status"
+
+msgid "FILTER_OWNED_YES"
+msgstr "Owned"
+
+msgid "FILTER_OWNED_NO"
+msgstr "Not owned"
+
+msgid "FILTER_CLEAR"
+msgstr "Clear"
+
+msgid "FILTER_COUNT"
+msgstr "%d of %d"

@@ -11,6 +11,7 @@ var focus_id:String="original"
 var focus_preview:Dictionary={}
 var atlas_page:int=0
 var atlas_owned_first:bool=true
+var atlas_filters:Dictionary={}
 var scroll_to_newest:bool=false
 func _ready()->void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=80
@@ -184,12 +185,41 @@ func atlas_entries()->Array[Dictionary]:
     if h.traits.coat==t.coat and h.traits.pattern==t.pattern and h.traits.mane==t.mane:
      entry.horse=h;entry.owned=true;break
  return result
+## Barra de filtros del atlas (Ant 8-nov 19:13): un desplegable por propiedad
+## del registro HorseFilters (propiedades como datos); "Todos" quita ese
+## filtro y los activos se combinan en AND. Misma barra en atlas y mercado.
+func _atlas_filter_bar()->void:
+ var widths:Array=[150,175,140,175,150]
+ var x:float=290.0
+ var props:Array=HorseFilters.properties()
+ for i in props.size():
+  var p:Dictionary=props[i]
+  var ob:=OptionButton.new();ob.position=Vector2(x,196);ob.size=Vector2(widths[i],40)
+  ob.add_theme_font_size_override("font_size",15)
+  ob.add_item(tr(p.label)+": "+tr("FILTER_ALL"))
+  var chosen:=0
+  for j in p.values.size():
+   ob.add_item(tr(p.label)+": "+tr(p.values[j].label))
+   if atlas_filters.get(p.id,null)==p.values[j].value:chosen=j+1
+  ob.selected=chosen
+  ob.item_selected.connect(_on_atlas_filter.bind(p.id,p.values))
+  content.add_child(ob);x+=widths[i]+8
+ var clear:=button(tr("FILTER_CLEAR"),Vector2(x,196),func():atlas_filters.clear();atlas_page=0;refresh(),1280-x-35)
+ clear.disabled=atlas_filters.is_empty()
+
+func _on_atlas_filter(idx:int,pid:String,values:Array)->void:
+ if idx<=0:atlas_filters.erase(pid)
+ else:atlas_filters[pid]=values[idx-1].value
+ atlas_page=0;refresh()
+
 func atlas_view()->void:
  label(tr("MARKET_BALANCE")%SaveData.equipment_points if page=="market" else tr("UI_121"),Vector2(35,200),25)
- if page!="market":button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(765,195),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),470)
+ if page!="market":button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(1010,222),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),240)
+ _atlas_filter_bar()
  label(tr("MARKET_DESIGN_NOTE"),Vector2(35,236),17)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
- var entries:Array[Dictionary]=atlas_entries();var pages:int=maxi(1,ceili(entries.size()/8.0));atlas_page=clampi(atlas_page,0,pages-1)
+ var all_entries:Array[Dictionary]=atlas_entries()
+ var entries:Array[Dictionary]=HorseFilters.apply(all_entries,atlas_filters);var pages:int=maxi(1,ceili(entries.size()/8.0));atlas_page=clampi(atlas_page,0,pages-1)
  for j in range(8):
   var n:int=atlas_page*8+j
   if n>=entries.size():break
@@ -204,6 +234,7 @@ func atlas_view()->void:
   if HorseJump.capable(h):
    var jump:=JumpBadge.new();jump.capable=true;jump.position=Vector2(x,y+88);jump.size=Vector2(64,56);content.add_child(jump)
  button(tr("UI_132"),Vector2(35,575),func():atlas_page=maxi(0,atlas_page-1);refresh())
+ if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(900,588),17)
  label(tr("UI_128")%[atlas_page+1,pages],Vector2(345,585),23)
  button(tr("UI_133"),Vector2(650,575),func():atlas_page=mini(pages-1,atlas_page+1);refresh())
 
