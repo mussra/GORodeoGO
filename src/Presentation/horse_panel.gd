@@ -137,6 +137,8 @@ func detail_view()->void:
   button(tr("UI_106"),Vector2(450,510),func():show_page("atlas"),340)
   return
  var title:=label(h.name,Vector2(40,175),27);title.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;title.size.x=365;title.clip_text=true
+ if PackLeader.is_leader(h,SaveData.horse_collection):
+  var badge:=label(tr("LEADER_TITLE"),Vector2(40,205),18);badge.add_theme_color_override("font_color",Color("ffd23d"))
  sprite(h,Vector2(70,250),235)
  var name_edit:=LineEdit.new();name_edit.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;name_edit.text=h.name;name_edit.placeholder_text=tr("UI_107");name_edit.max_length=60;name_edit.position=Vector2(40,485);name_edit.size=Vector2(200,48);content.add_child(name_edit)
  button(tr("UI_108"),Vector2(245,485),func():

@@ -36,6 +36,13 @@ var rider: Node2D = null
 ## Seconds left roped; while > 0 the horse cannot flee or wander.
 var held: float = 0.0
 var touch_grace: float = 0.0
+## Afinidad genetica (Ant 8-nov 13:33): rasgos visibles compartidos con el
+## caballo equipado (0-3); pack_leader_near = el equipado es Lider de manada
+## de su tipo. Los actualiza frontier_world cada tick; solo dibuja aqui.
+var affinity_matches: int = 0
+var pack_leader_near: bool = false
+## Jugador cercano para el indicador de afinidad (lo pone frontier_world).
+var player_ref: Node2D = null
 var _touching_rider: bool = false
 var _art: Node2D
 var _bob: float = 0.0
@@ -108,6 +115,39 @@ func _draw() -> void:
 		var progress: float = float(state.get("progress", 0.0))
 		if progress > 0.01:
 			HeldVisuals.draw_progress(self, progress, ROPE_ANCHOR_Y)
+	_draw_affinity()
+
+## Indicador de afinidad sobre la cabeza: corazon gris (sin rasgos), dorado
+## (1), dorado brillante (2), dorado con estrella (3). Corona si el equipado
+## es Lider de manada de este tipo. Solo visible a tiro de domesticacion.
+func _draw_affinity() -> void:
+	if player_ref == null or not is_instance_valid(player_ref):
+		return
+	if position.distance_to(player_ref.position) > WorldTaming.CALM_RANGE * 2.2:
+		return
+	var y: float = -100.0
+	var color: Color
+	match affinity_matches:
+		0: color = Color("9a9a9a")
+		1: color = Color("d9a441")
+		2: color = Color("ffd23d")
+		_: color = Color("ffd23d")
+	_draw_heart(Vector2(0, y), 5.0, color)
+	if affinity_matches >= 3:
+		_draw_star(Vector2(12, y - 2), 4.0, Color("fff3b0"))
+	if pack_leader_near:
+		_draw_crown(Vector2(0, y - 14), Color("ffd23d"))
+
+func _draw_heart(c: Vector2, s: float, color: Color) -> void:
+	draw_circle(c + Vector2(-s * 0.45, -s * 0.25), s * 0.55, color)
+	draw_circle(c + Vector2(s * 0.45, -s * 0.25), s * 0.55, color)
+	draw_colored_polygon(PackedVector2Array([c + Vector2(-s, 0), c + Vector2(s, 0), c + Vector2(0, s * 1.2)]), color)
+
+func _draw_star(c: Vector2, s: float, color: Color) -> void:
+	draw_colored_polygon(PackedVector2Array([c + Vector2(0, -s), c + Vector2(s * 0.3, -s * 0.3), c + Vector2(s, 0), c + Vector2(s * 0.3, s * 0.3), c + Vector2(0, s), c + Vector2(-s * 0.3, s * 0.3), c + Vector2(-s, 0), c + Vector2(-s * 0.3, -s * 0.3)]), color)
+
+func _draw_crown(c: Vector2, color: Color) -> void:
+	draw_colored_polygon(PackedVector2Array([c + Vector2(-7, 4), c + Vector2(-7, -3), c + Vector2(-3.5, 0), c + Vector2(0, -5), c + Vector2(3.5, 0), c + Vector2(7, -3), c + Vector2(7, 4)]), color)
 
 ## The rider drops the rope (double tap or a stun): the horse bolts, keeping
 ## the trust it had — same transition as the corral's release_by_player (D027),
@@ -142,6 +182,16 @@ func _pick_wander_target() -> void:
 	_wander_target = home + Vector2(cos(a), sin(a)) * r
 
 var _flee: Vector2 = Vector2.ZERO
+
+## Lider de manada: en vez de huir, el salvaje se acerca despacio al jinete.
+func approach(point: Vector2, delta: float) -> void:
+	var to: Vector2 = point - position
+	if to.length() < 1.0:
+		return
+	_flee = to.normalized() * 40.0  # reuses the leash-checked movement slot
+	_art.flip_h = to.x < 0.0
+	_art.grazing = false
+	_art.set_walk_direction(to)
 
 func flee_from(from: Vector2, _delta: float) -> void:
 	var away: Vector2 = position - from

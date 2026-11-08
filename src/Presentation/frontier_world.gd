@@ -164,7 +164,7 @@ func _tick_lasso(_delta: float) -> void:
 			if st.has("flee"):
 				st["flee"] = true
 			else:
-				st["spook"] = WorldTaming.SPOOK_SECONDS
+				st["spook"] = WorldTaming.spook_seconds(_affinity(_lasso_horse).matches)
 			_lasso_horse.state = st
 			_lasso_horse.release()
 			_end_lasso()
@@ -178,7 +178,7 @@ func _release_held_horse() -> void:
 	if st.has("flee"):
 		st["flee"] = true
 	else:
-		st["spook"] = WorldTaming.SPOOK_SECONDS
+		st["spook"] = WorldTaming.spook_seconds(_affinity(_lasso_horse).matches)
 	_lasso_horse.state = st
 	_lasso_horse.release()
 	_end_lasso()
@@ -302,6 +302,15 @@ func _ensure_chunk(cx: int, cy: int) -> void:
 			_refresh_missions()
 			SaveData.save_world_state(player.position)
 
+## Afinidad genetica (Ant 8-nov 13:33): el caballo equipado comparte rasgos
+## visibles (pelaje/patron/crin) con el salvaje -> confia mas y se asusta
+## menos. Si ademas es "Lider de manada" (3 generaciones, rasgos fijados) y
+## comparte los 3 rasgos, el salvaje no huye: curiosea y se acerca.
+func _affinity(horse: Node2D) -> Dictionary:
+	var ridden: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
+	var matches: int = WorldTaming.affinity_matches(ridden.get("traits", {}), horse.herd.get("traits", {}))
+	return {"matches": matches, "bonus": WorldTaming.affinity_bonus(matches), "leader": matches == 3 and PackLeader.is_leader(ridden, SaveData.horse_collection)}
+
 func _tick_taming(delta: float) -> void:
 	for key in _herd_horses:
 		var raw = _herd_horses[key]
@@ -311,12 +320,18 @@ func _tick_taming(delta: float) -> void:
 		var dist: float = player.position.distance_to(horse.position)
 		if dist > 700.0:
 			continue
+		var aff: Dictionary = _affinity(horse)
+		horse.affinity_matches = aff.matches
+		horse.pack_leader_near = aff.leader
+		horse.player_ref = player
 		var st: Dictionary
 		if horse.roped:
 			# Roped: trust fills fast while the horse stays put (Ant 21:47).
-			st = WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta)
+			st = WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta, aff.bonus)
 		else:
-			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta)
+			if aff.leader and float(horse.state.get("progress", 0.0)) < WorldTaming.LEADER_START_PROGRESS and dist < WorldTaming.CALM_RANGE * 1.5:
+				horse.state["progress"] = WorldTaming.LEADER_START_PROGRESS
+			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta, aff.bonus, WorldTaming.spook_seconds(aff.matches))
 		horse.state = st
 		if WorldTaming.tamed(st):
 			_deliver_horse(horse.get_meta("c"), horse)
@@ -326,7 +341,13 @@ func _tick_taming(delta: float) -> void:
 		# "Que suelte" (Ant, 7-nov-2026 19:58, the corral rule): contact with a
 		# bolting wild animal stuns the rider and drops the roped capture.
 		var touching: bool = dist <= horse.BODY_RADIUS + horse.RIDER_TOUCH_RADIUS
-		if WorldTaming.should_flee(st, dist):
+		if aff.leader:
+			# Lider de manada: no huye; curiosea y se acerca despacio.
+			if dist < WorldTaming.CALM_RANGE * 1.6 and dist > 60.0:
+				horse.approach(player.position, delta)
+			if dist < WorldTaming.CALM_RANGE * 1.5:
+				horse.face_towards(player.position)
+		elif WorldTaming.should_flee(st, dist):
 			horse.flee_from(player.position, delta)
 			if touching and not horse._touching_rider and horse.touch_grace <= 0.0:
 				player.stun()
