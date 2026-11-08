@@ -213,6 +213,9 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 
 func _toast(text: String) -> void:
 	_toast_label.text = text
+	# The edit palette covers (20..660, 56..206); drop the toast under it so a
+	# "mision descubierta" never hides the tool help (validation 8-nov).
+	_toast_label.position.y = 216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 60.0
 	_toast_left = 3.0
 	_toast_label.modulate.a = 1.0
 

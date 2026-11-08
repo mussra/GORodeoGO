@@ -64,13 +64,15 @@ func test_marker_shows_when_rider_hidden() -> void:
 func test_map_is_small_and_expands() -> void:
 	var world := _fresh_world()
 	await wait_physics_frames(4)
+	var map: Control = world._map_overlay
+	# Ant 22:49: the small map is always there, collapsed like the arena minimap.
+	assert_true(map.visible, "small map is always there")
+	assert_false(map.expanded, "starts collapsed")
+	assert_eq(map.size, Vector2(180, 112), "small corner size matches the arena minimap")
 	world._toggle_map()
 	await wait_process_frames(2)
-	var map: Control = world._map_overlay
-	assert_false(map.expanded, "map opens small like the arena minimap")
-	assert_eq(map.size, Vector2(180, 112), "small corner size matches the arena minimap")
-	map.expanded = true
-	await wait_process_frames(2)
+	assert_true(map.expanded, "Mapa button expands it")
 	assert_gt(map.size.x, 400.0, "expanded map is large")
 	world._toggle_map()
-	assert_false(map.visible, "map closes")
+	assert_true(map.visible, "small map stays visible")
+	assert_false(map.expanded, "map collapses back to the corner")

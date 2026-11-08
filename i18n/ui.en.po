@@ -242,7 +242,9 @@ msgid "UI_080"
 msgstr "Rarity: planned categories, not assigned. Saddle and accessories are NOT inherited."
 
 msgid "UI_081"
-msgstr "%d HORSES IN COLLECTION"
+msgid_plural "UI_081_PLURAL"
+msgstr[0] "%d HORSE IN COLLECTION"
+msgstr[1] "%d HORSES IN COLLECTION"
 
 msgid "UI_082"
 msgstr "%s%s\n%s · %s · mane %s"
@@ -1146,3 +1148,15 @@ msgstr "Erase"
 msgid "WORLD_HORSE_TIRED"
 msgstr "The horse takes a breather"
 
+
+msgid "MARKET_RULES_A"
+msgstr "Normal: 6 offers per reached level."
+
+msgid "MARKET_RULES_B"
+msgstr "Each victory earns one birth."
+
+msgid "TRIAL_RULES_A"
+msgstr "TRIAL: parents kept, no charge. Trial values."
+
+msgid "TRIAL_RULES_B"
+msgstr "Inheritance rules are not final."

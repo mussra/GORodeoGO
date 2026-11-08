@@ -216,7 +216,7 @@ func _layout() -> void:
 	_missions.add_theme_font_size_override("font_size",13)
 	_equipment_button.position=Vector2(350,557)
 	_equipment_button.size=Vector2(136,50)
-	_caption.position = Vector2(70,620)
+	_caption.position = Vector2(70,634)
 	_hero.get_node("Rider").position = Vector2(912,355)
 	_hero.get_node("Rider").scale = Vector2.ONE
 	_hero.get_node("Bull").position = Vector2(1056,466)

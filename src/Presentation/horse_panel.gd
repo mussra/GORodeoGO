@@ -46,7 +46,9 @@ func _refresh()->void:
   if not SaveData.save_progress():SaveData.horse_collection.restore(before);message=tr("UI_086");refresh();return
   parent_b=added[0].id;page="collection";scroll_to_newest=true;message=tr("UI_078")%SaveData.horse_collection.horses.size();refresh(),230)
  random_button.visible=SaveData.debug_mode or SaveData.trial_session_active
- var trial_note:=label(tr("MARKET_NORMAL_RULES") if not SaveData.debug_mode and not SaveData.trial_session_active else tr("UI_079"),Vector2(30,138),18);trial_note.size=Vector2(470,28);trial_note.clip_text=true
+ var rules_normal:=not SaveData.debug_mode and not SaveData.trial_session_active
+ label(tr("MARKET_RULES_A") if rules_normal else tr("TRIAL_RULES_A"),Vector2(30,136),17)
+ label(tr("MARKET_RULES_B") if rules_normal else tr("TRIAL_RULES_B"),Vector2(30,160),17)
  match page:
   "collection":collection_view()
   "breed":breed_view()
@@ -62,8 +64,8 @@ func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
  else:HorsePortrait.apply(tex,h.traits,SaveData.hat_color)
  tex.position=pos;tex.size=Vector2.ONE*size_px;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;content.add_child(tex)
 func collection_view()->void:
- label(tr("UI_081")%SaveData.horse_collection.horses.size(),Vector2(30,162),18)
- var scroll:=ScrollContainer.new();scroll.position=Vector2(30,185);scroll.size=Vector2(1210,420);content.add_child(scroll)
+ label(TranslationServer.translate_plural("UI_081","UI_081_PLURAL",SaveData.horse_collection.horses.size())%SaveData.horse_collection.horses.size(),Vector2(30,192),18)
+ var scroll:=ScrollContainer.new();scroll.position=Vector2(30,215);scroll.size=Vector2(1210,390);content.add_child(scroll)
  var rows:=VBoxContainer.new();rows.custom_minimum_size.x=1170;scroll.add_child(rows)
  for h in SaveData.horse_collection.horses:
   var row:=HBoxContainer.new();row.custom_minimum_size.y=100;rows.add_child(row)
@@ -96,7 +98,7 @@ func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
 func breed_view()->void:
  if SaveData.horse_collection.find(parent_a).is_empty():parent_a=SaveData.horse_collection.selected
  if SaveData.horse_collection.find(parent_b).is_empty():parent_b=SaveData.horse_collection.selected
- label(tr("BIRTH_CREDITS")%SaveData.horse_collection.birth_credits if not SaveData.debug_mode and not SaveData.trial_session_active else tr("BIRTH_FREE"),Vector2(40,185),18)
+ label(tr("BIRTH_CREDITS")%SaveData.horse_collection.birth_credits if not SaveData.debug_mode and not SaveData.trial_session_active else tr("BIRTH_FREE"),Vector2(40,215),18)
  label(tr("UI_087"),Vector2(40,210),18);label(tr("UI_088"),Vector2(840,210),18)
  parent_picker(parent_a,Vector2(40,240),true);parent_picker(parent_b,Vector2(840,240),false)
  sprite(SaveData.horse_collection.find(parent_a),Vector2(110,310),105)
@@ -181,9 +183,9 @@ func atlas_entries()->Array[Dictionary]:
      entry.horse=h;entry.owned=true;break
  return result
 func atlas_view()->void:
- label(tr("MARKET_BALANCE")%SaveData.equipment_points if page=="market" else tr("UI_121"),Vector2(35,170),25)
- if page!="market":button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(765,165),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),470)
- label(tr("MARKET_DESIGN_NOTE"),Vector2(35,208),17)
+ label(tr("MARKET_BALANCE")%SaveData.equipment_points if page=="market" else tr("UI_121"),Vector2(35,200),25)
+ if page!="market":button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(765,195),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),470)
+ label(tr("MARKET_DESIGN_NOTE"),Vector2(35,238),17)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
  var entries:Array[Dictionary]=atlas_entries();var pages:int=maxi(1,ceili(entries.size()/8.0));atlas_page=clampi(atlas_page,0,pages-1)
  for j in range(8):

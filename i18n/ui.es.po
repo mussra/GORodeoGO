@@ -242,7 +242,9 @@ msgid "UI_080"
 msgstr "Rareza: categorías previstas, aún sin asignar. Silla y complementos NO se heredan."
 
 msgid "UI_081"
-msgstr "%d CABALLOS EN LA COLECCIÓN"
+msgid_plural "UI_081_PLURAL"
+msgstr[0] "%d CABALLO EN LA COLECCIÓN"
+msgstr[1] "%d CABALLOS EN LA COLECCIÓN"
 
 msgid "UI_082"
 msgstr "%s%s\n%s · %s · crin %s"
@@ -1146,3 +1148,15 @@ msgstr "Borrar"
 msgid "WORLD_HORSE_TIRED"
 msgstr "El caballo se toma un respiro"
 
+
+msgid "MARKET_RULES_A"
+msgstr "Normal: 6 ofertas por nivel alcanzado."
+
+msgid "MARKET_RULES_B"
+msgstr "Cada victoria gana un nacimiento."
+
+msgid "TRIAL_RULES_A"
+msgstr "PRUEBA: padres intactos, sin coste. Valores de ensayo."
+
+msgid "TRIAL_RULES_B"
+msgstr "Reglas de herencia provisionales."
