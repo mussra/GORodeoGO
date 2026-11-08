@@ -1109,6 +1109,9 @@ msgstr "Cerrar"
 msgid "WORLD_PIGS"
 msgstr "Cerdos: %d"
 
+msgid "WORLD_PIG_REWARD"
+msgstr "¡Cerdo cazado! +%d puntos"
+
 msgid "WORLD_PIG_CAPTURED"
 msgstr "¡Cerdo capturado! Llevas %d"
 

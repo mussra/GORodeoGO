@@ -28,7 +28,7 @@ var _bob: float = 0.0
 
 func setup(p_pen: Dictionary) -> void:
 	pen = p_pen
-	state = WorldPigs.new_state()
+	state = WorldPigs.new_chase_state() if WorldPigs.CHASE_MODE else WorldPigs.new_state()
 	home = pen.get("pos", Vector2.ZERO)
 
 func _ready() -> void:
@@ -51,11 +51,11 @@ func release() -> void:
 	touch_grace = RELEASE_TOUCH_GRACE_SECONDS
 	_touching_rider = false
 
-func flee_from(from: Vector2, delta: float) -> void:
+func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 	var away: Vector2 = position - from
 	if away.length() < 1.0:
 		away = Vector2.RIGHT
-	var target: Vector2 = position + away.normalized() * 170.0 * delta
+	var target: Vector2 = position + away.normalized() * speed * delta
 	if home.distance_to(target) < WorldPigs.FLEE_LEASH:
 		position = target
 	flip_h = away.x < 0.0
@@ -72,7 +72,11 @@ func _draw() -> void:
 		var progress: float = float(state.get("progress", 0.0))
 		if progress > 0.01:
 			HeldVisuals.draw_progress(self, progress)
-	var bounce: float = sin(_bob * 5.0) * 2.0
+	# Chase mode (Ant 8-nov-2026): fleeing pigs sprint (fast bounce), tired pigs
+	# stop dead and pant (flat, no bounce) so the rider can read the moment.
+	var tired: bool = bool(state.get("tired", false))
+	var fleeing: bool = bool(state.get("flee", false))
+	var bounce: float = 0.0 if tired else sin(_bob * (14.0 if fleeing else 5.0)) * (3.0 if fleeing else 2.0)
 	var d: float = -1.0 if flip_h else 1.0
 	# body
 	draw_set_transform(Vector2(0, bounce), 0.0, Vector2(1.25, 1.0))
@@ -92,6 +96,8 @@ func _draw() -> void:
 		draw_rect(Rect2(lx - 3, 14 + bounce * 0.4, 7, 12), Color("e3899d"))
 	# curly tail
 	draw_arc(Vector2(-24 * d, -6 + bounce), 6.0, 0.0, PI * 1.6, 10, Color("e3899d"), 3.0)
+	if tired:
+		draw_string(ThemeDB.fallback_font, Vector2(-10, -36), "z Z", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("ffffff"))
 
 ## Same capture rule as the corral bulls (Ant: mismo codigo): the LassoController
 ## resolves nearest-first and each prey accepts landings within body + tolerance.

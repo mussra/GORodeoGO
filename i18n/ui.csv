@@ -368,6 +368,7 @@ WORLD_BOARD_ACTIVE,"Encargo activo: manada salvaje %s (%d m)","Active job: wild 
 WORLD_CLOSE,Cerrar,Close
 WORLD_PIGS,"Cerdos: %d","Pigs: %d"
 WORLD_PIG_CAPTURED,"¡Cerdo capturado! Llevas %d","Pig captured! You have %d"
+WORLD_PIG_REWARD,"¡Cerdo cazado! +%d puntos","Pig caught! +%d points"
 WORLD_EDIT,"Editar","Edit"
 WORLD_EDIT_HINT,"Elige qué colocar y toca el suelo · botón Editar para salir","Pick what to place and tap the ground · Edit button to exit"
 WORLD_DECOR_TREE,"Árbol","Tree"

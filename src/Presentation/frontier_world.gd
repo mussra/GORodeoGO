@@ -228,7 +228,10 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 	_lasso_horse = prey
 	prey.roped = true
 	prey.rider = player
-	prey.held = WorldTaming.HOLD_SECONDS
+	# Chase-mode pigs (Ant 8-nov-2026): the rope ends by the chase rules (rope
+	# snaps if the rider stands still, capture when the pig tires); the hold
+	# timer is only a safety net there.
+	prey.held = WorldPigs.CHASE_ROPE_MAX_SECONDS if WorldPigs.CHASE_MODE and not ("herd" in prey) else WorldTaming.HOLD_SECONDS
 	# Semental no admitido (Ant 8-nov 15:02): rompe el lazo casi al instante.
 	if "herd" in prey and WorldTaming.is_stallion(prey.herd):
 		var aff: Dictionary = _affinity(prey)
@@ -591,29 +594,47 @@ func _tick_pigs(delta: float) -> void:
 				all_captured = false
 				continue
 			var st: Dictionary
-			if pig.roped:
-				# Roped: trust fills fast while the pig stays put (Ant 21:47).
-				st = WorldPigs.hold_tick(pig.state, delta)
+			if WorldPigs.CHASE_MODE:
+				# Persecución (Ant 8-nov-2026): the pig flees, the rider chases and
+				# ropes it, keeps moving so the rope holds, and captures it once it
+				# tires. Same lasso/capture machinery; only the pig behaviour is new.
+				st = WorldPigs.chase_tick(pig.state, dist, player.velocity.length(), pig.roped, delta)
+				pig.state = st
+				if st.get("break_rope", false):
+					pig.state = WorldPigs.after_rope_break(st)
+					pig.release()
+					if pig == _lasso_horse:
+						_end_lasso()
+					st = pig.state
 			else:
-				st = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
-			pig.state = st
+				if pig.roped:
+					# Roped: trust fills fast while the pig stays put (Ant 21:47).
+					st = WorldPigs.hold_tick(pig.state, delta)
+				else:
+					st = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
+				pig.state = st
 			if WorldPigs.captured(st):
 				if pig == _lasso_horse:
 					_end_lasso()
 				_audio.play("return")
+				if WorldPigs.CHASE_MODE:
+					SaveData.equipment_points += WorldPigs.CHASE_REWARD_POINTS
+					_toast(tr("WORLD_PIG_REWARD") % WorldPigs.CHASE_REWARD_POINTS)
 				pig.queue_free()  # captured: counts right away (roped or walk-up)
 			else:
 				all_captured = false
-				if pig.roped:
-					continue  # held pigs can't bolt
+				if pig.roped and not WorldPigs.CHASE_MODE:
+					continue  # held pigs can't bolt (walk-up mode)
 				# "Que suelte": a bolting pig stuns on contact, like a wild bull.
 				var touching: bool = dist <= pig.BODY_RADIUS + pig.RIDER_TOUCH_RADIUS
 				if st.get("flee", false):
-					pig.flee_from(player.position, delta)
-					if touching and not pig._touching_rider and pig.touch_grace <= 0.0:
+					pig.flee_from(player.position, delta, WorldPigs.CHASE_FLEE_SPEED if WorldPigs.CHASE_MODE else 170.0)
+					# A roped pig drags against its own rope: contact with the rider
+					# who holds it must not stun (chase mode keeps it fleeing).
+					if not pig.roped and touching and not pig._touching_rider and pig.touch_grace <= 0.0:
 						player.stun()
 						_release_held_horse()
-				elif dist < WorldPigs.CAPTURE_RANGE * 1.5:
+				elif not st.get("tired", false) and dist < WorldPigs.CAPTURE_RANGE * 1.5:
 					pig.face_towards(player.position)
 				pig._touching_rider = touching
 		if all_captured and pen.get_child_count() == 0:

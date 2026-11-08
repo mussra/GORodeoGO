@@ -86,6 +86,9 @@ func _list_sorted_image_paths(folder: String) -> Array:
 func has_sprite() -> bool:
 	return _sprite != null
 
+func has_animation(anim_name: String) -> bool:
+	return _frames != null and _frames.has_animation(anim_name)
+
 func set_flip_h(flip: bool) -> void:
 	if _sprite != null:
 		_sprite.flip_h = flip
@@ -152,7 +155,7 @@ func stop_on_idle(fallback: String = "flee_down") -> void:
 			_sprite.frame = 0
 
 static func _is_gait(animation: String) -> bool:
-	return animation.begins_with("walk_") or animation.begins_with("flee_")
+	return animation.begins_with("walk_") or animation.begins_with("flee_") or animation.begins_with("gallop_")
 
 ## Gait body language on top of the shared walk art: lean and bob per gait.
 ## pose = Vector2(lean_radians, bob_amplitude_px); call every frame while riding.

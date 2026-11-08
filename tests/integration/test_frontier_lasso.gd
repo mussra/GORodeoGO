@@ -152,9 +152,12 @@ func test_bolting_horse_stuns_rider_and_drops_capture() -> void:
 	assert_false(horse.roped, "dropped horse is free")
 
 func test_lasso_ropes_pig_and_timer_captures() -> void:
+	# Chase mode (Ant 8-nov-2026): the roped pig tires while the rider keeps
+	# moving, then the capture fills fast and pays points.
 	var world := _fresh_world()
 	await wait_physics_frames(4)
 	var before: int = SaveData.world_pigs.size()
+	var points_before: int = SaveData.equipment_points
 	world.player.position = Vector2(0, 160)
 	var chunk: Node2D = world._chunks.values()[0]
 	var pen := Node2D.new()
@@ -164,12 +167,53 @@ func test_lasso_ropes_pig_and_timer_captures() -> void:
 	pig.setup({"pos": Vector2(150, 160)})
 	pen.add_child(pig)
 	pig.position = Vector2(150, 160)
+	# The pig bolts as soon as the rider is close; nearly tired, it stops soon.
+	pig.state["run"] = WorldPigs.CHASE_TIRE_SECONDS - 0.2
+	for i in range(30):
+		await wait_physics_frames(3)
+		if bool(pig.state.get("tired", false)):
+			break
+	assert_true(bool(pig.state.get("tired", false)), "the fleeing pig tires")
+	world.player.position = pig.position + Vector2(-140, 0)
+	await wait_physics_frames(2)
 	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
-	for i in range(120):
+	for i in range(30):
+		await wait_physics_frames(3)
+		if pig.roped:
+			break
+	assert_true(pig.roped, "the lasso ropes the tired pig")
+	for i in range(200):
 		await wait_physics_frames(3)
 		if not is_instance_valid(pig):
 			break
-	assert_false(is_instance_valid(pig), "roped pig captured when the hold timer fills")
+	assert_false(is_instance_valid(pig), "tired roped pig is captured")
 	# the pen registers the capture one frame after the pig node is freed
 	await wait_physics_frames(6)
 	assert_gt(SaveData.world_pigs.size(), before, "pig counts in the counter")
+	assert_gt(SaveData.equipment_points, points_before, "chase capture pays points")
+
+func test_standing_still_snaps_the_pig_rope() -> void:
+	# Chase mode (Ant 8-nov-2026): rope a pig and stop - the rope snaps and
+	# the pig bolts, keeping its fatigue.
+	var world := _fresh_world()
+	await wait_physics_frames(4)
+	world.player.position = Vector2(0, 160)
+	var chunk: Node2D = world._chunks.values()[0]
+	var pen := Node2D.new()
+	pen.name = "pigs"
+	chunk.add_child(pen)
+	var pig: Node2D = world.PigScript.new()
+	pig.setup({"pos": Vector2(150, 160)})
+	pen.add_child(pig)
+	pig.position = Vector2(150, 160)
+	world._on_lasso_prey_captured(pig)
+	await wait_physics_frames(3)
+	assert_true(pig.roped, "the lasso ropes the pig")
+	world.player.velocity = Vector2.ZERO
+	for i in range(60):
+		await wait_physics_frames(3)
+		if not pig.roped:
+			break
+	assert_false(pig.roped, "standing still snaps the rope")
+	assert_true(bool(pig.state.get("flee", false)), "freed pig bolts")
+	assert_gt(float(pig.state.get("run", 0.0)), 0.0, "freed pig keeps its fatigue")

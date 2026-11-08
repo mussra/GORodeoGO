@@ -7,7 +7,7 @@ extends CharacterBody2D
 
 signal stunned
 
-const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up"]
+const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "gallop_side"]
 
 var max_speed: float = 260.0
 var acceleration: float = 900.0
@@ -169,7 +169,16 @@ func _update_animation(delta: float) -> void:
 		_sprite_swap.set_gait_pose(Vector2.ZERO, delta, false)
 		return
 	var facing: Array = SpriteSwap.direction_suffix(velocity)
-	_sprite_swap.play("walk_" + facing[0])
+	# 12-frame gallop art (Ant, 8-nov-2026), side view only for now: diagonal
+	# and vertical gallops keep the shared walk art until their own art exists.
+	# Its bob is baked into the frames, so the code bob is zeroed for it (no double).
+	var anim: String = "walk_" + facing[0]
+	if gait == WorldGait.GALOPE and facing[0] == "side" and _sprite_swap.has_animation("gallop_side"):
+		anim = "gallop_side"
+	_sprite_swap.play(anim)
 	_sprite_swap.set_flip_h(facing[1])
 	_sprite_swap.set_motion_speed(velocity.length(), max_speed / WorldGait.pace_for(gait))
-	_sprite_swap.set_gait_pose(WorldGait.pose_for(gait), delta, true)
+	var pose: Vector2 = WorldGait.pose_for(gait)
+	if anim == "gallop_side":
+		pose = Vector2(pose.x, 0.0)
+	_sprite_swap.set_gait_pose(pose, delta, true)

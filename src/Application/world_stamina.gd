@@ -7,7 +7,10 @@ extends RefCounted
 const LEVELS_ENABLED:bool=false  # do not flip without telling Ant first
 
 const MAX:float=100.0
-const DRAIN_GALOPE:float=8.0    # ~12s of full gallop
+## Ant (8-nov-2026): horses must last much longer for long trips. The worst
+## horse now endures DOUBLE: every drain is divided by this one knob.
+const ENDURANCE_MULT:float=2.0
+const DRAIN_GALOPE:float=8.0    # ~12s of full gallop (x ENDURANCE_MULT)
 const DRAIN_TROTE:float=2.5     # trotting is cheap but not free
 const REGEN_PASO:float=9.0
 const REGEN_IDLE:float=14.0
@@ -25,8 +28,8 @@ static func new_state(power:float=0.65)->Dictionary:
 static func tick(state:Dictionary,gait:int,moving:bool,delta:float)->Dictionary:
  var out:Dictionary=state.duplicate()
  var v:float=float(out.value)
- if moving and gait==WorldGait.GALOPE:v-=DRAIN_GALOPE*delta
- elif moving and gait==WorldGait.TROTE:v-=DRAIN_TROTE*delta
+ if moving and gait==WorldGait.GALOPE:v-=DRAIN_GALOPE/ENDURANCE_MULT*delta
+ elif moving and gait==WorldGait.TROTE:v-=DRAIN_TROTE/ENDURANCE_MULT*delta
  elif moving:v+=REGEN_PASO*delta
  else:v+=REGEN_IDLE*delta
  out.value=clampf(v,0.0,float(out.max))
