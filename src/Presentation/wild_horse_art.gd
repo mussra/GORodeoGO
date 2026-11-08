@@ -4,11 +4,10 @@ extends AnimatedSprite2D
 ## recolored per genotype by HorseAppearance with the extended wild_* masks,
 ## so coat, mane, patterns and finish match exactly what taming adds to the
 ## collection. Faces right; the native flip_h mirrors. SpriteFrames are shared per
-## genotype so a herd costs one recolor, and a 2+4 frame subset keeps the
-## per-pixel recolor under the no-stutter rule (Ant 11:30:58).
+## genotype so a herd costs one recolor. Full 12-frame walk cycles in all five
+## directions (Ant 8-nov 12:41): ~70 ms one-time per genotype, benchmarked.
 
-const IDLE_FRAMES: Array[int] = [0, 3]
-const WALK_FRAMES: Array[int] = [0, 3, 6, 9]
+const WALK_CYCLE_FRAMES: Array[int] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 const DIRS: Array[String] = ["down", "up", "diag_down", "diag_up"]
 static var frame_cache: Dictionary = {}
 
@@ -37,7 +36,7 @@ func set_walk_direction(dir: Vector2) -> void:
 
 static func _build_frames(traits: Dictionary) -> SpriteFrames:
 	var frames := SpriteFrames.new()
-	for spec in [["wild_side", [0], "idle", 3.0], ["wild_side", [0], "walk", 8.0], ["wild_down", [0], "walk_down", 4.0], ["wild_up", [0], "walk_up", 4.0], ["wild_diag_down", [0], "walk_diag_down", 4.0], ["wild_diag_up", [0], "walk_diag_up", 4.0]]:
+	for spec in [["wild_side", [0], "idle", 3.0], ["wild_walk_side", WALK_CYCLE_FRAMES, "walk", 12.0], ["wild_walk_down", WALK_CYCLE_FRAMES, "walk_down", 12.0], ["wild_walk_up", WALK_CYCLE_FRAMES, "walk_up", 12.0], ["wild_walk_diag_down", WALK_CYCLE_FRAMES, "walk_diag_down", 12.0], ["wild_walk_diag_up", WALK_CYCLE_FRAMES, "walk_diag_up", 12.0]]:
 		var anim: String = spec[0]
 		frames.add_animation(spec[2])
 		frames.set_animation_speed(spec[2], spec[3])
