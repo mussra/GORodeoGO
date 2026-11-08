@@ -164,7 +164,11 @@ func _tick_lasso(_delta: float) -> void:
 			if st.has("flee"):
 				st["flee"] = true
 			else:
-				st["spook"] = WorldTaming.spook_seconds(_affinity(_lasso_horse).matches)
+				var aff: Dictionary = _affinity(_lasso_horse)
+				st["spook"] = WorldTaming.spook_seconds(aff.matches)
+				# Semental que rompe el lazo: pista inmediata (Ant 8-nov 15:02).
+				if "herd" in _lasso_horse and WorldTaming.is_stallion(_lasso_horse.herd) and not WorldTaming.stallion_admits(aff.matches, aff.leader):
+					_stallion_hint(_lasso_horse)
 			_lasso_horse.state = st
 			_lasso_horse.release()
 			_end_lasso()
@@ -208,8 +212,26 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 	prey.roped = true
 	prey.rider = player
 	prey.held = WorldTaming.HOLD_SECONDS
+	# Semental no admitido (Ant 8-nov 15:02): rompe el lazo casi al instante.
+	if "herd" in prey and WorldTaming.is_stallion(prey.herd):
+		var aff: Dictionary = _affinity(prey)
+		if not WorldTaming.stallion_admits(aff.matches, aff.leader):
+			prey.held = WorldTaming.STALLION_BREAK_SECONDS
 	_lasso_state = "hold"
 	player.lasso.set_active_capture_count(1)
+
+## Avisos progresivos ante un semental que no se fia (Ant 8-nov 15:02): la
+## pista se concreta con cada intento (fase de sesion) y cada caballo tiene
+## un enfriamiento para no machacar con el mismo aviso.
+var _stallion_hint_stage: int = 0
+
+func _stallion_hint(horse: Node2D) -> void:
+	var now: float = Time.get_ticks_msec() / 1000.0
+	if now < float(horse.get_meta("stallion_hint_cd", 0.0)):
+		return
+	horse.set_meta("stallion_hint_cd", now + WorldTaming.STALLION_HINT_COOLDOWN)
+	_toast(tr(WorldTaming.stallion_hint_key(_stallion_hint_stage)))
+	_stallion_hint_stage += 1
 
 func _toast(text: String) -> void:
 	_toast_label.text = text
@@ -324,14 +346,22 @@ func _tick_taming(delta: float) -> void:
 		horse.affinity_matches = aff.matches
 		horse.pack_leader_near = aff.leader
 		horse.player_ref = player
+		# Semental desconfiado (Ant 8-nov 15:02): sin caballo familiar (2+ rasgos
+		# o Lider de manada) huye antes del tiro de lazo y no gana confianza.
+		var stallion_guard: bool = WorldTaming.is_stallion(horse.herd) and not WorldTaming.stallion_admits(aff.matches, aff.leader)
 		var st: Dictionary
 		if horse.roped:
 			# Roped: trust fills fast while the horse stays put (Ant 21:47).
-			st = WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta, aff.bonus)
+			# El semental no admitido NUNCA llena confianza en el lazo: lo rompe.
+			st = horse.state if stallion_guard else WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta, aff.bonus)
 		else:
 			if aff.leader and float(horse.state.get("progress", 0.0)) < WorldTaming.LEADER_START_PROGRESS and dist < WorldTaming.CALM_RANGE * 1.5:
 				horse.state["progress"] = WorldTaming.LEADER_START_PROGRESS
 			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta, aff.bonus, WorldTaming.spook_seconds(aff.matches))
+			if stallion_guard and dist < WorldTaming.STALLION_FLEE_RANGE:
+				if float(st.get("spook", 0.0)) <= 0.0:
+					_stallion_hint(horse)
+				st["spook"] = WorldTaming.SPOOK_SECONDS
 		horse.state = st
 		if WorldTaming.tamed(st):
 			_deliver_horse(horse.get_meta("c"), horse)

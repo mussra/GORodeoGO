@@ -1160,3 +1160,12 @@ msgstr "TRIAL: parents kept, no charge. Trial values."
 
 msgid "TRIAL_RULES_B"
 msgstr "Inheritance rules are not final."
+
+msgid "WORLD_STALLION_HINT_1"
+msgstr "Oops... looks like we need a change of strategy."
+
+msgid "WORLD_STALLION_HINT_2"
+msgstr "It doesn't trust our horse. We'll need one that looks like it."
+
+msgid "WORLD_STALLION_HINT_3"
+msgstr "A horse with a similar coat and mane will earn its trust... or a Pack Leader."

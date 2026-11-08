@@ -71,3 +71,25 @@ static func affinity_bonus(matches:int)->float:
 
 static func spook_seconds(matches:int)->float:
  return AFFINITY_SPOOK_SECONDS if matches>=2 else SPOOK_SECONDS
+
+## Sementales desconfiados (Ant 8-nov 15:02): caballos salvajes de alto nivel
+## (rapidos y temperamentales) no se dejan capturar salvo que el caballo
+## equipado les resulte familiar: 2+ rasgos visibles compartidos o un Lider de
+## manada de su tipo. Si no, huyen ANTES de entrar a tiro de lazo (max throw
+## 220) y, si caen en el lazo, lo rompen casi al instante. Pistas progresivas.
+const STALLION_MIN_SPEED:float=275.0
+const STALLION_MIN_TEMPERAMENT:float=0.7
+const STALLION_REQUIRED_MATCHES:int=2
+const STALLION_FLEE_RANGE:float=260.0
+const STALLION_BREAK_SECONDS:float=1.2
+const STALLION_HINT_COOLDOWN:float=10.0
+
+static func is_stallion(herd:Dictionary)->bool:
+ var stats:Dictionary=herd.get("stats",{})
+ return float(stats.get("speed",0.0))>=STALLION_MIN_SPEED and float(herd.get("temperament",0.0))>=STALLION_MIN_TEMPERAMENT
+
+static func stallion_admits(matches:int,leader:bool)->bool:
+ return leader or matches>=STALLION_REQUIRED_MATCHES
+
+static func stallion_hint_key(stage:int)->String:
+ return "WORLD_STALLION_HINT_%d"%clampi(stage+1,1,3)

@@ -1160,3 +1160,12 @@ msgstr "PRUEBA: padres intactos, sin coste. Valores de ensayo."
 
 msgid "TRIAL_RULES_B"
 msgstr "Reglas de herencia provisionales."
+
+msgid "WORLD_STALLION_HINT_1"
+msgstr "Ups... parece que tendremos que cambiar de estrategia."
+
+msgid "WORLD_STALLION_HINT_2"
+msgstr "No se fía de nuestro caballo. Tendremos que buscar uno que se le parezca."
+
+msgid "WORLD_STALLION_HINT_3"
+msgstr "Un caballo de pelaje y crin parecidos ganará su confianza... o un Líder de manada."

@@ -24,7 +24,9 @@ static func build_frames(traits: Dictionary, hat: String = "original") -> Sprite
 	var hat_id: String = HatAppearance.sanitize(hat)
 	var overlays: Dictionary = {}
 	for d in ["side", "down", "up", "diag_down", "diag_up"]:
-		var saddle: Texture2D = load(SADDLE_ROOT + d + ".png")
+		var saddle: Texture2D = null
+		if ResourceLoader.exists(SADDLE_ROOT + d + ".png"):
+			saddle = load(SADDLE_ROOT + d + ".png")
 		var rider: Texture2D = load(RIDER_ROOT + hat_id + "/" + d + ".png")
 		if rider == null and hat_id != "original":
 			rider = load(RIDER_ROOT + "original/" + d + ".png")
@@ -46,7 +48,10 @@ static func build_frames(traits: Dictionary, hat: String = "original") -> Sprite
 		frames.set_animation_loop(spec[2], true)
 		var dir: String = base_dir.trim_prefix("walk_")
 		for i in spec[1]:
-			var base: Texture2D = load("res://art/world/wild_base/%s/frame_%02d.png" % [base_dir, i])
+			var base_path: String = "res://art/world/wild_base/%s/frame_%02d.png" % [base_dir, i]
+			if not ResourceLoader.exists(base_path):
+				continue
+			var base: Texture2D = load(base_path)
 			var recolored: Texture2D = HorseAppearance.texture(base, "wild_" + base_dir, i, traits)
 			frames.add_frame(spec[2], _with_overlay(recolored, overlays.get(dir)))
 	return frames
