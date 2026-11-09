@@ -85,6 +85,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		_flee = Vector2.ZERO
 		_art.grazing = false
+		_art.speed_scale=1.0
 		move_and_slide()
 		_art.position.y = sin(_bob * 1.6) * 1.5
 		queue_redraw()
@@ -95,17 +96,19 @@ func _physics_process(delta: float) -> void:
 			var gap:Vector2=target-herd_guide.position
 			if gap.length()>WorldHerd.COHESION_RADIUS:
 				if position.distance_to(herd_guide.position)>WorldHerd.COHESION_RADIUS:
-					target=position.move_toward(herd_guide.position,285.0*delta)
+					target=position.move_toward(herd_guide.position,(WorldHerd.PANIC_SPEED+WorldHerd.FOLLOW_CATCHUP)*delta)
 				else:target=herd_guide.position+gap.normalized()*WorldHerd.COHESION_RADIUS
 			_flee=(target-position)/maxf(delta,.001)
-		if home.distance_to(target) < WorldTaming.FLEE_LEASH:
+		if (is_instance_valid(herd_guide) and herd_guide!=self) or home.distance_to(target) < WorldTaming.FLEE_LEASH:
 			velocity = _flee
 		else:
 			velocity = Vector2.ZERO
 		_flee = Vector2.ZERO
 	elif wander:
+		_art.speed_scale=1.0
 		velocity = _wander_vel(delta)
 	else:
+		_art.speed_scale=1.0
 		velocity = Vector2.ZERO
 		_graze_timer -= delta
 		if _graze_timer <= 0.0:
@@ -202,8 +205,9 @@ func approach(point: Vector2, delta: float) -> void:
 	_art.grazing = false
 	_art.set_walk_direction(to)
 
-func flee_velocity(step:Vector2)->void:
+func flee_velocity(step:Vector2,panic:bool=false)->void:
 	_flee=step
+	_art.speed_scale=1.95 if panic else 1.55
 	_art.flip_h=step.x<0.0
 	_art.grazing=false
 	_art.set_walk_direction(step)

@@ -1,7 +1,7 @@
 extends GutTest
 func world()->Node2D:
  SaveData.world_seed=424242;SaveData.world_tamed.clear();SaveData.world_discovered.clear();SaveData.world_missions.clear();SaveData.world_position=Vector2(0,160);SaveData.horse_collection.seed_trial()
- var w:Node2D=load("res://src/Presentation/frontier_world.tscn").instantiate();add_child_autofree(w);w.set_process(false);return w
+ var w:Node2D=load("res://src/Presentation/frontier_world.tscn").instantiate();add_child_autofree(w);w.set_process(false);w.set_physics_process(false);return w
 func plant(w:Node2D,c:Vector2i,members_:Array)->Array:
  var out:Array=[]
  for member in members_:
@@ -69,3 +69,36 @@ func test_fleeing_group_stays_within_cohesion_radius()->void:
   w.player.position=guide.position+Vector2(-90,0);w.player.velocity=Vector2(200,0);w._tick_taming(1.0/60.0)
   for horse in horses:horse._physics_process(1.0/60.0)
  assert_lt(horses[-1].position.distance_to(guide.position),before,"straggler regroups without teleport")
+func test_lasso_release_panics_free_group_even_on_miss_and_keeps_roped_still()->void:
+ var w:Node2D=world();await wait_process_frames(3)
+ var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
+ var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
+ w.player.position=horses[0].position+Vector2(-100,0);w.player.velocity=Vector2.ZERO
+ horses[0].roped=true;horses[0].held=20.0;horses[0].rider=w.player
+ var origin:Vector2=horses[0].position
+ # Actual release signal, before any hit/miss resolution.
+ w.player.lasso.lasso_released.emit();w._tick_taming(.016)
+ for i in range(1,horses.size()):
+  assert_gt(float(horses[i].get_meta("panic_left",0.0)),1.0)
+  assert_gt(horses[i]._flee.length(),230.0)
+  assert_almost_eq(horses[i]._art.speed_scale,1.95,.001)
+ horses[0]._physics_process(.016);assert_eq(horses[0].position,origin)
+ for tick in range(90):w._tick_taming(1.0/60.0)
+ for horse in horses:assert_eq(float(horse.get_meta("panic_left",0.0)),0.0)
+func test_panic_group_cohesion_and_capture_remain_working()->void:
+ var w:Node2D=world();await wait_process_frames(3)
+ var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
+ var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
+ for horse in horses:horse.set_physics_process(false);horse.touch_grace=100.0
+ w.player.position=horses[0].position+Vector2(-90,0);w.player.lasso.lasso_released.emit()
+ var worst:float=0.0
+ for tick in range(480):
+  w.player.position=horses[0].position+Vector2(-90,15);w.player.velocity=Vector2(260,0)
+  w._tick_taming(1.0/60.0)
+  for horse in horses:horse._physics_process(1.0/60.0)
+  for horse in horses:worst=maxf(worst,horse.position.distance_to(horses[0].position))
+ assert_lte(worst,WorldHerd.COHESION_RADIUS+7.0)
+ assert_gt(float(horses[0].get_meta("chase_time",0.0)),6.0)
+ var prey:Node2D=w.player.lasso.resolve_capture(horses[0].position)
+ assert_eq(prey,horses[0]);assert_true(horses[0].roped)
+ var origin:Vector2=horses[0].position;horses[0]._physics_process(.1);assert_eq(horses[0].position,origin)

@@ -117,10 +117,13 @@ func _ready() -> void:
 		_step_chunk_build()
 	_update_chunks()
 
+func _physics_process(delta:float)->void:
+	# One escape decision per physics step; idle updates skipped movement at low FPS.
+	_tick_taming(delta)
+
 func _process(delta: float) -> void:
 	_update_chunks()
 	_drain_chunk_builds()
-	_tick_taming(delta)
 	_tick_lasso(delta)
 	_tick_rider_marker()
 	if _gauges.has("dodge"):
@@ -527,6 +530,7 @@ func _herd_guides()->Dictionary:
 		# Curve back before the inherited home leash, rather than freeze at its edge.
 		if guide.position.distance_to(guide.home)>430.0:
 			away=(away+(guide.home-guide.position).normalized()*2.5).normalized()
+		var pace:float=WorldHerd.escape_speed(float(guide.get_meta("panic_left",0.0)),float(guide.get_meta("chase_time",0.0)))
 		var regroup:bool=false
 		for member in group:
 			if member.position.distance_to(guide.position)>WorldHerd.REGROUP_RADIUS:regroup=true
@@ -534,16 +538,32 @@ func _herd_guides()->Dictionary:
 		heading=heading.lerp(away,.08).normalized();guide.set_meta("herd_heading",heading)
 		for i in group.size():
 			var horse:Node2D=group[i]
-			var velocity:Vector2=heading*(140.0 if regroup else 230.0) if i==0 else WorldHerd.follow_velocity(horse.position,guide.position,heading,i-1)
+			var velocity:Vector2=heading*(pace*.65 if regroup else pace) if i==0 else WorldHerd.follow_velocity(horse.position,guide.position,heading,i-1,pace)
 			# Short-range separation within this small group only, no world scan.
 			for other in group:
 				if other==horse:continue
 				var gap:Vector2=horse.position-other.position
 				if gap.length_squared()>1 and gap.length_squared()<2500:velocity+=gap.normalized()*(50-gap.length())*1.5
-			plans[horse]={"guide":guide,"velocity":velocity.limit_length(290.0)}
+			plans[horse]={"guide":guide,"velocity":velocity.limit_length(pace+WorldHerd.FOLLOW_CATCHUP)}
 	return plans
 
+func _on_frontier_lasso_released()->void:
+	var startled:Dictionary={}
+	for horse in _herd_horses.values():
+		if is_instance_valid(horse) and not horse.roped and horse.position.distance_to(player.position)<500.0:
+			startled[horse.get_meta("c",Vector2i(-999,-999))]=true
+	for horse in _herd_horses.values():
+		if not is_instance_valid(horse) or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
+		if startled.has(horse.get_meta("c",Vector2i(-998,-998))):
+			horse.set_meta("panic_left",WorldHerd.PANIC_SECONDS)
+			horse.state.spook=WorldTaming.SPOOK_SECONDS
+
 func _tick_taming(delta: float) -> void:
+	for horse in _herd_horses.values():
+		if not is_instance_valid(horse):continue
+		horse.set_meta("panic_left",maxf(0.0,float(horse.get_meta("panic_left",0.0))-delta))
+		var chasing:bool=not horse.roped and float(horse.state.get("spook",0.0))>0 and horse.position.distance_to(player.position)<550.0
+		horse.set_meta("chase_time",float(horse.get_meta("chase_time",0.0))+delta if chasing else 0.0)
 	var escape:Dictionary=_herd_guides()
 	var alerts:Dictionary={}
 	if player.velocity.length()>WorldTaming.SAFE_SPEED:
@@ -596,9 +616,9 @@ func _tick_taming(delta: float) -> void:
 				horse.approach(player.position, delta)
 			if dist < WorldTaming.CALM_RANGE * 1.5:
 				horse.face_towards(player.position)
-		elif WorldTaming.should_flee(st, dist) or (alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and float(st.get("spook",0.0))>0 and dist<500):
+		elif float(horse.get_meta("panic_left",0.0))>0.0 or WorldTaming.should_flee(st, dist) or (alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and float(st.get("spook",0.0))>0 and dist<500):
 			if escape.has(horse):
-				horse.herd_guide=escape[horse].guide;horse.flee_velocity(escape[horse].velocity)
+				horse.herd_guide=escape[horse].guide;horse.flee_velocity(escape[horse].velocity,float(horse.get_meta("panic_left",0.0))>0.0)
 			else:horse.flee_from(player.position, delta)
 			if touching and not horse._touching_rider and horse.touch_grace <= 0.0:
 				player.stun()
@@ -873,6 +893,8 @@ func _build_hud() -> void:
 	joy.anchor_top = 0.32
 	var aim_joy: VirtualJoystick = touch.get_node("AimJoystick")
 	aim_joy.anchor_top = 0.32
+	# Shorter flight only in Frontera: a350px/s panic must remain interceptable.
+	player.lasso.lasso_travel_time=.35
 	player.lasso.set_aim_joystick(aim_joy)
 	aim_joystick = aim_joy
 	JoystickAppearance.apply(self)  # same horse-themed sticks as the levels
@@ -897,6 +919,7 @@ func _build_hud() -> void:
 		return out
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
+	player.lasso.lasso_released.connect(_on_frontier_lasso_released)
 	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _open_navigation()->void:
