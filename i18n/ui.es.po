@@ -1235,3 +1235,15 @@ msgstr "Pareja guardada al cambiar. Avances anteriores conservados."
 
 msgid "TRAIN_AUTO_INVALID"
 msgstr "Selección no válida. La pareja activa anterior no cambia."
+
+msgid "TRAIN_HUD"
+msgstr "Aprendiz: %s\n%s\nAprendizaje %.0f%% · Dominio %.0f%%\nAfinidad %.0f%%\nEl avance se guarda al ganar"
+
+msgid "TRAIN_RESULT"
+msgstr "ENTRENAMIENTO · %s\nAprendizaje +%.1f → %.1f%%\nDominio +%.1f → %.1f%%\nAfinidad +%.1f → %.1f%%"
+
+msgid "TRAIN_HUD_SAVE"
+msgstr "El avance se guarda al ganar"
+
+msgid "TRAIN_HUD_TRIAL"
+msgstr "Ensayo: sin avances guardados"

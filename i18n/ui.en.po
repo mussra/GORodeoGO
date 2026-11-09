@@ -1235,3 +1235,15 @@ msgstr "Pair saved on change. Earlier progress kept."
 
 msgid "TRAIN_AUTO_INVALID"
 msgstr "Invalid selection. The earlier active pair is unchanged."
+
+msgid "TRAIN_HUD"
+msgstr "Learner: %s\n%s\nLearning %.0f%% · Mastery %.0f%%\nAffinity %.0f%%\nProgress saves on a win"
+
+msgid "TRAIN_RESULT"
+msgstr "TRAINING · %s\nLearning +%.1f → %.1f%%\nMastery +%.1f → %.1f%%\nAffinity +%.1f → %.1f%%"
+
+msgid "TRAIN_HUD_SAVE"
+msgstr "Progress saves on a win"
+
+msgid "TRAIN_HUD_TRIAL"
+msgstr "Trial: no progress saved"

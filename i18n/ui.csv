@@ -411,3 +411,21 @@ TRAIN_EQUIPPED,Aprendiz equipado. Gana un nivel de campaña con la pareja activa
 TRAIN_MOUNTED,Equipado: %s · cambiar pareja no cambia montura,Equipped: %s · changing pair does not change mount
 TRAIN_AUTO_SAVED,Pareja guardada al cambiar. Avances anteriores conservados.,Pair saved on change. Earlier progress kept.
 TRAIN_AUTO_INVALID,Selección no válida. La pareja activa anterior no cambia.,Invalid selection. The earlier active pair is unchanged.
+TRAIN_HUD,"Aprendiz: %s
+%s
+Aprendizaje %.0f%% · Dominio %.0f%%
+Afinidad %.0f%%
+El avance se guarda al ganar","Learner: %s
+%s
+Learning %.0f%% · Mastery %.0f%%
+Affinity %.0f%%
+Progress saves on a win"
+TRAIN_RESULT,"ENTRENAMIENTO · %s
+Aprendizaje +%.1f → %.1f%%
+Dominio +%.1f → %.1f%%
+Afinidad +%.1f → %.1f%%","TRAINING · %s
+Learning +%.1f → %.1f%%
+Mastery +%.1f → %.1f%%
+Affinity +%.1f → %.1f%%"
+TRAIN_HUD_SAVE,El avance se guarda al ganar,Progress saves on a win
+TRAIN_HUD_TRIAL,Ensayo: sin avances guardados,Trial: no progress saved

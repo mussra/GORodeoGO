@@ -32,6 +32,8 @@ var _level_number: int = 1
 var _max_simultaneous_captures: int = 1
 var _obstacle_rects: Array = []
 var _training_session:Dictionary={}
+var _training_before:Dictionary={}
+var _training_status:Label
 var _training_companion:Node2D
 var _win_requires_all_bulls: bool = true
 var _chaser_director: ChaserDirector = ChaserDirector.new(CHASER_ENGAGE_DELAY_SECONDS)
@@ -352,6 +354,7 @@ func _apply_unlocked_upgrades() -> void:
 	player.dodge_recharge_seconds=2.5*HorseTraining.recovery(trained_horse,"dodge")
 	player.jump_recovery_multiplier=HorseTraining.recovery(trained_horse,"jump")
 	_training_session=HorseTraining.session(SaveData.horse_collection)
+	_training_before=TrainingReport.snapshot(SaveData.horse_collection,_training_session)
 	if not _training_session.is_empty():_show_training_companion()
 	player.dodge_path_limit=reach if reach>0 else 260.0
 	var horse_stats:Dictionary=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected))
@@ -369,6 +372,7 @@ func _apply_unlocked_upgrades() -> void:
 var _level_gauges: Dictionary = {}
 
 func _process(delta: float) -> void:
+	_update_training_status()
 	if not _level_gauges.is_empty():
 		_level_gauges["dodge"].set_state(player.dodge_available, 1.0 - player._dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds) if player.dodge_available else 0.0)
 		_level_gauges["jump"].set_state(player.can_jump, 1.0 - player._jump_cooldown / maxf(0.01, 1.2 * player.jump_recovery_multiplier) if player.can_jump else 0.0)
@@ -544,6 +548,7 @@ func _trigger_win() -> void:
 	var reward:int=SaveData.record_victory(_level_number,_training_session)
 	hud.show_win()
 	hud.end_label.text += "\nENSAYO AISLADO: sin premios ni progreso guardado" if SaveData.trial_session_active else "\n+%d puntos · Saldo: %d\nEquipo y precios en prueba" % [reward,SaveData.equipment_points]
+	_show_training_result()
 	_audio.play("win")
 
 func _trigger_lose(reason: String) -> void:
@@ -552,6 +557,7 @@ func _trigger_lose(reason: String) -> void:
 	_game_over = true
 	_freeze_gameplay()
 	hud.show_lose(reason)
+	_show_training_result()
 	_audio.play("lose")
 
 func _freeze_gameplay() -> void:
@@ -711,13 +717,29 @@ func _spawn_jump_fences()->void:
 	for bull in all_bulls:bull.collision_mask|=32
 
 func _show_training_companion()->void:
-	var other:String=_training_session.learner if SaveData.horse_collection.selected==_training_session.mentor else _training_session.mentor
-	var h:Dictionary=SaveData.horse_collection.find(other)
-	# Partner is a support card, not a second collidable rider or a ghost over fences.
-	var card:=Panel.new();card.position=Vector2(22,100);card.size=Vector2(215,100);card.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("77dbd5"),8));hud.add_child(card)
-	var portrait:=TextureRect.new();portrait.position=Vector2(4,3);portrait.size=Vector2(78,90);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;HorsePortrait.apply(portrait,h.traits,SaveData.hat_color);card.add_child(portrait)
-	var caption:=Label.new();caption.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;caption.text=(tr("TRAIN_COMPANION")%"")+"\n"+str(h.name).left(16);caption.position=Vector2(84,20);caption.size=Vector2(125,65);caption.custom_minimum_size=Vector2.ZERO;caption.clip_text=true;caption.autowrap_mode=TextServer.AUTOWRAP_ARBITRARY;caption.add_theme_font_size_override("font_size",16);card.add_child(caption)
-	var cue:=Label.new();cue.text=tr("TRAIN_MISSION")%[SaveData.horse_collection.find(_training_session.mentor).name,SaveData.horse_collection.find(_training_session.learner).name];cue.position=Vector2(25,72);cue.add_theme_font_size_override("font_size",18);ToastStack.backdrop(cue);hud.add_child(cue)
+	var mentor:Dictionary=SaveData.horse_collection.find(_training_session.mentor)
+	var card:=Panel.new();card.name="TrainingStatus";card.position=Vector2(22,76);card.size=Vector2(390,150);card.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("77dbd5"),8));hud.add_child(card)
+	var portrait:=TextureRect.new();portrait.position=Vector2(4,16);portrait.size=Vector2(78,100);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;HorsePortrait.apply(portrait,mentor.traits,SaveData.hat_color);card.add_child(portrait)
+	_training_status=Label.new();_training_status.position=Vector2(90,8);_training_status.size=Vector2(290,120);_training_status.add_theme_font_size_override("font_size",17);card.add_child(_training_status);_update_training_status()
+
+func _update_training_status()->void:
+	if not is_instance_valid(_training_status):return
+	var current:Dictionary=TrainingReport.snapshot(SaveData.horse_collection,_training_session)
+	if current.is_empty():return
+	_training_status.text=tr("TRAIN_HUD")%[str(current.name).left(22),tr("TRAIN_JUMP") if current.skill=="jump" else tr("TRAIN_DODGE"),current.learning,current.mastery,current.affinity]
+	if SaveData.trial_session_active:_training_status.text=_training_status.text.replace(tr("TRAIN_HUD_SAVE"),tr("TRAIN_HUD_TRIAL"))
+
+func _show_training_result()->void:
+	if _training_session.is_empty():return
+	var after:Dictionary=TrainingReport.snapshot(SaveData.horse_collection,_training_session)
+	if after.is_empty():return
+	var summary:=Label.new();summary.name="TrainingResult";summary.position=Vector2(25,145);summary.size=Vector2(462,145);summary.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;summary.add_theme_font_size_override("font_size",18)
+	summary.text=tr("TRAIN_RESULT")%[str(after.name).left(24),TrainingReport.gain(_training_before,after,"learning"),after.learning,TrainingReport.gain(_training_before,after,"mastery"),after.mastery,TrainingReport.gain(_training_before,after,"affinity"),after.affinity]
+	hud.end_panel.offset_top=-210;hud.end_panel.offset_bottom=210
+	hud.end_label.position.y=12;hud.end_label.size.y=125
+	hud.restart_button.position.y=330;hud.quit_button.position.y=330;hud._next_button.position.y=330
+	hud.end_panel.add_child(summary)
+	if is_instance_valid(_training_status):_training_status.get_parent().hide()
 
 func navigate_back()->void:
 	if _game_over:
