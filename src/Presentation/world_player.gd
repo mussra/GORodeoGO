@@ -92,6 +92,7 @@ func _ready() -> void:
 		HorseAppearance.apply(_sprite_swap._frames, horse.traits)
 	if not horse.is_empty():
 		max_speed = HorseStats.read(horse).speed
+	if _sprite_swap.has_sprite():WorldActorScale.rider(_sprite_swap._sprite)
 	_sprite_swap.play("idle")
 
 func stun(duration: float = STUN_SECONDS) -> void:

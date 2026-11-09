@@ -72,7 +72,7 @@ func _ready() -> void:
 	_art = Art.new()
 	_art.traits = herd.get("traits", {})
 	add_child(_art)
-	_art.scale=Vector2.ONE*float(herd.get("appearance_scale",1.0))
+	_art.scale=Vector2.ONE*float(herd.get("appearance_scale",1.0))*WorldActorScale.HORSE
 	if wander:
 		_pick_wander_target()
 
