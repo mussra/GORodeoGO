@@ -14,16 +14,16 @@ const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
 
 var pen: Dictionary = {}
 var state: Dictionary = {}
-## Roped by the rider's lasso: stays in place while trust fills; when the
-## timer runs out it counts as captured (or bolts if released first).
+## Shared lasso target; chase-mode pigs keep running while roped.
 var roped: bool = false
 var rider: Node2D = null
-## Seconds left roped; while > 0 the pig cannot flee.
+## Safety timeout for a rope session.
 var held: float = 0.0
 var touch_grace: float = 0.0
 var _touching_rider: bool = false
 var home: Vector2 = Vector2.ZERO
 var flip_h: bool = false
+var movement:Vector2=Vector2.RIGHT
 var _art:WildPigArt
 
 func setup(p_pen: Dictionary) -> void:
@@ -38,10 +38,10 @@ func _ready() -> void:
 	add_child(_art)
 
 func _process(delta: float) -> void:
-	if is_instance_valid(_art):_art.update_state(bool(state.get("flee",false)),bool(state.get("tired",false)),flip_h)
+	if is_instance_valid(_art):_art.update_state(bool(state.get("flee",false)),bool(state.get("tired",false)),flip_h,movement)
 	touch_grace = maxf(0.0, touch_grace - delta)
 	if roped:
-		# Roped: stays in place while the hold timer runs (no tow, Ant 21:47).
+		# Safety timer. Chase motion is handled by the shared world tick.
 		held = maxf(0.0, held - delta)
 	queue_redraw()
 
@@ -59,9 +59,10 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 	if away.length() < 1.0:
 		away = Vector2.RIGHT
 	var target: Vector2 = position + away.normalized() * speed * delta
-	if home.distance_to(target) < WorldPigs.FLEE_LEASH:
+	if roped or home.distance_to(target) < WorldPigs.FLEE_LEASH:
 		position = target
 	flip_h = away.x < 0.0
+	movement=away.normalized()
 
 func face_towards(point: Vector2) -> void:
 	flip_h = point.x < position.x

@@ -1247,3 +1247,12 @@ msgstr "Progress saves on a win"
 
 msgid "TRAIN_HUD_TRIAL"
 msgstr "Trial: no progress saved"
+
+msgid "WORLD_GOAT_PROTOTYPE"
+msgstr "Goats · prototype\nRope: evade for 5 s, stay close"
+
+msgid "WORLD_GOAT_ESCAPED"
+msgstr "The goat broke free"
+
+msgid "WORLD_GOAT_CAPTURED"
+msgstr "Goat captured · test complete"

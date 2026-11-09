@@ -7,6 +7,7 @@ const PlayerScript := preload("res://src/Presentation/world_player.gd")
 const WildHorseScript := preload("res://src/Presentation/wild_horse.gd")
 const DecorScript := preload("res://src/Presentation/world_decor.gd")
 const RanchScript := preload("res://src/Presentation/world_ranch.gd")
+const GoatScript := preload("res://src/Presentation/wild_goat.gd")
 const PigScript := preload("res://src/Presentation/wild_pig.gd")
 const TrailScript := preload("res://src/Presentation/frontier_trail.gd")
 const WildHorseArtScript := preload("res://src/Presentation/wild_horse_art.gd")
@@ -19,6 +20,7 @@ const HOME_POS := Vector2(0, 160)
 const SAVE_EVERY := 4.0
 const ARROWS: Array[String] = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"]
 
+var _prototype_goats:Node2D
 var player: CharacterBody2D
 var _chunks: Dictionary = {}
 var _chunk_entities: Dictionary = {}
@@ -105,6 +107,7 @@ func _ready() -> void:
 	test_zone.name = "test_zone"
 	add_child(test_zone)
 	_build_hud()
+	_setup_goat_prototype()
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
 	_hoof_player.volume_db = -12.0
@@ -120,6 +123,8 @@ func _ready() -> void:
 func _physics_process(delta:float)->void:
 	# One escape decision per physics step; idle updates skipped movement at low FPS.
 	_tick_taming(delta)
+	_tick_pigs(delta)
+	_tick_goats(delta)
 
 func _process(delta: float) -> void:
 	_update_chunks()
@@ -133,7 +138,6 @@ func _process(delta: float) -> void:
 		player.dodge_available = HorseTraining.knows(horse, "dodge")
 		player.dodge_recharge_seconds = 2.5 * HorseTraining.recovery(horse, "dodge")
 		_gauges["dodge"].set_state(player.dodge_available, 1.0 - player.dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds))
-	_tick_pigs(delta)
 	_tick_hoofbeats(delta)
 	_tick_stamina(delta)
 	if player.gait != _last_gait:
@@ -231,7 +235,7 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 	prey.roped = true
 	prey.rider = player
 	# Chase-mode pigs (Ant 8-nov-2026): the rope ends by the chase rules (rope
-	# snaps if the rider stands still, capture when the pig tires); the hold
+	# snaps outside the allowed distance, capture when the pig tires); the hold
 	# timer is only a safety net there.
 	prey.held = WorldPigs.CHASE_ROPE_MAX_SECONDS if WorldPigs.CHASE_MODE and not ("herd" in prey) else WorldTaming.HOLD_SECONDS
 	# Semental no admitido (Ant 8-nov 15:02): rompe el lazo casi al instante.
@@ -669,7 +673,7 @@ func _tick_pigs(delta: float) -> void:
 			var st: Dictionary
 			if WorldPigs.CHASE_MODE:
 				# Persecución (Ant 8-nov-2026): the pig flees, the rider chases and
-				# ropes it, keeps moving so the rope holds, and captures it once it
+				# ropes it, stays within rope distance, and captures it once it
 				# tires. Same lasso/capture machinery; only the pig behaviour is new.
 				st = WorldPigs.chase_tick(pig.state, dist, player.velocity.length(), pig.roped, delta)
 				pig.state = st
@@ -916,6 +920,7 @@ func _build_hud() -> void:
 			if is_instance_valid(_herd_horses[key]):
 				out.append(_herd_horses[key])
 		out.append_array(_lasso_pigs())
+		out.append_array(_prototype_goats.get_children())
 		return out
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
@@ -1223,3 +1228,29 @@ class DiscoveryMap extends Control:
 
 func _exit_tree()->void:
 	if is_instance_valid(_navigation):get_tree().paused=_navigation_was_paused
+
+## Additive, repeatable near-ranch prototype; does not alter chunk RNG or saves.
+func _setup_goat_prototype()->void:
+	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";add_child(_prototype_goats)
+	for pos in [Vector2(-200,400),Vector2(-90,470)]:
+		var goat=GoatScript.new();goat.setup({"pos":pos});_prototype_goats.add_child(goat)
+	var sign:=Label.new();sign.position=Vector2(-300,280);sign.text=tr("WORLD_GOAT_PROTOTYPE");sign.add_theme_font_size_override("font_size",19);add_child(sign)
+func _tick_goats(delta:float)->void:
+	if not is_instance_valid(_prototype_goats):return
+	for goat in _prototype_goats.get_children():
+		var dist:float=player.position.distance_to(goat.position)
+		if dist>700 and not goat.roped:continue
+		var st:Dictionary=WorldGoats.tick(goat.state,dist,goat.roped,delta)
+		goat.state=st
+		if st.break_rope:
+			var contact:bool=st.contact
+			goat.release()
+			if goat==_lasso_horse:_end_lasso()
+			if contact:player.stun()
+			_toast(tr("WORLD_GOAT_ESCAPED"))
+		elif float(st.progress)>=1.0:
+			if goat==_lasso_horse:_end_lasso()
+			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED"))
+			continue
+		if goat.roped or dist<260:goat.move_from_or_towards(player.position,delta,goat.roped)
+		else:goat.movement=Vector2.ZERO

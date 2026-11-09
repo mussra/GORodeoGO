@@ -429,3 +429,8 @@ Mastery +%.1f → %.1f%%
 Affinity +%.1f → %.1f%%"
 TRAIN_HUD_SAVE,El avance se guarda al ganar,Progress saves on a win
 TRAIN_HUD_TRIAL,Ensayo: sin avances guardados,Trial: no progress saved
+WORLD_GOAT_PROTOTYPE,"Cabras · prototipo
+Lazo: esquiva 5 s sin alejarte","Goats · prototype
+Rope: evade for 5 s, stay close"
+WORLD_GOAT_ESCAPED,La cabra se ha liberado,The goat broke free
+WORLD_GOAT_CAPTURED,Cabra capturada · prueba completada,Goat captured · test complete

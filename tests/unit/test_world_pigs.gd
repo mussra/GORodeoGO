@@ -45,27 +45,24 @@ func test_chase_running_tires_the_pig():
  assert_true(st.tired)
  assert_false(st.flee)
 
-func test_chase_roped_runs_even_far_and_tires_faster():
+func test_chase_roped_runs_within_rope_and_tires_faster():
  var st:=WorldPigs.new_chase_state()
- st=WorldPigs.chase_tick(st,600.0,260.0,true,0.1)
- assert_true(st.flee)  # roped drags no matter the distance
+ st=WorldPigs.chase_tick(st,200.0,260.0,true,0.1)
+ assert_true(st.flee)  # roped runs even outside passive capture range
  var t:float=0.0
  while not bool(st.tired) and t<WorldPigs.CHASE_TIRE_SECONDS:
-  st=WorldPigs.chase_tick(st,600.0,260.0,true,0.1);t+=0.1
+  st=WorldPigs.chase_tick(st,200.0,260.0,true,0.1);t+=0.1
  assert_lt(t,WorldPigs.CHASE_TIRE_SECONDS)  # roped tires before the plain budget
 
-func test_chase_standing_still_breaks_the_rope():
+func test_chase_distance_breaks_the_rope_not_standing_still():
  var st:=WorldPigs.new_chase_state()
- var broke:float=-1.0;var t:float=0.0
- while t<2.0:
-  st=WorldPigs.chase_tick(st,100.0,0.0,true,0.1)
-  if st.break_rope:broke=t;break
-  t+=0.1
- assert_true(broke>=0.0 and broke<=WorldPigs.CHASE_ROPE_BREAK_STILL_SECONDS+0.2)
+ for i in 12:st=WorldPigs.chase_tick(st,100.0,0.0,true,0.1)
+ assert_false(st.break_rope)
+ st=WorldPigs.chase_tick(st,WorldPigs.CHASE_ROPE_RANGE+1,200.0,true,.1)
+ assert_true(st.break_rope)
  var after:=WorldPigs.after_rope_break(st)
- assert_gt(float(after.run),0.0)  # keeps its fatigue
- assert_false(bool(after.tired))
- assert_true(after.flee)
+ assert_gt(float(after.run),0.0)
+ assert_false(bool(after.tired));assert_true(after.flee)
 
 func test_chase_moving_keeps_the_rope():
  var st:=WorldPigs.new_chase_state()

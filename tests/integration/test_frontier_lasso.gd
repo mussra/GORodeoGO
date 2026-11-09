@@ -193,31 +193,18 @@ func test_lasso_ropes_pig_and_timer_captures() -> void:
 	assert_gt(SaveData.world_pigs.size(), before, "pig counts in the counter")
 	assert_gt(SaveData.equipment_points, points_before, "chase capture pays points")
 
-func test_standing_still_snaps_the_pig_rope() -> void:
-	# Chase mode (Ant 8-nov-2026): rope a pig and stop - the rope snaps and
-	# the pig bolts, keeping its fatigue.
-	var world := _fresh_world()
-	await wait_physics_frames(4)
-	world.player.position = Vector2(0, 160)
-	var chunk: Node2D = world._chunks.values()[0]
-	var pen := Node2D.new()
-	pen.name = "pigs"
-	chunk.add_child(pen)
-	var pig: Node2D = world.PigScript.new()
-	pig.setup({"pos": Vector2(150, 160)})
-	pen.add_child(pig)
-	pig.position = Vector2(150, 160)
-	world._on_lasso_prey_captured(pig)
-	await wait_physics_frames(3)
-	assert_true(pig.roped, "the lasso ropes the pig")
-	world.player.velocity = Vector2.ZERO
-	# Observe the release transition itself. Waiting three physics frames could
-	# inspect a later state after the pig had already left its alert radius.
-	world.set_process(false)
-	pig.state["still"] = 0.0
-	world._tick_pigs(0.4);world._tick_pigs(0.4)
-	assert_true(pig.roped, "rope holds before the still-time limit")
-	world._tick_pigs(0.15)
-	assert_false(pig.roped, "standing still snaps the rope")
-	assert_true(bool(pig.state.get("flee", false)), "freed pig bolts")
-	assert_gt(float(pig.state.get("run", 0.0)), 0.0, "freed pig keeps its fatigue")
+func test_distance_snaps_the_pig_rope():
+	var w=_fresh_world()
+	await wait_physics_frames(2)
+	w.set_process(false);w.set_physics_process(false);w.player.set_physics_process(false)
+	var chunk=w._chunks.values()[0]
+	var pen=Node2D.new();pen.name="pigs";chunk.add_child(pen)
+	var pig=load("res://src/Presentation/wild_pig.gd").new();pig.setup({"pos":w.player.position+Vector2(100,0)});pen.add_child(pig)
+	w._on_lasso_prey_captured(pig)
+	w._tick_pigs(.1)
+	assert_true(pig.roped,"rope holds within distance")
+	pig.position=w.player.position+Vector2(WorldPigs.CHASE_ROPE_RANGE+1,0)
+	w._tick_pigs(.1)
+	assert_false(pig.roped,"distance snaps rope")
+	assert_true(pig.state.flee,"freed pig bolts")
+	assert_eq(w._lasso_state,"")

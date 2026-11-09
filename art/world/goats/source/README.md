@@ -1,0 +1,2 @@
+# Goat art
+Original running-four-views.jpg supplied by Ant on 9 November 2026, via his Rancho development conversation. Twelve poses in each of right, left, front, back views. Extracted by tools/extract_animal_views_2758.py with edge-connected background removal and component isolation. No third-party goat artwork is included. The goat mechanic is an additive near-ranch prototype, not persistent collection content yet.

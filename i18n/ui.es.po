@@ -1247,3 +1247,12 @@ msgstr "El avance se guarda al ganar"
 
 msgid "TRAIN_HUD_TRIAL"
 msgstr "Ensayo: sin avances guardados"
+
+msgid "WORLD_GOAT_PROTOTYPE"
+msgstr "Cabras · prototipo\nLazo: esquiva 5 s sin alejarte"
+
+msgid "WORLD_GOAT_ESCAPED"
+msgstr "La cabra se ha liberado"
+
+msgid "WORLD_GOAT_CAPTURED"
+msgstr "Cabra capturada · prueba completada"
