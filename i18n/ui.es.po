@@ -922,10 +922,10 @@ msgid "TRAIN_LEARNER"
 msgstr "Aprendiz / compañero"
 
 msgid "TRAIN_STATUS"
-msgstr "Mentor: %s · Dominio %.0f/100\nAprendiz: %s · Aprendizaje %.0f/100\nAfinidad de pareja: %.0f/100"
+msgstr "Mentor: %s · Dominio conservado %.0f/100\nAprendiz: %s · Aprendizaje %.0f/100 · Dominio %.0f/100\nAfinidad de pareja: %.0f/100"
 
 msgid "TRAIN_KNOWN"
-msgstr "Ambos conocen la técnica: practicar mejora dominio sin igualar sus rasgos."
+msgstr "El aprendiz ya conoce la técnica: sus victorias mejoran su dominio."
 
 msgid "TRAIN_STUDY"
 msgstr "El aprendiz desbloquea la técnica al llegar a 100. El mentor conserva la suya."
@@ -937,7 +937,7 @@ msgid "TRAIN_STOP"
 msgstr "Quitar pareja"
 
 msgid "TRAIN_SAVED"
-msgstr "Pareja guardada. Monta uno de ellos y gana una misión."
+msgstr "Pareja guardada. Monta al aprendiz y gana una misión."
 
 msgid "TRAIN_STOPPED"
 msgstr "Pareja quitada. Avances conservados."
@@ -949,13 +949,13 @@ msgid "TRAIN_NONE"
 msgstr "Sin pareja activa."
 
 msgid "TRAIN_RULES"
-msgstr "Victorias con la pareja: aprendizaje, dominio y afinidad. Sin pérdida por ausencia.\nDominio: hasta 20% menos recuperación, sin cambiar animación ni stats base. Regate requiere fusta."
+msgstr "Gana misiones montando al aprendiz: aprendizaje, su dominio y afinidad de pareja.\nMontar al mentor no da avances. Su dominio se conserva. Sin pérdida por ausencia.\nDominio: hasta 20% menos recuperación. Regate requiere fusta."
 
 msgid "TRAIN_COMPANION"
 msgstr "Entrena: %s"
 
 msgid "TRAIN_MISSION"
-msgstr "Entrenamiento: %s + %s · Gana para progresar"
+msgstr "Mentor: %s · Aprendiz montado: %s · Gana para aprender"
 
 msgid "BACK_EXIT_TITLE"
 msgstr "Salir del juego"

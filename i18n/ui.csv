@@ -392,3 +392,17 @@ FILTER_OWNED_YES,"Conseguidos","Owned"
 FILTER_OWNED_NO,"Sin conseguir","Not owned"
 FILTER_CLEAR,"Limpiar","Clear"
 FILTER_COUNT,"%d de %d","%d of %d"
+TRAIN_STATUS,"Mentor: %s · Dominio conservado %.0f/100
+Aprendiz: %s · Aprendizaje %.0f/100 · Dominio %.0f/100
+Afinidad de pareja: %.0f/100","Mentor: %s · Kept mastery %.0f/100
+Learner: %s · Learning %.0f/100 · Mastery %.0f/100
+Pair affinity: %.0f/100"
+TRAIN_KNOWN,El aprendiz ya conoce la técnica: sus victorias mejoran su dominio.,The learner knows the skill: their wins improve their mastery.
+TRAIN_STUDY,El aprendiz desbloquea la técnica al llegar a 100. El mentor conserva la suya.,The learner unlocks the skill at 100. The mentor keeps theirs.
+TRAIN_SAVED,Pareja guardada. Monta al aprendiz y gana una misión.,Pair saved. Ride the learner and win a mission.
+TRAIN_RULES,"Gana misiones montando al aprendiz: aprendizaje, su dominio y afinidad de pareja.
+Montar al mentor no da avances. Su dominio se conserva. Sin pérdida por ausencia.
+Dominio: hasta 20% menos recuperación. Regate requiere fusta.","Win missions riding the learner: learning, their mastery and pair affinity.
+Riding the mentor gives no progress. Their mastery is kept. No decay while away.
+Mastery: up to 20% less cooldown. Dodge needs a whip."
+TRAIN_MISSION,Mentor: %s · Aprendiz montado: %s · Gana para aprender,Mentor: %s · Riding learner: %s · Win to learn

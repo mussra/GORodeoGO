@@ -29,13 +29,13 @@ func build()->void:
  if not HorseTraining.valid(c,mentor,learner,skill):label(tr("TRAIN_PICK_VALID"),Vector2(35,290),22)
  if HorseTraining.valid(c,mentor,learner,skill):
   var m:Dictionary=c.find(mentor);var l:Dictionary=c.find(learner);var affinity:float=float(c.affinities.get(HorseTraining.pair_key(mentor,learner),0))
-  label(tr("TRAIN_STATUS")%[m.name,HorseTraining.mastery(m,skill),l.name,HorseTraining.progress(l,skill),affinity],Vector2(35,270),23)
+  label(tr("TRAIN_STATUS")%[m.name,HorseTraining.mastery(m,skill),l.name,HorseTraining.progress(l,skill),HorseTraining.mastery(l,skill),affinity],Vector2(35,270),23)
   label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else tr("TRAIN_STUDY"),Vector2(35,400),21)
   button(tr("TRAIN_START"),Vector2(35,455),func():note=tr("TRAIN_SAVED") if SaveData.set_training_pair(mentor,learner,skill) else tr("MARKET_FAILED");refresh())
  button(tr("TRAIN_STOP"),Vector2(655,455),func():note=tr("TRAIN_STOPPED") if SaveData.clear_training_pair() else tr("MARKET_FAILED");refresh())
  var active:Dictionary=c.training_pair
  label(tr("TRAIN_ACTIVE")%[c.known_record(str(active.get("mentor",""))).get("name","-"),c.known_record(str(active.get("learner",""))).get("name","-")] if not active.is_empty() else tr("TRAIN_NONE"),Vector2(35,525),21)
- label(tr("TRAIN_RULES"),Vector2(35,570),19);label(note,Vector2(35,645),20)
+ label(tr("TRAIN_RULES"),Vector2(35,570),18);label(note,Vector2(35,650),20)
 func picker(is_mentor:bool,pos:Vector2)->void:
  var pick:=OptionButton.new();pick.position=pos;pick.size=Vector2(540,54);content.add_child(pick)
  for h in SaveData.horse_collection.horses:

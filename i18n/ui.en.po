@@ -922,10 +922,10 @@ msgid "TRAIN_LEARNER"
 msgstr "Learner / partner"
 
 msgid "TRAIN_STATUS"
-msgstr "Mentor: %s · Mastery %.0f/100\nLearner: %s · Learning %.0f/100\nPair affinity: %.0f/100"
+msgstr "Mentor: %s · Kept mastery %.0f/100\nLearner: %s · Learning %.0f/100 · Mastery %.0f/100\nPair affinity: %.0f/100"
 
 msgid "TRAIN_KNOWN"
-msgstr "Both know the skill: practice improves mastery without making their stats equal."
+msgstr "The learner knows the skill: their wins improve their mastery."
 
 msgid "TRAIN_STUDY"
 msgstr "The learner unlocks the skill at 100. The mentor keeps theirs."
@@ -937,7 +937,7 @@ msgid "TRAIN_STOP"
 msgstr "Clear pair"
 
 msgid "TRAIN_SAVED"
-msgstr "Pair saved. Ride one of them and win a mission."
+msgstr "Pair saved. Ride the learner and win a mission."
 
 msgid "TRAIN_STOPPED"
 msgstr "Pair cleared. Progress kept."
@@ -949,13 +949,13 @@ msgid "TRAIN_NONE"
 msgstr "No active pair."
 
 msgid "TRAIN_RULES"
-msgstr "Wins with the pair earn learning, mastery and affinity. No decay while away.\nMastery: up to 20% less cooldown, no animation or base-stat changes. Dodge needs a whip."
+msgstr "Win missions riding the learner: learning, their mastery and pair affinity.\nRiding the mentor gives no progress. Their mastery is kept. No decay while away.\nMastery: up to 20% less cooldown. Dodge needs a whip."
 
 msgid "TRAIN_COMPANION"
 msgstr "Training: %s"
 
 msgid "TRAIN_MISSION"
-msgstr "Training: %s + %s · Win to progress"
+msgstr "Mentor: %s · Riding learner: %s · Win to learn"
 
 msgid "BACK_EXIT_TITLE"
 msgstr "Exit game"
