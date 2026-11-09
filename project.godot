@@ -32,6 +32,7 @@ RanchMusic="*res://src/Application/ranch_music.gd"
 
 GameState="*res://src/Application/game_state.gd"
 SaveData="*res://src/Application/save_data.gd"
+MenuSounds="*res://src/Application/menu_sounds.gd"
 
 [display]
 

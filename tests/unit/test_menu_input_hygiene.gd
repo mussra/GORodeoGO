@@ -22,6 +22,7 @@ func before_each()->void:
  for i in range(4):SaveData.horse_collection.add_random_trial_pair()
  _panel=HorsePanel.new()
  get_tree().root.add_child(_panel)
+ _panel.show_page("collection")
  _neutralize_other_ui()
  _sender=GutInputSender.new(Input)
  _sender.set_auto_flush_input(true)

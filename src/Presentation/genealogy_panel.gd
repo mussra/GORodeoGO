@@ -34,33 +34,54 @@ func _ready()->void:
  collection=SaveData.horse_collection
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(_layout);_layout()
- _label(tr("GEN_TITLE"),Vector2(25,15),28)
- _button(tr("UI_009"),Vector2(1080,15),175,queue_free)
- var search:=LineEdit.new();search.placeholder_text=tr("GEN_SEARCH");search.position=Vector2(25,60);search.size=Vector2(330,46);canvas.add_child(search);search.text_changed.connect(func(v):query=v;draw_graph())
+ MenuNavigation.header(canvas,tr("GEN_TITLE"),queue_free)
+ var search:=LineEdit.new();search.placeholder_text=tr("GEN_SEARCH");search.position=Vector2(25,95);search.size=Vector2(330,50);canvas.add_child(search);search.text_changed.connect(func(v):query=v;draw_graph())
+ FilterDrawer.button(canvas,Vector2(375,95),active_filter_count(),open_filters)
+ _button("−",Vector2(610,95),60,func():set_zoom(zoom-.15));_button("+",Vector2(680,95),60,func():set_zoom(zoom+.15))
+ _button(tr("GEN_RESET_VIEW"),Vector2(760,95),250,func():set_zoom(.8);view.scroll_horizontal=0;view.scroll_vertical=0)
+ counter=_label("",Vector2(1030,108),18)
+ view=ScrollContainer.new();view.position=Vector2(25,165);view.size=Vector2(1230,400);view.mouse_filter=Control.MOUSE_FILTER_PASS;canvas.add_child(view)
+ view.gui_input.connect(_map_input)
+ info=_label(tr("GEN_HINT"),Vector2(25,580),19);info.size=Vector2(1230,115);info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ draw_graph()
+func active_filter_count()->int:
+ var count:int=0
+ for value in filters.values():
+  if int(value)>=0:count+=1
+ if not lineage_filter.is_empty():count+=1
+ if origin_filter>0:count+=1
+ return count
+func open_filters()->void:
+ var drawer:=FilterDrawer.new();add_child(drawer)
  var keys:Array=["coat","pattern","mane","eyes","finish"]
  var names:Array=[HorseCollection.COATS,HorseCollection.PATTERNS,HorseCollection.MANES,HorseCollection.EYES,["Normal","Galaxy","Original"]]
- for i in range(5):
-  var pick:=OptionButton.new();pick.position=Vector2(365+i*176,60);pick.size=Vector2(168,46);pick.add_item(tr(["UI_129","UI_130","UI_090","UI_131","UI_091"][i]));pick.set_item_metadata(0,-1);canvas.add_child(pick)
-  for j in range(names[i].size()):pick.add_item(tr(names[i][j]));pick.set_item_metadata(j+1,j)
-  pick.item_selected.connect(func(n):filters[keys[i]]=int(pick.get_item_metadata(n));draw_graph())
- _button(tr("GEN_HIGHLIGHT"),Vector2(25,115),260,func():only_matches=false;draw_graph())
- _button(tr("GEN_ONLY"),Vector2(295,115),260,func():only_matches=true;draw_graph())
- _button("−",Vector2(570,115),65,func():set_zoom(zoom-.15));_button("+",Vector2(645,115),65,func():set_zoom(zoom+.15))
- _button(tr("GEN_RESET_VIEW"),Vector2(725,115),200,func():set_zoom(.8);view.scroll_horizontal=0;view.scroll_vertical=0)
- counter=_label("",Vector2(940,125),19)
- var lineage_pick:=OptionButton.new();lineage_pick.position=Vector2(25,163);lineage_pick.size=Vector2(350,44);lineage_pick.add_item(tr("GEN_ALL_LINEAGES"));canvas.add_child(lineage_pick)
- var labels:Array[String]=[]
+ var titles:Array=["Pelaje","Patrón","Crin y cola","Ojos","Acabado"]
+ for i in keys.size():
+  var options:Array=[]
+  for j in names[i].size():options.append({"value":j,"label":tr(names[i][j])})
+  var current:Variant=filters.get(keys[i],null)
+  if current!=null and int(current)<0:current=null
+  drawer.add_choice(keys[i],titles[i],options,current)
+ var lineages:Array=[];var seen:Array=[]
  for h in HorseGenealogy.records(collection):
   var value:String=HorseGenealogy.lineage(h)
-  if not labels.has(value):labels.append(value);lineage_pick.add_item(value)
- lineage_pick.item_selected.connect(func(n):lineage_filter="" if n==0 else labels[n-1];draw_graph())
- var origin_pick:=OptionButton.new();origin_pick.position=Vector2(390,163);origin_pick.size=Vector2(350,44);canvas.add_child(origin_pick)
- for key in ["GEN_ALL_ORIGINS","GEN_BRED","GEN_PURCHASED","GEN_ROOT"]:origin_pick.add_item(tr(key))
- origin_pick.item_selected.connect(func(n):origin_filter=n;draw_graph())
- view=ScrollContainer.new();view.position=Vector2(25,215);view.size=Vector2(1230,310);view.mouse_filter=Control.MOUSE_FILTER_PASS;canvas.add_child(view)
- view.gui_input.connect(_map_input)
- info=_label(tr("GEN_HINT"),Vector2(25,540),19);info.size=Vector2(1230,150);info.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- draw_graph()
+  if not seen.has(value):seen.append(value);lineages.append({"value":value,"label":value})
+ drawer.add_choice("lineage","Linaje",lineages,null if lineage_filter.is_empty() else lineage_filter)
+ drawer.add_choice("origin","Origen",[{"value":1,"label":tr("GEN_BRED")},{"value":2,"label":tr("GEN_PURCHASED")},{"value":3,"label":tr("GEN_ROOT")}],null if origin_filter==0 else origin_filter)
+ drawer.add_choice("mode","Mostrar",[{"value":false,"label":tr("GEN_HIGHLIGHT")},{"value":true,"label":tr("GEN_ONLY")}],only_matches)
+ drawer.changed.connect(func(key:String,value:Variant):
+  match key:
+   "lineage":lineage_filter="" if value==null else str(value)
+   "origin":origin_filter=0 if value==null else int(value)
+   "mode":only_matches=false if value==null else bool(value)
+   _:
+    if value==null:filters.erase(key)
+    else:filters[key]=int(value)
+  draw_graph();update_filter_button())
+ drawer.cleared.connect(func():filters.clear();lineage_filter="";origin_filter=0;only_matches=false;draw_graph();update_filter_button())
+func update_filter_button()->void:
+ var button:=canvas.get_node_or_null("OpenFilters") as Button
+ if button!=null:button.text="Filtros"+(" · %d"%active_filter_count() if active_filter_count()>0 else "")
 func _layout()->void:
  var k:float=minf(size.x/1280,size.y/720);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2
 func _label(text:String,pos:Vector2,font:int)->Label:

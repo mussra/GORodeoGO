@@ -42,7 +42,7 @@ func _ready()->void:
  var horse_button:=_button(tr("UI_053"),Vector2(430,125),func():
   if _horses==null:
    _horses=HorsePanel.new();add_child(_horses)
-  else:_horses.show();_horses.refresh())
+  else:_horses.open_menu())
  horse_button.size=Vector2(360,52)
  _label(tr("UI_054"),Vector2(40,580),20)
  resized.connect(_layout);_layout();refresh()

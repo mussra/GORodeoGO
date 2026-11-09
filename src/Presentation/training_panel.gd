@@ -21,7 +21,7 @@ func refresh()->void:call_deferred("build")
 func build()->void:
  if content!=null:canvas.remove_child(content);content.queue_free()
  content=Control.new();canvas.add_child(content)
- label(tr("TRAIN_TITLE"),Vector2(35,24),30);button(tr("UI_009"),Vector2(880,24),queue_free)
+ MenuNavigation.header(content,tr("TRAIN_TITLE"),queue_free)
  button(tr("TRAIN_JUMP") if skill=="jump" else tr("TRAIN_DODGE"),Vector2(35,90),func():skill="dodge" if skill=="jump" else "jump";mentor="";refresh())
  var c:HorseCollection=SaveData.horse_collection
  label(tr("TRAIN_MENTOR"),Vector2(35,155));label(tr("TRAIN_LEARNER"),Vector2(655,155))

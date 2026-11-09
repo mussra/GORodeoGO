@@ -12,6 +12,7 @@ static func install(target:Control)->void:
  target.set_meta("ui_modal",true)
  target.mouse_filter=Control.MOUSE_FILTER_STOP
  var guard:=MenuInputGuard.new();guard.panel=target;target.add_child(guard)
+ target.add_child(MenuExperience.new())
 func _ready()->void:
  panel.visibility_changed.connect(_mark)
  panel.item_rect_changed.connect(_mark)

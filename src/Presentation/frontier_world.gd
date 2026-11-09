@@ -50,6 +50,8 @@ var _stamina: Dictionary = {}
 var _gauges: Dictionary = {}
 var _pant: AudioStream = load("res://art/audio/pant.wav")
 var _edit_tool: String = "tree"
+var _navigation:NavigationSheet
+var _navigation_was_paused:bool=false
 var _edit_panel: Control
 var _hoof_player: AudioStreamPlayer
 var _step_timer: float = 0.0
@@ -674,28 +676,19 @@ func _toggle_edit() -> void:
 		_edit_panel.queue_free()
 
 func _open_edit_palette() -> void:
-	if is_instance_valid(_edit_panel):
-		_edit_panel.queue_free()
-	_edit_panel = Panel.new()
-	_edit_panel.position = Vector2(20, 56)
-	_edit_panel.size = Vector2(640, 150)
-	_edit_panel.z_index = 40
-	_hud.add_child(_edit_panel)
-	var hint := Label.new()
-	hint.text = tr("WORLD_EDIT_HINT")
-	hint.position = Vector2(14, 8)
-	hint.size = Vector2(610, 26)
-	hint.add_theme_font_size_override("font_size", 16)
-	_edit_panel.add_child(hint)
-	var tools_: Array = [["tree", "WORLD_DECOR_TREE"], ["pine", "WORLD_DECOR_PINE"], ["fruit_tree", "WORLD_DECOR_FRUIT"], ["bush", "WORLD_DECOR_BUSH"], ["rock", "WORLD_DECOR_ROCK"], ["cactus", "WORLD_DECOR_CACTUS"], ["flower", "WORLD_DECOR_FLOWER"], ["pigs", "WORLD_EDIT_PIGS"], ["erase", "WORLD_ERASE"]]
-	for i in tools_.size():
-		var b := Button.new()
-		b.text = tr(tools_[i][1])
-		b.position = Vector2(14 + (i % 5) * 124, 40 + (i / 5) * 52)
-		b.size = Vector2(116, 44)
-		var tool: String = tools_[i][0]
-		b.pressed.connect(func(): _edit_tool = tool)
-		_edit_panel.add_child(b)
+	if is_instance_valid(_edit_panel):_edit_panel.queue_free()
+	_edit_panel=Panel.new();_edit_panel.position=Vector2(20,56);_edit_panel.size=Vector2(600,74);_edit_panel.z_index=40;_hud.add_child(_edit_panel)
+	var tool_label:=Label.new();tool_label.text="Editor · "+_edit_tool;tool_label.position=Vector2(18,22);_edit_panel.add_child(tool_label)
+	var choose:=Button.new();choose.text="Herramientas";choose.position=Vector2(230,12);choose.size=Vector2(205,50);choose.pressed.connect(_open_edit_tools);_edit_panel.add_child(choose)
+	var close:=Button.new();close.text="Terminar";close.position=Vector2(450,12);close.size=Vector2(135,50);close.pressed.connect(_toggle_edit);_edit_panel.add_child(close)
+func _open_edit_tools()->void:
+	var drawer:=FilterDrawer.new();drawer.title="Editor · herramientas";drawer.show_clear=false;drawer.confirm_text="Seguir editando";_hud.add_child(drawer)
+	var tools_:Array=[["tree","WORLD_DECOR_TREE"],["pine","WORLD_DECOR_PINE"],["fruit_tree","WORLD_DECOR_FRUIT"],["bush","WORLD_DECOR_BUSH"],["rock","WORLD_DECOR_ROCK"],["cactus","WORLD_DECOR_CACTUS"],["flower","WORLD_DECOR_FLOWER"],["pigs","WORLD_EDIT_PIGS"],["erase","WORLD_ERASE"]]
+	var options:Array=[]
+	for tool in tools_:options.append({"value":tool[0],"label":tr(tool[1])})
+	drawer.add_choice("tool","Herramienta",options,_edit_tool,false)
+	drawer.changed.connect(func(_key:String,value:Variant):
+		if value!=null:_edit_tool=str(value);_open_edit_palette())
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _map_overlay.expanded and event.is_action_pressed("ui_cancel"):
@@ -795,14 +788,7 @@ func _build_hud() -> void:
 		g.set_state(abilities[i][1], 1.0)
 		_gauges[abilities[i][0]] = g
 		_hud.add_child(g)
-	var specs: Array = [["WORLD_MAP", 760, Callable(self, "_toggle_map")], ["WORLD_EDIT", 870, Callable(self, "_toggle_edit")], ["WORLD_HOME", 980, Callable(self, "_home")], ["WORLD_MENU", 1150, Callable(self, "_menu")]]
-	for spec in specs:
-		var b := Button.new()
-		b.text = tr(spec[0])
-		b.position = Vector2(spec[1], 6)
-		b.size = Vector2(100 if spec[0] != "WORLD_HOME" else 150, 34)
-		b.pressed.connect(spec[2])
-		_hud.add_child(b)
+	var menu_button:=Button.new();menu_button.name="WorldNavigation";menu_button.text="Menú";menu_button.position=Vector2(1100,4);menu_button.size=Vector2(160,42);menu_button.pressed.connect(_open_navigation);_hud.add_child(menu_button)
 	_toasts=ToastStack.new()
 	_hud.add_child(_toasts)
 	_board_button = Button.new()
@@ -854,6 +840,32 @@ func _build_hud() -> void:
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
 	player.lasso.release_requested.connect(func(): _release_held_horse())
+
+func _open_navigation()->void:
+	if is_instance_valid(_navigation):return
+	_navigation_was_paused=get_tree().paused
+	player.velocity=Vector2.ZERO
+	player.lasso.cancel_all_actions()
+	get_tree().paused=true
+	var touch:Node=get_node_or_null("TouchControls")
+	if touch!=null:touch.visible=false
+	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
+	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.selected.connect(_navigation_selected)
+	_navigation.closed.connect(_close_navigation)
+	_hud.add_child(_navigation)
+func _navigation_selected(id:String)->void:
+	_close_navigation()
+	match id:
+		"map":_toggle_map()
+		"editor":_toggle_edit()
+		"home":_home()
+		"exit":_menu()
+func _close_navigation()->void:
+	get_tree().paused=_navigation_was_paused
+	var touch:Node=get_node_or_null("TouchControls")
+	if touch!=null:touch.visible=not _edit_mode
+	_navigation=null
 
 func _toggle_map() -> void:
 	# Toggles collapsed <-> expanded; the small map never disappears (Ant 22:49).
@@ -919,6 +931,7 @@ class DiscoveryMap extends Control:
 		var viewport: Vector2 = get_viewport_rect().size
 		size = Vector2(minf(700, viewport.x - 80), minf(410, viewport.y - 180)) if expanded else Vector2(180, 112)
 		position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x - size.x - 18, 84)
+		for i in _zoom_btns.size():_zoom_btns[i].position=Vector2(24+i*72,size.y-76)
 
 	func _process(delta: float) -> void:
 		if visible:
@@ -1013,11 +1026,11 @@ class DiscoveryMap extends Control:
 
 	func _draw() -> void:
 		# same shell as the arena minimap: dark framed box, content inside
-		draw_style_box(RanchTheme.box(Color(0.04, 0.13, 0.17, 0.94), Color("89bdb7"), 9), Rect2(Vector2.ZERO, size))
+		draw_style_box(MapAppearance.frame(), Rect2(Vector2.ZERO, size))
 		var area: Rect2 = Rect2(Vector2(12, 12), size - Vector2(24, 24))
 		if area.size.x <= 0.0 or area.size.y <= 0.0:
 			return
-		draw_rect(area, Color("1d2a26"), true)
+		draw_rect(area, MapAppearance.floor_color("10252d"), true)
 		var data: Dictionary = _cells()
 		if (data.cells as Array).is_empty():
 			return
@@ -1037,8 +1050,8 @@ class DiscoveryMap extends Control:
 		for c in data.cells:
 			var r: Rect2 = _chunk_rect(c, mins, cell, origin)
 			# cartoon ground tile with a soft rim
-			draw_rect(r.grow(1.0), Color("24513c"), true)
-			draw_rect(r, Color("3f7a45"), true)
+			draw_rect(r.grow(1.0), Color.TRANSPARENT, true)
+			draw_rect(r, MapAppearance.terrain_over_base("3f7a45"), true)
 			var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, c.x, c.y), SaveData.world_edits, c.x, c.y)
 			_draw_trails(c, mins, cell, origin, r)
 			_draw_decor(chunk, mins, cell, origin, r)
@@ -1126,3 +1139,6 @@ class DiscoveryMap extends Control:
 		elif state == "offered":
 			draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("ffffff"))
 			draw_string(font, pos - Vector2(cell * 0.2, cell * 0.14), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+
+func _exit_tree()->void:
+	if is_instance_valid(_navigation):get_tree().paused=_navigation_was_paused

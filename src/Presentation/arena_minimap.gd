@@ -24,9 +24,9 @@ func _point(world:Vector2,area:Rect2)->Vector2:
 	return area.position+(world-level.world_bounds.position)/level.world_bounds.size*area.size
 func _draw()->void:
 	if not is_instance_valid(level):return
-	draw_style_box(RanchTheme.box(Color(.04,.13,.17,.94),Color("89bdb7"),9),Rect2(Vector2.ZERO,size))
+	draw_style_box(MapAppearance.frame(),Rect2(Vector2.ZERO,size))
 	var area:=Rect2(Vector2(12,27),size-Vector2(24,42))
-	draw_rect(area,Color("34575c"))
+	draw_rect(area,MapAppearance.floor_color("34575c"))
 	if expanded:
 		# Inspectable consequences before choosing an opening. One line per link,
 		# with a destination arrow; gameplay floor still keeps only the focused trail.
