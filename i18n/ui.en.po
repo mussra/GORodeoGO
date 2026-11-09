@@ -843,6 +843,9 @@ msgstr "Gold: all ancestors and descendants. Tap the same horse to clear selecti
 msgid "JUMP_BADGE_TITLE"
 msgstr "Fence jumping"
 
+msgid "DODGE_BADGE_TITLE"
+msgstr "Dodge"
+
 msgid "MARKET_TITLE"
 msgstr "Market"
 

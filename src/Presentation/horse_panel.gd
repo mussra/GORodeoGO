@@ -14,6 +14,7 @@ var atlas_owned_first:bool=true
 var atlas_filters:Dictionary={}
 var scroll_to_newest:bool=false
 func _ready()->void:
+ MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=80
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas)
@@ -47,6 +48,9 @@ func _refresh()->void:
   if not SaveData.save_progress():SaveData.horse_collection.restore(before);message=tr("UI_086");refresh();return
   parent_b=added[0].id;page="collection";scroll_to_newest=true;message=tr("UI_078")%SaveData.horse_collection.horses.size();refresh(),230)
  random_button.visible=SaveData.debug_mode or SaveData.trial_session_active
+ # Ant 9-nov-2026: un botón que no se muestra tampoco acepta input.
+ random_button.disabled=not random_button.visible
+ random_button.mouse_filter=Control.MOUSE_FILTER_STOP if random_button.visible else Control.MOUSE_FILTER_IGNORE
  var rules_normal:=not SaveData.debug_mode and not SaveData.trial_session_active
  label(tr("MARKET_RULES_A") if rules_normal else tr("TRIAL_RULES_A"),Vector2(30,136),17)
  label(tr("MARKET_RULES_B") if rules_normal else tr("TRIAL_RULES_B"),Vector2(30,160),17)
@@ -154,7 +158,7 @@ func detail_view()->void:
  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(1120,225);badge.size=Vector2(64,56);content.add_child(badge)
  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.position=Vector2(1120,290);dodge_badge.size=Vector2(64,56);content.add_child(dodge_badge)
  var st:Dictionary=HorseStats.read(h)
- label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,335),20)
+ label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,335),18)
  if not SaveData.horse_collection.is_adult(h.id):
   label(tr("UI_115"),Vector2(790,512),16)
   button(tr("UI_116"),Vector2(40,555),func():

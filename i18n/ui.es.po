@@ -843,6 +843,9 @@ msgstr "Dorado: antepasados y descendientes completos. Toca el mismo caballo par
 msgid "JUMP_BADGE_TITLE"
 msgstr "Salto de vallas"
 
+msgid "DODGE_BADGE_TITLE"
+msgstr "Regate"
+
 msgid "MARKET_TITLE"
 msgstr "Mercado"
 

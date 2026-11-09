@@ -5,6 +5,7 @@ var _buttons:Dictionary={}
 var _message:Label
 var _portraits:Dictionary={}
 func _ready()->void:
+ MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  z_index=60
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)

@@ -8,6 +8,7 @@ var canvas:Control
 var note:String=""
 var dirty:bool=false
 func _ready()->void:
+ MenuInputGuard.install(self)
  set_meta("back_closes",false);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=95
  var horse:Dictionary=SaveData.horse_collection.find(horse_id);config=horse.traits.get("emblem",HorseEmblem.DEFAULT).duplicate(true)
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)

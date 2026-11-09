@@ -23,6 +23,7 @@ var _transitioning: bool = false
 var _next_level: int = 1
 
 func _ready() -> void:
+	MenuInputGuard.install(self)
 	SaveData.end_trial_session() # returning to menu always restores real state
 	RanchMusic.set_paused(false)
 	RanchMusic.set_enabled(GameState.sound_enabled)

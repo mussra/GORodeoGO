@@ -7,6 +7,7 @@ var content:Control
 var canvas:Control
 var note:String=""
 func _ready()->void:
+ MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=90
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(layout);layout();refresh()
