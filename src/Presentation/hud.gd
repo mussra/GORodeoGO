@@ -25,7 +25,7 @@ signal dual_lasso_intro_accepted
 
 var _pause_panel: Panel
 var _dual_lasso_panel: Panel
-var _flash_hint_until_seconds: float = 0.0
+var _toasts:ToastStack
 var _hint_label: Label
 var _level_label: Label
 var _pause_button: Button
@@ -34,6 +34,7 @@ var _level_number: int = 1
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS  # buttons must keep working while the tree is paused
+	_toasts=ToastStack.new();_toasts.top_offset=112.0;add_child(_toasts)
 	_build_pause_panel()
 	_apply_ranch_ui()
 	nerves_group.visible = false
@@ -82,6 +83,7 @@ func show_win() -> void:
 	nerves_group_2.hide()
 	_pause_button.hide()
 	_hint_label.hide()
+	_toasts.clear()
 	_next_button.visible = GameState.selected_level < LevelCatalog.MAX_LEVEL
 	restart_button.visible = not _next_button.visible
 	end_label.text = tr("UI_020")
@@ -93,6 +95,7 @@ func show_lose(reason: String) -> void:
 	nerves_group_2.hide()
 	_pause_button.hide()
 	_hint_label.hide()
+	_toasts.clear()
 	end_label.text = tr("UI_021") % reason
 	end_panel.visible = true
 
@@ -204,11 +207,12 @@ func _apply_ranch_ui() -> void:
 	_hint_label = Label.new()
 	_hint_label.theme = ranch_theme
 	_hint_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_hint_label.offset_top = -34
+	_hint_label.offset_top = -62
 	_hint_label.offset_bottom = -8
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint_label.add_theme_font_size_override("font_size", 17)
 	_hint_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ToastStack.backdrop(_hint_label)
 	add_child(_hint_label)
 	for group: VBoxContainer in [nerves_group, nerves_group_2]:
 		group.modulate = Color("fff1d2")
@@ -305,12 +309,9 @@ func _on_dual_lasso_accept_pressed() -> void:
 ## Transient override for update_guidance (which refreshes every frame): a blocked lasso
 ## throw explains itself here instead of failing silently.
 func flash_hint(text: String, seconds: float = 1.8) -> void:
-	_hint_label.text = text
-	_flash_hint_until_seconds = Time.get_ticks_msec() / 1000.0 + seconds
+	_toasts.push(text,seconds)
 
 func update_guidance(held_count: int, ready_count: int, has_closed_doors: bool) -> void:
-	if Time.get_ticks_msec() / 1000.0 < _flash_hint_until_seconds:
-		return
 	if ready_count > 0:
 		_hint_label.text = tr("UI_032")
 	elif held_count > 0:

@@ -63,7 +63,7 @@ func _ready() -> void:
 	_upgrades = PlayerUpgrades.for_progress(SaveData.effective_progress())
 	_apply_unlocked_upgrades()
 	if SaveData.trial_session_active:
-		var banner:=Label.new();banner.text=tr("ENSAYO AISLADO · sin premios ni guardado · equipo prestado");banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);hud.add_child(banner)
+		var banner:=Label.new();banner.text=tr("ENSAYO AISLADO · sin premios ni guardado · equipo prestado");banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);ToastStack.backdrop(banner);hud.add_child(banner)
 	_level_number = level_data.level_number
 	_arena_scale=ArenaLayout.scale_for_level(_level_number)
 	world_bounds=ArenaLayout.bounds_for_level(_level_number)
@@ -717,7 +717,7 @@ func _show_training_companion()->void:
 	var card:=Panel.new();card.position=Vector2(22,100);card.size=Vector2(215,100);card.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("77dbd5"),8));hud.add_child(card)
 	var portrait:=TextureRect.new();portrait.position=Vector2(4,3);portrait.size=Vector2(78,90);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;HorsePortrait.apply(portrait,h.traits,SaveData.hat_color);card.add_child(portrait)
 	var caption:=Label.new();caption.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;caption.text=(tr("TRAIN_COMPANION")%"")+"\n"+str(h.name).left(16);caption.position=Vector2(84,20);caption.size=Vector2(125,65);caption.custom_minimum_size=Vector2.ZERO;caption.clip_text=true;caption.autowrap_mode=TextServer.AUTOWRAP_ARBITRARY;caption.add_theme_font_size_override("font_size",16);card.add_child(caption)
-	var cue:=Label.new();cue.text=tr("TRAIN_MISSION")%[SaveData.horse_collection.find(_training_session.mentor).name,SaveData.horse_collection.find(_training_session.learner).name];cue.position=Vector2(25,72);cue.add_theme_font_size_override("font_size",18);hud.add_child(cue)
+	var cue:=Label.new();cue.text=tr("TRAIN_MISSION")%[SaveData.horse_collection.find(_training_session.mentor).name,SaveData.horse_collection.find(_training_session.learner).name];cue.position=Vector2(25,72);cue.add_theme_font_size_override("font_size",18);ToastStack.backdrop(cue);hud.add_child(cue)
 
 func navigate_back()->void:
 	if _game_over:

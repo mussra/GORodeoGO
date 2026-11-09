@@ -38,8 +38,7 @@ var _audio: RanchAudio
 var aim_joystick: VirtualJoystick  # named like the levels so JoystickAppearance.apply works
 var _gait_label: Label
 var _missions_label: Label
-var _toast_label: Label
-var _toast_left: float = 0.0
+var _toasts:ToastStack
 var _map_overlay: Control
 var _board_button: Button
 var _board_panel: Control
@@ -135,9 +134,7 @@ func _process(delta: float) -> void:
 	if player.gait != _last_gait:
 		_last_gait = player.gait
 		_gait_label.text = tr(WorldGait.gait_names()[_last_gait])
-	if _toast_left > 0.0:
-		_toast_left -= delta
-		_toast_label.modulate.a = clampf(_toast_left, 0.0, 1.0)
+	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 60.0)
 	_board_button.visible = player.position.distance_to(BOARD_POS) < 150.0
 	_save_timer += delta
 	if _save_timer >= SAVE_EVERY:
@@ -254,12 +251,8 @@ func _stallion_hint(horse: Node2D) -> void:
 	_stallion_hint_stage += 1
 
 func _toast(text: String) -> void:
-	_toast_label.text = text
-	# The edit palette covers (20..660, 56..206); drop the toast under it so a
-	# "mision descubierta" never hides the tool help (validation 8-nov).
-	_toast_label.position.y = 216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 60.0
-	_toast_left = 3.0
-	_toast_label.modulate.a = 1.0
+	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 60.0)
+	_toasts.push(text)
 
 func _update_chunks() -> void:
 	var pc: Vector2i = WorldMap.chunk_at(player.position)
@@ -810,15 +803,8 @@ func _build_hud() -> void:
 		b.size = Vector2(100 if spec[0] != "WORLD_HOME" else 150, 34)
 		b.pressed.connect(spec[2])
 		_hud.add_child(b)
-	_toast_label = Label.new()
-	_toast_label.position = Vector2(340, 60)
-	_toast_label.size = Vector2(600, 34)
-	_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast_label.add_theme_font_size_override("font_size", 21)
-	_toast_label.add_theme_color_override("font_outline_color", Color("10252d"))
-	_toast_label.add_theme_constant_override("outline_size", 6)
-	_toast_label.modulate.a = 0.0
-	_hud.add_child(_toast_label)
+	_toasts=ToastStack.new()
+	_hud.add_child(_toasts)
 	_board_button = Button.new()
 	_board_button.text = tr("WORLD_BOARD")
 	_board_button.position = Vector2(510, 640)
