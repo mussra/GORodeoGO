@@ -31,7 +31,7 @@ func test_filters_are_hidden_and_modal_repeatedly_restore_back()->void:
   panel.open_atlas_filters();await wait_process_frames(5)
   var drawer:FilterDrawer=panel.get_children().filter(func(c):return c is FilterDrawer)[0]
   assert_true(back.disabled,"background blocked by filters")
-  assert_eq(drawer.count,5)
+  assert_eq(drawer.count,8)
   assert_false(drawer.canvas.get_node("NavigationBack").disabled)
   drawer.queue_free();await wait_process_frames(5)
   assert_false(back.disabled,"back restored after closing filters")
@@ -65,3 +65,9 @@ func test_common_menu_finish_respects_mute_and_wires_new_controls()->void:
  GameState.sound_enabled=prior
  assert_eq(MenuSounds.voices.size(),3,"small fixed reusable voice pool")
  assert_true(panel.theme is Theme)
+func test_atlas_variant_page_preserves_return_and_cannot_buy_preview()->void:
+ panel.atlas_family={"coat":10,"pattern":1,"mane":2};panel.atlas_family_page=4;panel.show_page("atlas_variants");await wait_process_frames(4)
+ panel.focus_id="";panel.focus_preview={"traits":{"coat":10,"pattern":1,"mane":2,"spots":3},"stage":"adult"};panel.show_page("detail");await wait_process_frames(4)
+ assert_eq(panel.content.get_children().filter(func(c):return c is Button and c.text.begins_with("Comprar")).size(),0)
+ panel.go_back();await wait_process_frames(4);assert_eq(panel.page,"atlas_variants")
+ panel.go_back();await wait_process_frames(4);assert_eq(panel.page,"atlas");assert_eq(panel.atlas_page,4)
