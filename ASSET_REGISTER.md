@@ -25,7 +25,9 @@ cambiar el diseno del caballo clasico ni el jinete oficial.
 1. Cerdo: PNG RGBA, celdas de 128x128, perfil a derecha, pies en y=110.
    Carrera 6-10 fotogramas, reposo 4, cansado/jadeo 4, una tira por animacion.
    Rosa y marron con la misma escala y pivote. Hoja JPG de carrera recibida
-   el 9-nov: 10 fotogramas por color, pendiente de integrar tras 2.7.46.
+   el 9-nov: 10 fotogramas por color, integrada en 2.7.47. Original
+   conservado en art/world/pigs/source; PNG de 160x144 con pies en y=128.
+   Reposo y cansado siguen siendo fotogramas quietos provisionales.
 2. Iconos: coleccion, cria, atlas/mapa, mercado, entrenamiento, genealogia,
    editor, casa, salir, volver. PNG RGBA 128x128, margen interior 12 px,
    sin letras. Los glifos por codigo actuales son provisionales.

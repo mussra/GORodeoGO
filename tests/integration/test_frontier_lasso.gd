@@ -210,10 +210,13 @@ func test_standing_still_snaps_the_pig_rope() -> void:
 	await wait_physics_frames(3)
 	assert_true(pig.roped, "the lasso ropes the pig")
 	world.player.velocity = Vector2.ZERO
-	for i in range(60):
-		await wait_physics_frames(3)
-		if not pig.roped:
-			break
+	# Observe the release transition itself. Waiting three physics frames could
+	# inspect a later state after the pig had already left its alert radius.
+	world.set_process(false)
+	pig.state["still"] = 0.0
+	world._tick_pigs(0.4);world._tick_pigs(0.4)
+	assert_true(pig.roped, "rope holds before the still-time limit")
+	world._tick_pigs(0.15)
 	assert_false(pig.roped, "standing still snaps the rope")
 	assert_true(bool(pig.state.get("flee", false)), "freed pig bolts")
 	assert_gt(float(pig.state.get("run", 0.0)), 0.0, "freed pig keeps its fatigue")

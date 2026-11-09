@@ -16,3 +16,11 @@ no audio final de biblioteca. El mute global los desactiva. Registro de
 sustituciones y requisitos de procedencia en [ASSET_REGISTER.md](ASSET_REGISTER.md).
 La version final debe usar fuentes gratuitas con licencia comercial y de
 redistribucion compatible, comprobada para cada archivo.
+
+## Cerdos rosa/marron - art/world/pigs
+- Hoja JPG aportada por Ant el 9-nov-2026 para integrarla en el juego.
+- Original sin modificar: `art/world/pigs/source/running-sheet.jpg`.
+- Conversion: `tools/extract_pig_sprites.py`; fondo negro exterior a alfa,
+  20 fotogramas PNG, celdas160x144, pies alineados, sin redibujar el personaje.
+- Procedencia/licencia anterior a la aportacion: no verificada; no se declara
+  CC0 ni biblioteca gratuita. Pendiente de acreditar para distribucion final.
