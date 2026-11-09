@@ -937,7 +937,7 @@ msgid "TRAIN_STOP"
 msgstr "Clear pair"
 
 msgid "TRAIN_SAVED"
-msgstr "Pair saved. Ride the learner and win a mission."
+msgstr "Pair saved. Ride the learner and win a level."
 
 msgid "TRAIN_STOPPED"
 msgstr "Pair cleared. Progress kept."
@@ -949,13 +949,13 @@ msgid "TRAIN_NONE"
 msgstr "No active pair."
 
 msgid "TRAIN_RULES"
-msgstr "Win missions riding the learner: learning, their mastery and pair affinity.\nRiding the mentor gives no progress. Their mastery is kept. No decay while away.\nMastery: up to 20% less cooldown. Dodge needs a whip."
+msgstr "Win campaign levels with the learner equipped (replaying1-3 also counts).\nRiding the mentor gives no progress; their mastery stays. Isolated trials do not save.\nLearning, learner mastery and affinity rise on wins. Frontier does not count."
 
 msgid "TRAIN_COMPANION"
 msgstr "Training: %s"
 
 msgid "TRAIN_MISSION"
-msgstr "Mentor: %s · Riding learner: %s · Win to learn"
+msgstr "Mentor: %s · Riding learner: %s · Win the level"
 
 msgid "BACK_EXIT_TITLE"
 msgstr "Exit game"
@@ -1220,3 +1220,12 @@ msgstr "Symbol: drag it · size"
 
 msgid "EMBLEM_LETTERS"
 msgstr "Initials"
+
+msgid "TRAIN_EQUIP_LEARNER"
+msgstr "Ride learner"
+
+msgid "TRAIN_EQUIPPED"
+msgstr "Learner equipped. Save the pair and win a campaign level."
+
+msgid "TRAIN_MOUNTED"
+msgstr "Equipped to play: %s · saving a pair does not change your mount"

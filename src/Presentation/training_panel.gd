@@ -7,6 +7,9 @@ var content:Control
 var canvas:Control
 var note:String=""
 func _ready()->void:
+ var active:Dictionary=SaveData.horse_collection.training_pair
+ if not active.is_empty():
+  mentor=str(active.get("mentor",""));learner=str(active.get("learner",""));skill=str(active.get("skill","jump"))
  MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=90
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
@@ -23,13 +26,15 @@ func build()->void:
  content=Control.new();canvas.add_child(content)
  MenuNavigation.header(content,tr("TRAIN_TITLE"),queue_free)
  button(tr("TRAIN_JUMP") if skill=="jump" else tr("TRAIN_DODGE"),Vector2(35,90),func():skill="dodge" if skill=="jump" else "jump";mentor="";refresh())
+ button(tr("TRAIN_EQUIP_LEARNER"),Vector2(655,90),func():note=tr("TRAIN_EQUIPPED") if SaveData.select_horse(learner) else tr("MARKET_FAILED");refresh())
  var c:HorseCollection=SaveData.horse_collection
  label(tr("TRAIN_MENTOR"),Vector2(35,155));label(tr("TRAIN_LEARNER"),Vector2(655,155))
  picker(true,Vector2(35,195));picker(false,Vector2(655,195))
+ label(tr("TRAIN_MOUNTED")%c.find(c.selected).get("name","-"),Vector2(35,252),17)
  if not HorseTraining.valid(c,mentor,learner,skill):label(tr("TRAIN_PICK_VALID"),Vector2(35,290),22)
  if HorseTraining.valid(c,mentor,learner,skill):
   var m:Dictionary=c.find(mentor);var l:Dictionary=c.find(learner);var affinity:float=float(c.affinities.get(HorseTraining.pair_key(mentor,learner),0))
-  label(tr("TRAIN_STATUS")%[m.name,HorseTraining.mastery(m,skill),l.name,HorseTraining.progress(l,skill),HorseTraining.mastery(l,skill),affinity],Vector2(35,270),23)
+  label(tr("TRAIN_STATUS")%[m.name,HorseTraining.mastery(m,skill),l.name,HorseTraining.progress(l,skill),HorseTraining.mastery(l,skill),affinity],Vector2(35,282),22)
   label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else tr("TRAIN_STUDY"),Vector2(35,400),21)
   button(tr("TRAIN_START"),Vector2(35,455),func():note=tr("TRAIN_SAVED") if SaveData.set_training_pair(mentor,learner,skill) else tr("MARKET_FAILED");refresh())
  button(tr("TRAIN_STOP"),Vector2(655,455),func():note=tr("TRAIN_STOPPED") if SaveData.clear_training_pair() else tr("MARKET_FAILED");refresh())

@@ -937,7 +937,7 @@ msgid "TRAIN_STOP"
 msgstr "Quitar pareja"
 
 msgid "TRAIN_SAVED"
-msgstr "Pareja guardada. Monta al aprendiz y gana una misión."
+msgstr "Pareja guardada. Monta al aprendiz y gana un nivel."
 
 msgid "TRAIN_STOPPED"
 msgstr "Pareja quitada. Avances conservados."
@@ -949,13 +949,13 @@ msgid "TRAIN_NONE"
 msgstr "Sin pareja activa."
 
 msgid "TRAIN_RULES"
-msgstr "Gana misiones montando al aprendiz: aprendizaje, su dominio y afinidad de pareja.\nMontar al mentor no da avances. Su dominio se conserva. Sin pérdida por ausencia.\nDominio: hasta 20% menos recuperación. Regate requiere fusta."
+msgstr "Gana niveles de campaña con el aprendiz equipado (también repetir1-3).\nMontar al mentor no da avances; su dominio se conserva. Ensayo aislado no guarda.\nAprendizaje, dominio del aprendiz y afinidad suben al ganar. Frontera no cuenta."
 
 msgid "TRAIN_COMPANION"
 msgstr "Entrena: %s"
 
 msgid "TRAIN_MISSION"
-msgstr "Mentor: %s · Aprendiz montado: %s · Gana para aprender"
+msgstr "Mentor: %s · Aprendiz montado: %s · Gana el nivel"
 
 msgid "BACK_EXIT_TITLE"
 msgstr "Salir del juego"
@@ -1220,3 +1220,12 @@ msgstr "Símbolo: arrástralo · tamaño"
 
 msgid "EMBLEM_LETTERS"
 msgstr "Iniciales"
+
+msgid "TRAIN_EQUIP_LEARNER"
+msgstr "Montar aprendiz"
+
+msgid "TRAIN_EQUIPPED"
+msgstr "Aprendiz equipado. Guarda la pareja y gana un nivel de campaña."
+
+msgid "TRAIN_MOUNTED"
+msgstr "Equipado para jugar: %s · guardar pareja no cambia la montura"

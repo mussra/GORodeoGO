@@ -399,10 +399,13 @@ Learner: %s · Learning %.0f/100 · Mastery %.0f/100
 Pair affinity: %.0f/100"
 TRAIN_KNOWN,El aprendiz ya conoce la técnica: sus victorias mejoran su dominio.,The learner knows the skill: their wins improve their mastery.
 TRAIN_STUDY,El aprendiz desbloquea la técnica al llegar a 100. El mentor conserva la suya.,The learner unlocks the skill at 100. The mentor keeps theirs.
-TRAIN_SAVED,Pareja guardada. Monta al aprendiz y gana una misión.,Pair saved. Ride the learner and win a mission.
-TRAIN_RULES,"Gana misiones montando al aprendiz: aprendizaje, su dominio y afinidad de pareja.
-Montar al mentor no da avances. Su dominio se conserva. Sin pérdida por ausencia.
-Dominio: hasta 20% menos recuperación. Regate requiere fusta.","Win missions riding the learner: learning, their mastery and pair affinity.
-Riding the mentor gives no progress. Their mastery is kept. No decay while away.
-Mastery: up to 20% less cooldown. Dodge needs a whip."
-TRAIN_MISSION,Mentor: %s · Aprendiz montado: %s · Gana para aprender,Mentor: %s · Riding learner: %s · Win to learn
+TRAIN_SAVED,Pareja guardada. Monta al aprendiz y gana un nivel.,Pair saved. Ride the learner and win a level.
+TRAIN_RULES,"Gana niveles de campaña con el aprendiz equipado (también repetir1-3).
+Montar al mentor no da avances; su dominio se conserva. Ensayo aislado no guarda.
+Aprendizaje, dominio del aprendiz y afinidad suben al ganar. Frontera no cuenta.","Win campaign levels with the learner equipped (replaying1-3 also counts).
+Riding the mentor gives no progress; their mastery stays. Isolated trials do not save.
+Learning, learner mastery and affinity rise on wins. Frontier does not count."
+TRAIN_MISSION,Mentor: %s · Aprendiz montado: %s · Gana el nivel,Mentor: %s · Riding learner: %s · Win the level
+TRAIN_EQUIP_LEARNER,Montar aprendiz,Ride learner
+TRAIN_EQUIPPED,Aprendiz equipado. Guarda la pareja y gana un nivel de campaña.,Learner equipped. Save the pair and win a campaign level.
+TRAIN_MOUNTED,Equipado para jugar: %s · guardar pareja no cambia la montura,Equipped to play: %s · saving a pair does not change your mount
