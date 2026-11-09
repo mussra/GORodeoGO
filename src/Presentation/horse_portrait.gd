@@ -2,10 +2,11 @@ class_name HorsePortrait
 extends RefCounted
 const ART=preload("res://art/portraits/adult_hd.png")
 const MASK=preload("res://art/portraits/adult_hd_mask.png")
+const LIGHT_LEGS=preload("res://art/portraits/adult_light_legs_mask.png")
 const EYES=preload("res://art/portraits/adult_eyes.png")
 const SHADER=preload("res://art/portraits/portrait.gdshader")
 static func material_for(traits:Dictionary,hat:String="original")->ShaderMaterial:
- var m:=ShaderMaterial.new();m.shader=SHADER;m.set_shader_parameter("spot_data",PackedVector4Array(HorseAppearance.spots()));m.set_shader_parameter("spot_count",HorseAppearance.spots().size());m.set_shader_parameter("eye_mask",EYES);m.set_shader_parameter("custom_eyes",traits.has("eyes"));m.set_shader_parameter("eye_color",HorseAppearance.eye_color_at(HorseCollection.eye_index(traits),Vector2(.5,.5)));m.set_shader_parameter("region_mask",MASK)
+ var m:=ShaderMaterial.new();m.shader=SHADER;m.set_shader_parameter("spot_data",PackedVector4Array(HorseAppearance.spots()));m.set_shader_parameter("spot_count",HorseAppearance.spots().size());m.set_shader_parameter("eye_mask",EYES);m.set_shader_parameter("custom_eyes",traits.has("eyes"));m.set_shader_parameter("eye_color",HorseAppearance.eye_color_at(HorseCollection.eye_index(traits),Vector2(.5,.5)));m.set_shader_parameter("region_mask",MASK);m.set_shader_parameter("light_legs_mask",LIGHT_LEGS)
  m.set_shader_parameter("eye_style",HorseCollection.eye_index(traits) if HorseCollection.eye_index(traits)>=20 else 0)
  m.set_shader_parameter("galaxy",traits.get("finish","")=="galaxy")
  m.set_shader_parameter("original_horse",traits.get("finish","normal")=="original")
