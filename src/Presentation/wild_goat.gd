@@ -1,4 +1,5 @@
 extends "res://src/Presentation/wild_pig.gd"
+## Art B (Ant9-Nov): ten-frame cycle, one second, same dimensions/pivot.
 ## Shares lasso target, release, rope and nonblocking Node2D with pigs.
 const IS_GOAT:bool=true
 static var frames_cache:SpriteFrames
@@ -10,8 +11,8 @@ func _ready()->void:
  if frames_cache==null:
   frames_cache=SpriteFrames.new()
   for view in ["right","left","down","up"]:
-   frames_cache.add_animation(view);frames_cache.set_animation_speed(view,12.0)
-   for i in 12:frames_cache.add_frame(view,load("res://art/world/goats/%s/frame_%02d.png"%[view,i]))
+   frames_cache.add_animation(view);frames_cache.set_animation_speed(view,10.0)
+   for i in 10:frames_cache.add_frame(view,load("res://art/world/goats/compare10/%s/frame_%02d.png"%[view,i]))
  goat_art=AnimatedSprite2D.new();goat_art.sprite_frames=frames_cache
  goat_art.centered=false;goat_art.offset=Vector2(-80,-144);goat_art.scale=Vector2.ONE*.40
  goat_art.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
