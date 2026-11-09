@@ -278,7 +278,8 @@ func _update_chunks() -> void:
 				if is_instance_valid(e):
 					e.queue_free()
 			_chunk_entities.erase(key)
-			_herd_horses.erase(key)
+			for horse_key in _herd_horses.keys():
+				if str(horse_key)==str(key) or str(horse_key).begins_with(str(key)+"#"):_herd_horses.erase(horse_key)
 		_occluders.erase(key)  # ojo: scope original (borra cada frame; bug latente, reportado)
 	_drop_far(pc, _chunk_pending)
 	_drop_far(pc, _chunk_built)
@@ -425,10 +426,14 @@ func _advance_builder(b: Dictionary) -> void:
 			if herd.is_empty() or SaveData.world_tamed.has(mission_id):
 				b["phase"] = 5
 				return
-			var traits: Dictionary = herd.get("traits", {})
+			if not b.has("herd_members"):b["herd_members"]=WorldHerd.members(herd,SaveData.world_seed,cx,cy);b["herd_cursor"]=0
+			var members_:Array=b["herd_members"]
+			if int(b["herd_cursor"])>=members_.size():b["phase"]=5;return
+			var member:Dictionary=members_[int(b["herd_cursor"])]
+			var traits: Dictionary = member.get("traits", {})
 			var cache_key := str(traits)
 			if WildHorseArtScript.frame_cache.has(cache_key):
-				b["phase"] = 5
+				b["herd_cursor"] = int(b["herd_cursor"])+1
 				return
 			if b["frame_specs"] == null:
 				var frames := SpriteFrames.new()
@@ -447,7 +452,8 @@ func _advance_builder(b: Dictionary) -> void:
 			frames.add_frame(step[2], HorseAppearance.texture(base, step[0], int(step[1]), traits))
 			if (b["frame_specs"] as Array).is_empty():
 				WildHorseArtScript.frame_cache[cache_key] = frames
-				b["phase"] = 5
+				b["herd_cursor"] = int(b["herd_cursor"])+1
+				b["frame_specs"]=null;b["frames"]=null
 		5:
 			b["done"] = true
 
@@ -474,13 +480,15 @@ func _activate_built(key: String) -> void:
 	var herd: Dictionary = data.get("herd", {})
 	var mission_id: String = WorldMap.herd_mission_id(cx, cy)
 	if not herd.is_empty() and not SaveData.world_tamed.has(mission_id):
-		var horse := WildHorseScript.new()
-		horse.name = "herd"
-		horse.setup(herd)
-		horse.set_meta("c", Vector2i(cx, cy))
-		add_child(horse)
-		entities.append(horse)
-		_herd_horses[key] = horse
+		for member in WorldHerd.members(herd,SaveData.world_seed,cx,cy):
+			if SaveData.world_tamed.has(member.member_id):continue
+			var horse := WildHorseScript.new()
+			horse.name = "herd_"+str(member.member_index)
+			horse.setup(member)
+			horse.set_meta("c", Vector2i(cx, cy))
+			add_child(horse)
+			entities.append(horse)
+			_herd_horses[key+"#"+str(member.member_index)] = horse
 	add_child(b["node"])
 	_chunks[key] = b["node"]
 	_chunk_entities[key] = entities
@@ -502,6 +510,11 @@ func _affinity(horse: Node2D) -> Dictionary:
 	return {"matches": matches, "bonus": WorldTaming.affinity_bonus(matches), "leader": matches == 3 and PackLeader.is_leader(ridden, SaveData.horse_collection)}
 
 func _tick_taming(delta: float) -> void:
+	var alerts:Dictionary={}
+	if player.velocity.length()>WorldTaming.SAFE_SPEED:
+		for other in _herd_horses.values():
+			if is_instance_valid(other) and not other.roped and player.position.distance_to(other.position)<WorldTaming.SPOOK_RANGE:
+				alerts[other.get_meta("c",Vector2i(-999,-999))]=true
 	for key in _herd_horses:
 		var raw = _herd_horses[key]
 		if not is_instance_valid(raw):
@@ -525,6 +538,8 @@ func _tick_taming(delta: float) -> void:
 		else:
 			if aff.leader and float(horse.state.get("progress", 0.0)) < WorldTaming.LEADER_START_PROGRESS and dist < WorldTaming.CALM_RANGE * 1.5:
 				horse.state["progress"] = WorldTaming.LEADER_START_PROGRESS
+			if alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and not aff.leader:
+				horse.state["spook"]=WorldTaming.spook_seconds(aff.matches)
 			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta, aff.bonus, WorldTaming.spook_seconds(aff.matches))
 			if stallion_guard and dist < WorldTaming.STALLION_FLEE_RANGE:
 				if float(st.get("spook", 0.0)) <= 0.0:
@@ -545,7 +560,7 @@ func _tick_taming(delta: float) -> void:
 				horse.approach(player.position, delta)
 			if dist < WorldTaming.CALM_RANGE * 1.5:
 				horse.face_towards(player.position)
-		elif WorldTaming.should_flee(st, dist):
+		elif WorldTaming.should_flee(st, dist) or (alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and float(st.get("spook",0.0))>0 and dist<500):
 			horse.flee_from(player.position, delta)
 			if touching and not horse._touching_rider and horse.touch_grace <= 0.0:
 				player.stun()
@@ -559,12 +574,17 @@ func _deliver_horse(c: Vector2i, horse: Node2D) -> void:
 		_end_lasso()
 	var mission_id: String = WorldMap.herd_mission_id(c.x, c.y)
 	var was_encargo: bool = SaveData.world_missions.get(mission_id, "") == "encargo"
-	SaveData.mark_world_tamed(mission_id)
 	var herd: Dictionary = horse.herd
+	if herd.has("member_id"):
+		SaveData.mark_world_tamed(str(herd.member_id))
+		var base:Dictionary=WorldMap.generate(SaveData.world_seed,c.x,c.y).get("herd",{})
+		if WorldHerd.all_captured(WorldHerd.members(base,SaveData.world_seed,c.x,c.y),SaveData.world_tamed):SaveData.mark_world_tamed(mission_id)
+	else:SaveData.mark_world_tamed(mission_id)
 	var stats: Dictionary = herd.get("stats", {"speed": 265.0, "handling": 950.0, "power": 0.65, "dodge": 0.9}).duplicate()
 	stats["calm"] = clampf(float(herd.get("calm", 1.0)), 0.5, 2.0)
 	var traits: Dictionary = herd.get("traits", {})
 	var h: Dictionary = {"id": "world_%d_%d" % [c.x, c.y], "parents": [], "stage": "adult", "traits": traits, "stats": stats, "can_jump": false, "can_dodge": false}
+	if herd.has("member_index"):h["id"]+="_"+str(herd.member_index)
 	h["name"] = SaveData.horse_collection.suggest_name(traits)
 	SaveData.horse_collection.horses.append(h)
 	WorldMissions.complete(mission_id)
