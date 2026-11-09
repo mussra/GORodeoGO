@@ -90,19 +90,12 @@ func collection_view()->void:
  if scroll_to_newest:
   scroll_to_newest=false
   scroll.set_deferred("scroll_vertical",2147483647)
-func thumbnail(h:Dictionary)->Texture2D:
- var foal:bool=h.get("stage","adult")=="foal"
- var source:Texture2D=load("res://art/foal/base.png" if foal else "res://art/player/walk_diag_down/frame_00.png")
- return HorseAppearance.texture(source,"foal" if foal else "walk_diag_down",0,h.traits)
+func thumbnail(h:Dictionary)->Texture2D:return HorsePicker.thumbnail(h)
 func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
- var pick:=OptionButton.new();pick.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;pick.position=pos;pick.size=Vector2(370,64);pick.add_theme_constant_override("icon_max_width",56);pick.get_popup().add_theme_constant_override("icon_max_width",56);content.add_child(pick)
- for h in SaveData.horse_collection.horses:
-  pick.add_icon_item(thumbnail(h),h.name);pick.set_item_metadata(pick.item_count-1,h.id)
-  pick.set_item_disabled(pick.item_count-1,not SaveData.horse_collection.is_adult(h.id))
-  if h.id==id:pick.select(pick.item_count-1)
- pick.item_selected.connect(func(i:int):
-  if is_a:parent_a=str(pick.get_item_metadata(i))
-  else:parent_b=str(pick.get_item_metadata(i))
+ var horses:Array=SaveData.horse_collection.horses.filter(func(h):return SaveData.horse_collection.is_adult(h.id))
+ HorsePicker.create(content,horses,id,pos,370,func(selected:String):
+  if is_a:parent_a=selected
+  else:parent_b=selected
   refresh())
 func breed_view()->void:
  if SaveData.horse_collection.find(parent_a).is_empty():parent_a=SaveData.horse_collection.selected

@@ -25,33 +25,39 @@ func build()->void:
  if content!=null:canvas.remove_child(content);content.queue_free()
  content=Control.new();canvas.add_child(content)
  MenuNavigation.header(content,tr("TRAIN_TITLE"),queue_free)
- button(tr("TRAIN_JUMP") if skill=="jump" else tr("TRAIN_DODGE"),Vector2(35,90),func():skill="dodge" if skill=="jump" else "jump";mentor="";refresh())
+ button(tr("TRAIN_JUMP") if skill=="jump" else tr("TRAIN_DODGE"),Vector2(35,90),func():skill="dodge" if skill=="jump" else "jump";save_selection();refresh())
  button(tr("TRAIN_EQUIP_LEARNER"),Vector2(655,90),func():note=tr("TRAIN_EQUIPPED") if SaveData.select_horse(learner) else tr("MARKET_FAILED");refresh())
  var c:HorseCollection=SaveData.horse_collection
  label(tr("TRAIN_MENTOR"),Vector2(35,155));label(tr("TRAIN_LEARNER"),Vector2(655,155))
  picker(true,Vector2(35,195));picker(false,Vector2(655,195))
- label(tr("TRAIN_MOUNTED")%c.find(c.selected).get("name","-"),Vector2(35,252),17)
- if not HorseTraining.valid(c,mentor,learner,skill):label(tr("TRAIN_PICK_VALID"),Vector2(35,290),22)
+ HorsePicker.preview(content,c.find(mentor),Vector2(435,110),140)
+ HorsePicker.preview(content,c.find(learner),Vector2(1055,110),140)
+ label(tr("TRAIN_MOUNTED")%c.find(c.selected).get("name","-"),Vector2(35,278),17)
+ if not HorseTraining.valid(c,mentor,learner,skill):label(tr("TRAIN_PICK_VALID"),Vector2(35,315),22)
  if HorseTraining.valid(c,mentor,learner,skill):
   var m:Dictionary=c.find(mentor);var l:Dictionary=c.find(learner);var affinity:float=float(c.affinities.get(HorseTraining.pair_key(mentor,learner),0))
-  label(tr("TRAIN_STATUS")%[m.name,HorseTraining.mastery(m,skill),l.name,HorseTraining.progress(l,skill),HorseTraining.mastery(l,skill),affinity],Vector2(35,282),22)
-  label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else tr("TRAIN_STUDY"),Vector2(35,400),21)
-  button(tr("TRAIN_START"),Vector2(35,455),func():note=tr("TRAIN_SAVED") if SaveData.set_training_pair(mentor,learner,skill) else tr("MARKET_FAILED");refresh())
+  label(tr("TRAIN_STATUS")%[m.name,HorseTraining.mastery(m,skill),l.name,HorseTraining.progress(l,skill),HorseTraining.mastery(l,skill),affinity],Vector2(35,310),22)
+  label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else tr("TRAIN_STUDY"),Vector2(35,420),20)
+
  button(tr("TRAIN_STOP"),Vector2(655,455),func():note=tr("TRAIN_STOPPED") if SaveData.clear_training_pair() else tr("MARKET_FAILED");refresh())
  var active:Dictionary=c.training_pair
  label(tr("TRAIN_ACTIVE")%[c.known_record(str(active.get("mentor",""))).get("name","-"),c.known_record(str(active.get("learner",""))).get("name","-")] if not active.is_empty() else tr("TRAIN_NONE"),Vector2(35,525),21)
  label(tr("TRAIN_RULES"),Vector2(35,570),18);label(note,Vector2(35,650),20)
+func save_selection()->void:
+ var c:HorseCollection=SaveData.horse_collection
+ if not HorseTraining.valid(c,mentor,learner,skill):note=tr("TRAIN_AUTO_INVALID");return
+ if SaveData.set_training_pair(mentor,learner,skill):note=tr("TRAIN_AUTO_SAVED");return
+ var active:Dictionary=c.training_pair
+ if not active.is_empty():mentor=active.mentor;learner=active.learner;skill=active.skill
+ note=tr("MARKET_FAILED")
 func picker(is_mentor:bool,pos:Vector2)->void:
- var pick:=OptionButton.new();pick.position=pos;pick.size=Vector2(540,54);content.add_child(pick)
- for h in SaveData.horse_collection.horses:
-  if not SaveData.horse_collection.is_adult(h.id) or (is_mentor and not HorseTraining.knows(h,skill)):continue
-  pick.add_item(h.name);pick.set_item_metadata(pick.item_count-1,h.id)
-  if (mentor if is_mentor else learner)==h.id:pick.select(pick.item_count-1)
- if pick.item_count>0 and (mentor if is_mentor else learner).is_empty():
-  if is_mentor:mentor=str(pick.get_item_metadata(0))
-  else:learner=str(pick.get_item_metadata(0))
-  refresh()
- pick.item_selected.connect(func(i:int):
-  if is_mentor:mentor=str(pick.get_item_metadata(i))
-  else:learner=str(pick.get_item_metadata(i))
-  refresh())
+ var horses:Array=SaveData.horse_collection.horses.filter(func(h):return SaveData.horse_collection.is_adult(h.id) and (not is_mentor or HorseTraining.knows(h,skill)))
+ var current:String=mentor if is_mentor else learner
+ if not horses.is_empty() and not horses.any(func(h):return h.id==current):
+  if is_mentor:mentor=horses[0].id
+  else:learner=horses[0].id
+  current=horses[0].id
+ HorsePicker.create(content,horses,current,pos,395,func(selected:String):
+  if is_mentor:mentor=selected
+  else:learner=selected
+  save_selection();refresh())

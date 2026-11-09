@@ -949,7 +949,7 @@ msgid "TRAIN_NONE"
 msgstr "Sin pareja activa."
 
 msgid "TRAIN_RULES"
-msgstr "Gana niveles de campaña con el aprendiz equipado (también repetir1-3).\nMontar al mentor no da avances; su dominio se conserva. Ensayo aislado no guarda.\nAprendizaje, dominio del aprendiz y afinidad suben al ganar. Frontera no cuenta."
+msgstr "Gana niveles de campaña con el aprendiz equipado; repetir también cuenta.\nCambios de pareja válidos se guardan solos. Quitar no borra avances.\nMentor sin avances; Frontera y Ensayo aislado no cuentan."
 
 msgid "TRAIN_COMPANION"
 msgstr "Entrena: %s"
@@ -1225,7 +1225,13 @@ msgid "TRAIN_EQUIP_LEARNER"
 msgstr "Montar aprendiz"
 
 msgid "TRAIN_EQUIPPED"
-msgstr "Aprendiz equipado. Guarda la pareja y gana un nivel de campaña."
+msgstr "Aprendiz equipado. Gana un nivel de campaña con la pareja activa."
 
 msgid "TRAIN_MOUNTED"
-msgstr "Equipado para jugar: %s · guardar pareja no cambia la montura"
+msgstr "Equipado: %s · cambiar pareja no cambia montura"
+
+msgid "TRAIN_AUTO_SAVED"
+msgstr "Pareja guardada al cambiar. Avances anteriores conservados."
+
+msgid "TRAIN_AUTO_INVALID"
+msgstr "Selección no válida. La pareja activa anterior no cambia."

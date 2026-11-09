@@ -949,7 +949,7 @@ msgid "TRAIN_NONE"
 msgstr "No active pair."
 
 msgid "TRAIN_RULES"
-msgstr "Win campaign levels with the learner equipped (replaying1-3 also counts).\nRiding the mentor gives no progress; their mastery stays. Isolated trials do not save.\nLearning, learner mastery and affinity rise on wins. Frontier does not count."
+msgstr "Win campaign levels with the learner equipped; replays also count.\nValid pair changes save automatically. Clearing keeps progress.\nNo mentor progress; Frontier and isolated trials do not count."
 
 msgid "TRAIN_COMPANION"
 msgstr "Training: %s"
@@ -1225,7 +1225,13 @@ msgid "TRAIN_EQUIP_LEARNER"
 msgstr "Ride learner"
 
 msgid "TRAIN_EQUIPPED"
-msgstr "Learner equipped. Save the pair and win a campaign level."
+msgstr "Learner equipped. Win a campaign level with the active pair."
 
 msgid "TRAIN_MOUNTED"
-msgstr "Equipped to play: %s · saving a pair does not change your mount"
+msgstr "Equipped: %s · changing pair does not change mount"
+
+msgid "TRAIN_AUTO_SAVED"
+msgstr "Pair saved on change. Earlier progress kept."
+
+msgid "TRAIN_AUTO_INVALID"
+msgstr "Invalid selection. The earlier active pair is unchanged."

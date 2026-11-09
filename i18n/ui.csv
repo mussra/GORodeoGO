@@ -400,12 +400,14 @@ Pair affinity: %.0f/100"
 TRAIN_KNOWN,El aprendiz ya conoce la técnica: sus victorias mejoran su dominio.,The learner knows the skill: their wins improve their mastery.
 TRAIN_STUDY,El aprendiz desbloquea la técnica al llegar a 100. El mentor conserva la suya.,The learner unlocks the skill at 100. The mentor keeps theirs.
 TRAIN_SAVED,Pareja guardada. Monta al aprendiz y gana un nivel.,Pair saved. Ride the learner and win a level.
-TRAIN_RULES,"Gana niveles de campaña con el aprendiz equipado (también repetir1-3).
-Montar al mentor no da avances; su dominio se conserva. Ensayo aislado no guarda.
-Aprendizaje, dominio del aprendiz y afinidad suben al ganar. Frontera no cuenta.","Win campaign levels with the learner equipped (replaying1-3 also counts).
-Riding the mentor gives no progress; their mastery stays. Isolated trials do not save.
-Learning, learner mastery and affinity rise on wins. Frontier does not count."
+TRAIN_RULES,"Gana niveles de campaña con el aprendiz equipado; repetir también cuenta.
+Cambios de pareja válidos se guardan solos. Quitar no borra avances.
+Mentor sin avances; Frontera y Ensayo aislado no cuentan.","Win campaign levels with the learner equipped; replays also count.
+Valid pair changes save automatically. Clearing keeps progress.
+No mentor progress; Frontier and isolated trials do not count."
 TRAIN_MISSION,Mentor: %s · Aprendiz montado: %s · Gana el nivel,Mentor: %s · Riding learner: %s · Win the level
 TRAIN_EQUIP_LEARNER,Montar aprendiz,Ride learner
-TRAIN_EQUIPPED,Aprendiz equipado. Guarda la pareja y gana un nivel de campaña.,Learner equipped. Save the pair and win a campaign level.
-TRAIN_MOUNTED,Equipado para jugar: %s · guardar pareja no cambia la montura,Equipped to play: %s · saving a pair does not change your mount
+TRAIN_EQUIPPED,Aprendiz equipado. Gana un nivel de campaña con la pareja activa.,Learner equipped. Win a campaign level with the active pair.
+TRAIN_MOUNTED,Equipado: %s · cambiar pareja no cambia montura,Equipped: %s · changing pair does not change mount
+TRAIN_AUTO_SAVED,Pareja guardada al cambiar. Avances anteriores conservados.,Pair saved on change. Earlier progress kept.
+TRAIN_AUTO_INVALID,Selección no válida. La pareja activa anterior no cambia.,Invalid selection. The earlier active pair is unchanged.

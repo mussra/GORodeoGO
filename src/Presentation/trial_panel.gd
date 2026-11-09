@@ -3,6 +3,9 @@ var canvas:Control
 var note:Label
 var level_pick:OptionButton
 var picks:Array[OptionButton]=[]
+var preview_view:TextureRect
+var eye_pick:OptionButton
+var finish_pick:OptionButton
 func _ready()->void:
  MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=100
@@ -19,14 +22,17 @@ func _ready()->void:
   var pick:=OptionButton.new();pick.position=Vector2(35+i*395,300);pick.size=Vector2(365,48);canvas.add_child(pick)
   for value in names[i]:pick.add_item(tr(value))
   picks.append(pick)
- var eye_pick:=OptionButton.new();eye_pick.position=Vector2(35,360);eye_pick.size=Vector2(270,48);canvas.add_child(eye_pick)
+ eye_pick=OptionButton.new();eye_pick.position=Vector2(35,360);eye_pick.size=Vector2(270,48);canvas.add_child(eye_pick)
  for value in HorseCollection.EYES:eye_pick.add_item(tr("UI_140")+tr(value))
  eye_pick.selected=10
- var finish_pick:=OptionButton.new();finish_pick.position=Vector2(320,360);finish_pick.size=Vector2(270,48);canvas.add_child(finish_pick);finish_pick.add_item(tr("UI_141"));finish_pick.add_item(tr("UI_142"))
+ finish_pick=OptionButton.new();finish_pick.position=Vector2(320,360);finish_pick.size=Vector2(270,48);canvas.add_child(finish_pick);finish_pick.add_item(tr("UI_141"));finish_pick.add_item(tr("UI_142"))
  button(tr("DEBUG_USE_LOOK"),Vector2(35,420),func():SaveData.preview_trial_traits(picks[0].selected,picks[1].selected,picks[2].selected,eye_pick.selected,"galaxy" if finish_pick.selected==1 else "normal");refresh(),550)
  var whip:=OptionButton.new();whip.position=Vector2(620,365);whip.size=Vector2(600,48);canvas.add_child(whip)
  for id in ["whip_basic","whip_long"]:whip.add_item(tr(EquipmentCatalog.ITEMS[id].name)+tr("UI_144")%EquipmentCatalog.ITEMS[id].reach)
  whip.item_selected.connect(func(i):SaveData.equip_item("whip_basic" if i==0 else "whip_long");refresh())
+ preview_view=HorsePicker.preview(canvas,{},Vector2(1040,0),180)
+ for pick in picks:pick.item_selected.connect(func(_i:int):update_preview())
+ eye_pick.item_selected.connect(func(_i:int):update_preview());finish_pick.item_selected.connect(func(_i:int):update_preview());update_preview()
  note=label("",Vector2(35,475),22);refresh()
  label(tr("UI_145"),Vector2(35,530),21)
  level_pick=OptionButton.new();level_pick.position=Vector2(35,570);level_pick.size=Vector2(270,48);canvas.add_child(level_pick)
@@ -43,3 +49,7 @@ func refresh()->void:
  if note!=null:note.text=tr("UI_149")+SaveData.horse_collection.find(SaveData.horse_collection.selected).name+tr("UI_150")+tr(EquipmentCatalog.ITEMS.get(SaveData.equipment_equipped.get("whip",""),{}).get("name","UI_058"))
 
 func _process(_delta:float)->void:refresh()
+
+func update_preview()->void:
+ if not is_instance_valid(preview_view):return
+ HorsePortrait.apply(preview_view,{"coat":picks[0].selected,"pattern":picks[1].selected,"mane":picks[2].selected,"eyes":eye_pick.selected,"finish":"galaxy" if finish_pick.selected==1 else "normal"},SaveData.hat_color)
