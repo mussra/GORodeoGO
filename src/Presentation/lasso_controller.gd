@@ -22,6 +22,7 @@ signal lasso_released
 signal lasso_thrown(throw_origin: Vector2, landing_point: Vector2)
 signal prey_captured(prey: Node2D)
 signal landing_resolved(landing_point:Vector2,prey:Node2D)
+signal flight_cancelled
 signal throw_blocked
 signal release_requested
 
@@ -162,6 +163,7 @@ func cancel_input() -> void:
 	_cancel_charge()
 
 func cancel_all_actions() -> void:
+	if _lasso_in_flight:flight_cancelled.emit()
 	cancel_input()
 	_flight_generation += 1
 	_lasso_in_flight = false

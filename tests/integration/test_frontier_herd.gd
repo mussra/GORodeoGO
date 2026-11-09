@@ -123,3 +123,18 @@ func test_panic_group_cohesion_and_capture_remain_working()->void:
  var prey:Node2D=w.player.lasso.resolve_capture(horses[0].position)
  assert_eq(prey,horses[0]);assert_true(horses[0].roped)
  var origin:Vector2=horses[0].position;horses[0]._physics_process(.1);assert_eq(horses[0].position,origin)
+
+func test_opening_navigation_during_flight_unfreezes_without_panic()->void:
+ var w:Node2D=world();await wait_process_frames(3)
+ var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
+ var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
+ w.player.position=horses[0].position+Vector2(-100,0)
+ w.player.lasso._release_throw(Vector2(1,0))
+ assert_true(horses[0].flight_hold)
+ w._open_navigation()
+ for horse in horses:
+  assert_false(horse.flight_hold,"cancel flight releases hold even while paused")
+  assert_eq(float(horse.get_meta("panic_left",0.0)),0.0,"cancel does not count as a missed landing")
+ w._close_navigation()
+ await wait_seconds(.4)
+ assert_false(w.player.lasso.is_in_flight())

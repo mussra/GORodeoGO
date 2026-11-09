@@ -552,11 +552,13 @@ func _herd_guides()->Dictionary:
 	return plans
 
 var _flight_horses:Array=[]
-func _on_frontier_lasso_released()->void:
-	# Ant9-Nov: nearby horses cannot dodge a rope while it is still in flight.
+func _clear_flight_hold()->void:
 	for horse in _flight_horses:
 		if is_instance_valid(horse):horse.flight_hold=false
 	_flight_horses.clear()
+func _on_frontier_lasso_released()->void:
+	# Ant9-Nov: nearby horses cannot dodge a rope while it is still in flight.
+	_clear_flight_hold()
 	var affected:Dictionary={}
 	for horse in _herd_horses.values():
 		if is_instance_valid(horse) and not horse.roped and horse.position.distance_to(player.position)<500.0:
@@ -941,6 +943,7 @@ func _build_hud() -> void:
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
 	player.lasso.lasso_released.connect(_on_frontier_lasso_released)
 	player.lasso.landing_resolved.connect(_on_frontier_lasso_landed)
+	player.lasso.flight_cancelled.connect(_clear_flight_hold)
 	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _open_navigation()->void:
