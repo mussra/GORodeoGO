@@ -24,3 +24,17 @@ static func all_captured(members_:Array,captured:Array)->bool:
  for member in members_:
   if not captured.has(member.member_id):return false
  return true
+
+const COHESION_RADIUS:float=280.0
+const REGROUP_RADIUS:float=220.0
+
+## Loose staggered slots behind a guide, never a single-file waypoint chain.
+static func follow_velocity(position:Vector2,guide:Vector2,heading:Vector2,index:int)->Vector2:
+ var forward:Vector2=heading.normalized()
+ var side:=Vector2(-forward.y,forward.x)
+ var rank:int=maxi(0,index)
+ var lateral:float=(-1.0 if rank%2==0 else 1.0)*(48.0+float(rank/2)*30.0)
+ var behind:float=55.0+float(rank/2)*55.0
+ var target:Vector2=guide-forward*behind+side*lateral
+ var correction:Vector2=(target-position)*1.7
+ return (forward*230.0+correction.limit_length(115.0)).limit_length(285.0)

@@ -16,3 +16,11 @@ func test_herd_members_stable_related_but_distinct()->void:
  assert_false(WorldHerd.all_captured(members_,[ids[0]]))
  assert_true(WorldHerd.all_captured(members_,ids))
  assert_true(WorldHerd.members({},1,0,0).is_empty())
+func test_following_slots_share_heading_but_are_not_single_file()->void:
+ var a:Vector2=WorldHerd.follow_velocity(Vector2(-60,-50),Vector2.ZERO,Vector2.RIGHT,0)
+ var b:Vector2=WorldHerd.follow_velocity(Vector2(-60,50),Vector2.ZERO,Vector2.RIGHT,1)
+ assert_gt(a.x,200.0);assert_gt(b.x,200.0)
+ assert_lte(a.length(),285.1);assert_lte(b.length(),285.1)
+ var left:Vector2=WorldHerd.follow_velocity(Vector2.ZERO,Vector2(200,0),Vector2.RIGHT,0)
+ var right:Vector2=WorldHerd.follow_velocity(Vector2.ZERO,Vector2(200,0),Vector2.RIGHT,1)
+ assert_lt(left.y,0.0);assert_gt(right.y,0.0)

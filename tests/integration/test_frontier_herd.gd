@@ -38,3 +38,34 @@ func test_individual_capture_persists_and_old_complete_herds_stay_complete()->vo
  assert_true(SaveData.world_tamed.has(WorldMap.herd_mission_id(c.x,c.y)))
  var ids:Array=[]
  for horse in SaveData.horse_collection.horses:assert_false(ids.has(horse.id));ids.append(horse.id)
+func test_guide_is_stable_and_replaced_when_roped_or_captured()->void:
+ var w:Node2D=world();await wait_process_frames(3)
+ var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":0,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
+ var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
+ var plans:Dictionary=w._herd_guides()
+ for horse in horses:assert_eq(plans[horse].guide,horses[0])
+ horses[0].roped=true
+ plans=w._herd_guides();assert_false(plans.has(horses[0]))
+ for i in range(1,horses.size()):assert_eq(plans[horses[i]].guide,horses[1])
+ horses[1].state.progress=1.0
+ plans=w._herd_guides();assert_false(plans.has(horses[1]));assert_eq(plans[horses[2]].guide,horses[2])
+func test_fleeing_group_stays_within_cohesion_radius()->void:
+ var w:Node2D=world();await wait_process_frames(3)
+ var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":0,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
+ var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
+ for horse in horses:horse.set_physics_process(false)
+ var worst:float=0.0
+ for tick in range(480):
+  w.player.position=horses[0].position+Vector2(-90,15);w.player.velocity=Vector2(200,0)
+  w._tick_taming(1.0/60.0)
+  for horse in horses:horse._physics_process(1.0/60.0)
+  for horse in horses:worst=maxf(worst,horse.position.distance_to(horses[0].position))
+ assert_lte(worst,WorldHerd.COHESION_RADIUS+6.0,"8 second chase stays within280px plus one physics step")
+ var plans:Dictionary=w._herd_guides()
+ var guide:Node2D=plans[horses[0]].guide
+ horses[-1].position=guide.position+Vector2(-400,0)
+ var before:float=horses[-1].position.distance_to(guide.position)
+ for tick in range(60):
+  w.player.position=guide.position+Vector2(-90,0);w.player.velocity=Vector2(200,0);w._tick_taming(1.0/60.0)
+  for horse in horses:horse._physics_process(1.0/60.0)
+ assert_lt(horses[-1].position.distance_to(guide.position),before,"straggler regroups without teleport")

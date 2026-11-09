@@ -509,7 +509,42 @@ func _affinity(horse: Node2D) -> Dictionary:
 	var matches: int = WorldTaming.affinity_matches(ridden.get("traits", {}), horse.herd.get("traits", {}))
 	return {"matches": matches, "bonus": WorldTaming.affinity_bonus(matches), "leader": matches == 3 and PackLeader.is_leader(ridden, SaveData.horse_collection)}
 
+## A guide is a movement role, distinct from the ridden horse's PackLeader skill.
+func _herd_guides()->Dictionary:
+	var groups:Dictionary={}
+	for horse in _herd_horses.values():
+		if not is_instance_valid(horse) or horse.is_queued_for_deletion() or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
+		var c:Vector2i=horse.get_meta("c",Vector2i(-999,-999))
+		if not groups.has(c):groups[c]=[]
+		groups[c].append(horse)
+	var plans:Dictionary={}
+	for c in groups:
+		var group:Array=groups[c]
+		group.sort_custom(func(a,b):return int(a.herd.get("member_index",0))<int(b.herd.get("member_index",0)))
+		var guide:Node2D=group[0]
+		var away:Vector2=(guide.position-player.position).normalized()
+		if away.length_squared()<.1:away=Vector2.RIGHT
+		# Curve back before the inherited home leash, rather than freeze at its edge.
+		if guide.position.distance_to(guide.home)>430.0:
+			away=(away+(guide.home-guide.position).normalized()*2.5).normalized()
+		var regroup:bool=false
+		for member in group:
+			if member.position.distance_to(guide.position)>WorldHerd.REGROUP_RADIUS:regroup=true
+		var heading:Vector2=guide.get_meta("herd_heading",away)
+		heading=heading.lerp(away,.08).normalized();guide.set_meta("herd_heading",heading)
+		for i in group.size():
+			var horse:Node2D=group[i]
+			var velocity:Vector2=heading*(140.0 if regroup else 230.0) if i==0 else WorldHerd.follow_velocity(horse.position,guide.position,heading,i-1)
+			# Short-range separation within this small group only, no world scan.
+			for other in group:
+				if other==horse:continue
+				var gap:Vector2=horse.position-other.position
+				if gap.length_squared()>1 and gap.length_squared()<2500:velocity+=gap.normalized()*(50-gap.length())*1.5
+			plans[horse]={"guide":guide,"velocity":velocity.limit_length(290.0)}
+	return plans
+
 func _tick_taming(delta: float) -> void:
+	var escape:Dictionary=_herd_guides()
 	var alerts:Dictionary={}
 	if player.velocity.length()>WorldTaming.SAFE_SPEED:
 		for other in _herd_horses.values():
@@ -520,6 +555,7 @@ func _tick_taming(delta: float) -> void:
 		if not is_instance_valid(raw):
 			continue
 		var horse: Node2D = raw
+		horse.herd_guide=null
 		var dist: float = player.position.distance_to(horse.position)
 		if dist > 700.0:
 			continue
@@ -561,7 +597,9 @@ func _tick_taming(delta: float) -> void:
 			if dist < WorldTaming.CALM_RANGE * 1.5:
 				horse.face_towards(player.position)
 		elif WorldTaming.should_flee(st, dist) or (alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and float(st.get("spook",0.0))>0 and dist<500):
-			horse.flee_from(player.position, delta)
+			if escape.has(horse):
+				horse.herd_guide=escape[horse].guide;horse.flee_velocity(escape[horse].velocity)
+			else:horse.flee_from(player.position, delta)
 			if touching and not horse._touching_rider and horse.touch_grace <= 0.0:
 				player.stun()
 				_release_held_horse()

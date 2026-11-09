@@ -44,6 +44,7 @@ var pack_leader_near: bool = false
 ## Jugador cercano para el indicador de afinidad (lo pone frontier_world).
 var player_ref: Node2D = null
 var _touching_rider: bool = false
+var herd_guide:Node2D
 var _art: Node2D
 var _bob: float = 0.0
 var _graze_timer: float = 0.0
@@ -90,6 +91,13 @@ func _physics_process(delta: float) -> void:
 		return
 	if _flee.length() > 0.0:
 		var target: Vector2 = position + _flee * delta
+		if is_instance_valid(herd_guide) and herd_guide!=self and not herd_guide.roped:
+			var gap:Vector2=target-herd_guide.position
+			if gap.length()>WorldHerd.COHESION_RADIUS:
+				if position.distance_to(herd_guide.position)>WorldHerd.COHESION_RADIUS:
+					target=position.move_toward(herd_guide.position,285.0*delta)
+				else:target=herd_guide.position+gap.normalized()*WorldHerd.COHESION_RADIUS
+			_flee=(target-position)/maxf(delta,.001)
 		if home.distance_to(target) < WorldTaming.FLEE_LEASH:
 			velocity = _flee
 		else:
@@ -193,6 +201,12 @@ func approach(point: Vector2, delta: float) -> void:
 	_art.flip_h = to.x < 0.0
 	_art.grazing = false
 	_art.set_walk_direction(to)
+
+func flee_velocity(step:Vector2)->void:
+	_flee=step
+	_art.flip_h=step.x<0.0
+	_art.grazing=false
+	_art.set_walk_direction(step)
 
 func flee_from(from: Vector2, _delta: float) -> void:
 	var away: Vector2 = position - from
