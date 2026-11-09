@@ -2,7 +2,7 @@ class_name HorseMarket
 extends RefCounted
 ## Design tiers, not measured occurrence probabilities. No changes to breeding.
 const COAT_SCORES=[0,0,1,1,1,1,2,2,2,1,0,0,1,1,2,2,2,2,1,2]
-const PATTERN_SCORES=[0,0,1,1,1,2,2,2,2,2]
+const PATTERN_SCORES=[0,0,1,1,1,2,2,2,2,2,2,2]
 const BUY_PRICES=[250,600,1400,3200,7000]
 const SELL_PERCENT=40
 static func tier(h:Dictionary)->int:

@@ -2,10 +2,12 @@ class_name HorseCollection
 extends RefCounted
 ## Isolated trial collection. Provisional stats; no economy, sex or parent consumption.
 const COATS=["Negro","Blanco","Dorado","Azul","Verde","Rojo","Violeta","Turquesa","Rosa","Naranja","Castaño","Gris","Crema","Cobre","Lima","Marino","Lavanda","Coral","Celeste","Ciruela"]
-const PATTERNS=["Liso","Parches","Moteado","Trasera blanca","Patas claras","Corazones","Estrellas","Triángulos","Rombos","Cebra"]
+const PATTERNS=["Liso","Parches","Moteado","Trasera blanca","Patas claras","Corazones","Estrellas","Triángulos","Rombos","Cebra","Jirafa","Vaca"]
 const MANES=["Negra","Blanca","Dorada","Azul","Roja","Arcoíris"]
 const RARITIES=["Común","Poco frecuente","Raro","Ultra raro","Legendario"]
 const EYES=COATS+["Arcoíris","Galaxy"]
+static func spots_index(t:Dictionary)->int:return int(t.get("spots",-1))
+static func legs_index(t:Dictionary)->int:return int(t.get("legs",-1))
 static func eye_index(t:Dictionary)->int:return int(t.get("eyes",10))
 var horses:Array[Dictionary]=[]
 var ancestors:Array[Dictionary]=[]
@@ -46,15 +48,18 @@ func valid_traits(v:Variant)->bool:
  for k in ["coat","pattern","mane"]:
   if typeof(v.get(k))!=TYPE_INT:return false
  if v.has("emblem") and not HorseEmblem.valid(v.emblem):return false
+ if v.has("spots") and (typeof(v.spots)!=TYPE_INT or v.spots< -1 or v.spots>=COATS.size()):return false
+ if v.has("legs") and (typeof(v.legs)!=TYPE_INT or v.legs< -1 or v.legs>=COATS.size()):return false
  if v.has("eyes") and (typeof(v.eyes)!=TYPE_INT or v.eyes<0 or v.eyes>=EYES.size()):return false
  return v.coat>=0 and v.coat<20 and v.pattern>=0 and v.pattern<PATTERNS.size() and v.mane>=0 and v.mane<6 and v.get("finish","normal") in ["normal","original","galaxy"]
 func preview(a:String,b:String,choices:Dictionary)->Dictionary:
  if a==b or find(a).is_empty() or find(b).is_empty() or not is_adult(a) or not is_adult(b):return {}
  var inherited_finish:String=str(find(b if choices.get("finish",0)==1 else a).traits.get("finish","normal"))
  var t:Dictionary={"finish":"galaxy" if inherited_finish=="galaxy" else "normal"}
- for k in ["coat","pattern","mane","eyes"]:
+ for k in ["coat","pattern","mane","eyes","legs","spots"]:
   var source:String=b if choices.get(k,0)==1 else a
-  t[k]=eye_index(find(source).traits) if k=="eyes" else find(source).traits[k]
+  if k in ["legs","spots"] and not find(source).traits.has(k):continue
+  t[k]=spots_index(find(source).traits) if k=="spots" else (legs_index(find(source).traits) if k=="legs" else (eye_index(find(source).traits) if k=="eyes" else find(source).traits[k]))
  return t
 func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
@@ -126,7 +131,7 @@ func mature_trial(id:String)->bool:
 
 ## Suggested names do not overwrite saved names, including player-authored names.
 func suggest_name(traits:Dictionary)->String:
- var base:String=COATS[int(traits.coat)]+" "+["liso","manchado","moteado","de trasera blanca","de patas claras","con corazones","con estrellas","con triángulos","con rombos","cebra"][int(traits.pattern)]
+ var base:String=COATS[int(traits.coat)]+" "+["liso","manchado","moteado","de trasera blanca","de patas claras","con corazones","con estrellas","con triángulos","con rombos","cebra","jirafa","vaca"][int(traits.pattern)]
  var candidate:String=base;var suffix:int=2
  var names:Array=[]
  for h in horses:names.append(str(h.name).to_lower())

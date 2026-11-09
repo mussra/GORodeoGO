@@ -6,7 +6,7 @@ var message:String=""
 var page:String="collection"
 var parent_a:String="original"
 var parent_b:String="original"
-var choices:Dictionary={"coat":0,"pattern":0,"mane":0,"eyes":0,"finish":0}
+var choices:Dictionary={"coat":0,"pattern":0,"mane":0,"eyes":0,"legs":0,"spots":0,"finish":0}
 var focus_id:String="original"
 var focus_preview:Dictionary={}
 var atlas_page:int=0
@@ -109,17 +109,17 @@ func breed_view()->void:
  sprite(SaveData.horse_collection.find(parent_a),Vector2(110,330),105)
  sprite(SaveData.horse_collection.find(parent_b),Vector2(1045,330),105)
  label(tr("UI_089"),Vector2(420,222),18)
- var labels={"coat":tr("UI_129"),"pattern":tr("UI_130"),"mane":tr("UI_090"),"eyes":tr("UI_131")};var n:int=0
- for k in ["coat","pattern","mane","eyes"]:
-  label(labels[k],Vector2(420,256+n*50),20)
-  button("A" if choices[k]==0 else "B",Vector2(670,244+n*50),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
+ var labels={"coat":tr("UI_129"),"pattern":tr("UI_130"),"mane":tr("UI_090"),"eyes":tr("UI_131"),"legs":"Patas bajas","spots":"Color manchas"};var n:int=0
+ for k in ["coat","pattern","mane","eyes","legs","spots"]:
+  label(labels[k],Vector2(420,256+n*44),20)
+  button("A" if choices[k]==0 else "B",Vector2(670,244+n*44),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
  label(tr("UI_091"),Vector2(850,510),20)
  var finish_source:String=parent_b if choices.get("finish",0)==1 else parent_a
  var finish_value:String=SaveData.horse_collection.find(finish_source).traits.get("finish","normal")
  button(("B" if choices.get("finish",0)==1 else "A")+" · "+("Galaxy" if finish_value=="galaxy" else "Normal"),Vector2(840,545),func():choices["finish"]=1-int(choices.get("finish",0));refresh(),340)
  var t:Dictionary=SaveData.horse_collection.preview(parent_a,parent_b,choices)
  if not t.is_empty():
-  sprite({"traits":t,"stage":"foal"},Vector2(505,365),200)
+  sprite({"traits":t,"stage":"foal"},Vector2(740,305),170)
   button(tr("UI_092"),Vector2(440,570),func():
    var h:Dictionary=SaveData.breed_horses(parent_a,parent_b,choices)
    message=(tr("BIRTH_NEED_WIN") if not SaveData.debug_mode and not SaveData.trial_session_active and SaveData.horse_collection.birth_credits<=0 else tr("UI_093")) if h.is_empty() else tr("UI_094")%h.name
@@ -152,13 +152,29 @@ func detail_view()->void:
   var equip:=button(tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_111"),Vector2(40,555),func():
    message=tr("UI_112") if SaveData.select_horse(h.id) else tr("UI_086");refresh(),360)
   equip.disabled=SaveData.horse_collection.selected==h.id
- label(tr("UI_102")+tr(HorseCollection.COATS[h.traits.coat])+tr("UI_103")+tr(HorseCollection.PATTERNS[h.traits.pattern])+tr("UI_113")+tr(HorseCollection.MANES[h.traits.mane]),Vector2(420,225),24)
+ label(tr(HorseCollection.COATS[h.traits.coat])+" · "+tr(HorseCollection.PATTERNS[h.traits.pattern])+" · "+tr(HorseCollection.MANES[h.traits.mane]),Vector2(420,225),22)
+ var pattern_picker:=OptionButton.new();pattern_picker.position=Vector2(420,280);pattern_picker.size=Vector2(250,44)
+ for pattern_name in HorseCollection.PATTERNS:pattern_picker.add_item(tr(pattern_name))
+ pattern_picker.select(int(h.traits.pattern));content.add_child(pattern_picker)
+ pattern_picker.item_selected.connect(func(i:int):SaveData.set_horse_pattern_color(h.id,"pattern",i);refresh())
+ var spot_picker:=OptionButton.new();spot_picker.position=Vector2(690,280);spot_picker.size=Vector2(250,44);spot_picker.add_item("Manchas: original")
+ var coat_picker:=OptionButton.new();coat_picker.position=Vector2(960,280);coat_picker.size=Vector2(270,44)
+ for color_name in HorseCollection.COATS:
+  spot_picker.add_item("Manchas: "+tr(color_name));coat_picker.add_item("Pelaje: "+tr(color_name))
+ spot_picker.select(HorseCollection.spots_index(h.traits)+1);coat_picker.select(int(h.traits.coat));content.add_child(spot_picker);content.add_child(coat_picker)
+ spot_picker.item_selected.connect(func(i:int):SaveData.set_horse_pattern_color(h.id,"spots",i-1);refresh())
+ coat_picker.item_selected.connect(func(i:int):SaveData.set_horse_pattern_color(h.id,"coat",i);refresh())
+ var leg_picker:=OptionButton.new();leg_picker.position=Vector2(950,350);leg_picker.size=Vector2(280,48);leg_picker.add_item("Patas: original")
+ for color_name in HorseCollection.COATS:leg_picker.add_item("Patas: "+tr(color_name))
+ leg_picker.select(HorseCollection.legs_index(h.traits)+1);content.add_child(leg_picker)
+ leg_picker.item_selected.connect(func(i:int):message="Color de patas guardado" if SaveData.set_horse_legs(h.id,i-1) else "No se pudo guardar";refresh())
+ button("Mustang",Vector2(950,415),func():message="Pardo con patas oscuras" if SaveData.set_horse_legs(h.id,0,true) else "No se pudo guardar";refresh(),200)
  button(tr("EMBLEM_TITLE"),Vector2(420,505),func():
   var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor),360).disabled=not SaveData.horse_collection.is_adult(h.id)
- var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(1120,225);badge.size=Vector2(64,56);content.add_child(badge)
- var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.position=Vector2(1120,290);dodge_badge.size=Vector2(64,56);content.add_child(dodge_badge)
+ var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(1175,195);badge.size=Vector2(64,56);content.add_child(badge)
+ var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.position=Vector2(1095,195);dodge_badge.size=Vector2(64,56);content.add_child(dodge_badge)
  var st:Dictionary=HorseStats.read(h)
- label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,335),18)
+ label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(420,335),16)
  if not SaveData.horse_collection.is_adult(h.id):
   label(tr("UI_115"),Vector2(790,512),16)
   button(tr("UI_116"),Vector2(40,555),func():

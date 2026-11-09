@@ -20,7 +20,7 @@ func test_no_filters_returns_everything() -> void:
 func test_filter_by_coat_and_pattern() -> void:
 	var e: Array[Dictionary] = _entries()
 	var rojos: Array[Dictionary] = HorseFilters.apply(e, {"coat": 5})
-	assert_eq(rojos.size(), 10 * 6, "todos los rojos (20x10x6 -> 60)")
+	assert_eq(rojos.size(), HorseCollection.PATTERNS.size() * 6, "todos los rojos por patrón y crin")
 	for entry in rojos:
 		assert_eq(entry.horse.traits.coat, 5)
 	var rayados: Array[Dictionary] = HorseFilters.apply(e, {"pattern": 9})

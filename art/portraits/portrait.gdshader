@@ -9,6 +9,9 @@ uniform int eye_style = 0;
 uniform bool galaxy = false;
 uniform sampler2D region_mask: filter_linear;
 uniform sampler2D light_legs_mask: filter_linear;
+uniform sampler2D lower_legs_mask: filter_linear;
+uniform bool custom_legs=false;
+uniform vec4 legs_color: source_color=vec4(1.);
 uniform vec4 coat_color: source_color = vec4(.6,.3,.1,1);
 uniform vec4 mane_color: source_color = vec4(1,.95,.8,1);
 uniform vec4 hat_color: source_color = vec4(.2,.3,.45,1);
@@ -16,6 +19,10 @@ uniform bool original_horse = true;
 uniform bool original_hat = true;
 uniform bool rainbow = false;
 uniform int pattern = 0;
+uniform sampler2D cow_map: repeat_enable, filter_nearest;
+uniform sampler2D giraffe_map: repeat_enable, filter_nearest;
+uniform sampler2D zebra_map: repeat_enable, filter_nearest;
+uniform vec4 spot_color: source_color=vec4(.96,.93,.85,1.);
 vec3 soft_rainbow(float t) {
  vec3 a=vec3(.925,.376,.424);vec3 b=vec3(.937,.722,.365);vec3 c=vec3(.910,.847,.455);vec3 d=vec3(.467,.784,.533);vec3 e=vec3(.416,.663,.855);vec3 f=vec3(.600,.502,.784);
  float u=clamp(t,0.,.999)*6.;float k=smoothstep(0.,1.,fract(u));
@@ -48,7 +55,9 @@ float shape_cover(vec2 q,int shape){
  return 0.;
 }
 float genetic_pattern(vec2 p,int shape){
- if(shape==9){float wave=p.x*.95+sin(p.y*.16)*1.35+sin(p.y*.37+p.x*.055)*.55;return smoothstep(.57,.67,sin(wave));}
+ if(shape==11)return texture(cow_map,p/96.).r;
+ if(shape==10)return texture(giraffe_map,p/96.).r;
+ if(shape==9)return texture(zebra_map,p/96.).r;
  float cover=0.;
  for(int i=0;i<128;i++){if(i>=spot_count)break;vec4 spot=spot_data[i];vec2 q=p-spot.xy;float cs=cos(spot.w),sn=sin(spot.w);q=mat2(vec2(cs,-sn),vec2(sn,cs))*q/spot.z;if(dot(q,q)>3.5)continue;cover=max(cover,shape_cover(q,shape));}
  return cover;
@@ -74,10 +83,10 @@ void fragment(){
   vec3 c=coat_color.rgb;
   vec2 p=UV*vec2(800.,840.)+vec2(240.,0.);
   bool mark=(pattern==1 && (distance(p,vec2(465.,550.))<45. || distance(p,vec2(850.,570.))<42.)) || (pattern==2 && fract(p.x/65.)<.35 && fract(p.y/70.)<.35) || (pattern==3 && p.x<520. && p.y>410.);
-  if(pattern==2)c=mix(c,vec3(.96,.93,.85),natural_spots(p*.12));
-  else if(pattern>=5)c=mix(c,vec3(.96,.93,.85),genetic_pattern(p*.12,pattern));
+  if(pattern==2)c=mix(c,spot_color.rgb,natural_spots(p*.12));
+  else if(pattern>=5)c=mix(c,spot_color.rgb,genetic_pattern(p*.12,pattern));
   else if(pattern==4)c=mix(c,vec3(.96,.93,.85),texture(light_legs_mask,UV).r);
-  else if(mark)c=vec3(.96,.93,.85);
+  else if(mark)c=spot_color.rgb;
   if(galaxy)c=galaxy_color(p*.12);
   float coat_shade=shade;
   if(pattern==4)coat_shade=mix(shade,min(shade+.12,1.2),texture(light_legs_mask,UV).r);
@@ -85,6 +94,11 @@ void fragment(){
   vec3 mane=rainbow?soft_rainbow(p.x<540.?(p.y-300.)/340.:(p.y-80.)/275.):mane_color.rgb;
   if(galaxy)mane=galaxy_color(p*.12);
   col=mix(col,mane*shade,m.g);
+ }
+ if(custom_legs){
+  float coverage=texture(lower_legs_mask,UV).r;
+  if(pattern==4)coverage=max(coverage,step(.01,texture(light_legs_mask,UV).r));
+  col=mix(col,legs_color.rgb*shade,coverage);
  }
  if(!original_hat)col=mix(col,hat_color.rgb*shade,m.b);
  if(custom_eyes){vec3 eye=eye_color.rgb;if(eye_style>=20)eye=special_eye(vec2((UV.x*936.-748.)/118.,(UV.y*983.-244.)/25.));col=mix(col,eye*clamp(max(src.r,max(src.g,src.b))/.65,.15,1.15),texture(eye_mask,UV).r);}

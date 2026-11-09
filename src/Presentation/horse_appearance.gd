@@ -71,9 +71,7 @@ static func shape_point(q:Vector2,pattern:int)->bool:
  if pattern==8:return absf(q.x)*.8+absf(q.y)<1.12
  return absf(q.x)<1.0 and absf(q.y)<.85
 static func genetic_mark(p:Vector2,pattern:int)->bool:
- if pattern==9:
-  var wave:float=p.x*.95+sin(p.y*.16)*1.35+sin(p.y*.37+p.x*.055)*.55
-  return sin(wave)>.62
+ if pattern in [9,10,11]:return HorsePatternMap.coverage(p,pattern)>.5
  for item in spots():
   var q:Vector2=(p-Vector2(item.x,item.y)).rotated(item.w)/item.z
   if q.length_squared()>3.5:continue
@@ -100,7 +98,7 @@ static func eye_color_at(index:int,p:Vector2)->Color:
   if p.distance_to(star)<.022:return Color("f4f7ff")
  return color
 static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Texture2D:
- if t.get("finish","")=="original" and not t.has("emblem"):return source
+ if t.get("finish","")=="original" and not t.has("emblem") and HorseCollection.legs_index(t)<0:return source
  var key:String=source.resource_path+str(t)
  if cache.has(key):return cache[key]
  var path:String="res://art/horse_masks/%s/frame_%02d.png"%[anim,frame]
@@ -147,16 +145,36 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
      2:mark=natural_spot(Vector2(px,py))
      3:mark=px<40 and py>48 and py<78
      4:mark=py>77
-     5,6,7,8,9:mark=genetic_mark(Vector2(px,py),int(t.pattern))
+     5,6,7,8,9,10,11:mark=genetic_mark(Vector2(px,py),int(t.pattern))
     if anim=="foal" and int(t.pattern)==1:
      var dist:float=minf((Vector2(px,py)-Vector2(30,60)).length()-8.0,(Vector2(px,py)-Vector2(58,68)).length()-6.0)
      color=color.lerp(Color("f4edd8"),1.0-smoothstep(-.9,.9,dist))
-    elif mark:color=Color("f4edd8")
+    elif int(t.pattern) in [9,10,11]:color=color.lerp(HorsePatternMap.color(t),HorsePatternMap.coverage(Vector2(px,py),int(t.pattern)))
+    elif mark:color=HorsePatternMap.color(t)
    if t.get("finish","")=="galaxy":color=galaxy_color(Vector2(float(x)*96.0/image.get_width(),float(y-bob)*96.0/image.get_height()))
    if anim=="foal":
     shade=clampf(maxf(old.r,maxf(old.g,old.b))*(1.0 if m.g>m.r else 1.10),0.12,1.0)
    var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
    image.set_pixel(x,y,old.lerp(tinted,maxf(m.r,m.g)) if anim=="foal" else tinted)
+ # Shared for levels, open world, riderless horses and foals. No per-frame work.
+ if HorseCollection.legs_index(t)>=0:
+  var leg_path:String="res://art/lower_legs_masks/%s/frame_%02d.png"%[anim,frame]
+  if anim=="stunned":leg_path="res://art/lower_legs_masks/stunned/frame_0.png"
+  if ResourceLoader.exists(leg_path):
+   var leg_mask:Image=load(leg_path).get_image()
+   if leg_mask.is_compressed():leg_mask.decompress()
+   var original:Image=source.get_image()
+   if original.is_compressed():original.decompress()
+   var leg_color:=Color(COLORS[HorseCollection.legs_index(t)])
+   for ly in image.get_height():
+    for lx in image.get_width():
+     var coverage:float=leg_mask.get_pixel(lx,ly).r
+     if int(t.pattern)==4 and ly-bob>77 and mask.get_pixel(lx,ly).r>.5:coverage=1.0
+     if coverage<.01:continue
+     var old:Color=original.get_pixel(lx,ly)
+     var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))/.83,.16,1.18)
+     var colored:=Color(leg_color.r*shade,leg_color.g*shade,leg_color.b*shade,old.a)
+     image.set_pixel(lx,ly,image.get_pixel(lx,ly).lerp(colored,coverage))
  if cache.size()>600:cache.clear()
  if anim=="foal" and t.has("eyes"):
   var eye_mask:Image=FOAL_EYES.get_image()

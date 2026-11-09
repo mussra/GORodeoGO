@@ -364,6 +364,28 @@ func clear_training_pair()->bool:
 	if save_progress():return true
 	horse_collection.training_pair=before;return false
 
+func set_horse_pattern_color(id:String,key:String,value:int)->bool:
+	if key not in ["pattern","spots","coat"]:return false
+	var horse:Dictionary=horse_collection.find(id)
+	if horse.is_empty():return false
+	var traits:Dictionary=horse.traits.duplicate(true);traits[key]=value
+	if traits.get("finish","")=="original":traits["finish"]="normal"
+	if not horse_collection.valid_traits(traits):return false
+	var before:Dictionary=horse_collection.export_state();horse.traits=traits
+	if save_progress():return true
+	horse_collection.restore(before);return false
+
+func set_horse_legs(id:String,color:int,mustang:bool=false)->bool:
+	var horse:Dictionary=horse_collection.find(id)
+	if horse.is_empty() or color< -1 or color>=HorseCollection.COATS.size():return false
+	var before:Dictionary=horse_collection.export_state()
+	if color<0:horse.traits.erase("legs")
+	else:horse.traits["legs"]=color
+	if mustang:
+		horse.traits["coat"]=10;horse.traits["mane"]=0;horse.traits["pattern"]=0;horse.traits["finish"]="normal"
+	if save_progress():return true
+	horse_collection.restore(before);return false
+
 func set_horse_emblem(id:String,config:Dictionary)->bool:
 	var horse:Dictionary=horse_collection.find(id)
 	if horse.is_empty() or (not config.is_empty() and not HorseEmblem.valid(config)):return false

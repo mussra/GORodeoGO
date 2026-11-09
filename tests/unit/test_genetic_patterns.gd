@@ -1,7 +1,7 @@
 extends GutTest
 func test_new_pattern_ids_append_and_breed()->void:
  assert_eq(HorseCollection.PATTERNS.slice(0,5),["Liso","Parches","Moteado","Trasera blanca","Patas claras"])
- assert_eq(HorseCollection.PATTERNS.size(),10)
+ assert_eq(HorseCollection.PATTERNS.size(),12)
  for pattern in range(5,10):
   var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents()
   c.find("trial_a").traits.pattern=pattern
