@@ -1,5 +1,5 @@
 extends GutTest
-## Lead the target during the short Frontera flight: release now triggers panic.
+## Frontera freezes affected herd during flight; resolve first, panic only on miss.
 ## Lasso on fleeing wild horses (Ant 7-nov-2026 16:20): a landed rope holds the
 ## horse, and from there the corral post-capture flow applies (Ant 7-nov-2026
 ## 20:02-20:06, "el lazo después de cazar igual"): the animal follows the rider
@@ -37,7 +37,7 @@ func _plant_horse(world: Node2D, pos: Vector2, key: Vector2i = Vector2i(99, 99))
 	return horse
 
 func _rope_horse(world: Node2D) -> void:
-	world.player.lasso._release_throw(Vector2(1, 0))
+	world.player.lasso._release_throw(Vector2(90.0/220.0, 0))
 	assert_true(world.player.lasso._lasso_in_flight, "rope in flight after the throw")
 
 func test_lasso_holds_horse_in_place_then_captures() -> void:

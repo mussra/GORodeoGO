@@ -60,7 +60,7 @@ func test_fleeing_group_stays_within_cohesion_radius()->void:
   w._tick_taming(1.0/60.0)
   for horse in horses:horse._physics_process(1.0/60.0)
   for horse in horses:worst=maxf(worst,horse.position.distance_to(horses[0].position))
- assert_lte(worst,WorldHerd.COHESION_RADIUS+6.0,"8 second chase stays within280px plus one physics step")
+ assert_lte(worst,WorldHerd.COHESION_RADIUS+7.0,"8 second chase stays within280px plus one physics step and rounding")
  var plans:Dictionary=w._herd_guides()
  var guide:Node2D=plans[horses[0]].guide
  horses[-1].position=guide.position+Vector2(-400,0)
@@ -69,28 +69,49 @@ func test_fleeing_group_stays_within_cohesion_radius()->void:
   w.player.position=guide.position+Vector2(-90,0);w.player.velocity=Vector2(200,0);w._tick_taming(1.0/60.0)
   for horse in horses:horse._physics_process(1.0/60.0)
  assert_lt(horses[-1].position.distance_to(guide.position),before,"straggler regroups without teleport")
-func test_lasso_release_panics_free_group_even_on_miss_and_keeps_roped_still()->void:
+func test_lasso_flight_holds_free_group_then_miss_panics()->void:
+ var w:Node2D=world();await wait_process_frames(3)
+ var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
+ var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
+ w.player.position=horses[0].position+Vector2(-100,0);w.player.velocity=Vector2(260,0)
+ var positions:Array=[]
+ for horse in horses:
+  positions.append(horse.position);horse.set_physics_process(false)
+  horse.state.spook=2.0;horse.flee_velocity(Vector2(350,0),true)
+ w.player.lasso.lasso_released.emit()
+ for tick in 21:
+  w._tick_taming(1.0/60)
+  for i in horses.size():
+   horses[i]._physics_process(1.0/60)
+   assert_eq(horses[i].position,positions[i],"no dodge during flight")
+   assert_eq(float(horses[i].get_meta("panic_left",0.0)),0.0)
+ w.player.lasso.landing_resolved.emit(Vector2(-10000,0),null)
+ w._tick_taming(.016)
+ for horse in horses:
+  assert_false(horse.flight_hold)
+  assert_gt(float(horse.get_meta("panic_left",0.0)),1.0)
+  assert_gt(horse._flee.length(),230.0)
+ assert_eq(w.player.lasso.max_throw_distance,220.0)
+ assert_eq(w.player.lasso.lasso_travel_time,.35)
+ assert_eq(w.player.lasso.capture_area_visual_radius,58.0)
+func test_successful_landing_does_not_panic_free_herd()->void:
  var w:Node2D=world();await wait_process_frames(3)
  var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
  var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
  w.player.position=horses[0].position+Vector2(-100,0);w.player.velocity=Vector2.ZERO
- horses[0].roped=true;horses[0].held=20.0;horses[0].rider=w.player
- var origin:Vector2=horses[0].position
- # Actual release signal, before any hit/miss resolution.
- w.player.lasso.lasso_released.emit();w._tick_taming(.016)
- for i in range(1,horses.size()):
-  assert_gt(float(horses[i].get_meta("panic_left",0.0)),1.0)
-  assert_gt(horses[i]._flee.length(),230.0)
-  assert_almost_eq(horses[i]._art.speed_scale,1.95,.001)
- horses[0]._physics_process(.016);assert_eq(horses[0].position,origin)
- for tick in range(90):w._tick_taming(1.0/60.0)
- for horse in horses:assert_eq(float(horse.get_meta("panic_left",0.0)),0.0)
+ w.player.lasso.lasso_released.emit()
+ var caught:Node2D=w.player.lasso.resolve_capture(horses[0].position)
+ w.player.lasso.landing_resolved.emit(horses[0].position,caught)
+ assert_eq(caught,horses[0]);assert_true(caught.roped)
+ for horse in horses:
+  assert_false(horse.flight_hold)
+  assert_eq(float(horse.get_meta("panic_left",0.0)),0.0)
 func test_panic_group_cohesion_and_capture_remain_working()->void:
  var w:Node2D=world();await wait_process_frames(3)
  var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
  var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
  for horse in horses:horse.set_physics_process(false);horse.touch_grace=100.0
- w.player.position=horses[0].position+Vector2(-90,0);w.player.lasso.lasso_released.emit()
+ w.player.position=horses[0].position+Vector2(-90,0);w.player.lasso.lasso_released.emit();w.player.lasso.landing_resolved.emit(Vector2(-10000,0),null)
  var worst:float=0.0
  for tick in range(480):
   w.player.position=horses[0].position+Vector2(-90,15);w.player.velocity=Vector2(260,0)

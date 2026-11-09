@@ -551,20 +551,34 @@ func _herd_guides()->Dictionary:
 			plans[horse]={"guide":guide,"velocity":velocity.limit_length(pace+WorldHerd.FOLLOW_CATCHUP)}
 	return plans
 
+var _flight_horses:Array=[]
 func _on_frontier_lasso_released()->void:
-	var startled:Dictionary={}
+	# Ant9-Nov: nearby horses cannot dodge a rope while it is still in flight.
+	for horse in _flight_horses:
+		if is_instance_valid(horse):horse.flight_hold=false
+	_flight_horses.clear()
+	var affected:Dictionary={}
 	for horse in _herd_horses.values():
 		if is_instance_valid(horse) and not horse.roped and horse.position.distance_to(player.position)<500.0:
-			startled[horse.get_meta("c",Vector2i(-999,-999))]=true
+			affected[horse.get_meta("c",Vector2i(-999,-999))]=true
 	for horse in _herd_horses.values():
 		if not is_instance_valid(horse) or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
-		if startled.has(horse.get_meta("c",Vector2i(-998,-998))):
+		if affected.has(horse.get_meta("c",Vector2i(-998,-998))):
+			horse.flight_hold=true;horse.velocity=Vector2.ZERO
+			_flight_horses.append(horse)
+func _on_frontier_lasso_landed(_point:Vector2,captured:Node2D)->void:
+	# Resolve capture first. A successful landing causes no new group panic.
+	for horse in _flight_horses:
+		if not is_instance_valid(horse):continue
+		horse.flight_hold=false
+		if captured==null and not horse.roped and not WorldTaming.tamed(horse.state):
 			horse.set_meta("panic_left",WorldHerd.PANIC_SECONDS)
 			horse.state.spook=WorldTaming.SPOOK_SECONDS
+	_flight_horses.clear()
 
 func _tick_taming(delta: float) -> void:
 	for horse in _herd_horses.values():
-		if not is_instance_valid(horse):continue
+		if not is_instance_valid(horse) or horse.flight_hold:continue
 		horse.set_meta("panic_left",maxf(0.0,float(horse.get_meta("panic_left",0.0))-delta))
 		var chasing:bool=not horse.roped and float(horse.state.get("spook",0.0))>0 and horse.position.distance_to(player.position)<550.0
 		horse.set_meta("chase_time",float(horse.get_meta("chase_time",0.0))+delta if chasing else 0.0)
@@ -579,6 +593,7 @@ func _tick_taming(delta: float) -> void:
 		if not is_instance_valid(raw):
 			continue
 		var horse: Node2D = raw
+		if horse.flight_hold and not horse.roped:continue
 		horse.herd_guide=null
 		var dist: float = player.position.distance_to(horse.position)
 		if dist > 700.0:
@@ -925,6 +940,7 @@ func _build_hud() -> void:
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
 	player.lasso.lasso_released.connect(_on_frontier_lasso_released)
+	player.lasso.landing_resolved.connect(_on_frontier_lasso_landed)
 	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _open_navigation()->void:

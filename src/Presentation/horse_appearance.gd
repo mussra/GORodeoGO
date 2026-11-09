@@ -6,6 +6,23 @@ const FOAL_EYES=preload("res://art/foal/eyes.png")
 static var cache:Dictionary={}
 static var body_offsets:Dictionary={}
 static var hat_pixels:Dictionary={}
+static var pose_uv_cache:Dictionary={}
+static func pose_uv(anim:String,frame:int)->Image:
+ var id:String=anim+str(frame)
+ if pose_uv_cache.has(id):return pose_uv_cache[id]
+ var path:String="res://art/horse_pose_uv/%s/frame_%02d.png"%[anim,frame]
+ var uv:Image=null
+ if ResourceLoader.exists(path):
+  uv=load(path).get_image()
+  if uv.is_compressed():uv.decompress()
+ pose_uv_cache[id]=uv
+ return uv
+static func body_point(uv:Image,x:int,y:int,bob:int)->Vector2:
+ if uv!=null:
+  var sample:Color=uv.get_pixel(x,y)
+  return Vector2(sample.r,sample.g)*127.5
+ return Vector2(x,y-bob)
+
 static func protected_hat(anim:String,frame:int)->Dictionary:
  var id:String=anim+str(frame)
  if hat_pixels.has(id):return hat_pixels[id]
@@ -48,10 +65,16 @@ static func spots()->Array[Vector4]:
   if spot_layout.size()>=128:break
  return spot_layout
 static func natural_spot(p:Vector2)->bool:
+ return natural_spot_coverage(p)>.5
+static func natural_spot_coverage(p:Vector2)->float:
+ var coverage:float=0.0
  for item in spots():
   var q:Vector2=(p-Vector2(item.x,item.y)).rotated(item.w)
-  if absf(q.x)<item.z and absf(q.y)<item.z*.85:return true
- return false
+  var edge:float=maxf(absf(q.x)-item.z,absf(q.y)-item.z*.85)
+  if edge>.5:continue
+  coverage=maxf(coverage,1.0-smoothstep(-.5,.5,edge))
+  if coverage>=1.0:return coverage
+ return coverage
 # Pattern IDs 0..4 remain unchanged for existing saves. New shapes append at 5..9.
 static func shape_point(q:Vector2,pattern:int)->bool:
  if pattern==5:
@@ -108,6 +131,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
  if image.is_compressed():image.decompress()
  if mask.is_compressed():mask.decompress()
  var bob:=body_offset(image,anim,frame)
+ var uv:Image=pose_uv(anim,frame)
  var hat:Dictionary=protected_hat(anim,frame) if anim in ["walk_diag_down","walk_diag_up"] else {}
  for y in range(image.get_height()):
   for x in range(image.get_width()):
@@ -136,19 +160,21 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
     else:color=Color(MANES[int(t.mane)])
    elif int(t.pattern)>0:
     var mark:bool=false
-    var px:float=float(x)*96.0/image.get_width() if anim=="foal" else x
-    var py:float=float(y)*96.0/image.get_height() if anim=="foal" else y-bob
+    var point:Vector2=body_point(uv,x,y,bob) if int(t.pattern) not in [3,4] else Vector2(x,y-bob)
+    var px:float=float(x)*96.0/image.get_width() if anim=="foal" else point.x
+    var py:float=float(y)*96.0/image.get_height() if anim=="foal" else point.y
     match int(t.pattern):
      1:
-      if anim=="walk_diag_down":mark=(Vector2(px,py)-Vector2(32,51)).length()<7 or (Vector2(px,py)-Vector2(58,61)).length()<6
+      if anim=="walk_diag_down" and uv==null:mark=(Vector2(px,py)-Vector2(32,51)).length()<7 or (Vector2(px,py)-Vector2(58,61)).length()<6
       else:mark=(Vector2(px,py)-Vector2(30,60)).length()<8 or (Vector2(px,py)-Vector2(58,68)).length()<6
-     2:mark=natural_spot(Vector2(px,py))
+     2:mark=natural_spot(Vector2(px,py)) if uv==null else false
      3:mark=px<40 and py>48 and py<78
      4:mark=py>77
      5,6,7,8,9,10,11:mark=genetic_mark(Vector2(px,py),int(t.pattern))
     if anim=="foal" and int(t.pattern)==1:
      var dist:float=minf((Vector2(px,py)-Vector2(30,60)).length()-8.0,(Vector2(px,py)-Vector2(58,68)).length()-6.0)
      color=color.lerp(Color("f4edd8"),1.0-smoothstep(-.9,.9,dist))
+    elif int(t.pattern)==2 and uv!=null:color=color.lerp(HorsePatternMap.color(t),natural_spot_coverage(Vector2(px,py)))
     elif int(t.pattern) in [9,10,11]:color=color.lerp(HorsePatternMap.color(t),HorsePatternMap.coverage(Vector2(px,py),int(t.pattern)))
     elif mark:color=HorsePatternMap.color(t)
    if t.get("finish","")=="galaxy":color=galaxy_color(Vector2(float(x)*96.0/image.get_width(),float(y-bob)*96.0/image.get_height()))

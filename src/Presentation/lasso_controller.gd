@@ -21,6 +21,7 @@ const PREY_CAPTURE_TOLERANCE: float = 30.0
 signal lasso_released
 signal lasso_thrown(throw_origin: Vector2, landing_point: Vector2)
 signal prey_captured(prey: Node2D)
+signal landing_resolved(landing_point:Vector2,prey:Node2D)
 signal throw_blocked
 signal release_requested
 
@@ -207,7 +208,8 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 	_lasso_in_flight = false
 
 	lasso_thrown.emit(throw_origin, landing_point)
-	resolve_capture(landing_point)
+	var captured:Node2D=resolve_capture(landing_point)
+	landing_resolved.emit(landing_point,captured)
 	_flash_landing_area(landing_point)
 	# A second touch can begin before first flight lands. Keep held aim usable.
 	if _touch_aim_active and not _is_charging and has_free_lasso_slot() and throw_guard.call():
