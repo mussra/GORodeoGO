@@ -1205,3 +1205,18 @@ msgstr "Clear"
 
 msgid "FILTER_COUNT"
 msgstr "%d of %d"
+
+
+msgid "EMBLEM_LETTERS_HINT"
+msgstr "1-3 letters (A-Z)"
+msgid "EMBLEM_FONT_BLOCK"
+msgstr "Block"
+
+msgid "EMBLEM_FONT_ENGRAVED"
+msgstr "Engraved"
+msgid "EMBLEM_SYMBOL_ADJ"
+msgstr "Symbol: drag it · size"
+
+
+msgid "EMBLEM_LETTERS"
+msgstr "Initials"

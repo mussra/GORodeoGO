@@ -1039,7 +1039,7 @@ msgid "EMBLEM_GOLD"
 msgstr "Oro"
 
 msgid "EMBLEM_CONTRAST"
-msgstr "La tinta contrasta con el pelaje; el color identifica la ficha."
+msgstr "El color se aplica a la marca y a la ficha. El borde mejora el contraste."
 
 msgid "EMBLEM_COSMETIC"
 msgstr "Personalizar no cambia rareza, precio ni ascendencia."
@@ -1205,3 +1205,18 @@ msgstr "Limpiar"
 
 msgid "FILTER_COUNT"
 msgstr "%d de %d"
+
+
+msgid "EMBLEM_LETTERS_HINT"
+msgstr "1-3 letras (A-Z)"
+msgid "EMBLEM_FONT_BLOCK"
+msgstr "Bloque"
+
+msgid "EMBLEM_FONT_ENGRAVED"
+msgstr "Grabada"
+msgid "EMBLEM_SYMBOL_ADJ"
+msgstr "Símbolo: arrástralo · tamaño"
+
+
+msgid "EMBLEM_LETTERS"
+msgstr "Iniciales"

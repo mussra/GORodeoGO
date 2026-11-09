@@ -174,7 +174,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
   if ResourceLoader.exists(zone_path):
    var zone:Image=load(zone_path).get_image()
    if zone.is_compressed():zone.decompress()
-   HorseEmblem.stamp(image,zone,t.emblem)
+   HorseEmblem.stamp(image,zone,t.emblem,mask)
  var tex:=ImageTexture.create_from_image(image);cache[key]=tex;return tex
 static func apply(frames:SpriteFrames,t:Dictionary)->void:
  for anim in frames.get_animation_names():
