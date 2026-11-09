@@ -12,7 +12,7 @@ func _ready()->void:
    for i in indices:frames.add_frame(anim,load("res://art/world/pigs/%s/frame_%02d.png"%[variant,i]))
   frame_cache[variant]=frames
  sprite_frames=frame_cache[variant]
- centered=false;offset=Vector2(-80,-85);scale=Vector2.ONE*.60
+ centered=false;offset=Vector2(-80,-128);scale=Vector2.ONE*.36
  texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
  play("idle")
 func update_state(fleeing:bool,tired:bool,left:bool)->void:
