@@ -61,9 +61,9 @@ func refresh()->void:
  for id in _buy:
   var item:Dictionary=EquipmentCatalog.ITEMS[id]
   _buy[id].text=tr("UI_062") if state.owned.has(id) else tr("UI_056")%item["price"]
-  _buy[id].disabled=not state.can_buy(id,EquipmentCatalog.ITEMS)
+  MenuInputGuard.set_button_disabled(_buy[id],not state.can_buy(id,EquipmentCatalog.ITEMS))
   var selected:bool=state.equipped.get("whip","")==id
   _equip[id].text=tr("UI_061") if selected else tr("UI_059")
-  _equip[id].disabled=selected or not state.owned.has(id)
+  MenuInputGuard.set_button_disabled(_equip[id],selected or not state.owned.has(id))
  var selected:String=state.equipped.get("whip","")
  _state.text=tr("UI_057")+(tr(EquipmentCatalog.ITEMS[selected]["name"]) if EquipmentCatalog.ITEMS.has(selected) else tr("UI_058"))

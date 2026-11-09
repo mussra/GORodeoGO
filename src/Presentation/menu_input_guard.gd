@@ -20,6 +20,11 @@ func _tree_changed()->void:rebuild=true;dirty=true
 func _mark()->void:dirty=true
 func _collect(node:Node)->void:
  for child in node.get_children():
+  # A nested modal owns its descendants. Two guards saving/restoring the same
+  # button can capture each other's temporary disabled state as permanent.
+  if child is Control and child.has_meta("ui_modal"):
+   if not child.visibility_changed.is_connected(_mark):child.visibility_changed.connect(_mark)
+   continue
   if child is Control:
    controls.append(child)
    if not child.visibility_changed.is_connected(_mark):child.visibility_changed.connect(_mark)
@@ -71,3 +76,17 @@ func sync()->void:
    var state:Dictionary=saved[c];c.mouse_filter=state.mouse;c.focus_mode=state.focus
    if c is BaseButton:c.disabled=state.disabled
    saved.erase(c)
+## Business state may change while a panel is hidden (balance/ownership). Store
+## that intended state separately from the temporary visibility/input lock.
+static func set_button_disabled(button:BaseButton,value:bool)->void:
+ var node:Node=button.get_parent()
+ while node!=null:
+  if node.has_meta("ui_modal"):
+   for child in node.get_children():
+    if child is MenuInputGuard and child.saved.has(button):
+     child.saved[button].disabled=value
+     button.disabled=true
+     return
+   break
+  node=node.get_parent()
+ button.disabled=value

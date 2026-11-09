@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://tools/qa_equipment_2742.gd" id="1"]
+[node name="QaEquipment2742" type="Node"]
+script = ExtResource("1")
