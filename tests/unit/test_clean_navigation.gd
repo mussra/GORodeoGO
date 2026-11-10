@@ -14,8 +14,8 @@ func test_hub_has_six_large_entries_and_no_permanent_tabs()->void:
  assert_not_null(panel.content.get_node_or_null("NavigationBack"))
  var large:int=0
  for child in panel.content.get_children():
-  if child is TextureRect and child.size.x>=300:large+=1
- assert_eq(large,2,"both adult parents enlarged")
+  if child is TextureRect and child.size.x>=280:large+=1
+ assert_eq(large,2,"both adult parents readable above the two trait rows")
  panel.go_back();await wait_process_frames(4);assert_eq(panel.page,"hub")
  panel.go_back();await wait_process_frames(3);assert_false(panel.visible)
  panel.open_menu();await wait_process_frames(4);assert_eq(panel.page,"hub");assert_true(panel.visible)

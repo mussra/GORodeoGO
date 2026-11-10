@@ -21,18 +21,15 @@ static func traits(base:Dictionary,filters:Dictionary)->Dictionary:
  return t
 static func variants(base:Dictionary,filters:Dictionary,horses:Array)->Array[Dictionary]:
  var out:Array[Dictionary]=[]
- var colors:Array=[-1] if int(base.pattern)==0 else []
+ var colors:Array=[-1]
  if int(base.pattern)>0:
-  colors.append(-1)
-  for i in HorseCollection.COATS.size():
-   var a:=Color(HorseAppearance.COLORS[int(base.coat)]);var b:=Color(HorseAppearance.COLORS[i])
-   if Vector3(a.r-b.r,a.g-b.g,a.b-b.b).length()>=.48:colors.append(i)
+  for i in HorseCollection.COATS.size():colors.append(i)
  for color in colors:
   if filters.has("spots") and color!=int(filters.spots):continue
   var t:=traits(base,filters);t.spots=color
   var found:=owned(t,horses)
   out.append({"horse":found if not found.is_empty() else {"traits":t,"name":HorseCollection.COATS[int(t.coat)],"stage":"adult"},"owned":not found.is_empty()})
- out.sort_custom(func(a,b):return a.owned and not b.owned)
+ out=owned_first_order(out)
  return out
 static func properties()->Array:
  var out:Array=[]
@@ -42,4 +39,46 @@ static func properties()->Array:
   var names:Array=HorseCollection.EYES if key=="eyes" else HorseCollection.COATS
   for i in names.size():values.append({"value":i,"label":names[i]})
   out.append({"id":key,"label":{"spots":"Color manchas","eyes":"Ojos","legs":"Patas bajas"}[key],"values":values})
+ return out
+
+## Filtered Atlas results enumerate actual spot colors, not family representatives.
+## Eyes/legs stay bounded to the requested slice, never a full Cartesian product.
+static func filtered_entries(filters:Dictionary,horses:Array,owned_first:bool=true)->Array[Dictionary]:
+ var out:Array[Dictionary]=[]
+ var owned_by_signature:Dictionary={}
+ for h in horses:owned_by_signature[signature(h.traits)]=h
+ for coat in HorseCollection.COATS.size():
+  if filters.has("coat") and coat!=int(filters.coat):continue
+  for pattern in HorseCollection.PATTERNS.size():
+   if filters.has("pattern") and pattern!=int(filters.pattern):continue
+   for mane in HorseCollection.MANES.size():
+    if filters.has("mane") and mane!=int(filters.mane):continue
+    var base:Dictionary=traits({"coat":coat,"pattern":pattern,"mane":mane},filters)
+    for entry in variants(base,filters,[]):
+     var key:String=signature(entry.horse.traits)
+     if owned_by_signature.has(key):entry={"horse":owned_by_signature[key],"owned":true}
+     out.append(entry)
+ # Preserve owned variants outside the generated eye/leg/finish slice, but never
+ # substitute a family match for exact ownership or add a duplicate signature.
+ var seen:Dictionary={}
+ for entry in out:seen[signature(entry.horse.traits)]=true
+ for h in horses:
+  var key:String=signature(h.traits)
+  if seen.has(key):continue
+  var matches:bool=true
+  for prop in ["spots","eyes","legs"]:
+   if filters.has(prop):
+    var value:int=HorseCollection.spots_index(h.traits) if prop=="spots" else (HorseCollection.eye_index(h.traits) if prop=="eyes" else HorseCollection.legs_index(h.traits))
+    if value!=int(filters[prop]):matches=false
+  if matches:out.append({"horse":h,"owned":true});seen[key]=true
+ out=HorseFilters.apply(out,filters)
+ if owned_first:out=owned_first_order(out)
+ return out
+
+static func owned_first_order(entries:Array[Dictionary])->Array[Dictionary]:
+ var out:Array[Dictionary]=[]
+ for entry in entries:
+  if entry.owned:out.append(entry)
+ for entry in entries:
+  if not entry.owned:out.append(entry)
  return out

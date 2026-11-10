@@ -38,7 +38,7 @@ func _refresh()->void:
  if not is_inside_tree():return
  if content!=null:canvas.remove_child(content);content.queue_free()
  content=Control.new();canvas.add_child(content);MenuNavigation.reveal(content)
- var titles={"hub":"CABALLERIZA","collection":"COLECCIÓN","breed":"CRUZAR","atlas":"ATLAS · FAMILIAS","atlas_variants":"ATLAS · VARIANTES","market":"MERCADO","detail":"FICHA"}
+ var titles={"hub":"CABALLERIZA","collection":"COLECCIÓN","breed":"CRUZAR","atlas":("ATLAS · RESULTADOS" if not atlas_filters.is_empty() else "ATLAS · FAMILIAS"),"atlas_variants":"ATLAS · VARIANTES","market":"MERCADO","detail":"FICHA"}
  MenuNavigation.header(content,str(titles.get(page,"CABALLERIZA")),go_back)
  if page=="hub":
   MenuNavigation.cards(content,[{"id":"collection","title":"Colección","hint":"Tus caballos"},{"id":"breed","title":"Cruzar","hint":"Elige padres y rasgos"},{"id":"atlas","title":"Atlas","hint":"Explora colores y patrones"},{"id":"market","title":"Mercado","hint":"Compra y venta"},{"id":"training","title":"Entrenamiento","hint":"Aprende habilidades"},{"id":"genealogy","title":"Mapa genealógico","hint":"Linajes y parentescos"}],open_section)
@@ -103,27 +103,28 @@ func breed_view()->void:
  label(tr("BIRTH_CREDITS")%SaveData.horse_collection.birth_credits if not SaveData.debug_mode and not SaveData.trial_session_active else tr("BIRTH_FREE"),Vector2(30,95),18)
  label(tr("UI_087"),Vector2(30,130),21);label(tr("UI_088"),Vector2(900,130),21)
  parent_picker(parent_a,Vector2(30,165),true);parent_picker(parent_b,Vector2(880,165),false)
- sprite(SaveData.horse_collection.find(parent_a),Vector2(20,250),330)
- sprite(SaveData.horse_collection.find(parent_b),Vector2(920,250),330)
+ sprite(SaveData.horse_collection.find(parent_a),Vector2(60,225),280)
+ sprite(SaveData.horse_collection.find(parent_b),Vector2(940,225),280)
  var labels={"coat":tr("UI_129"),"pattern":tr("UI_130"),"mane":tr("UI_090"),"eyes":tr("UI_131"),"legs":"Patas bajas","spots":"Color manchas"};var n:int=0
  for k in ["coat","pattern","mane","eyes","legs","spots"]:
-  label(labels[k],Vector2(370,240+n*49),21)
-  button("A" if choices[k]==0 else "B",Vector2(610,230+n*49),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
+  var slot:=Vector2(45+(n%3)*410,515+int(n/3)*50)
+  label(labels[k],slot+Vector2(0,10),21)
+  button("A" if choices[k]==0 else "B",slot+Vector2(270,0),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
  var finish_source:String=parent_b if choices.get("finish",0)==1 else parent_a
  var finish_value:String=SaveData.horse_collection.find(finish_source).traits.get("finish","normal")
- label(tr("UI_091"),Vector2(370,545),20)
- button(("B" if choices.get("finish",0)==1 else "A")+" · "+("Galaxy" if finish_value=="galaxy" else "Normal"),Vector2(540,535),func():choices["finish"]=1-int(choices.get("finish",0));refresh(),170)
+ label(tr("UI_091"),Vector2(45,620),20)
+ button(("B" if choices.get("finish",0)==1 else "A")+" · "+("Galaxy" if finish_value=="galaxy" else "Normal"),Vector2(175,610),func():choices["finish"]=1-int(choices.get("finish",0));refresh(),170)
  var t:Dictionary=SaveData.horse_collection.preview(parent_a,parent_b,choices)
  if not t.is_empty():
-  var preview_title:=label("Vista de la cría",Vector2(700,255),19)
+  var preview_title:=label("Vista de la cría",Vector2(525,225),19)
   preview_title.size.x=230;preview_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-  sprite({"traits":t,"stage":"foal"},Vector2(700,290),230)
-  button(tr("UI_092"),Vector2(420,605),func():
+  sprite({"traits":t,"stage":"foal"},Vector2(525,265),230)
+  button(tr("UI_092"),Vector2(420,615),func():
    var h:Dictionary=SaveData.breed_horses(parent_a,parent_b,choices)
    message=(tr("BIRTH_NEED_WIN") if not SaveData.debug_mode and not SaveData.trial_session_active and SaveData.horse_collection.birth_credits<=0 else tr("UI_093")) if h.is_empty() else tr("UI_094")%h.name
    if not h.is_empty():focus_id=h.id
    refresh(),440)
- else:label(tr("UI_095"),Vector2(380,580),22)
+ else:label(tr("UI_095"),Vector2(490,350),22)
 func family_view()->void:
  var graph:=GenealogyPanel.new();add_child(graph);graph.select(focus_id);page="collection"
 
@@ -151,7 +152,7 @@ func detail_view()->void:
   var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);box.add_child(line)
  if not owned:
   var note:=Label.new();note.text="Vista de posibilidad · no cambia tu colección";box.add_child(note)
-  if detail_origin!="atlas_variants":
+  if detail_origin not in ["atlas","atlas_variants"]:
    var buy:=Button.new();buy.text=tr("MARKET_BUY")%(0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h));box.add_child(buy);buy.pressed.connect(func():confirm_trade(h,false));buy.disabled=not SaveData.debug_mode and not SaveData.trial_session_active and (SaveData.equipment_points<HorseMarket.buy_price(h) or not HorseMarket.available(SaveData.horse_collection,h,SaveData.highest_level_completed))
   return
  var can_edit:bool=SaveData.horse_editing_allowed()
@@ -178,6 +179,7 @@ func detail_view()->void:
  var sell:=Button.new();sell.text=tr("MARKET_SELL")%HorseMarket.sell_price(h);sell.custom_minimum_size.y=48;sell.disabled=not HorseMarket.can_sell(SaveData.horse_collection,h.id);box.add_child(sell);sell.pressed.connect(func():confirm_trade(h,true))
 func atlas_entries()->Array[Dictionary]:
  if page=="atlas_variants":return HorseAtlas.variants(atlas_family,atlas_filters,SaveData.horse_collection.horses)
+ if page=="atlas" and not atlas_filters.is_empty():return HorseAtlas.filtered_entries(atlas_filters,SaveData.horse_collection.horses,atlas_owned_first)
  if page=="market" and not SaveData.debug_mode and not SaveData.trial_session_active:
   var limited:Array[Dictionary]=[]
   for h in HorseMarket.offers(SaveData.highest_level_completed):
@@ -193,15 +195,6 @@ func atlas_entries()->Array[Dictionary]:
   var t:Dictionary={"coat":int(n/(HorseCollection.PATTERNS.size()*6)),"pattern":int(n/6)%HorseCollection.PATTERNS.size(),"mane":n%6}
   if page!="market":t=HorseAtlas.traits(t,atlas_filters)
   if page=="market" or not atlas_owned_first or not owned.has("%d_%d_%d"%[t.coat,t.pattern,t.mane]):result.append({"horse":{"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":false})
- if page!="market" and ["spots","eyes","legs"].any(func(k):return atlas_filters.has(k)):
-  result.clear()
-  for n in range(20*HorseCollection.PATTERNS.size()*6):
-   var t:Dictionary=HorseAtlas.traits({"coat":int(n/(HorseCollection.PATTERNS.size()*6)),"pattern":int(n/6)%HorseCollection.PATTERNS.size(),"mane":n%6},atlas_filters)
-   if not HorseAtlas.contrast_ok(t):continue
-   var found:Dictionary=HorseAtlas.owned(t,SaveData.horse_collection.horses)
-   result.append({"horse":found if not found.is_empty() else {"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":not found.is_empty()})
-  if atlas_owned_first:result.sort_custom(func(a,b):return a.owned and not b.owned)
-  return result
  if not atlas_owned_first and page!="market":
   for entry in result:
    var t:Dictionary=entry.horse.traits
@@ -238,7 +231,7 @@ func atlas_view()->void:
   var order_btn:=button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(1015,575),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),230)
   order_btn.add_theme_font_size_override("font_size",14)
  _atlas_filter_bar()
- label(tr("MARKET_DESIGN_NOTE") if page=="market" else ("Desliza para ver todas las tarjetas · ojos y patas desde Filtros" if page=="atlas_variants" else "1.440 familias · toca una para explorar manchas, ojos y patas"),Vector2(35,160),17)
+ label(tr("MARKET_DESIGN_NOTE") if page=="market" else ("Desliza para ver todas las tarjetas · ojos y patas desde Filtros" if page=="atlas_variants" else ("Resultados: todos los colores de manchas · toca para abrir Ficha" if not atlas_filters.is_empty() else "1.440 familias · toca una para explorar manchas, ojos y patas")),Vector2(35,160),17)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
  var all_entries:Array[Dictionary]=atlas_entries()
  var entries:Array[Dictionary]=HorseFilters.apply(all_entries,atlas_filters);var pages:int=maxi(1,ceili(entries.size()/6.0));atlas_page=clampi(atlas_page,0,pages-1)
@@ -253,7 +246,7 @@ func atlas_view()->void:
   sprite(h,Vector2(x,y),175)
   var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
   var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,420);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():
-   if page=="atlas":
+   if page=="atlas" and atlas_filters.is_empty():
     atlas_family_page=atlas_page;atlas_family=h.traits.duplicate(true);atlas_page=0;show_page("atlas_variants")
    else:detail_entries=entries;focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
   var texts:Array=HorseValues.visual(t)+HorseValues.performance(h,entry.owned)
