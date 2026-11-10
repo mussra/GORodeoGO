@@ -31,3 +31,6 @@ Cada entrega incluye HTMLvNcon todas las bases nuevas y JSONcompleto de esa mism
 
 ## Vigente: v3. V4descartada por Ant10:50
 "Deja las que estaban antes y actualiza el editor si es necesario": continuar HTML+JSONcompletov3, ya correctos; no v5vacía. Las16poses no retocadas conservan su v3y NO se vuelven a derivar cuando llegue otro JSON. V4es ensayo descartado, no usar para continuar ni aplicar al juego. Archivosv4se conservan solo para comparaciónhistórica. No se ha aplicado ninguna de estas máscaras al juego/APK.
+
+## VIGENTE v5, JSONcompleto de Ant11:29
+Baseverificada v3formato2,90PNGbasey69poses524trazos. Importado entero enHTMLv3, renderexactoposeaposeypasado a basesv5sin cambios de pertenencia ni derivaciones.69posesnuevasincluyen16diagonalesdel salvaje queantesfaltaban:90posesretocadasacumuladas, ninguna sintocar. Las21sintrazosnuevosconservanlasbasesv3proporcionadas. Manchas=canalrojopelaje90/90. HTMLv5yJSONcompletoimportablemismabase,90assets;Chrome390pintar/export/import/persistenciapasa. Vídeos15smáscaras20spatronesporactor,5vistas9poses. V4sigue descartada; no repetirtransferenciaentre actores. Noaplicadojuego/APK. Máscarasimportadasexactas,suszonashairincluyenpartesclarasdecabeza;noalterar silenciosamente. Mapaspatronesexperimentalesprevios, no prometercero deriva.
