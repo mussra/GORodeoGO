@@ -292,6 +292,9 @@ func _show_settings()->void:
 	for text in [tr("UI_037"),"Español","English"]:pick.add_item(text)
 	pick.selected=["auto","es","en"].find(Localization.choice)
 	var note:=Label.new();note.text=tr("UI_040");box.add_child(note)
+	var art:=CheckButton.new();art.text="PixelLab experimental: lateral, pelaje fijo";art.button_pressed=PixelLabTrial.active();art.custom_minimum_size.y=56;box.add_child(art)
+	art.toggled.connect(func(value:bool):PixelLabTrial.set_active(value))
+	var art_note:=Label.new();art_note.text="Solo caballo y vaquero. Otras vistas: arte actual.\nSe aplica al entrar a jugar. No cambia tus caballos.";box.add_child(art_note)
 	var close:=Button.new();close.text=tr("UI_009");close.custom_minimum_size.y=52;box.add_child(close);close.pressed.connect(panel.queue_free)
 	pick.item_selected.connect(func(i:int):
 		if Localization.set_choice(["auto","es","en"][i]):get_tree().reload_current_scene()
