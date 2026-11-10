@@ -43,11 +43,11 @@ static func _build_frames(traits: Dictionary) -> SpriteFrames:
 		for i in spec[1]:
 			var base: Texture2D = load("res://art/world/wild_base/%s/frame_%02d.png" % [anim.trim_prefix("wild_"), i])
 			frames.add_frame(spec[2], HorseAppearance.texture(base, anim, i, traits))
-	PixelLabTrial.apply(frames,"horse","walk")
+	PixelLabTrial.apply(frames,"horse","walk",traits)
 	return frames
 
 func _ready() -> void:
-	var key := str(traits)+str(PixelLabTrial.active())
+	var key := PixelLabTrial.cache_key(traits)
 	if not frame_cache.has(key):
 		frame_cache[key] = _build_frames(traits)
 	sprite_frames = frame_cache[key]

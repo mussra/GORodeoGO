@@ -159,7 +159,7 @@ func _ready() -> void:
 	if _sprite_swap.has_sprite():
 		var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
 		if not horse.is_empty():HorseAppearance.apply(_sprite_swap._frames,horse.traits)
-		PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side")
+		PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}))
 	var cue_layer:=CanvasLayer.new()
 	cue_layer.layer=16
 	add_child(cue_layer)

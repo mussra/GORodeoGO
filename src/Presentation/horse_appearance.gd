@@ -120,26 +120,26 @@ static func eye_color_at(index:int,p:Vector2)->Color:
  for star in [Vector2(.25,.25),Vector2(.65,.38),Vector2(.42,.72),Vector2(.78,.75)]:
   if p.distance_to(star)<.022:return Color("f4f7ff")
  return color
-static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Texture2D:
+static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_override:Image=null,uv_override:Image=null)->Texture2D:
  if t.get("finish","")=="original" and not t.has("emblem") and HorseCollection.legs_index(t)<0:return source
- var key:String=source.resource_path+str(t)
+ var key:String=source.resource_path+str(t)+(":pixellab-v5" if mask_override!=null else "")
  if cache.has(key):return cache[key]
  var path:String="res://art/horse_masks/%s/frame_%02d.png"%[anim,frame]
  if anim=="stunned":path="res://art/horse_masks/stunned/frame_0.png"
- if not ResourceLoader.exists(path):return source
- var mask:Image=load(path).get_image();var image:Image=source.get_image().duplicate()
+ if mask_override==null and not ResourceLoader.exists(path):return source
+ var mask:Image=mask_override if mask_override!=null else load(path).get_image();var image:Image=source.get_image().duplicate()
  if image.is_compressed():image.decompress()
  if mask.is_compressed():mask.decompress()
- var bob:=body_offset(image,anim,frame)
- var uv:Image=pose_uv(anim,frame)
- var hat:Dictionary=protected_hat(anim,frame) if anim in ["walk_diag_down","walk_diag_up"] else {}
+ var bob:int=0 if mask_override!=null else body_offset(image,anim,frame)
+ var uv:Image=uv_override if mask_override!=null else pose_uv(anim,frame)
+ var hat:Dictionary=protected_hat(anim,frame) if mask_override==null and anim in ["walk_diag_down","walk_diag_up"] else {}
  for y in range(image.get_height()):
   for x in range(image.get_width()):
    var m:Color=mask.get_pixel(x,y)
    # Horse masks previously touched the hat in downward-diagonal frames 8-11.
    # Hat exclusion follows the same airborne bob as the source; a fixed row
    # clipped the horse forehead in raised phases.
-   if anim in ["walk_diag_down","walk_diag_up"] and ((y<23+bob and x>=28 and x<=72) or hat.has(Vector2i(x,y))):continue
+   if mask_override==null and anim in ["walk_diag_down","walk_diag_up"] and ((y<23+bob and x>=28 and x<=72) or hat.has(Vector2i(x,y))):continue
    if t.get("finish","")=="original":continue
    if maxf(m.r,m.g)<0.02:continue
    var old:Color=image.get_pixel(x,y);var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))*255.0/205.0,0.25,1.18)
@@ -183,7 +183,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
    var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
    image.set_pixel(x,y,old.lerp(tinted,maxf(m.r,m.g)) if anim=="foal" else tinted)
  # Shared for levels, open world, riderless horses and foals. No per-frame work.
- if HorseCollection.legs_index(t)>=0:
+ if mask_override==null and HorseCollection.legs_index(t)>=0:
   var leg_path:String="res://art/lower_legs_masks/%s/frame_%02d.png"%[anim,frame]
   if anim=="stunned":leg_path="res://art/lower_legs_masks/stunned/frame_0.png"
   if ResourceLoader.exists(leg_path):
@@ -213,7 +213,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary)->Textur
     var eye:Color=eye_color_at(eye_id,Vector2((float(x)-202.0)/30.0,(float(y)-122.0)/23.0))
     var old:Color=image.get_pixel(x,y);var shade:=clampf(maxf(old.r,maxf(old.g,old.b))/.65,.15,1.15)
     image.set_pixel(x,y,old.lerp(Color(eye.r*shade,eye.g*shade,eye.b*shade,old.a),weight))
- if HorseEmblem.valid(t.get("emblem")):
+ if mask_override==null and HorseEmblem.valid(t.get("emblem")):
   var zone_path:String="res://art/lineage_masks/%s/frame_%02d.png"%[anim,frame]
   if ResourceLoader.exists(zone_path):
    var zone:Image=load(zone_path).get_image()

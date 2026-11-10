@@ -438,7 +438,7 @@ func _advance_builder(b: Dictionary) -> void:
 			if int(b["herd_cursor"])>=members_.size():b["phase"]=5;return
 			var member:Dictionary=members_[int(b["herd_cursor"])]
 			var traits: Dictionary = member.get("traits", {})
-			var cache_key := str(traits)+str(PixelLabTrial.active())
+			var cache_key := PixelLabTrial.cache_key(traits)
 			if WildHorseArtScript.frame_cache.has(cache_key):
 				b["herd_cursor"] = int(b["herd_cursor"])+1
 				return
@@ -458,7 +458,7 @@ func _advance_builder(b: Dictionary) -> void:
 			var base: Texture2D = load("res://art/world/wild_base/%s/frame_%02d.png" % [String(step[0]).trim_prefix("wild_"), int(step[1])])
 			frames.add_frame(step[2], HorseAppearance.texture(base, step[0], int(step[1]), traits))
 			if (b["frame_specs"] as Array).is_empty():
-				PixelLabTrial.apply(frames,"horse","walk")
+				PixelLabTrial.apply(frames,"horse","walk",traits)
 				WildHorseArtScript.frame_cache[cache_key] = frames
 				b["herd_cursor"] = int(b["herd_cursor"])+1
 				b["frame_specs"]=null;b["frames"]=null
