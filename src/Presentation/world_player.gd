@@ -87,10 +87,10 @@ func _ready() -> void:
 	# Jinete = el de niveles (Ant 8-nov 18:06): mismo SpriteSwap, mismo arte
 	# art/player + sombreros (HatAppearance) y mismo recolor por genotipo
 	# (HorseAppearance) que el modo niveles. Una sola base para ambos modos.
-	_sprite_swap = SpriteSwap.new(self, placeholder, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.classic_rider_animations(ANIM_NAMES))
+	_sprite_swap = SpriteSwap.new(self, placeholder, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.unreplaced_rider_animations(ANIM_NAMES))
 	if not horse.is_empty() and _sprite_swap.has_sprite():
 		HorseAppearance.apply(_sprite_swap._frames, horse.traits)
-		PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}))
+	if _sprite_swap.has_sprite():PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}))
 	if not horse.is_empty():
 		max_speed = HorseStats.read(horse).speed
 	if _sprite_swap.has_sprite():WorldActorScale.rider(_sprite_swap._sprite)
@@ -166,23 +166,5 @@ func _draw() -> void:
 	lasso.draw_charge_aim(self)
 
 func _update_animation(delta: float) -> void:
-	if _sprite_swap == null or not _sprite_swap.has_sprite():
-		return
-	if velocity.length() < 12.0:
-		_sprite_swap.stop_on_idle()
-		_sprite_swap.set_gait_pose(Vector2.ZERO, delta, false)
-		return
-	var facing: Array = SpriteSwap.direction_suffix(velocity)
-	# 12-frame gallop art (Ant, 8-nov-2026), side view only for now: diagonal
-	# and vertical gallops keep the shared walk art until their own art exists.
-	# Its bob is baked into the frames, so the code bob is zeroed for it (no double).
-	var anim: String = "walk_" + facing[0]
-	if gait == WorldGait.GALOPE and facing[0] == "side" and _sprite_swap.has_animation("gallop_side"):
-		anim = "gallop_side"
-	_sprite_swap.play(anim)
-	_sprite_swap.set_flip_h(facing[1])
-	_sprite_swap.set_motion_speed(velocity.length(), max_speed / WorldGait.pace_for(gait))
-	var pose: Vector2 = WorldGait.pose_for(gait)
-	if anim == "gallop_side":
-		pose = Vector2(pose.x, 0.0)
-	_sprite_swap.set_gait_pose(pose, delta, true)
+	if _sprite_swap == null:return
+	RiderGaitVisual.apply(_sprite_swap,velocity,max_speed,gait,delta)

@@ -1,39 +1,13 @@
 class_name PixelLabTrial
 extends RefCounted
-## Reversible five-view art trial. Never changes horse genes, physics or saves.
-static var enabled:bool=true
-static var initialized:bool=false
-static var masks_enabled:bool=true
-static var pig_enabled:bool=true
-static var goat_enabled:bool=true
-static var bull_enabled:bool=true
+## Nominal PixelLab movement art. Never changes horse genes, physics or saves.
 static var image_cache:Dictionary={}
 static var texture_cache:Dictionary={}
-static func active()->bool:
- if not initialized:
-  var cfg:=ConfigFile.new()
-  if cfg.load("user://pixellab-trial.cfg")==OK:
-   enabled=bool(cfg.get_value("art","enabled",true))
-   masks_enabled=bool(cfg.get_value("art","masks_v5",true))
-   pig_enabled=bool(cfg.get_value("art","pig_side",true))
-   goat_enabled=bool(cfg.get_value("art","goat_views",true))
-   bull_enabled=bool(cfg.get_value("art","bull_views",true))
-  initialized=true
- return enabled
-static func set_active(value:bool)->void:
- enabled=value;initialized=true
- save_config()
-static func save_config()->void:
- var cfg:=ConfigFile.new();cfg.set_value("art","enabled",enabled);cfg.set_value("art","masks_v5",masks_enabled);cfg.set_value("art","pig_side",pig_enabled);cfg.set_value("art","goat_views",goat_enabled);cfg.set_value("art","bull_views",bull_enabled);cfg.save("user://pixellab-trial.cfg")
-static func masks_active()->bool:
- active();return masks_enabled
-static func set_masks_active(value:bool)->void:
- active();masks_enabled=value;save_config()
 static func cache_key(t:Dictionary)->String:
- return str(t)+str(active())+str(masks_active())
+ return str(t)
 static func pose_texture(kind:String,view:String,i:int,traits:Dictionary)->Texture2D:
  var base:Texture2D=load("res://art/experimental/pixellab/%s/%s/frame_%02d.png"%[kind,view,i])
- if not masks_active() or traits.is_empty():return base
+ if traits.is_empty():return base
  var key:String=kind+view+str(i)+str(traits)
  if texture_cache.has(key):return texture_cache[key]
  var pose:String=kind+view+str(i)
@@ -49,7 +23,6 @@ static func pose_texture(kind:String,view:String,i:int,traits:Dictionary)->Textu
  texture_cache[key]=result;return result
 
 static func apply(frames:SpriteFrames,kind:String,animation:String,traits:Dictionary={})->void:
- if not active():return
  for view in ["side","down","up","diag_down","diag_up"]:
   var target:String=("walk" if view=="side" else "walk_"+view) if kind=="horse" else "walk_"+view
   if frames.has_animation(target):frames.remove_animation(target)
@@ -59,14 +32,6 @@ static func apply(frames:SpriteFrames,kind:String,animation:String,traits:Dictio
  if frames.has_animation("idle"):frames.remove_animation("idle")
  frames.add_animation("idle");frames.add_frame("idle",pose_texture(kind,"side",0,traits))
 
-static func pig_active()->bool:
- active();return pig_enabled
-static func set_pig_active(value:bool)->void:
- active();pig_enabled=value;save_config()
-static func goat_active()->bool:
- active();return goat_enabled
-static func set_goat_active(value:bool)->void:
- active();goat_enabled=value;save_config()
 static func animal_views(kind:String)->Array:
  var views:Array=[]
  for view in ["side","down","up","diag_down","diag_up"]:
@@ -82,7 +47,7 @@ static func apply_animal(frames:SpriteFrames,kind:String)->void:
   frames.add_animation(anim);frames.set_animation_speed(anim,9.0)
   for i in 9:frames.add_frame(anim,load("res://art/experimental/pixellab/%s/%s/frame_%02d.png"%[kind,view,i]))
 static func apply_pig(frames:SpriteFrames)->void:
- if pig_active():apply_animal(frames,"pig")
+ apply_animal(frames,"pig")
 
 static func frame_specs(kind:String)->Array:
  var specs:Array=[]
@@ -94,16 +59,10 @@ static func append_pose(frames:SpriteFrames,kind:String,step:Array,traits:Dictio
  if not frames.has_animation(step[2]):
   frames.add_animation(step[2]);frames.set_animation_speed(step[2],step[3])
  frames.add_frame(step[2],pose_texture(kind,step[0],int(step[1]),traits))
-static func classic_rider_animations(names:Array)->Array:
- if not active():return names
+static func unreplaced_rider_animations(names:Array)->Array:
  return names.filter(func(anim):return not str(anim).begins_with("walk"))
 
-static func bull_active()->bool:
- active();return bull_enabled
-static func set_bull_active(value:bool)->void:
- active();bull_enabled=value;save_config()
 static func apply_bull(frames:SpriteFrames)->void:
- if not bull_active():return
  for view in animal_views("bull"):
   var anim:String="flee_"+view
   if frames.has_animation(anim):frames.remove_animation(anim)

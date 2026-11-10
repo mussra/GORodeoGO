@@ -155,7 +155,7 @@ var _active_capture_count: int = 0
 var _max_captures: int = 1
 
 func _ready() -> void:
-	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.classic_rider_animations(ANIM_NAMES))
+	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.unreplaced_rider_animations(ANIM_NAMES))
 	if _sprite_swap.has_sprite():
 		var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
 		if not horse.is_empty():HorseAppearance.apply(_sprite_swap._frames,horse.traits)
@@ -308,15 +308,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 
-	if is_moving:
-		var dir_info: Array = SpriteSwap.direction_suffix(input_dir)
-		_sprite_swap.play("walk_" + dir_info[0])
-		_sprite_swap.set_flip_h(dir_info[1])
-	else:
-		_sprite_swap.play("idle")
-
 	move_and_slide()
-	_sprite_swap.set_motion_speed(velocity.length(), 260.0)
+	RiderGaitVisual.apply(_sprite_swap,velocity,max_speed,RiderGaitVisual.from_speed(velocity.length(),max_speed),delta)
 	global_position = global_position.clamp(world_bounds.position, world_bounds.end)
 
 	if Input.is_action_just_pressed("release_capture"):
@@ -336,10 +329,7 @@ func _resume_running_after_dodge(dir: Vector2 = Vector2.INF) -> void:
 
 ## Called by the DodgeController after each dodge step: sprite facing + redraw.
 func _on_dodge_moved() -> void:
-	var facing: Array = SpriteSwap.direction_suffix(velocity if not velocity.is_zero_approx() else dodge.direction)
-	_sprite_swap.play("walk_" + facing[0])
-	_sprite_swap.set_flip_h(facing[1])
-	_sprite_swap.set_motion_speed(velocity.length(), 260.0)
+	RiderGaitVisual.apply(_sprite_swap,velocity,max_speed,RiderGaitVisual.from_speed(velocity.length(),max_speed),get_physics_process_delta_time())
 	queue_redraw()
 
 func _process_throw_input(delta: float) -> void:

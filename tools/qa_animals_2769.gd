@@ -5,7 +5,7 @@ var goats:Array=[]
 var bulls:Array=[]
 var title:Label
 func _ready()->void:
- get_tree().root.size=Vector2i(1280,720);PixelLabTrial.initialized=true;PixelLabTrial.pig_enabled=true;PixelLabTrial.goat_enabled=true
+ get_tree().root.size=Vector2i(1280,720);
  var bg=ColorRect.new();bg.color=Color("d8e0cb");bg.size=Vector2(1280,720);add_child(bg)
  title=Label.new();title.position=Vector2(25,10);title.add_theme_color_override("font_color",Color("251f21"));title.add_theme_font_size_override("font_size",24);add_child(title)
  var labels=["Derecha","Diagonal abajo","Abajo","Diagonal izq.","Izquierda","Diagonal arriba","Arriba","Diagonal der."]

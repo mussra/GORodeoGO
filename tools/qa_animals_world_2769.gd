@@ -1,7 +1,7 @@
 extends SceneTree
 func _initialize()->void:call_deferred("run")
 func run()->void:
- var SaveData=root.get_node("SaveData");root.size=Vector2i(1280,720);PixelLabTrial.initialized=true;PixelLabTrial.pig_enabled=true;PixelLabTrial.goat_enabled=true;PixelLabTrial.bull_enabled=true
+ var SaveData=root.get_node("SaveData");root.size=Vector2i(1280,720);
  SaveData.save_path="user://qa-visual69-isolated.dat";SaveData.world_seed=7781;SaveData.world_position=Vector2(-360,400);SaveData.world_edits.clear();SaveData.world_tamed.clear();SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
  var world=load("res://src/Presentation/frontier_world.gd").new();root.add_child(world)
  while world._loading_world:await process_frame

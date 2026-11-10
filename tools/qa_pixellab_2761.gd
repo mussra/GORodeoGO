@@ -17,7 +17,7 @@ func _physics_process(delta:float)->void:
  horse.position+=direction*delta*110
 func run()->void:
  TranslationServer.set_locale("es");get_tree().root.size=Vector2i(1280,720)
- PixelLabTrial.initialized=true;PixelLabTrial.enabled=true
+
  SaveData.save_path="user://qa-pixellab61.dat";SaveData.world_seed=7781;SaveData.world_edits=[];SaveData.world_position=Vector2(-360,400)
  SaveData.world_tamed=[];SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
  world=load("res://src/Presentation/frontier_world.gd").new();add_child(world)

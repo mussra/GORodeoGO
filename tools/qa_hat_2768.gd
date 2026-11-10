@@ -2,7 +2,7 @@ extends Node
 var elapsed:float=0
 func _ready()->void:
  TranslationServer.set_locale("es");get_tree().root.size=Vector2i(1280,720)
- PixelLabTrial.initialized=true;PixelLabTrial.enabled=true;PixelLabTrial.masks_enabled=true
+
  var bg=ColorRect.new();bg.color=Color("e7e3de");bg.size=Vector2(1280,720);add_child(bg)
  var title=Label.new();title.text="2.7.68 · sombrero limpio · 9 frames por vista · máscaras v5 intactas";title.position=Vector2(25,15);title.add_theme_color_override("font_color",Color("251f21"));title.add_theme_font_size_override("font_size",25);add_child(title)
  var vs=["up","diag_up","side","diag_down","down"]

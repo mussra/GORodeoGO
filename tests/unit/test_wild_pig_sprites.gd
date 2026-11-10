@@ -6,7 +6,7 @@ func test_pig_uses_shared_sprite_frames_and_keeps_capture_geometry()->void:
  assert_eq(pig.BODY_RADIUS,28.0)
  assert_almost_eq(pig._art.scale.x,.36,.001)
  assert_eq(pig._art.offset,Vector2(-80,-128))
- assert_eq(pig._art.sprite_frames.get_frame_count("run"),9 if PixelLabTrial.pig_active() else 10)
+ assert_eq(pig._art.sprite_frames.get_frame_count("run"),9)
  assert_eq(pig._art.sprite_frames.get_frame_count("idle"),1)
  assert_eq(pig._art.sprite_frames.get_frame_count("tired"),1)
  assert_eq(pig._art.sprite_frames.get_frame_texture("run",0).get_size(),Vector2(160,144))

@@ -1,7 +1,7 @@
 extends GutTest
 func test_removed_matte_stays_transparent_with_user_masks()->void:
  var audit=JSON.parse_string(FileAccess.get_file_as_string("res://tools/hat_cleanup_2768.json"))
- PixelLabTrial.initialized=true;PixelLabTrial.enabled=true;PixelLabTrial.masks_enabled=true
+
  var count:int=0
  for entry in audit:
   var bits=entry.path.split("/");var view=bits[4];var frame=int(bits[5].trim_prefix("frame_").trim_suffix(".png"))

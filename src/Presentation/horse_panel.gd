@@ -10,6 +10,7 @@ var parent_b:String="original"
 var choices:Dictionary={"coat":0,"pattern":0,"mane":0,"eyes":0,"legs":0,"spots":0,"finish":0}
 var focus_id:String="original"
 var focus_preview:Dictionary={}
+var detail_entries:Array=[]
 var atlas_family:Dictionary={}
 var atlas_family_page:int=0
 var atlas_page:int=0
@@ -86,7 +87,7 @@ func collection_view()->void:
    var emblem:=TextureRect.new();emblem.texture=HorseEmblem.mask(h.traits.emblem);emblem.modulate=Color(HorseEmblem.COLORS[h.traits.emblem.color]);emblem.custom_minimum_size=Vector2(45,45);emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(emblem)
   var eq:=Button.new();eq.size_flags_vertical=Control.SIZE_SHRINK_CENTER;eq.custom_minimum_size=Vector2(124,56);eq.text=tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_059");eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
    message=(tr("UI_084") if SaveData.trial_session_active else tr("UI_085")) if SaveData.select_horse(h.id) else tr("UI_086");refresh())
-  var fam:=Button.new();fam.size_flags_vertical=Control.SIZE_SHRINK_CENTER;fam.custom_minimum_size=Vector2(100,56);fam.text=tr("FICHA");row.add_child(fam);fam.pressed.connect(func():focus_id=h.id;show_page("detail"))
+  var fam:=Button.new();fam.size_flags_vertical=Control.SIZE_SHRINK_CENTER;fam.custom_minimum_size=Vector2(100,56);fam.text=tr("FICHA");row.add_child(fam);fam.pressed.connect(func():detail_entries=SaveData.horse_collection.horses.map(func(item):return {"horse":item,"owned":true});focus_id=h.id;show_page("detail"))
  if scroll_to_newest:
   scroll_to_newest=false
   scroll.set_deferred("scroll_vertical",2147483647)
@@ -131,6 +132,14 @@ func detail_view()->void:
  var owned:bool=not h.is_empty()
  if not owned:h=focus_preview
  if h.is_empty():return
+ var entries:Array=detail_entries
+ if entries.is_empty():entries=SaveData.horse_collection.horses.map(func(item):return {"horse":item,"owned":true})
+ var selected:int=0
+ for i in entries.size():
+  var candidate:Dictionary=entries[i].horse
+  if (owned and candidate.get("id","")==focus_id) or (not owned and candidate.traits==h.traits):selected=i;break
+ ItemPager.create(content,Vector2(480,20),340,selected,entries.size(),func(i:int):
+  var item:Dictionary=entries[i].horse;focus_id=str(item.get("id",""));focus_preview=item;refresh())
  var t:Dictionary=h.traits
  var title:String=str(h.get("name","")) if owned else HorseCollection.COATS[t.coat]+" · "+HorseCollection.PATTERNS[t.pattern]+" · "+HorseCollection.MANES[t.mane]
  label(title,Vector2(35,110),26)
@@ -241,16 +250,14 @@ func atlas_view()->void:
   var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,420);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():
    if page=="atlas":
     atlas_family_page=atlas_page;atlas_family=h.traits.duplicate(true);atlas_page=0;show_page("atlas_variants")
-   else:focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
+   else:detail_entries=entries;focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
   var texts:Array=HorseValues.visual(t)+HorseValues.performance(h,entry.owned)
   texts.append("Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)])
   if page=="market":texts.append(tr("MARKET_PRICE")%HorseMarket.buy_price(h))
   for i in texts.size():label(str(texts[i]),Vector2(x+180,y+48+i*27),17)
  content=outer
- button(tr("UI_132"),Vector2(35,575),func():atlas_page=maxi(0,atlas_page-1);refresh())
+ ItemPager.create(content,Vector2(345,575),540,atlas_page,pages,func(i:int):atlas_page=i;refresh())
  if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(892,588),17)
- label(tr("UI_128")%[atlas_page+1,pages],Vector2(345,585),23)
- button(tr("UI_133"),Vector2(650,575),func():atlas_page=mini(pages-1,atlas_page+1);refresh())
 
 func confirm_trade(h:Dictionary,selling:bool)->void:
  var dialog:=ConfirmationDialog.new();dialog.title=tr("MARKET_TITLE")

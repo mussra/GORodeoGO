@@ -32,7 +32,7 @@ func test_failed_save_rolls_back_selected_hat()->void:
  var sut=FailingSave.new();sut.hat_color="blue"
  assert_false(sut.select_hat("sand"));assert_eq(sut.hat_color,"blue");sut.free()
 func test_all_existing_frames_have_both_variants()->void:
- for anim in ["idle","stunned","walk_side","walk_down","walk_up","walk_diag_down","walk_diag_up"]:
+ for anim in ["idle","stunned","jump_side","jump_down","jump_up","jump_diag_down","jump_diag_up"]:
   for file in DirAccess.get_files_at("res://art/player/"+anim):
    if not file.ends_with(".png"):continue
    for color in ["blue","sand"]:assert_true(ResourceLoader.exists(HatAppearance.art_root(color)+anim+"/"+file))

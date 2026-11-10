@@ -6,11 +6,11 @@ const DIRS: Array[String] = ["down", "up", "diag_down", "diag_up"]
 
 func test_directional_frames_exist():
 	for d in DIRS:
-		assert_true(ResourceLoader.exists("res://art/world/wild_base/%s/frame_00.png" % d), "missing base " + d)
+		assert_true(ResourceLoader.exists("res://art/experimental/pixellab/horse/%s/frame_00.png" % d), "missing base " + d)
 
 func test_directional_masks_exist():
 	for d in DIRS:
-		assert_true(ResourceLoader.exists("res://art/horse_masks/wild_%s/frame_00.png" % d), "missing mask " + d)
+		assert_true(ResourceLoader.exists("res://art/experimental/pixellab_masks_review_v5/horse/%s/color_00.png" % d), "missing mask " + d)
 
 const Art := preload("res://src/Presentation/wild_horse_art.gd")
 

@@ -1,8 +1,8 @@
 extends GutTest
 func test_trial_replaces_five_views_and_idle_without_touching_genes()->void:
- PixelLabTrial.initialized=true;PixelLabTrial.enabled=true
+
  var frames:=SpriteFrames.new();frames.add_animation("walk_up")
- var original:Texture2D=load("res://art/world/wild_base/walk_up/frame_00.png")
+ var original:Texture2D=load("res://art/experimental/pixellab/horse/up/frame_00.png")
  frames.add_frame("walk_up",original)
  PixelLabTrial.apply(frames,"horse","walk")
  assert_eq(frames.get_frame_count("walk"),9)
@@ -12,17 +12,18 @@ func test_trial_replaces_five_views_and_idle_without_touching_genes()->void:
   assert_eq(frames.get_frame_count(view),9)
   assert_eq(frames.get_animation_speed(view),9.0)
  for i in 9:assert_eq(frames.get_frame_texture("walk",i).get_size(),Vector2(96,96))
-func test_disabled_preserves_original_and_rider_uses_nine_frames()->void:
+func test_rider_always_uses_nine_frames()->void:
  var frames:=SpriteFrames.new();frames.add_animation("walk_side")
- frames.add_frame("walk_side",load("res://art/player/walk_side/frame_00.png"))
- PixelLabTrial.enabled=false;PixelLabTrial.apply(frames,"rider","walk_side")
- assert_eq(frames.get_frame_count("walk_side"),1)
- PixelLabTrial.enabled=true;PixelLabTrial.apply(frames,"rider","walk_side")
+ frames.add_frame("walk_side",load("res://art/experimental/pixellab/rider/side/frame_00.png"))
+ PixelLabTrial.apply(frames,"rider","walk_side")
+ assert_eq(frames.get_frame_count("walk_side"),9)
+ PixelLabTrial.apply(frames,"rider","walk_side")
  assert_eq(frames.get_frame_count("walk_side"),9)
 func after_all()->void:
- PixelLabTrial.initialized=false
+ pass
+
 func test_world_and_level_rider_both_use_shared_trial()->void:
- PixelLabTrial.initialized=true;PixelLabTrial.enabled=true
+
  SaveData.horse_collection.seed_trial()
  var world_rider:Node2D=load("res://src/Presentation/world_player.gd").new();add_child_autofree(world_rider)
  assert_eq(world_rider._sprite_swap._frames.get_frame_count("walk_side"),9)

@@ -4,7 +4,7 @@ extends GutTest
 ## (r/g > 0.5); the stamp must stay inside them.
 
 const EMBLEM:Dictionary={"shape":0,"division":0,"left":0,"right":1,"color":0}
-const FAMILIES:Array[String]=["idle","walk_side","walk_down","walk_up","walk_diag_down","walk_diag_up","jump_side","jump_down","jump_up","jump_diag_down","jump_diag_up","stunned"]
+const FAMILIES:Array[String]=["idle","jump_side","jump_down","jump_up","jump_diag_down","jump_diag_up","stunned"]
 
 func _frame_files(dir_path:String)->Array[String]:
  var out:Array[String]=[]

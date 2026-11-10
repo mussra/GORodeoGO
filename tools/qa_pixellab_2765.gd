@@ -18,7 +18,7 @@ func _physics_process(delta:float)->void:
  title.text="PixelLab · 5 vistas · "+names[index]+" · máscaras v5"
 func run()->void:
  TranslationServer.set_locale("es");get_tree().root.size=Vector2i(1280,720)
- PixelLabTrial.initialized=true;PixelLabTrial.enabled=true;PixelLabTrial.masks_enabled=true
+
  SaveData.save_path="user://qa-pixellab61.dat";SaveData.world_seed=7781;SaveData.world_edits=[];SaveData.world_position=Vector2(-360,400)
  SaveData.world_tamed=[];SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
  var selected=SaveData.horse_collection.find(SaveData.horse_collection.selected);selected.traits={"coat":12,"pattern":2,"mane":0,"spots":5,"finish":"matte"}

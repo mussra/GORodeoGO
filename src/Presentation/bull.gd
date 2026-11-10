@@ -146,7 +146,10 @@ func _physics_process(delta: float) -> void:
 				velocity = offset.normalized() * minf(80.0, offset.length() / delta) if offset.length() > 1 else Vector2.ZERO
 				move_and_slide()
 				_blocked_detector.reset()
-				_sprite_swap.play("drinking")
+				if velocity.length()>5.0:
+					_update_flee_animation(velocity.normalized(),delta)
+					_sprite_swap.set_motion_speed(velocity.length(),flee_speed)
+				else:_sprite_swap.play("drinking")
 				return
 			if _leaving_corral and _release_delay > 0:
 				_release_delay -= delta
@@ -325,7 +328,7 @@ func _update_flee_animation(flee_direction: Vector2, delta: float) -> void:
 	var dir_info: Array = SpriteSwap.direction_suffix(_facing.update(flee_direction, delta))
 	if _sprite_swap.play("flee_" + dir_info[0]):
 		_sprite_swap.set_flip_h(dir_info[1])
-		_sprite_swap.set_motion_speed(0.0, flee_speed)
+		_sprite_swap.set_motion_speed(velocity.length(), flee_speed)
 		modulate = Color.WHITE
 	else:
 		_sprite_swap.stop_on_idle()

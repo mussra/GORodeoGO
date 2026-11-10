@@ -27,10 +27,10 @@ func test_shared_maps_have_islands_and_gaps_and_wrap()->void:
   assert_gt(low,10);assert_gt(high,10)
   assert_almost_eq(HorsePatternMap.coverage(Vector2(5,8),pattern),HorsePatternMap.coverage(Vector2(101,104),pattern),.001)
 func test_custom_legs_do_not_touch_tail_hooves_or_rider()->void:
- var source:Texture2D=load("res://art/player/walk_diag_down/frame_00.png")
- var base:=HorseAppearance.texture(source,"walk_diag_down",0,{"coat":10,"pattern":0,"mane":0}).get_image()
- var colored:=HorseAppearance.texture(source,"walk_diag_down",0,{"coat":10,"pattern":0,"mane":0,"legs":3}).get_image()
- var mask:Image=load("res://art/lower_legs_masks/walk_diag_down/frame_00.png").get_image()
+ var source:Texture2D=load("res://art/player/jump_diag_down/frame_00.png")
+ var base:=HorseAppearance.texture(source,"jump_diag_down",0,{"coat":10,"pattern":0,"mane":0}).get_image()
+ var colored:=HorseAppearance.texture(source,"jump_diag_down",0,{"coat":10,"pattern":0,"mane":0,"legs":3}).get_image()
+ var mask:Image=load("res://art/lower_legs_masks/jump_diag_down/frame_00.png").get_image()
  if mask.is_compressed():mask.decompress()
  var changed:=0
  for y in base.get_height():

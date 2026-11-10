@@ -44,18 +44,21 @@ func test_every_level_can_release_capture_calm_deliver_and_win() -> void:
 		level.queue_free()
 		await wait_physics_frames(2)
 
-func test_loaded_sprite_animation_advances_and_idle_loops() -> void:
+func test_nominal_sprite_cycle_advances_and_idle_is_still() -> void:
 	GameState.selected_level = 1
 	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
 	add_child_autofree(level)
 	await wait_physics_frames(2)
 	var sprite: AnimatedSprite2D = level.player._sprite_swap._sprite
-	assert_eq(sprite.sprite_frames.get_frame_count("walk_diag_down"), 12)
+	assert_eq(sprite.sprite_frames.get_frame_count("walk_diag_down"), 9)
 	assert_true(sprite.is_playing())
-	var first_frame: int = sprite.frame
-	await wait_seconds(0.4)
-	assert_ne(sprite.frame, first_frame, "idle animation really advances in the engine")
 	assert_eq(sprite.animation, "idle")
+	assert_eq(sprite.frame, 0, "stationary rider intentionally holds idle")
+	level.player.set_physics_process(false)
+	level.player._sprite_swap.play("walk_diag_down")
+	var phase:float=float(sprite.frame)+sprite.frame_progress
+	await wait_seconds(.15)
+	assert_ne(float(sprite.frame)+sprite.frame_progress, phase, "nominal cycle advances")
 
 func test_resolve_capture_does_not_reorder_active_bulls() -> void:
 	# Ant 22:22 ("se ha estropeado el modo de los toros"): resolve_capture sorted

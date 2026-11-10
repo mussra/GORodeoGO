@@ -10,8 +10,8 @@ func test_save_load_remove_and_cosmetic_only()->void:
 func test_failed_save_rolls_back_and_rejects_bad_config()->void:
  var s=load("res://src/Application/save_data.gd").new();s.save_path="user://missing-emblem-dir/fail.dat";s.horse_collection.seed_trial();var before:Dictionary=s.horse_collection.export_state();assert_false(s.set_horse_emblem("original",HorseEmblem.DEFAULT));assert_eq(s.horse_collection.export_state(),before);assert_false(s.set_horse_emblem("original",{}));assert_push_error_count(2);s.free()
 func test_no_pixels_change_outside_separate_zone()->void:
- var source:Texture2D=load("res://art/player/walk_side/frame_00.png");var image:Image=source.get_image();if image.is_compressed():image.decompress()
- var before:=image.duplicate();var zone:Image=load("res://art/lineage_masks/walk_side/frame_00.png").get_image();if zone.is_compressed():zone.decompress()
+ var source:Texture2D=load("res://art/player/jump_side/frame_00.png");var image:Image=source.get_image();if image.is_compressed():image.decompress()
+ var before:=image.duplicate();var zone:Image=load("res://art/lineage_masks/jump_side/frame_00.png").get_image();if zone.is_compressed():zone.decompress()
  HorseEmblem.stamp(image,zone,HorseEmblem.DEFAULT);var changes:int=0
  for y in image.get_height():
   for x in image.get_width():

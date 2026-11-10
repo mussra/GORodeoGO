@@ -1,6 +1,6 @@
 extends GutTest
 func test_real_world_animals_rope_and_corral_bull_art()->void:
- PixelLabTrial.initialized=true;PixelLabTrial.enabled=true;PixelLabTrial.pig_enabled=true;PixelLabTrial.goat_enabled=true;PixelLabTrial.bull_enabled=true
+
  SaveData.save_path="user://qa-animals69-isolated.dat";SaveData.world_seed=7781;SaveData.world_position=Vector2(-360,400);SaveData.world_edits=[];SaveData.world_tamed=[];SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
  var world=load("res://src/Presentation/frontier_world.gd").new();add_child_autofree(world)
  var frames:int=0

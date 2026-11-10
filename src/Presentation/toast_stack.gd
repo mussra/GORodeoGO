@@ -1,18 +1,17 @@
 class_name ToastStack
 extends Control
-## Same non-blocking readable notices for the world and levels. Three are
-## visible together; overflow waits FIFO and gets its full reading time.
-const MAX_VISIBLE:int=3
+## Shared compact, nonblocking notices. One visible; the rest wait FIFO.
+const MAX_VISIBLE:int=1
 var active:Array[Dictionary]=[]
 var pending:Array[Dictionary]=[]
 var column:VBoxContainer
 var top_offset:float=60.0
 static func reading_seconds(text:String,minimum:float=0.0)->float:
- return maxf(minimum,clampf(4.0+float(text.length())/15.0,5.0,16.0))
+ return maxf(minimum,clampf(2.5+float(text.length())/24.0,3.0,7.0))
 static func backdrop(label:Label)->void:
- var box:=RanchTheme.box(Color(0.035,0.09,0.12,.90),Color(.45,.65,.64,.8),10)
- box.content_margin_left=16;box.content_margin_right=16
- box.content_margin_top=10;box.content_margin_bottom=10
+ var box:=RanchTheme.box(Color(0.035,0.09,0.12,.56),Color(.45,.65,.64,.8),10)
+ box.content_margin_left=10;box.content_margin_right=10
+ box.content_margin_top=5;box.content_margin_bottom=5
  label.add_theme_stylebox_override("normal",box)
  label.add_theme_color_override("font_color",Color("fff1d2"))
  label.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -24,8 +23,8 @@ func _ready()->void:
 func _layout()->void:
  if column==null:return
  var viewport_size:Vector2=get_viewport_rect().size
- var width:float=minf(780.0,viewport_size.x-48.0)
- column.position=Vector2((viewport_size.x-width)/2,top_offset)
+ var width:float=minf(640.0,viewport_size.x*.44)
+ column.position=Vector2(16,top_offset)
  column.size.x=width
  for notice in active:notice.label.custom_minimum_size.x=width
 func set_top(value:float)->void:
@@ -44,9 +43,9 @@ func _fill()->void:
  while active.size()<MAX_VISIBLE and not pending.is_empty():
   var next:Dictionary=pending.pop_front()
   var label:=Label.new();label.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED
-  label.text=next.text;label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  label.text=next.text;label.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT
   label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-  label.add_theme_font_size_override("font_size",21);backdrop(label)
+  label.add_theme_font_size_override("font_size",20);backdrop(label)
   label.custom_minimum_size.x=column.size.x
   column.add_child(label)
   active.append({"text":next.text,"left":next.duration,"label":label})

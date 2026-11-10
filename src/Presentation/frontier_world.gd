@@ -222,10 +222,10 @@ func _lasso_pigs() -> Array:
 	var out: Array = []
 	for key in _chunks:
 		var pen: Node2D = _chunks[key].get_node_or_null("pigs")
-		if pen == null:
+		if pen == null or pen.is_queued_for_deletion():
 			continue
 		for pig in pen.get_children():
-			if is_instance_valid(pig):
+			if is_instance_valid(pig) and not pig.is_queued_for_deletion():
 				out.append(pig)
 	return out
 
@@ -374,6 +374,7 @@ func _advance_builder(b: Dictionary) -> void:
 			b["data"] = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, cx, cy), SaveData.world_edits, cx, cy)
 			var node := Node2D.new()
 			node.set_meta("c", Vector2i(cx, cy))
+			node.y_sort_enabled=true
 			var ground := ColorRect.new()
 			ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			ground.color = Color("32653a").lerp(Color("3a7142"), float(absi(hash(WorldMap.chunk_key(cx, cy))) % 100) / 220.0)
@@ -409,6 +410,8 @@ func _advance_builder(b: Dictionary) -> void:
 			var pigs: Dictionary = (b["data"] as Dictionary).get("pigs", {})
 			var pig_id: String = WorldEdits.edited_pen_id(pigs.get("pos", Vector2.ZERO)) if pigs.get("edited", false) else WorldMap.pig_id(cx, cy)
 			if not pigs.is_empty() and not SaveData.world_pigs.has(pig_id):
+				if not (b["node"] as Node).has_node("pigs"):
+					var container:=Node2D.new();container.name="pigs";container.y_sort_enabled=true;(b["node"] as Node).add_child(container)
 				var todo: Array = b["pig_todo"]
 				if todo.is_empty() and int(b["pig_idx"]) == 0:
 					var base: Vector2 = pigs["pos"]
@@ -434,7 +437,7 @@ func _advance_builder(b: Dictionary) -> void:
 			b["phase"] = 4
 		4:
 			# Frames del caballo de la manada: una textura recoloreada por paso
-			# (61 en total; es el 90% del coste del chunk). Misma caché por
+			# (46 en total; coste repartido por la carga incremental). Misma caché por
 			# genotipo que wild_horse_art.gd, así manadas repetidas son gratis.
 			var herd: Dictionary = (b["data"] as Dictionary).get("herd", {})
 			var mission_id: String = WorldMap.herd_mission_id(cx, cy)
@@ -453,21 +456,14 @@ func _advance_builder(b: Dictionary) -> void:
 			if b["frame_specs"] == null:
 				var frames := SpriteFrames.new()
 				b["frames"] = frames
-				var specs: Array = PixelLabTrial.frame_specs("horse") if PixelLabTrial.active() else []
-				for spec in [["wild_side", [0], "idle", 3.0], ["wild_walk_side", range(12), "walk", 12.0], ["wild_walk_down", range(12), "walk_down", 12.0], ["wild_walk_up", range(12), "walk_up", 12.0], ["wild_walk_diag_down", range(12), "walk_diag_down", 12.0], ["wild_walk_diag_up", range(12), "walk_diag_up", 12.0]]:
-					for i in (spec[1] if not PixelLabTrial.active() else []):
-						specs.append([spec[0], i, spec[2], spec[3]])
+				var specs:Array=PixelLabTrial.frame_specs("horse")
 				b["frame_specs"] = specs
 			var step: Array = (b["frame_specs"] as Array).pop_front()
 			var frames: SpriteFrames = b["frames"]
 			if not frames.has_animation(step[2]):
 				frames.add_animation(step[2])
 				frames.set_animation_speed(step[2], step[3])
-			if PixelLabTrial.active():
-				frames.add_frame(step[2],PixelLabTrial.pose_texture("horse",step[0],int(step[1]),traits))
-			else:
-				var base: Texture2D = load("res://art/world/wild_base/%s/frame_%02d.png" % [String(step[0]).trim_prefix("wild_"), int(step[1])])
-				frames.add_frame(step[2], HorseAppearance.texture(base, step[0], int(step[1]), traits))
+			frames.add_frame(step[2],PixelLabTrial.pose_texture("horse",step[0],int(step[1]),traits))
 			if (b["frame_specs"] as Array).is_empty():
 				WildHorseArtScript.frame_cache[cache_key] = frames
 				b["herd_cursor"] = int(b["herd_cursor"])+1
@@ -486,12 +482,10 @@ func _activate_built(key: String) -> void:
 	var cy: int = b["cy"]
 	var entities: Array = b["entities"]
 	for e in entities:
-		add_child(e)
+		if e.get_script()==PigScript:(b["node"] as Node).get_node("pigs").add_child(e)
+		else:add_child(e)
 	for box in b["boxes"]:
 		entities.append(Physics.add_box(self, box))
-	for e in entities.duplicate():
-		if e is Node2D and String((e as Node2D).name).begins_with("pig"):
-			entities.append(Physics.add_box(self, Rect2((e as Node2D).position + Vector2(-12, -6), Vector2(24, 12))))
 	for occ in b["occluders"]:
 		register_occluder(key, occ)
 	var data: Dictionary = b["data"]
@@ -689,11 +683,11 @@ func _tick_pigs(delta: float) -> void:
 	for key in _chunks:
 		var node: Node2D = _chunks[key]
 		var pen: Node2D = node.get_node_or_null("pigs")
-		if pen == null:
+		if pen == null or pen.is_queued_for_deletion():
 			continue
 		var all_captured: bool = true
 		for pig in pen.get_children():
-			if pig.name == "bar":
+			if pig.name == "bar" or pig.is_queued_for_deletion():
 				continue
 			var dist: float = player.position.distance_to(pig.position)
 			if dist > 700.0 and not pig.roped:

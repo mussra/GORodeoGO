@@ -26,6 +26,7 @@ var edge_nodes:Array=[]
 var display_positions:Dictionary={}
 var graph_scale:float=0.8
 var focus_positions:Dictionary={}
+var item_pager:ItemPager
 func _exit_tree()->void:
  if motion!=null:motion.kill()
 func _ready()->void:
@@ -35,6 +36,8 @@ func _ready()->void:
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(_layout);_layout()
  MenuNavigation.header(canvas,tr("GEN_TITLE"),queue_free)
+ item_pager=ItemPager.create(canvas,Vector2(640,20),340,0,0,func(i:int):
+  var records:Array=HorseGenealogy.records(collection);select(str(records[i].id)))
  var search:=LineEdit.new();search.placeholder_text=tr("GEN_SEARCH");search.position=Vector2(25,95);search.size=Vector2(330,50);canvas.add_child(search);search.text_changed.connect(func(v):query=v;draw_graph())
  FilterDrawer.button(canvas,Vector2(375,95),active_filter_count(),open_filters)
  _button("−",Vector2(610,95),60,func():set_zoom(zoom-.15));_button("+",Vector2(680,95),60,func():set_zoom(zoom+.15))
@@ -99,6 +102,11 @@ func _map_input(event:InputEvent)->void:
 func _unhandled_input(event:InputEvent)->void:
  if event is InputEventMagnifyGesture:set_zoom(zoom*event.factor);get_viewport().set_input_as_handled()
 func draw_graph()->void:
+ if is_instance_valid(item_pager):
+  var records:Array=HorseGenealogy.records(collection);var current:int=0
+  for i in records.size():
+   if str(records[i].id)==selected:current=i;break
+  item_pager.visible=not selected.is_empty();item_pager.set_state(current,records.size())
  if view==null:return
  var old_positions:Dictionary=display_positions.duplicate()
  var saved_scroll:=Vector2(view.scroll_horizontal,view.scroll_vertical)
