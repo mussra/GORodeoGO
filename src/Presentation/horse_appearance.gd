@@ -157,7 +157,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
      else:tpos=(float(y)-25.0)/28.0
      var u:float=clampf(tpos,0.0,.999)*6.0
      color=palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.0,1.0,u-floorf(u)))
-    else:color=Color(MANES[int(t.mane)])
+    else:color=Color("33302e") if anim=="foal" and int(t.mane)==0 else Color(MANES[int(t.mane)])
    elif int(t.pattern)>0:
     var mark:bool=false
     var point:Vector2=body_point(uv,x,y,bob) if int(t.pattern) not in [3,4] else Vector2(x,y-bob)
@@ -191,7 +191,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
    if leg_mask.is_compressed():leg_mask.decompress()
    var original:Image=source.get_image()
    if original.is_compressed():original.decompress()
-   var leg_color:=Color(COLORS[HorseCollection.legs_index(t)])
+   var leg_color:=Color("33302e") if anim=="foal" and HorseCollection.legs_index(t)==0 else Color(COLORS[HorseCollection.legs_index(t)])
    for ly in image.get_height():
     for lx in image.get_width():
      var coverage:float=leg_mask.get_pixel(lx,ly).r

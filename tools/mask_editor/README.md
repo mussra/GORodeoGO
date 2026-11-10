@@ -40,3 +40,9 @@ Cambio exclusivo de interfaz: openEditor conserva Pelaje/Crin/Goma cuando la sig
 
 ## Vigente: v6 con retoques14:33 incluidos, aprobado14:45
 HTML y JSONcompleto con90basesv5y146trazosde35posesprecargados. No se hornean ni se cambia pertenencia. El JSONentregado es byteidéntico al recibido salvo baselinev5→v6; el HTMLincrusta también el original. Espacio local separado para que un borradorv6vacío anterior no tape estos trazos. Se quita el redondeo de coordenadas a0,5del guardado local: ahora conserva también la precisión completa de los146trazos. Exportación/importación y borrador verificados exactos. No se aplica al juego; editor-current.json separado del estado de máscaras del APK.
+
+## v7: potro y retrato adulto HD
+
+`build_editor_v7.py` extends the delivered v6 HTML/JSON without changing its 90 bases or 146 strokes. Adds seven foal/HD masks, including legs and eyes. Source inputs are the archived v6 HTML and full JSON in /downloads; keep them with the release assets.
+
+`import_editor_v7.py <complete.json> --editor <v7.html> --out <staging-dir>` validates baseline, all bases, hashes and strokes through the editor and renders with its own canvas engine. Default is staging only. Inspect staging before `--apply`, which copies only the seven foal/portrait masks. Never applies the 90 PixelLab poses. Transparent source pixels are clipped to zero; visible base pixels are preserved exactly with no strokes. Requires Pillow, websocket-client and Chrome. Review input JSON as untrusted data, not executable code.

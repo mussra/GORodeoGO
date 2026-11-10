@@ -1,0 +1,51 @@
+{
+  "foal-color": {
+    "path": "art/horse_masks/foal/frame_00.png",
+    "source": "art/foal/base.png",
+    "hash": "317dfe23d106d554ba1c9148d87214d8b2c7570bbfe872b1fba519bc59285f5c",
+    "w": 299,
+    "h": 346
+  },
+  "foal-lower-legs": {
+    "path": "art/lower_legs_masks/foal/frame_00.png",
+    "source": "art/foal/base.png",
+    "hash": "7032ef8ad203075b641835a00468c43ac2bab73a6ebdc3a50fdc94e4649efbb5",
+    "w": 299,
+    "h": 346
+  },
+  "foal-eyes": {
+    "path": "art/foal/eyes.png",
+    "source": "art/foal/base.png",
+    "hash": "4f3a8d37df74a84c5c33ef98844a1e21b30e771e7e5b593da4c18ae182d43061",
+    "w": 299,
+    "h": 346
+  },
+  "portrait-color": {
+    "path": "art/portraits/adult_hd_mask.png",
+    "source": "art/portraits/adult_hd.png",
+    "hash": "a9d337e260ed4c492743b11db36c10ce3257944a6ad6da1308663687310fd53d",
+    "w": 936,
+    "h": 983
+  },
+  "portrait-lower-legs": {
+    "path": "art/portraits/adult_lower_legs_mask.png",
+    "source": "art/portraits/adult_hd.png",
+    "hash": "ab183f156d4271b9276d638802edc4e74bfe305826f4277d0de45b29eeb0751c",
+    "w": 936,
+    "h": 983
+  },
+  "portrait-light-legs": {
+    "path": "art/portraits/adult_light_legs_mask.png",
+    "source": "art/portraits/adult_hd.png",
+    "hash": "5f5b0c8752c92d6125648add4439690637b849984f2b209c076ffd6ea0110715",
+    "w": 936,
+    "h": 983
+  },
+  "portrait-eyes": {
+    "path": "art/portraits/adult_eyes.png",
+    "source": "art/portraits/adult_hd.png",
+    "hash": "17c38fa1fe1db32cc3db49c3cfa70eca4bd9b6c7d5144b846b9d064a27039a4f",
+    "w": 936,
+    "h": 983
+  }
+}

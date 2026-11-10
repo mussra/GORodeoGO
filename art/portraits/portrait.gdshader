@@ -38,12 +38,12 @@ float natural_spots(vec2 p){
   float cs=cos(spot.w),sn=sin(spot.w);q=mat2(vec2(cs,-sn),vec2(sn,cs))*q;
   vec2 edge=abs(q)-vec2(spot.z,spot.z*.85);
   float distance_to_edge=max(edge.x,edge.y);
-  cover=max(cover,1.-smoothstep(-.1,.1,distance_to_edge));
+  cover=max(cover,1.-smoothstep(-max(fwidth(distance_to_edge),.1),max(fwidth(distance_to_edge),.1),distance_to_edge));
  }
  return cover;
 }
 float shape_cover(vec2 q,int shape){
- if(shape==5){q.y=-q.y+.25;float a=dot(q,q)-1.;return 1.-smoothstep(-.04,.04,a*a*a-q.x*q.x*q.y*q.y*q.y);}
+ if(shape==5){q.y=-q.y+.25;float a=dot(q,q)-1.;float field=a*a*a-q.x*q.x*q.y*q.y*q.y;float aa=max(fwidth(field),.025);return 1.-smoothstep(-aa,aa,field);}
  if(shape==6){
   bool inside=false;vec2 last=vec2(cos(-1.570796+9.*.6283185),sin(-1.570796+9.*.6283185))*.48;
   for(int k=0;k<10;k++){float angle=-1.570796+float(k)*.6283185;vec2 v=vec2(cos(angle),sin(angle))*(k%2==0?1.2:.48);
