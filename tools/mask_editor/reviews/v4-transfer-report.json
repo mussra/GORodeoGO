@@ -1,0 +1,178 @@
+[
+  {
+    "actor": "horse",
+    "view": "diag_down",
+    "frame": 3,
+    "source_actor": "rider",
+    "dx": 7.666666666666666,
+    "dy": -11.46875,
+    "scale_x": 0.8333333333333334,
+    "scale_y": 0.90625,
+    "filled_occluded_pixels": 743
+  },
+  {
+    "actor": "horse",
+    "view": "diag_down",
+    "frame": 4,
+    "source_actor": "rider",
+    "dx": 6.2058823529411775,
+    "dy": -13.16393442622951,
+    "scale_x": 0.8529411764705882,
+    "scale_y": 0.9344262295081968,
+    "filled_occluded_pixels": 767
+  },
+  {
+    "actor": "horse",
+    "view": "diag_down",
+    "frame": 5,
+    "source_actor": "rider",
+    "dx": 6.542857142857143,
+    "dy": -4.575757575757574,
+    "scale_x": 0.8714285714285714,
+    "scale_y": 0.8787878787878788,
+    "filled_occluded_pixels": 822
+  },
+  {
+    "actor": "horse",
+    "view": "diag_down",
+    "frame": 6,
+    "source_actor": "rider",
+    "dx": 5.126760563380282,
+    "dy": -2.470588235294116,
+    "scale_x": 0.8873239436619719,
+    "scale_y": 0.8235294117647058,
+    "filled_occluded_pixels": 807
+  },
+  {
+    "actor": "horse",
+    "view": "diag_down",
+    "frame": 7,
+    "source_actor": "rider",
+    "dx": 5.115942028985508,
+    "dy": 5.4,
+    "scale_x": 0.8985507246376812,
+    "scale_y": 0.76,
+    "filled_occluded_pixels": 832
+  },
+  {
+    "actor": "horse",
+    "view": "diag_down",
+    "frame": 8,
+    "source_actor": "rider",
+    "dx": 4.484848484848484,
+    "dy": 4.444444444444445,
+    "scale_x": 0.8939393939393939,
+    "scale_y": 0.7777777777777778,
+    "filled_occluded_pixels": 744
+  },
+  {
+    "actor": "horse",
+    "view": "diag_down",
+    "frame": 9,
+    "source_actor": "rider",
+    "dx": 5.846153846153847,
+    "dy": 3.859154929577464,
+    "scale_x": 0.8769230769230769,
+    "scale_y": 0.8309859154929577,
+    "filled_occluded_pixels": 792
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 1,
+    "source_actor": "rider",
+    "dx": 4.068965517241381,
+    "dy": -15.096774193548388,
+    "scale_x": 0.896551724137931,
+    "scale_y": 0.967741935483871,
+    "filled_occluded_pixels": 404
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 2,
+    "source_actor": "rider",
+    "dx": 0.3888888888888893,
+    "dy": 2.1111111111111107,
+    "scale_x": 0.9814814814814815,
+    "scale_y": 0.7777777777777778,
+    "filled_occluded_pixels": 480
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 3,
+    "source_actor": "rider",
+    "dx": 4.525423728813561,
+    "dy": 2.5,
+    "scale_x": 0.9152542372881356,
+    "scale_y": 0.75,
+    "filled_occluded_pixels": 492
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 4,
+    "source_actor": "rider",
+    "dx": 10.419354838709676,
+    "dy": 3.873239436619718,
+    "scale_x": 0.8387096774193549,
+    "scale_y": 0.7605633802816901,
+    "filled_occluded_pixels": 609
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 5,
+    "source_actor": "rider",
+    "dx": 14.682539682539684,
+    "dy": 3.9615384615384617,
+    "scale_x": 0.7936507936507936,
+    "scale_y": 0.7307692307692307,
+    "filled_occluded_pixels": 707
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 6,
+    "source_actor": "rider",
+    "dx": 18.75,
+    "dy": 2.571428571428571,
+    "scale_x": 0.75,
+    "scale_y": 0.7662337662337663,
+    "filled_occluded_pixels": 763
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 7,
+    "source_actor": "rider",
+    "dx": 15.476190476190476,
+    "dy": 2.1898734177215182,
+    "scale_x": 0.7936507936507936,
+    "scale_y": 0.7341772151898734,
+    "filled_occluded_pixels": 789
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 8,
+    "source_actor": "rider",
+    "dx": 8.786885245901638,
+    "dy": 0.23076923076922995,
+    "scale_x": 0.8360655737704918,
+    "scale_y": 0.7692307692307693,
+    "filled_occluded_pixels": 640
+  },
+  {
+    "actor": "horse",
+    "view": "diag_up",
+    "frame": 9,
+    "source_actor": "rider",
+    "dx": 8.876923076923077,
+    "dy": 0.4615384615384617,
+    "scale_x": 0.7846153846153846,
+    "scale_y": 0.7692307692307693,
+    "filled_occluded_pixels": 575
+  }
+]
