@@ -93,6 +93,9 @@ func _on_aim_pressed() -> void:
 ## Shared gesture machine (src/Application/lasso_gesture.gd): tap vs drag,
 ## cancel near the centre (D037), double tap drops a capture (D038).
 func _on_aim_released(input_vector: Vector2) -> void:
+	if not throw_guard.call():
+		cancel_input()
+		return
 	if not _touch_aim_active:
 		return
 	_touch_aim_active = false
@@ -108,6 +111,9 @@ func _on_aim_released(input_vector: Vector2) -> void:
 
 ## Keyboard/mouse path: aim_* actions steer, throw_lasso charges and releases.
 func process_throw_input(delta: float) -> void:
+	if not throw_guard.call():
+		cancel_input()
+		return
 	if _is_charging:
 		var aim_vec: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
 		if aim_vec.length() > 0.0:
@@ -180,10 +186,14 @@ func _cancel_charge() -> void:
 		_charge_visual = null
 	_is_charging = false
 	_charge_distance = 0.0
+	if get_parent() is CanvasItem:get_parent().queue_redraw()
 
 ## [param final_vector]: the aim stick's exact release vector when present
 ## (avoids one-frame staleness); zero means keyboard/mouse fallback.
 func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
+	if not throw_guard.call():
+		cancel_input()
+		return
 	if not has_free_lasso_slot():
 		_cancel_charge()
 		throw_blocked.emit()

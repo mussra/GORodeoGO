@@ -101,7 +101,9 @@ func stun(duration: float = STUN_SECONDS) -> void:
 		stunned.emit()
 	_stun_time_remaining = maxf(_stun_time_remaining, duration * stun_resistance_multiplier)
 	modulate = Color(1.0, 0.5, 0.5, 1.0)  # no stun art in the world yet: corral's red-tint fallback
-	dodge.cancel()  # same as the corral's cancel_input on stun
+	dodge.cancel()
+	lasso.cancel_input()  # cancel held aim, but let an already thrown rope land
+	queue_redraw()
 
 func calm() -> float:
 	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
