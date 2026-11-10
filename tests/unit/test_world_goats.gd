@@ -27,3 +27,12 @@ func test_nominal_nine_frames_and_stable_pivot():
   assert_true(goat.goat_art.sprite_frames.get_frame_texture(view,0).resource_path.contains("pixellab/goat"))
  assert_eq(goat.goat_art.offset,Vector2(-80,-144))
  assert_eq(goat.goat_art.scale,Vector2.ONE*.40)
+
+func test_roped_goat_moves_towards_rider_not_away():
+ var goat=load("res://src/Presentation/wild_goat.gd").new();goat.setup({"pos":Vector2(200,200)});add_child_autofree(goat)
+ var rider=Vector2(50,200);var before:float=goat.position.distance_to(rider)
+ goat.move_from_or_towards(rider,.1,true)
+ assert_lt(goat.position.distance_to(rider),before)
+ var after:float=goat.position.distance_to(rider)
+ goat.move_from_or_towards(rider,.1,false)
+ assert_gt(goat.position.distance_to(rider),after)

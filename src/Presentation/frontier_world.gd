@@ -240,6 +240,7 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 	_lasso_horse = prey
 	prey.roped = true
 	prey.rider = player
+	if prey.get_script()==PigScript:prey.state=WorldPigs.begin_rope(prey.state)
 	# Chase-mode pigs (Ant 8-nov-2026): the rope ends by the chase rules (rope
 	# snaps outside the allowed distance, capture when the pig tires); the hold
 	# timer is only a safety net there.
@@ -556,36 +557,9 @@ func _herd_guides()->Dictionary:
 			plans[horse]={"guide":guide,"velocity":velocity.limit_length(pace+WorldHerd.FOLLOW_CATCHUP)}
 	return plans
 
-var _flight_horses:Array=[]
-func _clear_flight_hold()->void:
-	for horse in _flight_horses:
-		if is_instance_valid(horse):horse.flight_hold=false
-	_flight_horses.clear()
-func _on_frontier_lasso_released()->void:
-	# Ant9-Nov: nearby horses cannot dodge a rope while it is still in flight.
-	_clear_flight_hold()
-	var affected:Dictionary={}
-	for horse in _herd_horses.values():
-		if is_instance_valid(horse) and not horse.roped and horse.position.distance_to(player.position)<500.0:
-			affected[horse.get_meta("c",Vector2i(-999,-999))]=true
-	for horse in _herd_horses.values():
-		if not is_instance_valid(horse) or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
-		if affected.has(horse.get_meta("c",Vector2i(-998,-998))):
-			horse.flight_hold=true;horse.velocity=Vector2.ZERO
-			_flight_horses.append(horse)
-func _on_frontier_lasso_landed(_point:Vector2,captured:Node2D)->void:
-	# Resolve capture first. A successful landing causes no new group panic.
-	for horse in _flight_horses:
-		if not is_instance_valid(horse):continue
-		horse.flight_hold=false
-		if captured==null and not horse.roped and not WorldTaming.tamed(horse.state):
-			horse.set_meta("panic_left",WorldHerd.PANIC_SECONDS)
-			horse.state.spook=WorldTaming.SPOOK_SECONDS
-	_flight_horses.clear()
-
 func _tick_taming(delta: float) -> void:
 	for horse in _herd_horses.values():
-		if not is_instance_valid(horse) or horse.flight_hold:continue
+		if not is_instance_valid(horse) or horse.is_queued_for_deletion():continue
 		horse.set_meta("panic_left",maxf(0.0,float(horse.get_meta("panic_left",0.0))-delta))
 		var chasing:bool=not horse.roped and float(horse.state.get("spook",0.0))>0 and horse.position.distance_to(player.position)<550.0
 		horse.set_meta("chase_time",float(horse.get_meta("chase_time",0.0))+delta if chasing else 0.0)
@@ -597,10 +571,9 @@ func _tick_taming(delta: float) -> void:
 				alerts[other.get_meta("c",Vector2i(-999,-999))]=true
 	for key in _herd_horses:
 		var raw = _herd_horses[key]
-		if not is_instance_valid(raw):
+		if not is_instance_valid(raw) or raw.is_queued_for_deletion():
 			continue
 		var horse: Node2D = raw
-		if horse.flight_hold and not horse.roped:continue
 		horse.herd_guide=null
 		horse.player_ref=player
 		var dist: float = player.position.distance_to(horse.position)
@@ -619,8 +592,6 @@ func _tick_taming(delta: float) -> void:
 			# El semental no admitido NUNCA llena confianza en el lazo: lo rompe.
 			st = horse.state if stallion_guard else WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta, aff.bonus)
 		else:
-			if aff.leader and float(horse.state.get("progress", 0.0)) < WorldTaming.LEADER_START_PROGRESS and dist < WorldTaming.CALM_RANGE * 1.5:
-				horse.state["progress"] = WorldTaming.LEADER_START_PROGRESS
 			if alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and not aff.leader:
 				horse.state["spook"]=WorldTaming.spook_seconds(aff.matches)
 			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta, aff.bonus, WorldTaming.spook_seconds(aff.matches))
@@ -629,7 +600,7 @@ func _tick_taming(delta: float) -> void:
 					_stallion_hint(horse)
 				st["spook"] = WorldTaming.SPOOK_SECONDS
 		horse.state = st
-		if WorldTaming.tamed(st):
+		if horse.roped and WorldTaming.tamed(st):
 			_deliver_horse(horse.get_meta("c"), horse)
 			continue
 		if horse.roped:
@@ -949,9 +920,6 @@ func _build_hud() -> void:
 		return out
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
-	player.lasso.lasso_released.connect(_on_frontier_lasso_released)
-	player.lasso.landing_resolved.connect(_on_frontier_lasso_landed)
-	player.lasso.flight_cancelled.connect(_clear_flight_hold)
 	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _open_navigation()->void:

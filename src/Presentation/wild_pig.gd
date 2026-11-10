@@ -1,5 +1,5 @@
 extends Node2D
-## A wild pig in the frontier, using Ant's supplied pink/brown running sprites.
+## Wild pink pig. Brown appearance cancelled until further notice (10-Nov).
 ## Idle/tired are still frames until separate animations are supplied.
 ##
 ## Chase mode: flee, keep the rider moving while roped, tire, then capture.
@@ -34,7 +34,7 @@ func setup(p_pen: Dictionary) -> void:
 func _ready() -> void:
 	position = home
 	_art=WildPigArt.new()
-	_art.variant="brown" if (int(absf(home.x)*31+absf(home.y)*17)%2)==1 else "pink"
+	_art.variant="pink"  # Brown pigs cancelled until further notice.
 	add_child(_art)
 
 func _process(delta: float) -> void:
@@ -58,6 +58,10 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 	var away: Vector2 = position - from
 	if away.length() < 1.0:
 		away = Vector2.RIGHT
+	# Gentle changes of heading while roped make the rider track the pig.
+	if roped:
+		var chase_time:float=float(state.get("rope_run",0.0))
+		away=away.rotated(sin(chase_time*2.6+home.x*.01)*.7)
 	var target: Vector2 = position + away.normalized() * speed * delta
 	if roped or home.distance_to(target) < WorldPigs.FLEE_LEASH:
 		position = target

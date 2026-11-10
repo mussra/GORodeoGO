@@ -71,7 +71,7 @@ func test_chase_moving_keeps_the_rope():
   assert_false(st.break_rope)
 
 func test_chase_tired_and_roped_captures_fast():
- var st:Dictionary=WorldPigs.new_chase_state();st.tired=true
+ var st:Dictionary=WorldPigs.new_chase_state();st.tired=true;st.rope_run=WorldPigs.MIN_ROPED_RUN_SECONDS
  var t:float=0.0
  while not WorldPigs.captured(st) and t<3.0:
   st=WorldPigs.chase_tick(st,50.0,150.0,true,0.1);t+=0.1
@@ -84,3 +84,14 @@ func test_chase_tired_unroped_recovers():
   st=WorldPigs.chase_tick(st,600.0,0.0,false,0.1)
  assert_false(st.tired)
  assert_gt(float(st.run),0.0)  # partially rested, not fresh
+
+func test_even_exhausted_pig_runs_three_seconds_after_new_rope():
+ var st=WorldPigs.new_chase_state();st.tired=true;st.progress=.9
+ st=WorldPigs.begin_rope(st)
+ for i in 29:
+  st=WorldPigs.chase_tick(st,150,260,true,.1)
+  assert_true(st.flee);assert_false(st.tired);assert_eq(st.progress,0.0)
+ st=WorldPigs.chase_tick(st,241,260,true,.1)
+ assert_true(st.break_rope)
+ st=WorldPigs.begin_rope(st)
+ assert_eq(st.rope_run,0.0);assert_eq(st.progress,0.0)

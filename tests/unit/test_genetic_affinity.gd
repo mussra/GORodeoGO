@@ -14,18 +14,18 @@ func test_affinity_bonus_caps_at_three_traits():
 	assert_eq(WorldTaming.affinity_bonus(1), 1.25)
 	assert_eq(WorldTaming.affinity_bonus(3), 1.75)
 
-func test_affinity_speeds_trust_fill():
+func test_affinity_cannot_grant_passive_trust():
 	var slow := WorldTaming.new_state()
 	var fast := WorldTaming.new_state()
 	for i in range(120):
 		slow = WorldTaming.tick(slow, 100.0, 0.0, 1.0, 0.5, 1.0 / 60.0, 1.0)
 		fast = WorldTaming.tick(fast, 100.0, 0.0, 1.0, 0.5, 1.0 / 60.0, 1.75)
-	assert_gt(fast.progress, slow.progress)
+	assert_eq(fast.progress,0.0);assert_eq(slow.progress,0.0)
 
 func test_affinity_speeds_lasso_hold_fill():
 	var slow := WorldTaming.new_state()
 	var fast := WorldTaming.new_state()
-	for i in range(120):
+	for i in range(30):
 		slow = WorldTaming.hold_tick(slow, 0.5, 1.0 / 60.0, 1.0)
 		fast = WorldTaming.hold_tick(fast, 0.5, 1.0 / 60.0, 1.75)
 	assert_gt(fast.progress, slow.progress)

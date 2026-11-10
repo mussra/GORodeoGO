@@ -1,5 +1,5 @@
 extends GutTest
-## Frontera freezes affected herd during flight; resolve first, panic only on miss.
+## Flight never freezes or scares the herd; normal proximity still applies.
 ## Lasso on fleeing wild horses (Ant 7-nov-2026 16:20): a landed rope holds the
 ## horse, and from there the corral post-capture flow applies (Ant 7-nov-2026
 ## 20:02-20:06, "el lazo después de cazar igual"): the animal follows the rider
@@ -43,6 +43,7 @@ func _rope_horse(world: Node2D) -> void:
 func test_lasso_holds_horse_in_place_then_captures() -> void:
 	# Ant 21:47: the roped horse does NOT follow; after the hold timer it is captured.
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	var horse: Node2D = _plant_horse(world, Vector2(90, 160))
@@ -75,6 +76,7 @@ func test_lasso_holds_horse_in_place_then_captures() -> void:
 func test_rider_not_blocked_by_horse() -> void:
 	# Ant 21:48: bumping into a horse must never block the rider.
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	world.player.velocity = Vector2.ZERO
@@ -87,6 +89,7 @@ func test_rider_not_blocked_by_horse() -> void:
 
 func test_lasso_miss_recovers() -> void:
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
@@ -99,6 +102,7 @@ func test_lasso_miss_recovers() -> void:
 
 func test_aim_stick_charge_and_release_throws() -> void:
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	world.player.lasso._on_aim_pressed()
 	assert_true(world.player.lasso._is_charging, "pressing the aim stick starts the charge")
@@ -107,6 +111,7 @@ func test_aim_stick_charge_and_release_throws() -> void:
 
 func test_aim_release_near_center_cancels() -> void:
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	world.player.lasso._on_aim_pressed()
 	world.player.lasso._on_aim_released(Vector2(0.05, 0.0))
@@ -115,6 +120,7 @@ func test_aim_release_near_center_cancels() -> void:
 
 func test_double_tap_releases_roped_horse() -> void:
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	var horse: Node2D = _plant_horse(world, Vector2(90, 160))
@@ -136,6 +142,7 @@ func test_bolting_horse_stuns_rider_and_drops_capture() -> void:
 	# "Que suelte" (Ant 19:58): contact with a bolting wild animal stuns the
 	# rider and drops the roped capture — the corral's contact rule.
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	world.player.position = Vector2(0, 160)
 	var horse: Node2D = _plant_horse(world, Vector2(90, 160))
@@ -156,18 +163,13 @@ func test_lasso_ropes_pig_and_timer_captures() -> void:
 	# Chase mode (Ant 8-nov-2026): the roped pig tires while the rider keeps
 	# moving, then the capture fills fast and pays points.
 	var world := _fresh_world()
+	while world._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(4)
 	var before: int = SaveData.world_pigs.size()
 	var points_before: int = SaveData.equipment_points
 	world.player.position = Vector2(0, 160)
-	var chunk: Node2D = world._chunks.values()[0]
-	var pen := Node2D.new()
-	pen.name = "pigs"
-	chunk.add_child(pen)
-	var pig: Node2D = world.PigScript.new()
-	pig.setup({"pos": Vector2(150, 160)})
-	pen.add_child(pig)
-	pig.position = Vector2(150, 160)
+	var pig:Node2D=world._lasso_pigs()[0]
+	world.player.position=pig.position+Vector2(-140,0)
 	# The pig bolts as soon as the rider is close; nearly tired, it stops soon.
 	pig.state["run"] = WorldPigs.CHASE_TIRE_SECONDS - 0.2
 	for i in range(30):
@@ -184,13 +186,13 @@ func test_lasso_ropes_pig_and_timer_captures() -> void:
 			break
 	assert_true(pig.roped, "the lasso ropes the tired pig")
 	for i in range(200):
+		if not is_instance_valid(pig):break
+		world.player.position=pig.position+Vector2(-140,0)
 		await wait_physics_frames(3)
-		if not is_instance_valid(pig):
-			break
 	assert_false(is_instance_valid(pig), "tired roped pig is captured")
 	# the pen registers the capture one frame after the pig node is freed
 	await wait_physics_frames(6)
-	assert_gt(SaveData.world_pigs.size(), before, "pig counts in the counter")
+	assert_eq(SaveData.world_pigs.size(), before, "individual does not complete whole pen")
 	assert_gt(SaveData.equipment_points, points_before, "chase capture pays points")
 
 func test_distance_snaps_the_pig_rope():

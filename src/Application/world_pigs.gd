@@ -54,6 +54,14 @@ const CHASE_TIRED_FILL:float=0.8  # capture fill/s while roped+tired
 const CHASE_ROPE_MAX_SECONDS:float=20.0  # safety net; chase rules end it first
 const CHASE_REWARD_POINTS:int=40
 const CHASE_ROPE_RANGE:float=240.0
+const MIN_ROPED_RUN_SECONDS:float=3.0
+
+## Every new lasso requires real chase time, even if already exhausted.
+static func begin_rope(state:Dictionary)->Dictionary:
+ var out:Dictionary=state.duplicate()
+ out.rope_run=0.0;out.progress=0.0;out.tired=false;out.flee=true
+ return out
+
 
 static func new_chase_state()->Dictionary:
  return {"progress":0.0,"flee":false,"run":0.0,"rest":0.0,"still":0.0,"tired":false,"break_rope":false}
@@ -64,6 +72,11 @@ static func chase_tick(state:Dictionary,dist:float,_speed:float,roped:bool,delta
  out.break_rope=false
  if roped and dist>CHASE_ROPE_RANGE:
   out.break_rope=true;out.progress=0.0
+  return out
+ if roped and float(out.get("rope_run",0.0))<MIN_ROPED_RUN_SECONDS:
+  out.rope_run=minf(MIN_ROPED_RUN_SECONDS,float(out.get("rope_run",0.0))+delta)
+  out.tired=false;out.flee=true;out.progress=0.0
+  out.run=minf(CHASE_TIRE_SECONDS,float(out.run)+delta*CHASE_ROPED_TIRE_MULT)
   return out
  if bool(out.tired):
   out.flee=false

@@ -69,28 +69,31 @@ func test_fleeing_group_stays_within_cohesion_radius()->void:
   w.player.position=guide.position+Vector2(-90,0);w.player.velocity=Vector2(200,0);w._tick_taming(1.0/60.0)
   for horse in horses:horse._physics_process(1.0/60.0)
  assert_lt(horses[-1].position.distance_to(guide.position),before,"straggler regroups without teleport")
-func test_lasso_flight_holds_free_group_then_miss_panics()->void:
+func test_lasso_flight_preserves_movement_and_miss_does_not_spook()->void:
  var w:Node2D=world();await wait_process_frames(3)
+ w.player.set_physics_process(false)
+ w.player.lasso.throw_guard=func():return true
  var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
  var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
- w.player.position=horses[0].position+Vector2(-100,0);w.player.velocity=Vector2(260,0)
- var positions:Array=[]
- for horse in horses:
-  positions.append(horse.position);horse.set_physics_process(false)
-  horse.state.spook=2.0;horse.flee_velocity(Vector2(350,0),true)
- w.player.lasso.lasso_released.emit()
- for tick in 21:
-  w._tick_taming(1.0/60)
-  for i in horses.size():
-   horses[i]._physics_process(1.0/60)
-   assert_eq(horses[i].position,positions[i],"no dodge during flight")
-   assert_eq(float(horses[i].get_meta("panic_left",0.0)),0.0)
- w.player.lasso.landing_resolved.emit(Vector2(-10000,0),null)
+ w.player.position=horses[0].position+Vector2(-100,0);w.player.velocity=Vector2.ZERO
+ var moving=horses[0];moving.set_physics_process(false);moving.state.spook=2.0;moving.flee_velocity(Vector2(260,0),false)
+ var origin:Vector2=moving.position
+ var still=horses[1];still.set_physics_process(false);var resting:Vector2=still.position
+ w.player.lasso._release_throw(Vector2(-1,0))
+ for i in 10:
+  moving.flee_velocity(Vector2(260,0),false);moving._physics_process(.016);still._physics_process(.016)
+ assert_gt(moving.position.distance_to(origin),1.0,"throw cannot freeze existing movement")
+ assert_eq(still.position,resting,"throw cannot move a resting horse")
+ assert_eq(float(still.state.spook),0.0)
+ await wait_seconds(.4)
+ assert_eq(float(still.state.spook),0.0,"miss alone causes no panic")
+ assert_eq(float(still.get_meta("panic_left",0.0)),0.0)
+ # A new throw while the rider approaches fast must NOT shield the herd.
+ w.player.lasso._release_throw(Vector2(-1,0))
+ w.player.position=still.position+Vector2(-70,0);w.player.velocity=Vector2(260,0)
  w._tick_taming(.016)
- for horse in horses:
-  assert_false(horse.flight_hold)
-  assert_gt(float(horse.get_meta("panic_left",0.0)),1.0)
-  assert_gt(horse._flee.length(),230.0)
+ assert_gt(float(still.state.spook),0.0,"normal proximity fear remains active in flight")
+ assert_gt(still._flee.length(),0.0)
  assert_eq(w.player.lasso.max_throw_distance,220.0)
  assert_eq(w.player.lasso.lasso_travel_time,.35)
  assert_eq(w.player.lasso.capture_area_visual_radius,58.0)
@@ -104,7 +107,6 @@ func test_successful_landing_does_not_panic_free_herd()->void:
  w.player.lasso.landing_resolved.emit(horses[0].position,caught)
  assert_eq(caught,horses[0]);assert_true(caught.roped)
  for horse in horses:
-  assert_false(horse.flight_hold)
   assert_eq(float(horse.get_meta("panic_left",0.0)),0.0)
 func test_panic_group_cohesion_and_capture_remain_working()->void:
  var w:Node2D=world();await wait_process_frames(3)
@@ -124,17 +126,35 @@ func test_panic_group_cohesion_and_capture_remain_working()->void:
  assert_eq(prey,horses[0]);assert_true(horses[0].roped)
  var origin:Vector2=horses[0].position;horses[0]._physics_process(.1);assert_eq(horses[0].position,origin)
 
-func test_opening_navigation_during_flight_unfreezes_without_panic()->void:
+func test_opening_navigation_during_flight_cancels_without_panic()->void:
  var w:Node2D=world();await wait_process_frames(3)
  var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
  var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
  w.player.position=horses[0].position+Vector2(-100,0)
+ w.player.lasso.throw_guard=func():return true
  w.player.lasso._release_throw(Vector2(1,0))
- assert_true(horses[0].flight_hold)
+ assert_true(w.player.lasso.is_in_flight())
  w._open_navigation()
  for horse in horses:
-  assert_false(horse.flight_hold,"cancel flight releases hold even while paused")
   assert_eq(float(horse.get_meta("panic_left",0.0)),0.0,"cancel does not count as a missed landing")
  w._close_navigation()
  await wait_seconds(.4)
  assert_false(w.player.lasso.is_in_flight())
+
+func test_no_passive_capture_with_existing_progress_and_fast_rope()->void:
+ var w:Node2D=world();await wait_process_frames(3)
+ var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":1.0,"stats":{"speed":260}}
+ var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
+ var horse=horses[0];horse.set_physics_process(false);w.player.set_physics_process(false)
+ w.player.position=horse.position+Vector2(-80,0);w.player.velocity=Vector2.ZERO
+ horse.state.progress=.9
+ for i in 100:w._tick_taming(.1)
+ assert_almost_eq(float(horse.state.progress),.9,.0001)
+ assert_false(horse.is_queued_for_deletion())
+ horse.state.progress=1.0;w._tick_taming(.1)
+ assert_false(horse.is_queued_for_deletion(),"stale full progress cannot capture without rope")
+ var count_before:int=SaveData.horse_collection.horses.size()
+ horse.state.progress=0.0;w._on_lasso_prey_captured(horse)
+ for i in 32:w._tick_taming(.1)
+ assert_true(horse.is_queued_for_deletion(),"even skittish admitted horse fills within 3.2s")
+ assert_eq(SaveData.horse_collection.horses.size(),count_before+1,"only one delivery before queued deletion")

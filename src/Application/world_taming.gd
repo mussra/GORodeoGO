@@ -1,8 +1,8 @@
 class_name WorldTaming
 extends RefCounted
-## Taming a wild horse: stay close and calm; rush it and it bolts (Ant, 7-nov-2026).
+## Taming a wild horse requires a landed lasso (Ant, 10-Nov-2026).
 ## Pure logic so unit tests drive it without a scene. Serenidad (calm) of the ridden
-## horse sets how fast trust builds; temperament makes skittish horses slower.
+## No passive trust. Temperament and affinity affect the lasso fill only.
 
 const CALM_RANGE:float=170.0
 const SPOOK_RANGE:float=120.0
@@ -24,10 +24,9 @@ static func tick(state:Dictionary,dist:float,speed:float,calm:float,temperament:
   out.spook=spook_secs
   out.progress=maxf(0.0,float(out.progress)-2.0*delta)
   return out
- if float(out.spook)>0.0:return out
- if dist<CALM_RANGE and speed<=STILL_SPEED:
-  var rate:float=BASE_FILL*clampf(calm,0.5,2.0)*(1.0-clampf(temperament,0.0,1.0)*0.6)*bonus
-  out.progress=minf(1.0,float(out.progress)+rate*delta)
+ # No passive trust, including affinity and calm bonuses. Only a landed rope fills.
+ out.progress=minf(float(out.get("progress",0.0)),.999)
+
  return out
 
 static func tamed(state:Dictionary)->bool:
@@ -41,7 +40,7 @@ static func should_flee(state:Dictionary,dist:float)->bool:
 ## while held, and when it fills the horse is captured. Skittish temperaments
 ## resist the fill.
 const HOLD_SECONDS:float=4.0
-const HOLD_FILL:float=0.30
+const HOLD_FILL:float=0.65
 
 static func hold_tick(state:Dictionary,temperament:float,delta:float,bonus:float=1.0)->Dictionary:
  var out:Dictionary=state.duplicate()
@@ -57,7 +56,6 @@ const AFFINITY_BONUS_PER_TRAIT:float=0.25
 const AFFINITY_SPOOK_SECONDS:float=1.5
 ## "Lider de manada": caballo criado con 3+ generaciones y rasgos fijados;
 ## los salvajes de sus 3 rasgos no huyen: curiosidad y confianza inicial.
-const LEADER_START_PROGRESS:float=0.25
 const CURIOUS_SECONDS:float=3.0
 
 static func affinity_matches(ridden:Dictionary,wild:Dictionary)->int:

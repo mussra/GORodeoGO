@@ -26,7 +26,6 @@ var wander_speed: float = 55.0
 ## Roped by the rider's lasso: stays in place while trust fills; when the
 ## timer runs out it is captured (or bolts if released first).
 var roped: bool = false
-var flight_hold:bool=false
 
 ## The sprite stands with its hooves at the node origin (offset -80), so the
 ## shared hold visuals must lift their anchor to the body or the rope and the
@@ -80,9 +79,6 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if is_instance_valid(player_ref) and not roped and position.distance_squared_to(player_ref.position)>700.0*700.0:
 		_art.speed_scale=0.0;return
-	if flight_hold and not roped:
-		velocity=Vector2.ZERO;_flee=Vector2.ZERO;_art.speed_scale=0.0
-		queue_redraw();return
 	_bob += delta
 	touch_grace = maxf(0.0, touch_grace - delta)
 	if roped:
