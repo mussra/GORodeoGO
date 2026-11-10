@@ -40,7 +40,7 @@ func test_custom_legs_do_not_touch_tail_hooves_or_rider()->void:
  assert_gt(changed,0)
 func test_leg_save_persistence_and_rollback()->void:
  var script=load("res://src/Application/save_data.gd")
- var save=script.new();save.save_path="user://legs-persist-qa.dat";save.debug_mode=false;save.horse_collection.seed_trial()
+ var save=script.new();save.save_path="user://legs-persist-qa.dat";save.debug_mode=true;save.horse_collection.seed_trial()
  assert_true(save.set_horse_legs("original",0,true));assert_eq(save.horse_collection.find("original").traits.legs,0);assert_eq(save.horse_collection.find("original").traits.coat,10)
  assert_true(save.set_horse_pattern_color("original","pattern",11));assert_true(save.set_horse_pattern_color("original","spots",3))
  save.load_progress();assert_eq(save.horse_collection.find("original").traits.legs,0);assert_eq(save.horse_collection.find("original").traits.spots,3);assert_eq(save.horse_collection.find("original").traits.pattern,11)

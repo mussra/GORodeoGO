@@ -30,8 +30,9 @@ func test_foal_cannot_equip_or_breed_until_trial_training()->void:
  assert_eq(h.stage,"foal");assert_false(SaveData.select_horse(h.id));assert_eq(SaveData.horse_collection.selected,"original")
  assert_true(SaveData.breed_horses(h.id,"original",{}).is_empty())
  var d:=HorseCollection.new();assert_true(d.restore(SaveData.horse_collection.export_state()));assert_false(d.is_adult(h.id))
+ var was_debug:bool=SaveData.debug_mode;SaveData.debug_mode=true
  assert_true(SaveData.mature_horse_trial(h.id));assert_true(SaveData.select_horse(h.id));assert_true(SaveData.horse_collection.is_adult(h.id))
- SaveData.horse_collection.restore(original);SaveData.save_path=path;DirAccess.remove_absolute("user://qa_foal_test.dat")
+ SaveData.debug_mode=was_debug;SaveData.horse_collection.restore(original);SaveData.save_path=path;DirAccess.remove_absolute("user://qa_foal_test.dat")
 func test_repeated_random_pairs_after_breeding_have_unique_ids()->void:
  var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents()
  c.breed("trial_a","trial_b",{})

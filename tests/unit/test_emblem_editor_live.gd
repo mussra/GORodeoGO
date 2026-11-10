@@ -49,7 +49,7 @@ func test_translations_not_raw_keys()->void:
   for key in ["EMBLEM_LETTERS","EMBLEM_LETTERS_HINT","EMBLEM_FONT_BLOCK","EMBLEM_FONT_ENGRAVED","EMBLEM_SYMBOL_ADJ"]:assert_ne(tr(key),key)
  TranslationServer.set_locale(previous)
 func test_save_reload_letters_font_and_position()->void:
- var s=load("res://src/Application/save_data.gd").new();s.save_path="user://qa-emblem-live.dat"
+ var s=load("res://src/Application/save_data.gd").new();s.debug_mode=true;s.save_path="user://qa-emblem-live.dat"
  s.horse_collection.seed_trial()
  var config:=HorseEmblem.DEFAULT.duplicate()
  config.letters="ALV";config.letters_font=1;config.color=1

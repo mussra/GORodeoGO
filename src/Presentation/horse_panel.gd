@@ -154,19 +154,24 @@ func detail_view()->void:
   if detail_origin!="atlas_variants":
    var buy:=Button.new();buy.text=tr("MARKET_BUY")%(0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h));box.add_child(buy);buy.pressed.connect(func():confirm_trade(h,false));buy.disabled=not SaveData.debug_mode and not SaveData.trial_session_active and (SaveData.equipment_points<HorseMarket.buy_price(h) or not HorseMarket.available(SaveData.horse_collection,h,SaveData.highest_level_completed))
   return
- var name_edit:=LineEdit.new();name_edit.text=h.name;name_edit.max_length=60;name_edit.position=Vector2(35,600);name_edit.size=Vector2(210,48);content.add_child(name_edit)
- button(tr("UI_108"),Vector2(255,600),func():SaveData.rename_horse(h.id,name_edit.text);refresh(),170)
- var fields:Array=[["coat","Pelaje",HorseCollection.COATS,int(t.coat)],["pattern","Tipo de manchas",HorseCollection.PATTERNS,int(t.pattern)],["spots","Color de manchas",["Original"]+HorseCollection.COATS,HorseCollection.spots_index(t)+1],["legs","Patas bajas",["Original"]+HorseCollection.COATS,HorseCollection.legs_index(t)+1]]
- for spec in fields:
-  var pick:=OptionButton.new();pick.custom_minimum_size.y=48
-  for value in spec[2]:pick.add_item(str(spec[1])+": "+str(value))
-  pick.select(spec[3]);box.add_child(pick)
-  pick.item_selected.connect(func(i:int):
-   if spec[0]=="legs":SaveData.set_horse_legs(h.id,i-1)
-   else:SaveData.set_horse_pattern_color(h.id,spec[0],i-1 if spec[0]=="spots" else i)
-   refresh())
- var actions:Array=[["Usar caballo",func():SaveData.select_horse(h.id);refresh()],["Emblema",func():var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor)],["Mapa genealógico",func():show_page("family")],["Mustang: patas oscuras",func():SaveData.set_horse_legs(h.id,0,true);refresh()]]
- if not SaveData.horse_collection.is_adult(h.id):actions.append(["Crecer (prueba)",func():SaveData.mature_horse_trial(h.id);refresh()])
+ var can_edit:bool=SaveData.horse_editing_allowed()
+ if can_edit:
+  var name_edit:=LineEdit.new();name_edit.text=h.name;name_edit.max_length=60;name_edit.position=Vector2(35,600);name_edit.size=Vector2(210,48);content.add_child(name_edit)
+  button(tr("UI_108"),Vector2(255,600),func():SaveData.rename_horse(h.id,name_edit.text);refresh(),170)
+  var fields:Array=[["coat","Pelaje",HorseCollection.COATS,int(t.coat)],["pattern","Tipo de manchas",HorseCollection.PATTERNS,int(t.pattern)],["spots","Color de manchas",["Original"]+HorseCollection.COATS,HorseCollection.spots_index(t)+1],["legs","Patas bajas",["Original"]+HorseCollection.COATS,HorseCollection.legs_index(t)+1]]
+  for spec in fields:
+   var pick:=OptionButton.new();pick.custom_minimum_size.y=48
+   for value in spec[2]:pick.add_item(str(spec[1])+": "+str(value))
+   pick.select(spec[3]);box.add_child(pick)
+   pick.item_selected.connect(func(i:int):
+    if spec[0]=="legs":SaveData.set_horse_legs(h.id,i-1)
+    else:SaveData.set_horse_pattern_color(h.id,spec[0],i-1 if spec[0]=="spots" else i)
+    refresh())
+ var actions:Array=[["Usar caballo",func():SaveData.select_horse(h.id);refresh()],["Mapa genealógico",func():show_page("family")]]
+ if can_edit:
+  actions.append(["Emblema",func():var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor)])
+  actions.append(["Mustang: patas oscuras",func():SaveData.set_horse_legs(h.id,0,true);refresh()])
+  if not SaveData.horse_collection.is_adult(h.id):actions.append(["Crecer (prueba)",func():SaveData.mature_horse_trial(h.id);refresh()])
  for action in actions:
   var b:=Button.new();b.text=action[0];b.custom_minimum_size.y=48;box.add_child(b);b.pressed.connect(action[1])
   if action[0] in ["Usar caballo","Emblema"]:b.disabled=not SaveData.horse_collection.is_adult(h.id)

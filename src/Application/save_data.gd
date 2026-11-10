@@ -262,7 +262,11 @@ func select_horse(id:String)->bool:
 	horse_collection.selected=before
 	return false
 
+func horse_editing_allowed()->bool:
+	return debug_mode or trial_session_active
+
 func rename_horse(id:String,value:String)->bool:
+	if not horse_editing_allowed():return false
 	var h:Dictionary=horse_collection.find(id)
 	if h.is_empty():return false
 	var before:String=h.name
@@ -272,6 +276,7 @@ func rename_horse(id:String,value:String)->bool:
 	return false
 
 func mature_horse_trial(id:String)->bool:
+	if not horse_editing_allowed():return false
 	var before:Dictionary=horse_collection.export_state()
 	if not horse_collection.mature_trial(id):return false
 	if save_progress():return true
@@ -365,6 +370,7 @@ func clear_training_pair()->bool:
 	horse_collection.training_pair=before;return false
 
 func set_horse_pattern_color(id:String,key:String,value:int)->bool:
+	if not horse_editing_allowed():return false
 	if key not in ["pattern","spots","coat"]:return false
 	var horse:Dictionary=horse_collection.find(id)
 	if horse.is_empty():return false
@@ -376,6 +382,7 @@ func set_horse_pattern_color(id:String,key:String,value:int)->bool:
 	horse_collection.restore(before);return false
 
 func set_horse_legs(id:String,color:int,mustang:bool=false)->bool:
+	if not horse_editing_allowed():return false
 	var horse:Dictionary=horse_collection.find(id)
 	if horse.is_empty() or color< -1 or color>=HorseCollection.COATS.size():return false
 	var before:Dictionary=horse_collection.export_state()
@@ -387,6 +394,7 @@ func set_horse_legs(id:String,color:int,mustang:bool=false)->bool:
 	horse_collection.restore(before);return false
 
 func set_horse_emblem(id:String,config:Dictionary)->bool:
+	if not horse_editing_allowed():return false
 	var horse:Dictionary=horse_collection.find(id)
 	if horse.is_empty() or (not config.is_empty() and not HorseEmblem.valid(config)):return false
 	var before:Dictionary=horse_collection.export_state()
