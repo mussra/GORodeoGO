@@ -20,3 +20,13 @@ static func material_for(traits:Dictionary,hat:String="original")->ShaderMateria
  return m
 static func apply(view:CanvasItem,traits:Dictionary,hat:String="original")->void:
  view.set("texture",ART);view.material=material_for(traits,hat);view.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
+
+## One portrait configuration for foals and adults across all collection screens.
+static func apply_horse(view:TextureRect,horse:Dictionary,hat:String="original")->void:
+ view.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+ view.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+ view.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
+ if horse.get("stage","adult")=="foal":
+  view.material=null
+  view.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,horse.traits)
+ else:apply(view,horse.traits,hat)

@@ -7,8 +7,7 @@ static func thumbnail(h:Dictionary)->Texture2D:
 static func preview(host:Control,h:Dictionary,pos:Vector2,extent:float)->TextureRect:
  var view:=TextureRect.new();view.name="HorsePreview";view.mouse_filter=Control.MOUSE_FILTER_IGNORE;view.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;view.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;view.position=pos;view.size=Vector2.ONE*extent
  if not h.is_empty():
-  if h.get("stage","adult")=="foal":view.texture=thumbnail(h)
-  else:HorsePortrait.apply(view,h.traits,SaveData.hat_color)
+  HorsePortrait.apply_horse(view,h,SaveData.hat_color)
  host.add_child(view);return view
 static func create(host:Control,horses:Array,current:String,pos:Vector2,width:float,changed:Callable)->OptionButton:
  var pick:=OptionButton.new();pick.name="HorsePicker";pick.fit_to_longest_item=false;pick.clip_text=true;pick.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;pick.position=pos;pick.size=Vector2(width-164,64);pick.add_theme_constant_override("icon_max_width",56);pick.get_popup().add_theme_constant_override("icon_max_width",56);host.add_child(pick)

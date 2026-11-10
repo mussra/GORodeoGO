@@ -70,8 +70,7 @@ func add_random_pair()->void:
  parent_b=added[0].id;page="collection";scroll_to_newest=true;refresh()
 func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
  var tex:=TextureRect.new();tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
- if h.get("stage","adult")=="foal":tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits)
- else:HorsePortrait.apply(tex,h.traits,SaveData.hat_color)
+ HorsePortrait.apply_horse(tex,h,SaveData.hat_color)
  tex.position=pos;tex.size=Vector2.ONE*size_px;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;content.add_child(tex)
 func collection_view()->void:
  label(TranslationServer.translate_plural("UI_081","UI_081_PLURAL",SaveData.horse_collection.horses.size())%SaveData.horse_collection.horses.size(),Vector2(30,100),18)
@@ -79,7 +78,7 @@ func collection_view()->void:
  var rows:=VBoxContainer.new();rows.custom_minimum_size.x=1170;scroll.add_child(rows)
  for h in SaveData.horse_collection.horses:
   var row:=HBoxContainer.new();row.custom_minimum_size.y=170;rows.add_child(row)
-  var tex:=TextureRect.new();tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits) if not SaveData.horse_collection.is_adult(h.id) else HorsePortrait.ART;tex.material=HorsePortrait.material_for(h.traits,SaveData.hat_color) if SaveData.horse_collection.is_adult(h.id) else null;tex.custom_minimum_size=Vector2(160,160);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
+  var tex:=TextureRect.new();HorsePortrait.apply_horse(tex,h,SaveData.hat_color);tex.custom_minimum_size=Vector2(160,160);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
   var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;row.add_child(l)
   var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
   var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");row.add_child(dodge_badge)
@@ -116,8 +115,9 @@ func breed_view()->void:
  button(("B" if choices.get("finish",0)==1 else "A")+" · "+("Galaxy" if finish_value=="galaxy" else "Normal"),Vector2(540,535),func():choices["finish"]=1-int(choices.get("finish",0));refresh(),170)
  var t:Dictionary=SaveData.horse_collection.preview(parent_a,parent_b,choices)
  if not t.is_empty():
-  label("Vista de la cría",Vector2(725,255),19)
-  sprite({"traits":t,"stage":"foal"},Vector2(710,295),205)
+  var preview_title:=label("Vista de la cría",Vector2(700,255),19)
+  preview_title.size.x=230;preview_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  sprite({"traits":t,"stage":"foal"},Vector2(700,290),230)
   button(tr("UI_092"),Vector2(420,605),func():
    var h:Dictionary=SaveData.breed_horses(parent_a,parent_b,choices)
    message=(tr("BIRTH_NEED_WIN") if not SaveData.debug_mode and not SaveData.trial_session_active and SaveData.horse_collection.birth_credits<=0 else tr("UI_093")) if h.is_empty() else tr("UI_094")%h.name

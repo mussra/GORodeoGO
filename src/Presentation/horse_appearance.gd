@@ -183,7 +183,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
    var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
    image.set_pixel(x,y,old.lerp(tinted,maxf(m.r,m.g)) if anim=="foal" else tinted)
  # Shared for levels, open world, riderless horses and foals. No per-frame work.
- if mask_override==null and HorseCollection.legs_index(t)>=0:
+ if mask_override==null and (HorseCollection.legs_index(t)>=0 or anim=="foal") :
   var leg_path:String="res://art/lower_legs_masks/%s/frame_%02d.png"%[anim,frame]
   if anim=="stunned":leg_path="res://art/lower_legs_masks/stunned/frame_0.png"
   if ResourceLoader.exists(leg_path):
@@ -191,11 +191,11 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
    if leg_mask.is_compressed():leg_mask.decompress()
    var original:Image=source.get_image()
    if original.is_compressed():original.decompress()
-   var leg_color:=Color("33302e") if anim=="foal" and HorseCollection.legs_index(t)==0 else Color(COLORS[HorseCollection.legs_index(t)])
+   var leg_color:=Color("f4edd8") if HorseCollection.legs_index(t)<0 else (Color("33302e") if anim=="foal" and HorseCollection.legs_index(t)==0 else Color(COLORS[HorseCollection.legs_index(t)]))
    for ly in image.get_height():
     for lx in image.get_width():
      var coverage:float=leg_mask.get_pixel(lx,ly).r
-     if int(t.pattern)==4 and ly-bob>77 and mask.get_pixel(lx,ly).r>.5:coverage=1.0
+     if anim!="foal" and int(t.pattern)==4 and ly-bob>77 and mask.get_pixel(lx,ly).r>.5:coverage=1.0
      if coverage<.01:continue
      var old:Color=original.get_pixel(lx,ly)
      var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))/.83,.16,1.18)

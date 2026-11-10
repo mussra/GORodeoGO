@@ -167,8 +167,7 @@ func draw_graph()->void:
   card.modulate.a=(1.0 if is_related else .24) if not selected.is_empty() else (1.0 if _matches(h) else .4)
   layer.add_child(card);card_nodes[h.id]=card
   var tex:=TextureRect.new();tex.position=Vector2(8,8);tex.size=Vector2(65,70);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.mouse_filter=Control.MOUSE_FILTER_IGNORE
-  if h.get("stage","adult")=="foal":tex.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits)
-  else:HorsePortrait.apply(tex,h.traits,SaveData.hat_color)
+  HorsePortrait.apply_horse(tex,h,SaveData.hat_color)
   card.add_child(tex)
   var text:=Label.new();text.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;text.position=Vector2(80,10);text.size=Vector2(142,65);text.text=str(h.name);text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;text.add_theme_font_size_override("font_size",17);text.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(text)
   var desc:=Label.new();desc.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;desc.position=Vector2(10,83);desc.size=Vector2(210,70);desc.text=tr(HorseCollection.COATS[h.traits.coat])+" · "+tr(HorseCollection.PATTERNS[h.traits.pattern])+"\n"+HorseGenealogy.lineage(h)+"\n"+(tr("GEN_ROOT") if h.parents.is_empty() else HorseGenealogy.origin(h));desc.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;desc.add_theme_font_size_override("font_size",13);desc.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_child(desc)
