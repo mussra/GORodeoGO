@@ -148,8 +148,9 @@ func detail_view()->void:
  sprite(h,Vector2(30,205),390)
  var scroll:=ScrollContainer.new();scroll.position=Vector2(470,130);scroll.size=Vector2(770,540);content.add_child(scroll)
  var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(735,0);box.add_theme_constant_override("separation",12);scroll.add_child(box)
- for text in HorseValues.visual(t)+HorseValues.performance(h,owned)+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
+ for text in HorseValues.visual(t)+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
   var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);box.add_child(line)
+ HorseStatBars.create(box,h,owned)
  if not owned:
   var note:=Label.new();note.text="Vista de posibilidad · no cambia tu colección";box.add_child(note)
   if detail_origin not in ["atlas","atlas_variants"]:
@@ -237,22 +238,23 @@ func atlas_view()->void:
  var entries:Array[Dictionary]=HorseFilters.apply(all_entries,atlas_filters);var pages:int=maxi(1,ceili(entries.size()/6.0));atlas_page=clampi(atlas_page,0,pages-1)
  var outer:Control=content
  var scroll:=ScrollContainer.new();scroll.position=Vector2(0,200);scroll.size=Vector2(1280,365);content.add_child(scroll)
- var cards:=Control.new();cards.custom_minimum_size=Vector2(1250,1335);scroll.add_child(cards);content=cards
+ var cards:=Control.new();cards.custom_minimum_size=Vector2(1250,1875);scroll.add_child(cards);content=cards
  for j in range(6):
   var n:int=atlas_page*6+j
   if n>=entries.size():break
   var entry:Dictionary=entries[n];var h:Dictionary=entry.horse;var t:Dictionary=h.traits
-  var x:float=30+(j%2)*620;var y:float=0+int(j/2)*445
+  var x:float=30+(j%2)*620;var y:float=0+int(j/2)*625
   sprite(h,Vector2(x,y),175)
   var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
-  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,420);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():
+  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,610);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():
    if page=="atlas" and atlas_filters.is_empty():
     atlas_family_page=atlas_page;atlas_family=h.traits.duplicate(true);atlas_page=0;show_page("atlas_variants")
    else:detail_entries=entries;focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
-  var texts:Array=HorseValues.visual(t)+HorseValues.performance(h,entry.owned)
+  var texts:Array=HorseValues.visual(t)
   texts.append("Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)])
   if page=="market":texts.append(tr("MARKET_PRICE")%HorseMarket.buy_price(h))
   for i in texts.size():label(str(texts[i]),Vector2(x+180,y+48+i*27),17)
+  var stat_host:=VBoxContainer.new();stat_host.position=Vector2(x+180,y+48+texts.size()*27);stat_host.size.x=410;content.add_child(stat_host);HorseStatBars.create(stat_host,h,entry.owned,true)
  content=outer
  ItemPager.create(content,Vector2(345,575),540,atlas_page,pages,func(i:int):atlas_page=i;refresh())
  if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(892,588),17)

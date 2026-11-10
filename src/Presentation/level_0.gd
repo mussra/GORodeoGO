@@ -720,21 +720,28 @@ func _show_training_companion()->void:
 	var mentor:Dictionary=SaveData.horse_collection.find(_training_session.mentor)
 	var card:=Panel.new();card.name="TrainingStatus";card.position=Vector2(22,76);card.size=Vector2(390,150);card.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("77dbd5"),8));hud.add_child(card)
 	var portrait:=TextureRect.new();portrait.position=Vector2(4,16);portrait.size=Vector2(78,100);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;HorsePortrait.apply(portrait,mentor.traits,SaveData.hat_color);card.add_child(portrait)
-	_training_status=Label.new();_training_status.position=Vector2(90,8);_training_status.size=Vector2(290,120);_training_status.add_theme_font_size_override("font_size",17);card.add_child(_training_status);_update_training_status()
+	_training_status=Label.new();_training_status.position=Vector2(90,8);_training_status.size=Vector2(290,30);_training_status.add_theme_font_size_override("font_size",17);card.add_child(_training_status);_update_training_status()
 
 func _update_training_status()->void:
 	if not is_instance_valid(_training_status):return
 	var current:Dictionary=TrainingReport.snapshot(SaveData.horse_collection,_training_session)
 	if current.is_empty():return
-	_training_status.text=tr("TRAIN_HUD")%[str(current.name).left(22),tr("TRAIN_JUMP") if current.skill=="jump" else tr("TRAIN_DODGE"),current.learning,current.mastery,current.affinity]
-	if SaveData.trial_session_active:_training_status.text=_training_status.text.replace(tr("TRAIN_HUD_SAVE"),tr("TRAIN_HUD_TRIAL"))
+	_training_status.text=str(current.name).left(22)+" · "+("Salto" if current.skill=="jump" else "Esquiva")
+	var previous=_training_status.get_parent().get_node_or_null("TrainingBars")
+	if previous!=null:previous.free()
+	var bars:=VBoxContainer.new();bars.name="TrainingBars";bars.position=Vector2(90,40);bars.size.x=290;_training_status.get_parent().add_child(bars)
+	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],current[spec[1]],0,100,true)
 
 func _show_training_result()->void:
 	if _training_session.is_empty():return
 	var after:Dictionary=TrainingReport.snapshot(SaveData.horse_collection,_training_session)
 	if after.is_empty():return
 	var summary:=Label.new();summary.name="TrainingResult";summary.position=Vector2(25,145);summary.size=Vector2(462,145);summary.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;summary.add_theme_font_size_override("font_size",18)
-	summary.text=tr("TRAIN_RESULT")%[str(after.name).left(24),TrainingReport.gain(_training_before,after,"learning"),after.learning,TrainingReport.gain(_training_before,after,"mastery"),after.mastery,TrainingReport.gain(_training_before,after,"affinity"),after.affinity]
+	summary.text=str(after.name).left(24)+" · "+("Salto" if after.skill=="jump" else "Esquiva")
+	summary.size.y=30
+	var bars:=VBoxContainer.new();bars.name="TrainingResultBars";bars.position=Vector2(25,190);bars.size.x=462;hud.end_panel.add_child(bars)
+	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],after[spec[1]],0,100,true)
+
 	hud.end_panel.offset_top=-210;hud.end_panel.offset_bottom=210
 	hud.end_label.position.y=12;hud.end_label.size.y=125
 	hud.restart_button.position.y=330;hud.quit_button.position.y=330;hud._next_button.position.y=330

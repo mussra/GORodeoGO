@@ -36,8 +36,12 @@ func build()->void:
  if not HorseTraining.valid(c,mentor,learner,skill):label(tr("TRAIN_PICK_VALID"),Vector2(35,315),22)
  if HorseTraining.valid(c,mentor,learner,skill):
   var m:Dictionary=c.find(mentor);var l:Dictionary=c.find(learner);var affinity:float=float(c.affinities.get(HorseTraining.pair_key(mentor,learner),0))
-  label(tr("TRAIN_STATUS")%[m.name,HorseTraining.mastery(m,skill),l.name,HorseTraining.progress(l,skill),HorseTraining.mastery(l,skill),affinity],Vector2(35,310),22)
-  label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else tr("TRAIN_STUDY"),Vector2(35,420),20)
+  var stats:=VBoxContainer.new();stats.position=Vector2(35,310);stats.size.x=1140;content.add_child(stats)
+  HorseStatBars.row(stats,"Mentor · dominio",HorseTraining.mastery(m,skill),0,100,true)
+  HorseStatBars.row(stats,"Aprendiz · aprendizaje",HorseTraining.progress(l,skill),0,100,true)
+  HorseStatBars.row(stats,"Aprendiz · dominio",HorseTraining.mastery(l,skill),0,100,true)
+  HorseStatBars.row(stats,"Afinidad",affinity,0,100,true)
+  label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else "El aprendiz desbloquea la técnica al llenar la barra. El mentor conserva la suya.",Vector2(35,420),20)
 
  button(tr("TRAIN_STOP"),Vector2(655,455),func():note=tr("TRAIN_STOPPED") if SaveData.clear_training_pair() else tr("MARKET_FAILED");refresh())
  var active:Dictionary=c.training_pair

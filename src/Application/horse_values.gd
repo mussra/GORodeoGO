@@ -9,5 +9,4 @@ static func visual(t:Dictionary)->Array[String]:
  return ["Pelaje: "+HorseCollection.COATS[int(t.coat)],"Tipo de manchas: "+HorseCollection.PATTERNS[int(t.pattern)],"Color de manchas: "+(HorseCollection.COATS[spot] if spot>=0 else "Original"),"Crin / cola: "+HorseCollection.MANES[int(t.mane)],"Ojos: "+HorseCollection.EYES[HorseCollection.eye_index(t)],"Patas bajas: "+(HorseCollection.COATS[legs] if legs>=0 else "Original"),"Acabado: "+str(t.get("finish","normal")).capitalize(),"Emblema: "+emblem]
 static func performance(h:Dictionary,concrete:bool)->Array[String]:
  if not concrete:return ["Rendimiento y habilidades:", "no definidos hasta conseguirlo."]
- var s=HorseStats.read(h)
- return ["Velocidad: %.0f · Manejo: %.0f"%[s.speed,s.handling],"Fuerza: %.0f%% · Esquiva: %.0f%%"%[s.power*100,s.dodge*100],"Serenidad: %.2f"%s.calm,"Salto: "+("Sí" if HorseJump.capable(h) else "No")+" · dominio %.0f%% · aprendizaje %.0f%%"%[HorseTraining.mastery(h,"jump"),HorseTraining.progress(h,"jump")],"Esquiva: "+("Sí" if HorseTraining.knows(h,"dodge") else "No")+" · dominio %.0f%% · aprendizaje %.0f%%"%[HorseTraining.mastery(h,"dodge"),HorseTraining.progress(h,"dodge")]]
+ return ["Rendimiento: consulta las barras", "Salto: "+("Disponible" if HorseJump.capable(h) else "Por aprender"),"Esquiva: "+("Disponible" if HorseTraining.knows(h,"dodge") else "Por aprender")]

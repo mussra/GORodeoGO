@@ -7,6 +7,6 @@ func test_unowned_never_invents_stats()->void:
  assert_true(" ".join(lines).contains("no definidos"))
 func test_actual_stats_include_calm()->void:
  var lines=HorseValues.performance({"stats":{"calm":1.75}},true)
- assert_has(lines,"Serenidad: 1.75");assert_eq(lines.size(),5)
+ assert_eq(lines.size(),3);assert_false(" ".join(lines).contains("1.75"))
 func test_incremental_pixellab_specs_are_exact_46()->void:
  var specs=PixelLabTrial.frame_specs("horse");assert_eq(specs.size(),46);assert_eq(specs[-1][2],"idle")

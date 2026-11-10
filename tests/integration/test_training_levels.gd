@@ -34,13 +34,13 @@ func test_real_level_win_with_mentor_does_not_advance_training()->void:
 func test_training_hud_and_result_show_current_and_actual_gain()->void:
  GameState.selected_level=1
  var level=load("res://src/Presentation/level_0.tscn").instantiate();add_child(level);await wait_physics_frames(2)
- assert_not_null(level._training_status);assert_true(level._training_status.text.contains("0%"))
+ assert_not_null(level._training_status);assert_false(level._training_status.text.contains("%"));assert_eq(level._training_status.get_parent().get_node("TrainingBars").get_child(0).get_child(1).value,0.0)
  level._trigger_win();var result:Label=level.hud.end_panel.get_node("TrainingResult")
- assert_true(result.text.contains("+34.0"));assert_true(result.text.contains("34.0%"));assert_true(result.text.contains("+10.0"))
+ assert_false(result.text.contains("%"));assert_almost_eq(level.hud.end_panel.get_node("TrainingResultBars").get_child(0).get_child(1).value,.34,.001);assert_almost_eq(level.hud.end_panel.get_node("TrainingResultBars").get_child(2).get_child(1).value,.1,.001)
  level.queue_free();await wait_physics_frames(2)
 func test_loss_training_result_shows_zero_gain()->void:
  GameState.selected_level=1
  var level=load("res://src/Presentation/level_0.tscn").instantiate();add_child(level);await wait_physics_frames(2)
  level._trigger_lose("QA");var result:Label=level.hud.end_panel.get_node("TrainingResult")
- assert_false(result.text.contains("+34.0"));assert_true(result.text.contains("+0.0"));assert_eq(HorseTraining.progress(SaveData.horse_collection.find("original"),"jump"),0.0)
+ assert_false(result.text.contains("%"));assert_eq(level.hud.end_panel.get_node("TrainingResultBars").get_child(0).get_child(1).value,0.0);assert_eq(HorseTraining.progress(SaveData.horse_collection.find("original"),"jump"),0.0)
  level.queue_free();await wait_physics_frames(2)
