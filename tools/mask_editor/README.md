@@ -28,3 +28,6 @@ Cada entrega incluye HTMLvNcon todas las bases nuevas y JSONcompleto de esa mism
 
 ## v4 transferencia entre actores10:44
 16posesfaltantes tienen equivalente jinete editado por Ant: salvaje diagonal abajo03-09(7)y diagonal arriba01-09(9). Ninguna sin equivalente.74correccionesv3se conservan idénticaspíxelapíxel. Se escala/encaja máscara equivalente a silueta salvaje; se continúa membresía pelaje/crin más cercana por huecos tapados por jinete/silla y recorta a colores visibles del caballo. No es copia simple de coordenadas: tamaño y siluetas difieren. Revisión visual16poses comparadas con fuente y antes/después; zona azul de cuello/crin más extensa en varias, necesita valoración. Manchas=pelaje90/90. Editor+JSONcompletobasev4, sin APK.
+
+## Vigente: v3. V4descartada por Ant10:50
+"Deja las que estaban antes y actualiza el editor si es necesario": continuar HTML+JSONcompletov3, ya correctos; no v5vacía. Las16poses no retocadas conservan su v3y NO se vuelven a derivar cuando llegue otro JSON. V4es ensayo descartado, no usar para continuar ni aplicar al juego. Archivosv4se conservan solo para comparaciónhistórica. No se ha aplicado ninguna de estas máscaras al juego/APK.
