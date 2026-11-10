@@ -4,7 +4,8 @@ extends AnimatedSprite2D
 static var frame_cache:Dictionary={}
 var variant:String="pink"
 func _ready()->void:
- if not frame_cache.has(variant):
+ var key:String=variant+str(PixelLabTrial.pig_active())
+ if not frame_cache.has(key):
   var frames:=SpriteFrames.new()
   for anim in ["idle","run","tired","run_down","run_up"]:
    frames.add_animation(anim);frames.set_animation_speed(anim,12.0 if anim.begins_with("run") else 1.0)
@@ -12,8 +13,9 @@ func _ready()->void:
    for i in indices:
     var view:String="/down" if anim=="run_down" else ("/up" if anim=="run_up" else "")
     frames.add_frame(anim,load("res://art/world/pigs/%s%s/frame_%02d.png"%[variant,view,i]))
-  frame_cache[variant]=frames
- sprite_frames=frame_cache[variant]
+  PixelLabTrial.apply_pig(frames)
+  frame_cache[key]=frames
+ sprite_frames=frame_cache[key]
  centered=false;offset=Vector2(-80,-128);scale=Vector2.ONE*.36
  texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
  play("idle")

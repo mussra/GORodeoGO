@@ -4,19 +4,21 @@ extends RefCounted
 static var enabled:bool=true
 static var initialized:bool=false
 static var masks_enabled:bool=true
+static var pig_enabled:bool=true
 static func active()->bool:
  if not initialized:
   var cfg:=ConfigFile.new()
   if cfg.load("user://pixellab-trial.cfg")==OK:
    enabled=bool(cfg.get_value("art","enabled",true))
    masks_enabled=bool(cfg.get_value("art","masks_v5",true))
+   pig_enabled=bool(cfg.get_value("art","pig_side",true))
   initialized=true
  return enabled
 static func set_active(value:bool)->void:
  enabled=value;initialized=true
  save_config()
 static func save_config()->void:
- var cfg:=ConfigFile.new();cfg.set_value("art","enabled",enabled);cfg.set_value("art","masks_v5",masks_enabled);cfg.save("user://pixellab-trial.cfg")
+ var cfg:=ConfigFile.new();cfg.set_value("art","enabled",enabled);cfg.set_value("art","masks_v5",masks_enabled);cfg.set_value("art","pig_side",pig_enabled);cfg.save("user://pixellab-trial.cfg")
 static func masks_active()->bool:
  active();return masks_enabled
 static func set_masks_active(value:bool)->void:
@@ -41,3 +43,13 @@ static func apply(frames:SpriteFrames,kind:String,animation:String,traits:Dictio
  # Rest remains deliberate, not an arbitrary running frame.
  if frames.has_animation("idle"):frames.remove_animation("idle")
  frames.add_animation("idle");frames.add_frame("idle",pose_texture(kind,"side",0,traits))
+
+static func pig_active()->bool:
+ active();return pig_enabled
+static func set_pig_active(value:bool)->void:
+ active();pig_enabled=value;save_config()
+static func apply_pig(frames:SpriteFrames)->void:
+ if not pig_active():return
+ if frames.has_animation("run"):frames.remove_animation("run")
+ frames.add_animation("run");frames.set_animation_speed("run",9.0)
+ for i in 9:frames.add_frame("run",load("res://art/experimental/pixellab/pig/side/frame_%02d.png"%i))
