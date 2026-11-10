@@ -1,5 +1,5 @@
 extends GutTest
-func test_trial_replaces_only_lateral_and_idle_without_touching_genes()->void:
+func test_trial_replaces_five_views_and_idle_without_touching_genes()->void:
  PixelLabTrial.initialized=true;PixelLabTrial.enabled=true
  var frames:=SpriteFrames.new();frames.add_animation("walk_up")
  var original:Texture2D=load("res://art/world/wild_base/walk_up/frame_00.png")
@@ -8,7 +8,9 @@ func test_trial_replaces_only_lateral_and_idle_without_touching_genes()->void:
  assert_eq(frames.get_frame_count("walk"),9)
  assert_eq(frames.get_animation_speed("walk"),9.0)
  assert_eq(frames.get_frame_count("idle"),1)
- assert_eq(frames.get_frame_texture("walk_up",0),original)
+ for view in ["walk","walk_down","walk_up","walk_diag_down","walk_diag_up"]:
+  assert_eq(frames.get_frame_count(view),9)
+  assert_eq(frames.get_animation_speed(view),9.0)
  for i in 9:assert_eq(frames.get_frame_texture("walk",i).get_size(),Vector2(96,96))
 func test_disabled_preserves_original_and_rider_uses_nine_frames()->void:
  var frames:=SpriteFrames.new();frames.add_animation("walk_side")
