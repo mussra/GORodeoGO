@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PixelLab · Revisión de máscaras nuevas</title>
+<style>
+:root{--bg:#f4efec;--card:#fff;--ink:#2b2320;--mut:#6b5e55;--acc:#7a3b2e;--line:#d9cec4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:14px}
+h1{font-size:22px;margin:8px 0 4px}
+h2{font-size:17px;margin:18px 0 6px}
+p{margin:6px 0}
+.hint{color:var(--mut);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 13px;margin:3px;min-height:42px}
+button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+button:disabled{opacity:.45}
+select,input[type=range]{width:100%;margin:6px 0}
+select{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:2px}
+.viewport{max-height:62vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/18px 18px;touch-action:pan-x pan-y}
+.drawing{width:100%}
+.drawing canvas{display:block;width:100%;image-rendering:pixelated}
+.viewport.pan{touch-action:pan-x pan-y}
+.viewport.paint{touch-action:none}
+.status{border-radius:10px;padding:8px 10px;font-size:13px;margin:8px 0}
+.status.ok{background:#e5f2e5;border:1px solid #9c9}
+.status.warn{background:#fbeeee;border:1px solid #d99}
+textarea{width:100%;font:12px/1.4 monospace;min-height:90px}
+details{margin:8px 0}
+summary{cursor:pointer;font-weight:600;padding:6px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.thumb{background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px;text-align:center;font-size:11px;word-break:break-all}
+.thumb img{width:100%;image-rendering:pixelated;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/12px 12px}
+.thumb .flag{font-size:11px;padding:4px 6px;min-height:30px}
+.thumb.marked{border-color:var(--acc);border-width:2px}
+img.exp{max-width:100%;border:1px solid var(--line);image-rendering:pixelated}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>PixelLab · Revisión de máscaras nuevas</h1>
+<p class="hint">Revisión v3 sobre el JSON nuevo de Ant (98 máscaras de 74 poses, base v1). Se usan sus zonas de pelaje y crin, recortadas a la silueta; lo no editado conserva el ajuste anterior. Manchas = pelaje, sin máscara aparte. Pendiente de revisión. No aplicado al juego. Guarda una copia JSON antes de cerrar: el guardado local depende del navegador y de dónde abras este archivo. Pinta las zonas que deben cambiar de color; el dibujo original no se modifica. 90 poses, 90 máscaras: rojo = pelaje y manchas con la misma zona; verde = crin/cola. No hay máscara separada de manchas. Rojo = pelaje y manchas; verde = crin y cola; la goma quita máscara.</p>
+
+<div class="card" id="reviewCard">
+<h2 style="margin-top:0">Repaso rápido</h2>
+<p class="hint">Marca con ⚑ la máscara que veas mal y pulsa «Editar» para corregirla. Al final, envía tu trabajo desde «Guardar y devolver».</p>
+<div class="bar"><button id="copyReview">Copiar repaso como texto</button></div>
+<div id="groups"></div>
+</div>
+
+<div class="card" id="editCard" style="display:none">
+<div class="bar"><button id="backReview">← Volver al repaso</button></div>
+<h2 id="maskTitle">Máscara</h2>
+<div class="bar"><button id="prevBtn">Anterior</button><button id="nextBtn">Siguiente</button><span id="dims" class="hint"></span></div>
+<div class="viewport paint" id="viewport"><div class="drawing" id="drawing"><canvas id="cv"></canvas></div></div>
+<div class="status warn" id="saveStatus">Cargando…</div>
+<div class="bar">
+<button id="modePaint" class="on">Pincel: pintar</button>
+<button id="modePan">Mano: mover vista</button>
+<button id="undoBtn">↶ Deshacer (0)</button>
+<button id="resetBtn">Restaurar esta imagen</button>
+</div>
+<h2>Pincel</h2>
+<div class="bar" id="materials"></div>
+<label>Radio: <span id="radiusVal">2</span> píxeles<input type="range" id="radius" min="1" max="12" value="2"></label>
+<label>Zoom <span id="zoomVal">1</span>×<input type="range" id="zoom" min="1" max="5" step="0.5" value="1"></label>
+<label>Separación dedo/pincel: <span id="offVal">0</span> px<input type="range" id="offset" min="0" max="140" step="5" value="0"></label>
+<h2>Zona de trabajo</h2>
+<div class="bar">
+<button data-view="overlay" class="on">Superpuesta</button><button data-view="result">Resultado</button><button data-view="mask">Máscara</button><button data-view="source">Original</button>
+</div>
+<label id="opRow">Opacidad <span id="opVal">50</span>%<input type="range" id="opacity" min="10" max="90" step="10" value="50"></label>
+</div>
+
+<div class="card">
+<h2 style="margin-top:0">Guardar y devolver</h2>
+<p class="hint">JSON completo: incluye todas las máscaras base y tus trazos, con versión v3. El borrador local depende del navegador. Para que llegue al chat: descarga el JSON y adjúntalo, o copia el texto y pégalo. Adjunta el JSON en el chat. Se revisa antes de aplicarlo al juego. No cierres sin exportar si el guardado no está confirmado.</p>
+<div class="bar">
+<button id="exportJson">Mostrar JSON para copiar</button>
+<button id="downloadJson">Descargar rancho-pixellab-mascaras-v3.json</button>
+<label style="display:inline-block"><button type="button" onclick="document.getElementById('importFile').click()">Importar proyecto</button><input type="file" id="importFile" accept=".json,application/json" style="display:none"></label>
+<button id="showPng">Mostrar máscara PNG</button>
+</div>
+<p id="notice" class="hint"></p>
+<details id="jsonBox" style="display:none" open><summary>JSON del proyecto</summary><p class="hint">Copia este texto completo y envíalo por el chat, o guárdalo como rancho-pixellab-mascaras-v3.json.</p><textarea id="jsonText" readonly></textarea></details>
+<div id="pngBox"></div>
+</div>
+<p class="hint">Revisión v2 asistida: puede omitir bordes y confundir zonas claras o partes del jinete. Revisa en especial crin, cola, patas, silla y cara. Las manchas usan la misma zona roja del pelaje, sin máscara separada. El editor no cambia los mapas experimentales por pose. No modifica la APK.</p>
+</div>
+<script>
+const ASSETS = [];
+const BASELINE = 'pixellab-20261110-v3';
+const LSKEY = 'rancho-pixellab-mask-draft.20261110.v3';
+const LSFLAGS = 'rancho-pixellab-mask-flags.20261110.v3';
+const CAP = 4500000;
+const COLORS = {coat:[255,0,0], hair:[0,255,0], hat:[0,0,255], eye:[255,255,255], erase:[0,0,0]};
+const MAT_LABEL = {hair:'Crin y cola', coat:'Pelaje', hat:'Sombrero', eye:'Iris', erase:'Goma: quitar máscara'};
+
+let index = 0, material = 'hair', radius = 2, zoom = 1, offset = 0, opacity = 0.5, view = 'overlay';
+let edits = {}, history = [], flags = [];
+let stroke = null, activePointer = null;
+const $ = id => document.getElementById(id);
+const imgCache = {};
+
+function isEye(kind){ return kind === 'eye' || kind === 'lineage' || kind === 'pattern'; }
+function materialsFor(kind){ if(kind === 'socks') return ['coat','erase']; return isEye(kind) ? ['eye','erase'] : (kind === 'rgb-hat' ? ['hair','coat','hat','erase'] : ['hair','coat','erase']); }
+
+function loadImg(uri){
+  if(imgCache[uri]) return Promise.resolve(imgCache[uri]);
+  return new Promise((res, rej) => { const im = new Image(); im.onload = () => { imgCache[uri] = im; res(im); }; im.onerror = rej; im.src = uri; });
+}
+
+/* ---------- draft persistence ---------- */
+function pack(){ return Object.entries(edits).filter(([,v]) => v.length).map(([id, ss]) => [id, ss.map(s => [s.material, s.radius, s.points.map(p => p.map(n => Math.round(n*2)/2))])]); }
+function unpack(c){ const o = {}; for(const [id, ss] of c) o[id] = ss.map(([material, radius, points]) => ({material, radius, points})); return o; }
+function saveDraft(){
+  try{
+    const bytes = new TextEncoder().encode(JSON.stringify(pack())).length;
+    localStorage.setItem(LSKEY, JSON.stringify(pack()));
+    setStatus(true, 'Borrador guardado en este navegador. Capacidad: ' + bytes + ' / ' + CAP + ' bytes.');
+  }catch(e){ setStatus(false, 'Guardado NO confirmado en este navegador: usa «Descargar» o copia el JSON antes de cerrar.'); }
+}
+function setStatus(ok, msg){ const el = $('saveStatus'); el.className = 'status ' + (ok ? 'ok' : 'warn'); el.textContent = msg; }
+function loadDraft(){
+  try{
+    const raw = localStorage.getItem(LSKEY);
+    if(raw){ edits = unpack(JSON.parse(raw)); setStatus(true, 'Borrador restaurado en este navegador.'); }
+    else setStatus(false, 'No hay borrador previo. Si el aviso indica guardado no confirmado, no cierres sin enviar copia.');
+  }catch(e){ setStatus(false, 'Guardado local no disponible: envía copias con «Descargar» o copiando el JSON.'); }
+  try{ flags = JSON.parse(localStorage.getItem(LSFLAGS) || '[]'); }catch(e){ flags = []; }
+}
+
+/* ---------- review grid ---------- */
+function buildGroups(){
+  const order = [];
+  const map = {};
+  ASSETS.forEach((a, i) => {
+    const g = (a.name.split('/')[0] || a.name).trim();
+    if(!map[g]){ map[g] = []; order.push(g); }
+    map[g].push(i);
+  });
+  order.sort((a, b) => (a.startsWith('Zona de linaje') ? 1 : 0) - (b.startsWith('Zona de linaje') ? 1 : 0) || a.localeCompare(b));
+  const host = $('groups'); host.innerHTML = '';
+  for(const g of order){
+    const det = document.createElement('details');
+    const sum = document.createElement('summary');
+    sum.textContent = g + ' (' + map[g].length + ')';
+    det.appendChild(sum);
+    const grid = document.createElement('div'); grid.className = 'grid';
+    let built = false;
+    det.addEventListener('toggle', () => {
+      if(built || !det.open) return; built = true;
+      for(const i of map[g]){
+        const a = ASSETS[i];
+        const d = document.createElement('div'); d.className = 'thumb' + (flags.includes(a.id) ? ' marked' : '');
+        const im = document.createElement('img'); im.loading = 'lazy'; im.src = a.s; im.alt = a.name;
+        const lb = document.createElement('div'); lb.textContent = a.name;
+        const bar = document.createElement('div');
+        const fl = document.createElement('button'); fl.className = 'flag'; fl.textContent = flags.includes(a.id) ? '⚑ Marcada' : '⚑ Marcar';
+        fl.onclick = () => { flags.includes(a.id) ? flags = flags.filter(f => f !== a.id) : flags.push(a.id); try{ localStorage.setItem(LSFLAGS, JSON.stringify(flags)); }catch(e){} buildGroups(); };
+        const ed = document.createElement('button'); ed.className = 'flag'; ed.textContent = 'Editar';
+        ed.onclick = () => openEditor(i);
+        bar.appendChild(fl); bar.appendChild(ed);
+        d.appendChild(im); d.appendChild(lb); d.appendChild(bar);
+        grid.appendChild(d);
+      }
+    });
+    det.appendChild(grid);
+    host.appendChild(det);
+  }
+}
+$('copyReview').onclick = () => {
+  const names = flags.map(id => (ASSETS.find(a => a.id === id) || {name: id}).name);
+  const txt = names.length ? 'Repaso de máscaras Rancho: marco ' + names.length + ' como fallando: ' + names.join(', ') + '.' : 'Repaso de máscaras Rancho: todas correctas, ninguna marcada.';
+  $('jsonBox').style.display = ''; $('jsonText').value = txt; $('jsonText').focus(); $('jsonText').select();
+  try{ navigator.clipboard.writeText(txt); }catch(e){}
+};
+
+/* ---------- editor ---------- */
+const cv = $('cv'), ctx = cv.getContext('2d', {willReadFrequently: true});
+const work = document.createElement('canvas'), wctx = work.getContext('2d', {willReadFrequently: true});
+let srcImg = null, maskReady = false;
+
+function art(){ return ASSETS[index]; }
+
+function openEditor(i){
+  index = i; zoom = 1; $('zoom').value = 1; $('zoomVal').textContent = 1;
+  $('reviewCard').style.display = 'none'; $('editCard').style.display = '';
+  const k = art().kind;
+  material = materialsFor(k)[0];
+  buildMaterials();
+  loadArt();
+  $('editCard').scrollIntoView();
+}
+$('backReview').onclick = () => { $('editCard').style.display = 'none'; $('reviewCard').style.display = ''; buildGroups(); };
+
+function buildMaterials(){
+  const host = $('materials'); host.innerHTML = '';
+  const k = art().kind;
+  for(const m of materialsFor(k)){
+    const b = document.createElement('button');
+    b.textContent = k === 'socks' && m === 'coat' ? (art().id === 'portrait-lower-legs' ? 'Patas bajas' : 'Patas claras') : m === 'eye' && k === 'pattern' ? 'Zona de manchas' : m === 'eye' && k === 'lineage' ? 'Zona de linaje' : MAT_LABEL[m];
+    b.className = m === material ? 'on' : '';
+    b.onclick = () => { material = m; buildMaterials(); };
+    host.appendChild(b);
+  }
+}
+
+async function loadArt(){
+  const a = art();
+  $('maskTitle').textContent = a.name;
+  $('dims').textContent = a.w + ' × ' + a.h + ' px';
+  maskReady = false;
+  const [s, m] = await Promise.all([loadImg(a.s), loadImg(a.m)]);
+  srcImg = s;
+  work.width = cv.width = a.w; work.height = cv.height = a.h;
+  wctx.clearRect(0,0,work.width,work.height);wctx.drawImage(m, 0, 0);
+  maskReady = true;
+  render();
+}
+
+function strokes(){ return edits[art().id] || []; }
+
+function render(){
+  if(!maskReady) return;
+  const a = art();
+  wctx.clearRect(0,0,work.width,work.height); wctx.drawImage(maskBase, 0, 0);
+  for(const s of [...strokes(), ...(stroke ? [stroke] : [])]){
+    const c = COLORS[s.material];
+    wctx.fillStyle = wctx.strokeStyle = 'rgb(' + c.join(',') + ')';
+    wctx.lineCap = wctx.lineJoin = 'round'; wctx.lineWidth = s.radius * 2;
+    wctx.beginPath(); s.points.forEach(([x, y], i) => i ? wctx.lineTo(x, y) : wctx.moveTo(x, y)); wctx.stroke();
+    for(const [x, y] of s.points){ wctx.beginPath(); wctx.arc(x, y, s.radius, 0, Math.PI * 2); wctx.fill(); }
+  }
+  ctx.clearRect(0,0,cv.width,cv.height); ctx.drawImage(srcImg, 0, 0);
+  if(view === 'source') return;
+  const base = ctx.getImageData(0, 0, a.w, a.h), m = wctx.getImageData(0, 0, a.w, a.h), d = base.data, md = m.data;
+  for(let p = 0; p < d.length; p += 4){
+    if(!d[p+3]) continue;
+    let w0 = md[p]/255, w1 = md[p+1]/255, w2 = md[p+2]/255;
+    if(isEye(a.kind)){ w1 = 0; w2 = 0; }
+    if(view === 'mask'){ d[p] = md[p]; d[p+1] = md[p+1]; d[p+2] = md[p+2]; continue; }
+    let col = isEye(a.kind) ? [61,163,207] : [168,98,62];
+    if(a.kind !== 'eye'){ if(w1 > w0) col = [50,143,235]; if(a.kind === 'rgb-hat' && w2 > Math.max(w0, w1)) col = [80,99,153]; }
+    let strength = a.kind === 'rgb-hat' ? Math.max(w0, w1, w2) : Math.max(w0, w1);
+    if(isEye(a.kind)) strength = w0;
+    if(a.kind === 'socks') col = [245,237,217];
+    const shade = Math.max(0.2, Math.min(1.15, Math.max(d[p], d[p+1], d[p+2]) / 210));
+    if(view === 'overlay'){ col = isEye(a.kind) ? [238,87,93] : [md[p], md[p+1], md[p+2]]; strength *= opacity; }
+    else col = col.map(v => v * shade);
+    for(let k = 0; k < 3; k++) d[p+k] = d[p+k] * (1 - strength) + col[k] * strength;
+  }
+  ctx.putImageData(base, 0, 0);
+}
+let maskBase = document.createElement('canvas');
+const mbCtx = maskBase.getContext('2d');
+const _loadArtInner = loadArt;
+loadArt = async function(){
+  const a = art();
+  $('maskTitle').textContent = a.name;
+  $('dims').textContent = a.w + ' × ' + a.h + ' px';
+  maskReady = false;
+  const [s, m] = await Promise.all([loadImg(a.s), loadImg(a.m)]);
+  srcImg = s;
+  maskBase.width = work.width = cv.width = a.w; maskBase.height = work.height = cv.height = a.h;
+  mbCtx.drawImage(m, 0, 0);
+  maskReady = true;
+  render();
+};
+
+/* painting */
+function toImg(e){
+  const r = cv.getBoundingClientRect();
+  return [Math.max(0, Math.min(art().w, (e.clientX - r.left) * art().w / r.width)),
+          Math.max(0, Math.min(art().h, (e.clientY - r.top - offset) * art().h / r.height))];
+}
+cv.addEventListener('pointerdown', e => {
+  if(!maskReady || activePointer !== null || $('viewport').classList.contains('pan')) return;
+  e.preventDefault(); activePointer = e.pointerId;
+  try{ cv.setPointerCapture(e.pointerId); }catch(err){}
+  stroke = {material, radius, points: [toImg(e)]};
+  render();
+});
+cv.addEventListener('pointermove', e => {
+  if(activePointer !== e.pointerId || !stroke) return;
+  e.preventDefault();
+  const p = toImg(e), last = stroke.points[stroke.points.length - 1];
+  if(Math.hypot(p[0] - last[0], p[1] - last[1]) >= 0.75){ stroke.points.push(p); render(); }
+});
+function finishStroke(){
+  if(!stroke) return;
+  const id = art().id, list = strokes().slice(); list.push(stroke);
+  history.push({edits: JSON.parse(JSON.stringify(edits)), index});
+  edits[id] = list; stroke = null;
+  $('undoBtn').textContent = '↶ Deshacer (' + history.length + ')';
+  saveDraft(); render();
+}
+cv.addEventListener('pointerup', e => { if(activePointer === e.pointerId){ activePointer = null; finishStroke(); } });
+cv.addEventListener('pointercancel', () => { activePointer = null; finishStroke(); });
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden'){ activePointer = null; finishStroke(); } });
+
+$('undoBtn').onclick = () => {
+  if(!history.length) return;
+  const prev = history.pop(); edits = prev.edits; index = prev.index; stroke = null;
+  $('undoBtn').textContent = '↶ Deshacer (' + history.length + ')';
+  saveDraft(); loadArt();
+};
+let resetConfirm = false;
+$('resetBtn').onclick = () => {
+  if(!resetConfirm){ resetConfirm = true; $('resetBtn').textContent = 'Confirmar restaurar'; return; }
+  resetConfirm = false; $('resetBtn').textContent = 'Restaurar esta imagen';
+  history.push({edits: JSON.parse(JSON.stringify(edits)), index});
+  edits[art().id] = [];
+  $('undoBtn').textContent = '↶ Deshacer (' + history.length + ')';
+  saveDraft(); render();
+};
+$('modePaint').onclick = () => { $('viewport').className = 'viewport paint'; $('modePaint').className = 'on'; $('modePan').className = ''; };
+$('modePan').onclick = () => { finishStroke(); $('viewport').className = 'viewport pan'; $('modePan').className = 'on'; $('modePaint').className = ''; };
+$('radius').oninput = e => { radius = +e.target.value; $('radiusVal').textContent = radius; };
+$('zoom').oninput = e => { zoom = +e.target.value; $('zoomVal').textContent = zoom; $('drawing').style.width = (zoom * 100) + '%'; };
+$('offset').oninput = e => { offset = +e.target.value; $('offVal').textContent = offset; };
+$('opacity').oninput = e => { opacity = +e.target.value / 100; $('opVal').textContent = e.target.value; if(view === 'overlay') render(); };
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => {
+  view = b.dataset.view;
+  document.querySelectorAll('[data-view]').forEach(x => x.className = x === b ? 'on' : '');
+  $('opRow').style.display = view === 'overlay' ? '' : 'none';
+  render();
+});
+$('prevBtn').onclick = () => { if(index > 0) openEditor(index - 1); };
+$('nextBtn').onclick = () => { if(index < ASSETS.length - 1) openEditor(index + 1); };
+
+/* export / import */
+function projectJson(){
+  finishStroke();
+  const changes = Object.entries(edits).filter(([,v]) => v.length).map(([id, ss]) => ({id, hash: (ASSETS.find(a => a.id === id) || {}).hash, strokes: ss}));
+  return JSON.stringify({format: 'rancho-mask-review', version: 2, baseline: BASELINE, bases:ASSETS.map(a=>({id:a.id,hash:a.hash,mask:a.m})), changes});
+}
+$('exportJson').onclick = () => {
+  const t = projectJson();
+  $('jsonBox').style.display = ''; $('jsonText').value = t; $('jsonText').focus(); $('jsonText').select();
+  const n = Object.keys(edits).filter(k => edits[k].length).length;
+  $('notice').textContent = 'Texto preparado: ' + n + ' máscaras. Cópialo y envíalo por el chat, o usa «Descargar».';
+};
+$('downloadJson').onclick = () => {
+  const blob = new Blob([projectJson()], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'rancho-pixellab-mascaras-v3.json'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  $('notice').textContent = 'Descarga iniciada: adjunta el archivo rancho-pixellab-mascaras-v3.json en el chat.';
+};
+$('importFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if(!f) return;
+  try{
+    const doc = JSON.parse(await f.text());
+    if(doc.baseline !== BASELINE) throw Error('Este JSON pertenece a otro editor/base');
+    if(doc.format !== 'rancho-mask-review' || ![1,2].includes(doc.version) || !Array.isArray(doc.changes)) throw Error('Formato no válido');
+    if(doc.version===2){ if(!Array.isArray(doc.bases)||doc.bases.length!==ASSETS.length)throw Error('Faltan bases completas');for(const entry of doc.bases){const a=ASSETS.find(a=>a.id===entry.id);if(!a||a.hash!==entry.hash||!entry.mask.startsWith('data:image/png;base64,'))throw Error('Base incompatible');}for(const entry of doc.bases)ASSETS.find(a=>a.id===entry.id).m=entry.mask;}
+    const next = {};
+    for(const entry of doc.changes){
+      const found = ASSETS.find(a => a.id === entry.id);
+      if(!found || entry.hash !== found.hash) throw Error('La máscara base no coincide: ' + entry.id);
+      if(!Array.isArray(entry.strokes) || entry.strokes.length > 20000) throw Error('Trazos no válidos');
+      for(const s of entry.strokes){
+        if(!COLORS[s.material] || !Number.isFinite(s.radius) || s.radius <= 0 || s.radius > 200 || !Array.isArray(s.points) || s.points.some(p => !Array.isArray(p) || p.length !== 2 || p.some(n => !Number.isFinite(n)))) throw Error('Trazo no válido');
+      }
+      next[entry.id] = entry.strokes;
+    }
+    edits = next; history = [];
+    $('undoBtn').textContent = '↶ Deshacer (0)';
+    saveDraft(); if($('editCard').style.display !== 'none') loadArt();
+    $('notice').textContent = 'Proyecto importado. Comprueba las zonas antes de exportar.';
+  }catch(err){ $('notice').textContent = 'No importado: ' + err.message; }
+};
+$('showPng').onclick = () => { if(!maskReady){ $('notice').textContent='Abre primero una máscara con Editar';return;} finishStroke();render();
+  const url = work.toDataURL('image/png');
+  $('pngBox').innerHTML = '<p class="hint">PNG de la máscara actual, no del caballo. Mantén pulsada la imagen para guardarla.</p><img class="exp" src="' + url + '" alt="Máscara PNG">';
+};
+
+/* boot */
+loadDraft();
+buildGroups();
+document.querySelector('.wrap').insertBefore(Object.assign(document.createElement('p'), {className: 'hint', textContent: '90 poses · 5 vistas × 9 frames × 2 actores. 90 máscaras editables. Revisión v3, no aprobada.'}), $('reviewCard'));
+</script>
+</body>
+</html>

@@ -19,3 +19,9 @@ Editorv2 independiente, bases ya incluyen el trabajo parcial y ajustes. NuevoJSO
 
 ## Prueba de manchas v2 (10nov09:51)
 Solo render de revisión, sin aplicación al juego. `build_preview_uv_v2.py` genera90mapas experimentales en pixellab_preview_uv con regiones cabeza/cuello/tronco y flujo imagen-pose inicial. `render_pattern_preview.tscn` usa directamente HorseAppearance.natural_spot_coverage y HorsePatternMap.coverage para Moteado2/Jirafa10/Vaca11. Respeta máscara de elegibilidadv2, pelaje/crin y alfa. Render270PNG, dosvídeos20s:5vistas×9poses,4vueltas a9fps. No es un modelo3D y no garantiza cero parpadeo ni continuidad al girar. Grandes patrones muestran variaciones entre vistas y siluetas IA; faltan zonas castañas en torno a silla/anca, pelo crema puede quedar sin colorear. No integrar sin revisión.
+
+## Revisión v3, nuevo JSON10nov10:31
+Ant continuó en v1:98máscaras/74poses/1250trazos. Se importa sobre v1, no sobre v2.74son color;24eran manchas separadas. Por instrucción10:32se descarta la separación: manchas=canalrojo de pelaje, comprobado igualdadexacta90/90. El editorv3contiene90máscaras, no180. Correcciones de color74poses se preservan, recorte al alfa solamente;16posesrestantes usan v2. No se sobreescriben originales.
+
+### Intercambio completo numerado
+Cada entrega incluye HTMLvNcon todas las bases nuevas y JSONcompleto de esa misma versión (formato rancho-mask-review versión2, baseline pixellab-20261110-vN). El JSONcontiene90bases PNG incrustadas y trazos, no solo diferencias. Abriendo el HTMLya se ve el resultado; importar el JSONmatching repone el estado completo. Exportar desde ese HTMLy devolverlo permite siguientevN+1. No mezclar basesv1/v2/v3ni borrar los HTML/JSONanteriores. Probado v3 pintar/exportar/importar y persistencia enChrome a390px, sin errores. Vídeos máscaras15s+patrones20s por actor regenerados, cinco vistas,90poses. No APKni aplicación al juego.
