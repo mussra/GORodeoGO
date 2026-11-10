@@ -5,6 +5,8 @@ static var enabled:bool=true
 static var initialized:bool=false
 static var masks_enabled:bool=true
 static var pig_enabled:bool=true
+static var goat_enabled:bool=true
+static var bull_enabled:bool=true
 static var image_cache:Dictionary={}
 static var texture_cache:Dictionary={}
 static func active()->bool:
@@ -14,13 +16,15 @@ static func active()->bool:
    enabled=bool(cfg.get_value("art","enabled",true))
    masks_enabled=bool(cfg.get_value("art","masks_v5",true))
    pig_enabled=bool(cfg.get_value("art","pig_side",true))
+   goat_enabled=bool(cfg.get_value("art","goat_views",true))
+   bull_enabled=bool(cfg.get_value("art","bull_views",true))
   initialized=true
  return enabled
 static func set_active(value:bool)->void:
  enabled=value;initialized=true
  save_config()
 static func save_config()->void:
- var cfg:=ConfigFile.new();cfg.set_value("art","enabled",enabled);cfg.set_value("art","masks_v5",masks_enabled);cfg.set_value("art","pig_side",pig_enabled);cfg.save("user://pixellab-trial.cfg")
+ var cfg:=ConfigFile.new();cfg.set_value("art","enabled",enabled);cfg.set_value("art","masks_v5",masks_enabled);cfg.set_value("art","pig_side",pig_enabled);cfg.set_value("art","goat_views",goat_enabled);cfg.set_value("art","bull_views",bull_enabled);cfg.save("user://pixellab-trial.cfg")
 static func masks_active()->bool:
  active();return masks_enabled
 static func set_masks_active(value:bool)->void:
@@ -59,11 +63,26 @@ static func pig_active()->bool:
  active();return pig_enabled
 static func set_pig_active(value:bool)->void:
  active();pig_enabled=value;save_config()
+static func goat_active()->bool:
+ active();return goat_enabled
+static func set_goat_active(value:bool)->void:
+ active();goat_enabled=value;save_config()
+static func animal_views(kind:String)->Array:
+ var views:Array=[]
+ for view in ["side","down","up","diag_down","diag_up"]:
+  var complete:bool=true
+  for i in 9:
+   if not ResourceLoader.exists("res://art/experimental/pixellab/%s/%s/frame_%02d.png"%[kind,view,i]):complete=false;break
+  if complete:views.append(view)
+ return views
+static func apply_animal(frames:SpriteFrames,kind:String)->void:
+ for view in animal_views(kind):
+  var anim:String="run" if view=="side" else "run_"+view
+  if frames.has_animation(anim):frames.remove_animation(anim)
+  frames.add_animation(anim);frames.set_animation_speed(anim,9.0)
+  for i in 9:frames.add_frame(anim,load("res://art/experimental/pixellab/%s/%s/frame_%02d.png"%[kind,view,i]))
 static func apply_pig(frames:SpriteFrames)->void:
- if not pig_active():return
- if frames.has_animation("run"):frames.remove_animation("run")
- frames.add_animation("run");frames.set_animation_speed("run",9.0)
- for i in 9:frames.add_frame("run",load("res://art/experimental/pixellab/pig/side/frame_%02d.png"%i))
+ if pig_active():apply_animal(frames,"pig")
 
 static func frame_specs(kind:String)->Array:
  var specs:Array=[]
@@ -78,3 +97,15 @@ static func append_pose(frames:SpriteFrames,kind:String,step:Array,traits:Dictio
 static func classic_rider_animations(names:Array)->Array:
  if not active():return names
  return names.filter(func(anim):return not str(anim).begins_with("walk"))
+
+static func bull_active()->bool:
+ active();return bull_enabled
+static func set_bull_active(value:bool)->void:
+ active();bull_enabled=value;save_config()
+static func apply_bull(frames:SpriteFrames)->void:
+ if not bull_active():return
+ for view in animal_views("bull"):
+  var anim:String="flee_"+view
+  if frames.has_animation(anim):frames.remove_animation(anim)
+  frames.add_animation(anim);frames.set_animation_speed(anim,9.0)
+  for i in 9:frames.add_frame(anim,load("res://art/experimental/pixellab/bull/%s/frame_%02d.png"%[view,i]))

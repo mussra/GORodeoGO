@@ -89,6 +89,7 @@ func set_is_chaser(value: bool) -> void:
 
 func _ready() -> void:
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, ART_ROOT, ANIM_NAMES)
+	if _sprite_swap.has_sprite():PixelLabTrial.apply_bull(_sprite_swap._frames)
 
 	controller = BullController.new(BullState.State.SAFE, tuning)
 	controller.state_changed.connect(_on_state_changed)

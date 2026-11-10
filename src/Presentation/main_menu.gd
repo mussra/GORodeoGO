@@ -274,7 +274,8 @@ func _show_equipment()->void:
 func _show_settings()->void:
 	var panel:=Control.new();panel.set_meta("back_closes",true);panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
 	var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.add_child(bg)
-	var box:=VBoxContainer.new();box.position=Vector2(60,70);box.size=Vector2(540,330);box.add_theme_constant_override("separation",14);panel.add_child(box)
+	var scroll:=ScrollContainer.new();scroll.position=Vector2(60,40);scroll.size=Vector2(1160,640);panel.add_child(scroll)
+	var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(700,0);box.add_theme_constant_override("separation",14);scroll.add_child(box)
 	var title:=Label.new();title.text=tr("UI_035");title.add_theme_font_size_override("font_size",30);box.add_child(title)
 	var language:=Label.new();language.text=tr("UI_036");box.add_child(language)
 	var pick:=OptionButton.new();pick.custom_minimum_size=Vector2(400,56);box.add_child(pick)
@@ -285,8 +286,12 @@ func _show_settings()->void:
 	art.toggled.connect(func(value:bool):PixelLabTrial.set_active(value))
 	var masks:=CheckButton.new();masks.text="Máscaras v5: pelaje, crin y manchas";masks.button_pressed=PixelLabTrial.masks_active();masks.custom_minimum_size.y=56;box.add_child(masks)
 	masks.toggled.connect(func(value:bool):PixelLabTrial.set_masks_active(value))
-	var pig:=CheckButton.new();pig.text="Cerdo PixelLab: carrera lateral (prueba)";pig.button_pressed=PixelLabTrial.pig_active();pig.custom_minimum_size.y=56;box.add_child(pig)
+	var pig:=CheckButton.new();pig.text="Cerdo PixelLab: vistas disponibles (prueba)";pig.button_pressed=PixelLabTrial.pig_active();pig.custom_minimum_size.y=56;box.add_child(pig)
 	pig.toggled.connect(func(value:bool):PixelLabTrial.set_pig_active(value))
+	var goat:=CheckButton.new();goat.text="Cabra PixelLab: vistas disponibles (prueba)";goat.button_pressed=PixelLabTrial.goat_active();goat.custom_minimum_size.y=56;box.add_child(goat)
+	goat.toggled.connect(func(value:bool):PixelLabTrial.set_goat_active(value))
+	var bull:=CheckButton.new();bull.text="Toro PixelLab: 5 vistas de carrera (prueba)";bull.button_pressed=PixelLabTrial.bull_active();bull.custom_minimum_size.y=56;box.add_child(bull)
+	bull.toggled.connect(func(value:bool):PixelLabTrial.set_bull_active(value))
 	var art_note:=Label.new();art_note.text="Se aplica al entrar a jugar. No cambia tus caballos.\nDesactiva máscaras para volver al pelaje PixelLab fijo.\nSin emblemas ni patas especiales en este arte de prueba.";box.add_child(art_note)
 	var close:=Button.new();close.text=tr("UI_009");close.custom_minimum_size.y=52;box.add_child(close);close.pressed.connect(panel.queue_free)
 	pick.item_selected.connect(func(i:int):

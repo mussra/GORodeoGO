@@ -1,26 +1,41 @@
 extends "res://src/Presentation/wild_pig.gd"
-## Art B (Ant9-Nov): ten-frame cycle, one second, same dimensions/pivot.
+## Reversible PixelLab run views; Art B remains the classic fallback.
 ## Shares lasso target, release, rope and nonblocking Node2D with pigs.
 const IS_GOAT:bool=true
-static var frames_cache:SpriteFrames
+static var frames_cache:Dictionary={}
 var goat_art:AnimatedSprite2D
+var pixellab_views:Array=[]
 func setup(p_pen:Dictionary)->void:
  pen=p_pen;home=pen.get("pos",Vector2.ZERO);state=WorldGoats.new_state()
 func _ready()->void:
  position=home
- if frames_cache==null:
-  frames_cache=SpriteFrames.new()
+ pixellab_views=PixelLabTrial.animal_views("goat") if PixelLabTrial.goat_active() else []
+ var key:String=str(PixelLabTrial.goat_active())
+ if not frames_cache.has(key):
+  var frames:=SpriteFrames.new()
   for view in ["right","left","down","up"]:
-   frames_cache.add_animation(view);frames_cache.set_animation_speed(view,10.0)
-   for i in 10:frames_cache.add_frame(view,load("res://art/world/goats/compare10/%s/frame_%02d.png"%[view,i]))
- goat_art=AnimatedSprite2D.new();goat_art.sprite_frames=frames_cache
+   frames.add_animation(view);frames.set_animation_speed(view,10.0)
+   for i in 10:frames.add_frame(view,load("res://art/world/goats/compare10/%s/frame_%02d.png"%[view,i]))
+  if PixelLabTrial.goat_active():PixelLabTrial.apply_animal(frames,"goat")
+  frames_cache[key]=frames
+ goat_art=AnimatedSprite2D.new();goat_art.sprite_frames=frames_cache[key]
  goat_art.centered=false;goat_art.offset=Vector2(-80,-144);goat_art.scale=Vector2.ONE*.40
+ # Both classic and PixelLab use a 160px canvas and the same foot pivot.
  goat_art.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
  add_child(goat_art);goat_art.play("right")
 func _process(delta:float)->void:
  touch_grace=maxf(0,touch_grace-delta)
  if roped:held=maxf(0,held-delta)
  var view:String=("down" if movement.y>0 else "up") if absf(movement.y)>absf(movement.x)*1.2 else ("left" if movement.x<0 else "right")
+ if PixelLabTrial.goat_active():
+  var wanted:String=AnimalDirection.view(movement)
+  if wanted not in pixellab_views:
+   wanted=("down" if movement.y>0 else "up") if absf(movement.y)>absf(movement.x)*1.2 else "side"
+  var candidate:String="run" if wanted=="side" else "run_"+wanted
+  if goat_art.sprite_frames.has_animation(candidate):
+   view=candidate;goat_art.flip_h=movement.x<0 and wanted not in ["up","down"]
+  else:goat_art.flip_h=false
+ else:goat_art.flip_h=false
  if goat_art.animation!=view:goat_art.play(view)
  goat_art.speed_scale=1.0 if movement.length_squared()>0.01 else 0.0
  queue_redraw()

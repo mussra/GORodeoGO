@@ -1,0 +1,550 @@
+{
+  "version": "2.7.69",
+  "code": 328,
+  "new_frames_exact_or_losslessly_mirrored": 90,
+  "new_frames_imported_into_apk": 90,
+  "pig_goat_genuine_diagonals": false,
+  "bull_genuine_views": 5,
+  "frames": [
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_00.png",
+      "sha256": "afd4472843515c9f62ff03008e889c3dc51e2bb2b4863477b7eedd4cbe491b78",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_01.png",
+      "sha256": "9257be2d875128962c97abda6d3caf88d69a8536ebc99bdac0e758b9c851a663",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_02.png",
+      "sha256": "e37f8172d71fb41f288d98eee6c377b622b6f0925cb13298225224ab2c5aa627",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_03.png",
+      "sha256": "b0b8932d8546c1ceedc1429720b027e74314f7f222afa35841bdad4089788e95",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_04.png",
+      "sha256": "278d246fae11cd97629f31dab4d8e0fe4121f4bd52a5343cd5babca25083fead",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_05.png",
+      "sha256": "732318b500279bf97f7ae3f1ab2c7cc94c443a61d8976da897147502f173c3bd",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_06.png",
+      "sha256": "be4d88d388cca9cd30aa2a08b75bd5f336da72b5c3b6fea25e14accafe5dd0e7",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_07.png",
+      "sha256": "a34e9b6b4bef3c2da41f107231dc142cadb5122664cee383bb1a4dd3041ee4d5",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/up/frame_08.png",
+      "sha256": "66ec0b07ac9845ef5e6eaf99ec32b4fe355a341874174b6723978897016dcd03",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_00.png",
+      "sha256": "379e33c791f65b076ca7074fc8667eb9b6564c53b048585502f7a327d55803df",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_01.png",
+      "sha256": "866c67ae996a013696e36afb9a4daf41426d3b71a6a70d6eac8219de3c31206a",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_02.png",
+      "sha256": "ebf3bee9d476a9323defbc764e90f1d7fe556a7d57afa87fc4a11946f25b5d7f",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_03.png",
+      "sha256": "c0c6037230ba34aaab122d46ccc069b63486b9fbc8c1e4113fe4eb0b8f7731be",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_04.png",
+      "sha256": "003f4760b30435c4cbcd994f38628af6b078c81694cd9d3015546e6640542886",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_05.png",
+      "sha256": "51ff00015f746c1a6add6c4f0759d8f37f4b12e4391e7fba8f36b820778f7b2f",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_06.png",
+      "sha256": "78f006cc74e4a49bf4403d232e4d13ea46c3aaaa9c7d1a939813f5e7e3bb4013",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_07.png",
+      "sha256": "f0ac4ae1ee9f3ae49dd6546eb509ecdd3d45aeef1d914613d02977b91ac91598",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/pig/down/frame_08.png",
+      "sha256": "c09f74ccb4b3b4c7275f0142924bf6179ceb92d80b3ec51fe5c1740914b7ab8b",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_00.png",
+      "sha256": "c013edcfb36faef4cf80fd0331ebdbc35e29c3522bfd53d3e38595fbbd641b98",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_01.png",
+      "sha256": "60b8d6c8fb430c805dfa31ab0735e6f676aa613285f4919e9cd669bd88b9b297",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_02.png",
+      "sha256": "49e6ff5b7f3640a21b69a98e8e20878ce6ce3201b6be104e3d7e6b8c53ef9621",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_03.png",
+      "sha256": "ffe97a4fbabd4fba09a9843744d6fa51a03c0d8ad67c97a85969131d49ef3504",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_04.png",
+      "sha256": "14501c8d5a70e4cc6e2fd8725d7ed9595e8a94fd45932f3a30cd3dcfcb9dc236",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_05.png",
+      "sha256": "072e6e6aa72866b615094353716047579ef18b661c745d6cecd0026479e4f7bf",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_06.png",
+      "sha256": "31fc95b66e5751bdd0f756fca2bc0b08d365ab9df6c827b1a0f1c991aee93d78",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_07.png",
+      "sha256": "bc487bb129969bc0b788cf10b6dcd4a90029c78a2096e0b1fa83b17b85e638f1",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/side/frame_08.png",
+      "sha256": "67c3fe2c801b6918bdf70b76d16205c2beb3a8087856b6f90267104ce1325e3c",
+      "source_exact": true,
+      "mirrored": true
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_00.png",
+      "sha256": "1723e4fb87c555924662a5d8174fc5c1375399490bf5d8ff5c1562ee012fa2ff",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_01.png",
+      "sha256": "9227156a1b681988ff329fe9d1ef443e68898886354c1496fc39c1efe2a67292",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_02.png",
+      "sha256": "ebd676c41aafc73d823bc1cd35364163735e2cd4ef570a659ba0b125345dd9f2",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_03.png",
+      "sha256": "1dd59a1e793b42779943052de7077c60d432999a725ff668ff2442c294781ec6",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_04.png",
+      "sha256": "e01c5c6443ae34e2478c6a8b8606ce3df80a521a50055933b232bbc0011a55b8",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_05.png",
+      "sha256": "b1eb876a17b5c083064fea8dacea7fff719b1d258ddf835e3c1bf6a9f2519ff7",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_06.png",
+      "sha256": "1d23fe38b6be0b3c129597fc27f0b4a61b285484487fd35a808cbe044f60f2ea",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_07.png",
+      "sha256": "e1a8e1acfa05cb986fa2953b60c46fb2122d6f13ea2590ea9738da6eabc3925a",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/up/frame_08.png",
+      "sha256": "d51aebe8f0db0db59c82feeeeb44fc49a07d7d8bd7ce504578fc178dd610b9e3",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_00.png",
+      "sha256": "c3886bb3faae700aaeade660c53887af52c44a8ac826e7272e686074d98e565c",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_01.png",
+      "sha256": "a4a4c9d595c7f7b9751925f4f2b9da974e6e5dd02917cf3b6eec176fbe34a6a2",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_02.png",
+      "sha256": "6ffb57d5ac51c81c7ba04f8cf50c57a8134a261dc9a10b1daec5ce43211bdc04",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_03.png",
+      "sha256": "2d5bd0c02193cb031eccd81c19158cbb53b3a123573fed9e527e91bc3b2f9b48",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_04.png",
+      "sha256": "ce740c8297c9e939d5103bdb60abfe0c19919842506bc920fb687fb09b847990",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_05.png",
+      "sha256": "8ae602fcc4086fa99308ba57c13d6bb62130023dc4b03a2cef0092bdf4093282",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_06.png",
+      "sha256": "92fbbf9506924e43777c998a5b4268a56b604dc84e3e0cd7b3a368c655eafd46",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_07.png",
+      "sha256": "6e569fada5bfaf6595a741e7c41f43d447c92a28c57ae25ff8b27f16e2eee242",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/goat/down/frame_08.png",
+      "sha256": "43ded577de743f2f7328ce9b0848d30d5397577e78793fe88a47a27212c5570d",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_00.png",
+      "sha256": "ef2c8c1af1523f2fc0df0f76b74e036aea4996e370593a8b11bfde63f14ff9ad",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_01.png",
+      "sha256": "5d747df61d455ba594a63904ff6de75b9389936d39c3991eb7dc2f49ceba85ba",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_02.png",
+      "sha256": "eac9a8d22cc9f0e98dcd433679183ba61844b60422b56acec41ae32b81f54357",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_03.png",
+      "sha256": "86dda633c2caa20694da24bd9d78b4ede75b930ad09864b75beb4c95641b8a49",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_04.png",
+      "sha256": "7be3775412280243de352eed146f164a9f0e84fb3448a04add0dbc17d826c559",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_05.png",
+      "sha256": "fff34e3fd597e4a5ea7dff6b30bae023ef95df3b5c65e8975f1731b890e65066",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_06.png",
+      "sha256": "43703a7ae52a6abad9392a9726c9b59880a4820da64ba8ba3d2fd6d9e8e77558",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_07.png",
+      "sha256": "0fc31ab2ea409a236bd4ff08d5ecef75f06159a923e52a38100bb0a9e0274c22",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/side/frame_08.png",
+      "sha256": "7c618676f222d3a8a89c05d631f9887389983e14cc46371e008e0dba73405e69",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_00.png",
+      "sha256": "52e9bad873733f19e615fb5f807726ea3a5efc6d938ceb5703a8884116233ab1",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_01.png",
+      "sha256": "aa929161d8cb560c8d068a6a6edf167f1eb8344e9bbb557de172d619029086b5",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_02.png",
+      "sha256": "58ee09083b759ff4cd9298bee1398a64d9bb07b60f55020d4f8e94e6e62c299d",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_03.png",
+      "sha256": "3daaced19364ad71bdf6d8303c6acadbeeaba2a444e744076524b47336d166c2",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_04.png",
+      "sha256": "7f4715ddb0957ddf841d51ede41e138daaea784846ee74ee39b4adef46f153d8",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_05.png",
+      "sha256": "db8bc7c66dccce4703a530f9270ebb126adb5c649f93e924c37e49b7f017942d",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_06.png",
+      "sha256": "c6fc2e1dd2d6f357e58d99b37eecee79d7207dcdebed58992f778c1bc79bdf63",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_07.png",
+      "sha256": "07fe0515396b927f8c716b5f081e2a5dd914ece3853f7fcd0d6cfe17985dbf00",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/up/frame_08.png",
+      "sha256": "1724b23a007ad68783f0809b4ce3b077ecc0df63d09677c50c6b0b4beefdd2e0",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_00.png",
+      "sha256": "c45c66a5f42b55e95cdd56237edd8c27455528b01d22f8e2d7625927200b0c62",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_01.png",
+      "sha256": "f065fed37f6502b3fcb6993c9b7f442b5c3a932327df1d66f6ea8156812dd233",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_02.png",
+      "sha256": "269750bface07ca5d0eb5623a9537360fa9238d73267b743a4acdfadc4a5781b",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_03.png",
+      "sha256": "74a7020fd79afcfb9f7c5a6a5c76033bff0b008e22d65b2ea1b5e65bd8489322",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_04.png",
+      "sha256": "9e1e0913d63bb57978054ad5487d51eb81b8b2bf5a533f81720ce0a61de2db31",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_05.png",
+      "sha256": "58c6bb7efe85b6d3c91f506a4a5d5cfbebd3804bbe82bf98f4ec50bfe1cedea8",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_06.png",
+      "sha256": "0c3ded02aeb65e5020a6537bdc40282ebdb8c729b388a61e476ab2f4d76259ba",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_07.png",
+      "sha256": "d418b14a9e0e985fb871e87566a9cc41eb83a4ad7b5ad8d8c304055a083a47ce",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/down/frame_08.png",
+      "sha256": "8d6e19bdf3d8875c68f6e855a847da8d01e970f651cfa295ab9f4c07a072ca2f",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_00.png",
+      "sha256": "10980d7a6fbf5a2013c1f94ece53a128357a2e6d770bbfb870bce2b6af9185e6",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_01.png",
+      "sha256": "13beedcbc97c00f89e6ffe349bc4a966339d8c6d4379c39f8141c816580594a5",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_02.png",
+      "sha256": "3d8631657866dce26456850fcd85992ae26334e0759cf8d75877ed343e3f9e94",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_03.png",
+      "sha256": "ee4dbe4e91069190ea8f7630a133a4d237dd744c80c13d30af4ba5bbecbe1900",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_04.png",
+      "sha256": "942f680b04f6a7c0fa2f93598752f095d9171f227ee2c5d28bdf35c9b74f3481",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_05.png",
+      "sha256": "284007b1b268cebe32bc3d424efa994ffc1295207bd10dcf7616aed0eece6102",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_06.png",
+      "sha256": "9430890d6c42a1d10d9e22bb0f3d11f8296463b102364053a6d9f9de6035edfe",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_07.png",
+      "sha256": "8cd68f7faaae062095ea4f785f15eb360fb8521b6a927e80cc04b1d31b2276e6",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_up/frame_08.png",
+      "sha256": "0da5af61e6366618157555d62662b3f305ba2c72d40dc3270f6062cbbfbba81d",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_00.png",
+      "sha256": "7afcc5e6b0ef67614aa0ac0ab8ee5642165cd61501d4d69d4c4fc719d85f909c",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_01.png",
+      "sha256": "db8ad04e0533b8b37f5867db23a6674476cd3cb7759ef636f3770642a65289fe",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_02.png",
+      "sha256": "d91455dd8fbc05ea8ea9fdb0514e2b2f7b57fb6a4ecc4b95b7c596580e0ab3cd",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_03.png",
+      "sha256": "cd9fdc73682197b6b2b478334149cb3d10bbc3c89f39775fda54eff63d268ff6",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_04.png",
+      "sha256": "7c8ba47c21fbb3f1180f835b7efabbdf58ba96be96dde441c843962ecc4fb5c1",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_05.png",
+      "sha256": "57ac5c423c7235d548bd33b5ffb4e1f0ea1b517bb612eb427aa929e541766a18",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_06.png",
+      "sha256": "9e5d76207ac2739e2f82dcdfdb7fd1d4dfe746b3cc4bd7d3c5d9439ccc97cfcd",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_07.png",
+      "sha256": "c90f63757f8cae460ccddfe5f3161232196bf45ebd057d1c5d103ae7c747a90f",
+      "source_exact": true,
+      "mirrored": false
+    },
+    {
+      "path": "art/experimental/pixellab/bull/diag_down/frame_08.png",
+      "sha256": "04114b7fb99a28d9f55d9abf3a0cc1a19681483a5cd2cee9997096580b33e422",
+      "source_exact": true,
+      "mirrored": false
+    }
+  ]
+}

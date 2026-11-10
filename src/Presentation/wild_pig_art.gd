@@ -22,6 +22,13 @@ func _ready()->void:
 func update_state(fleeing:bool,tired:bool,left:bool,movement:Vector2=Vector2.RIGHT)->void:
  flip_h=left
  var next:String="tired" if tired else ("run" if fleeing else "idle")
- if fleeing and not tired and absf(movement.y)>absf(movement.x)*1.2:
+ if fleeing and not tired and PixelLabTrial.pig_active():
+  var available:Array=["side","down","up"]
+  for view in ["diag_down","diag_up"]:
+   if sprite_frames.has_animation("run_"+view):available.append(view)
+  var view:String=AnimalDirection.available_view(movement,available)
+  next="run" if view=="side" else "run_"+view
+  flip_h=left and view not in ["up","down"]
+ elif fleeing and not tired and absf(movement.y)>absf(movement.x)*1.2:
   next="run_down" if movement.y>0 else "run_up";flip_h=false
  if animation!=next:play(next)
