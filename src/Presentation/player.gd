@@ -155,7 +155,7 @@ var _active_capture_count: int = 0
 var _max_captures: int = 1
 
 func _ready() -> void:
-	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), ANIM_NAMES)
+	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.classic_rider_animations(ANIM_NAMES))
 	if _sprite_swap.has_sprite():
 		var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
 		if not horse.is_empty():HorseAppearance.apply(_sprite_swap._frames,horse.traits)

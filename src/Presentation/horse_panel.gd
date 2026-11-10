@@ -128,67 +128,40 @@ func family_view()->void:
 
 func detail_view()->void:
  var h:Dictionary=SaveData.horse_collection.find(focus_id)
- var is_owned:bool=not h.is_empty()
- if not is_owned:h=focus_preview
+ var owned:bool=not h.is_empty()
+ if not owned:h=focus_preview
  if h.is_empty():return
- if not is_owned and detail_origin=="atlas_variants":
-  label("Variante sin conseguir",Vector2(40,130),28);sprite(h,Vector2(80,210),350)
-  var t:Dictionary=h.traits
-  label(tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]),Vector2(510,170),24)
-  label("Manchas: "+(tr(HorseCollection.COATS[HorseCollection.spots_index(t)]) if HorseCollection.spots_index(t)>=0 else "original"),Vector2(510,240),22)
-  label("Ojos: "+tr(HorseCollection.EYES[HorseCollection.eye_index(t)]),Vector2(510,290),22)
-  label("Patas: "+(tr(HorseCollection.COATS[HorseCollection.legs_index(t)]) if HorseCollection.legs_index(t)>=0 else "original"),Vector2(510,340),22)
-  label("Vista de posibilidad · no cambia tu colección",Vector2(510,420),21)
+ var t:Dictionary=h.traits
+ var title:String=str(h.get("name","")) if owned else HorseCollection.COATS[t.coat]+" · "+HorseCollection.PATTERNS[t.pattern]+" · "+HorseCollection.MANES[t.mane]
+ label(title,Vector2(35,110),26)
+ label("Tu caballo · desliza los valores" if owned else "Variante sin conseguir",Vector2(35,155),19)
+ sprite(h,Vector2(30,205),390)
+ var scroll:=ScrollContainer.new();scroll.position=Vector2(470,130);scroll.size=Vector2(770,540);content.add_child(scroll)
+ var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(735,0);box.add_theme_constant_override("separation",12);scroll.add_child(box)
+ for text in HorseValues.visual(t)+HorseValues.performance(h,owned)+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
+  var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);box.add_child(line)
+ if not owned:
+  var note:=Label.new();note.text="Vista de posibilidad · no cambia tu colección";box.add_child(note)
+  if detail_origin!="atlas_variants":
+   var buy:=Button.new();buy.text=tr("MARKET_BUY")%(0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h));box.add_child(buy);buy.pressed.connect(func():confirm_trade(h,false));buy.disabled=not SaveData.debug_mode and not SaveData.trial_session_active and (SaveData.equipment_points<HorseMarket.buy_price(h) or not HorseMarket.available(SaveData.horse_collection,h,SaveData.highest_level_completed))
   return
- if not is_owned:
-  label(tr(HorseCollection.COATS[h.traits.coat])+tr("UI_101"),Vector2(40,185),28);sprite(h,Vector2(60,245),300)
-  label(tr("UI_102")+tr(HorseCollection.COATS[h.traits.coat])+tr("UI_103")+tr(HorseCollection.PATTERNS[h.traits.pattern])+tr("UI_104")+tr(HorseCollection.MANES[h.traits.mane]),Vector2(510,150),26)
-  label(tr("MARKET_VALUE")%[tr(HorseCollection.RARITIES[HorseMarket.tier(h)]),HorseMarket.buy_price(h)],Vector2(510,280),22)
-  var purchase:=button(tr("MARKET_BUY")%(0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h)),Vector2(510,340),func():confirm_trade(h,false),400);purchase.disabled=not SaveData.debug_mode and not SaveData.trial_session_active and (SaveData.equipment_points<HorseMarket.buy_price(h) or not HorseMarket.available(SaveData.horse_collection,h,SaveData.highest_level_completed))
-  button(tr("UI_106"),Vector2(510,410),func():show_page("atlas"),340)
-  return
- var title:=label(h.name,Vector2(30,100),27);title.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;title.size.x=365;title.clip_text=true
- if PackLeader.is_leader(h,SaveData.horse_collection):
-  var badge:=label(tr("LEADER_TITLE"),Vector2(30,135),18);badge.add_theme_color_override("font_color",Color("ffd23d"))
- sprite(h,Vector2(20,150),420)
- var name_edit:=LineEdit.new();name_edit.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;name_edit.text=h.name;name_edit.placeholder_text=tr("UI_107");name_edit.max_length=60;name_edit.position=Vector2(30,580);name_edit.size=Vector2(200,48);content.add_child(name_edit)
- button(tr("UI_108"),Vector2(245,580),func():
-  message=tr("UI_109") if SaveData.rename_horse(h.id,name_edit.text) else tr("UI_110");refresh(),160)
- if SaveData.horse_collection.is_adult(h.id):
-  var equip:=button(tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_111"),Vector2(30,635),func():
-   message=tr("UI_112") if SaveData.select_horse(h.id) else tr("UI_086");refresh(),360)
-  equip.disabled=SaveData.horse_collection.selected==h.id
- label(tr(HorseCollection.COATS[h.traits.coat])+" · "+tr(HorseCollection.PATTERNS[h.traits.pattern])+" · "+tr(HorseCollection.MANES[h.traits.mane]),Vector2(480,100),22)
- var pattern_picker:=OptionButton.new();pattern_picker.position=Vector2(480,180);pattern_picker.size=Vector2(250,44)
- for pattern_name in HorseCollection.PATTERNS:pattern_picker.add_item(tr(pattern_name))
- pattern_picker.select(int(h.traits.pattern));content.add_child(pattern_picker)
- pattern_picker.item_selected.connect(func(i:int):SaveData.set_horse_pattern_color(h.id,"pattern",i);refresh())
- var spot_picker:=OptionButton.new();spot_picker.position=Vector2(745,180);spot_picker.size=Vector2(235,44);spot_picker.add_item("Manchas: original")
- var coat_picker:=OptionButton.new();coat_picker.position=Vector2(1000,180);coat_picker.size=Vector2(240,44)
- for color_name in HorseCollection.COATS:
-  spot_picker.add_item("Manchas: "+tr(color_name));coat_picker.add_item("Pelaje: "+tr(color_name))
- spot_picker.select(HorseCollection.spots_index(h.traits)+1);coat_picker.select(int(h.traits.coat));content.add_child(spot_picker);content.add_child(coat_picker)
- spot_picker.item_selected.connect(func(i:int):SaveData.set_horse_pattern_color(h.id,"spots",i-1);refresh())
- coat_picker.item_selected.connect(func(i:int):SaveData.set_horse_pattern_color(h.id,"coat",i);refresh())
- var leg_picker:=OptionButton.new();leg_picker.position=Vector2(960,250);leg_picker.size=Vector2(280,48);leg_picker.add_item("Patas: original")
- for color_name in HorseCollection.COATS:leg_picker.add_item("Patas: "+tr(color_name))
- leg_picker.select(HorseCollection.legs_index(h.traits)+1);content.add_child(leg_picker)
- leg_picker.item_selected.connect(func(i:int):message="Color de patas guardado" if SaveData.set_horse_legs(h.id,i-1) else "No se pudo guardar";refresh())
- button("Mustang",Vector2(1010,315),func():message="Pardo con patas oscuras" if SaveData.set_horse_legs(h.id,0,true) else "No se pudo guardar";refresh(),200)
- button(tr("EMBLEM_TITLE"),Vector2(480,405),func():
-  var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor),360).disabled=not SaveData.horse_collection.is_adult(h.id)
- var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);badge.position=Vector2(1175,95);badge.size=Vector2(64,56);content.add_child(badge)
- var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");dodge_badge.position=Vector2(1095,95);dodge_badge.size=Vector2(64,56);content.add_child(dodge_badge)
- var st:Dictionary=HorseStats.read(h)
- label(tr("UI_114")%[tr(HorseCollection.EYES[HorseCollection.eye_index(h.traits)]),st.speed,st.handling,st.power*100,st.dodge*100],Vector2(480,235),16)
- if not SaveData.horse_collection.is_adult(h.id):
-  label(tr("UI_115"),Vector2(850,412),16)
-  button(tr("UI_116"),Vector2(30,635),func():
-   message=tr("UI_117") if SaveData.mature_horse_trial(h.id) else tr("UI_086");refresh(),360)
- label(tr("UI_118") if not SaveData.horse_collection.is_adult(h.id) else tr("UI_119")%SaveData.equipped_whip_reach(),Vector2(480,462),16)
- button(tr("UI_120"),Vector2(480,490),func():show_page("family"),420)
- var sell:=button(tr("MARKET_SELL")%HorseMarket.sell_price(h),Vector2(920,540),func():confirm_trade(h,true),360);sell.disabled=not HorseMarket.can_sell(SaveData.horse_collection,h.id)
- sell.tooltip_text=tr("MARKET_PROTECT")
+ var name_edit:=LineEdit.new();name_edit.text=h.name;name_edit.max_length=60;name_edit.position=Vector2(35,600);name_edit.size=Vector2(210,48);content.add_child(name_edit)
+ button(tr("UI_108"),Vector2(255,600),func():SaveData.rename_horse(h.id,name_edit.text);refresh(),170)
+ var fields:Array=[["coat","Pelaje",HorseCollection.COATS,int(t.coat)],["pattern","Tipo de manchas",HorseCollection.PATTERNS,int(t.pattern)],["spots","Color de manchas",["Original"]+HorseCollection.COATS,HorseCollection.spots_index(t)+1],["legs","Patas bajas",["Original"]+HorseCollection.COATS,HorseCollection.legs_index(t)+1]]
+ for spec in fields:
+  var pick:=OptionButton.new();pick.custom_minimum_size.y=48
+  for value in spec[2]:pick.add_item(str(spec[1])+": "+str(value))
+  pick.select(spec[3]);box.add_child(pick)
+  pick.item_selected.connect(func(i:int):
+   if spec[0]=="legs":SaveData.set_horse_legs(h.id,i-1)
+   else:SaveData.set_horse_pattern_color(h.id,spec[0],i-1 if spec[0]=="spots" else i)
+   refresh())
+ var actions:Array=[["Usar caballo",func():SaveData.select_horse(h.id);refresh()],["Emblema",func():var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor)],["Mapa genealógico",func():show_page("family")],["Mustang: patas oscuras",func():SaveData.set_horse_legs(h.id,0,true);refresh()]]
+ if not SaveData.horse_collection.is_adult(h.id):actions.append(["Crecer (prueba)",func():SaveData.mature_horse_trial(h.id);refresh()])
+ for action in actions:
+  var b:=Button.new();b.text=action[0];b.custom_minimum_size.y=48;box.add_child(b);b.pressed.connect(action[1])
+  if action[0] in ["Usar caballo","Emblema"]:b.disabled=not SaveData.horse_collection.is_adult(h.id)
+ var sell:=Button.new();sell.text=tr("MARKET_SELL")%HorseMarket.sell_price(h);sell.custom_minimum_size.y=48;sell.disabled=not HorseMarket.can_sell(SaveData.horse_collection,h.id);box.add_child(sell);sell.pressed.connect(func():confirm_trade(h,true))
 func atlas_entries()->Array[Dictionary]:
  if page=="atlas_variants":return HorseAtlas.variants(atlas_family,atlas_filters,SaveData.horse_collection.horses)
  if page=="market" and not SaveData.debug_mode and not SaveData.trial_session_active:
@@ -251,31 +224,29 @@ func atlas_view()->void:
   var order_btn:=button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(1015,575),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),230)
   order_btn.add_theme_font_size_override("font_size",14)
  _atlas_filter_bar()
- label(tr("MARKET_DESIGN_NOTE") if page=="market" else ("Colores de manchas · cambia ojos y patas desde Filtros" if page=="atlas_variants" else "1.440 familias · toca una para explorar manchas, ojos y patas"),Vector2(35,160),17)
+ label(tr("MARKET_DESIGN_NOTE") if page=="market" else ("Desliza para ver todas las tarjetas · ojos y patas desde Filtros" if page=="atlas_variants" else "1.440 familias · toca una para explorar manchas, ojos y patas"),Vector2(35,160),17)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
  var all_entries:Array[Dictionary]=atlas_entries()
  var entries:Array[Dictionary]=HorseFilters.apply(all_entries,atlas_filters);var pages:int=maxi(1,ceili(entries.size()/6.0));atlas_page=clampi(atlas_page,0,pages-1)
+ var outer:Control=content
+ var scroll:=ScrollContainer.new();scroll.position=Vector2(0,200);scroll.size=Vector2(1280,365);content.add_child(scroll)
+ var cards:=Control.new();cards.custom_minimum_size=Vector2(1250,1335);scroll.add_child(cards);content=cards
  for j in range(6):
   var n:int=atlas_page*6+j
   if n>=entries.size():break
   var entry:Dictionary=entries[n];var h:Dictionary=entry.horse;var t:Dictionary=h.traits
-  var x:float=30+(j%3)*415;var y:float=205+int(j/3)*185
+  var x:float=30+(j%2)*620;var y:float=0+int(j/2)*445
   sprite(h,Vector2(x,y),175)
-  var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat]))),Vector2(x+180,y),18);title.size=Vector2(225,30);title.clip_text=true
-  label(tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]),Vector2(x+180,y+32),16)
-  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(395,175);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():
+  var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
+  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,420);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():
    if page=="atlas":
     atlas_family_page=atlas_page;atlas_family=h.traits.duplicate(true);atlas_page=0;show_page("atlas_variants")
    else:focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
-  label(tr(HorseCollection.RARITIES[HorseMarket.tier(h)]),Vector2(x+180,y+58),16)
-  if page=="market":label(tr("MARKET_PRICE")%HorseMarket.buy_price(h),Vector2(x+180,y+82),16)
-  else:
-   var spot:int=HorseCollection.spots_index(t)
-   label("Manchas: "+(tr(HorseCollection.COATS[spot]) if spot>=0 else "original"),Vector2(x+180,y+82),16)
-   label("Ojos: "+tr(HorseCollection.EYES[HorseCollection.eye_index(t)]),Vector2(x+180,y+105),15)
-   label("Patas: "+(tr(HorseCollection.COATS[HorseCollection.legs_index(t)]) if HorseCollection.legs_index(t)>=0 else "original"),Vector2(x+180,y+127),15)
-  if HorseJump.capable(h):
-   var jump:=JumpBadge.new();jump.capable=true;jump.position=Vector2(x+110,y+116);jump.size=Vector2(64,56);content.add_child(jump)
+  var texts:Array=HorseValues.visual(t)+HorseValues.performance(h,entry.owned)
+  texts.append("Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)])
+  if page=="market":texts.append(tr("MARKET_PRICE")%HorseMarket.buy_price(h))
+  for i in texts.size():label(str(texts[i]),Vector2(x+180,y+48+i*27),17)
+ content=outer
  button(tr("UI_132"),Vector2(35,575),func():atlas_page=maxi(0,atlas_page-1);refresh())
  if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(892,588),17)
  label(tr("UI_128")%[atlas_page+1,pages],Vector2(345,585),23)

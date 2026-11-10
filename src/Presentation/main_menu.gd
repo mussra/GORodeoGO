@@ -155,15 +155,6 @@ func _build_menu() -> void:
 	_equipment_caption.position=Vector2(850,600)
 	add_child(_equipment_caption)
 	_refresh_points_caption()
-	var bull_host := Node2D.new()
-	_hero.add_child(bull_host)
-	var b := Polygon2D.new()
-	bull_host.add_child(b)
-	var bull_swap := SpriteSwap.new(bull_host,b,"res://art/bull/",["flee_diag_down"])
-	bull_swap.play("flee_diag_down")
-	_bull = bull_swap._sprite
-	bull_host.hide()
-	bull_host.name = "Bull"
 	var footer := _label(tr("UI_006"),13,Color("78979d"))
 	footer.name = "Footer"
 	add_child(footer)
@@ -220,8 +211,6 @@ func _layout() -> void:
 	_caption.position = Vector2(70,634)
 	_hero.get_node("Rider").position = Vector2(912,355)
 	_hero.get_node("Rider").scale = Vector2.ONE
-	_hero.get_node("Bull").position = Vector2(1056,466)
-	_hero.get_node("Bull").scale = Vector2(2.3,2.3)
 	var footer: Control = get_node("Footer")
 	footer.position = Vector2(32,size.y-35)
 	quit_button.position = Vector2(size.x-118,22)

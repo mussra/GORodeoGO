@@ -87,7 +87,7 @@ func _ready() -> void:
 	# Jinete = el de niveles (Ant 8-nov 18:06): mismo SpriteSwap, mismo arte
 	# art/player + sombreros (HatAppearance) y mismo recolor por genotipo
 	# (HorseAppearance) que el modo niveles. Una sola base para ambos modos.
-	_sprite_swap = SpriteSwap.new(self, placeholder, HatAppearance.art_root(SaveData.hat_color), ANIM_NAMES)
+	_sprite_swap = SpriteSwap.new(self, placeholder, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.classic_rider_animations(ANIM_NAMES))
 	if not horse.is_empty() and _sprite_swap.has_sprite():
 		HorseAppearance.apply(_sprite_swap._frames, horse.traits)
 		PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}))

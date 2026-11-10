@@ -78,6 +78,8 @@ func _ready() -> void:
 		_pick_wander_target()
 
 func _physics_process(delta: float) -> void:
+	if is_instance_valid(player_ref) and not roped and position.distance_squared_to(player_ref.position)>700.0*700.0:
+		_art.speed_scale=0.0;return
 	if flight_hold and not roped:
 		velocity=Vector2.ZERO;_flee=Vector2.ZERO;_art.speed_scale=0.0
 		queue_redraw();return

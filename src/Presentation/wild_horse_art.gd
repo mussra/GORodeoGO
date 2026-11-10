@@ -36,6 +36,9 @@ func set_walk_direction(dir: Vector2) -> void:
 
 static func _build_frames(traits: Dictionary) -> SpriteFrames:
 	var frames := SpriteFrames.new()
+	if PixelLabTrial.active():
+		PixelLabTrial.apply(frames,"horse","walk",traits)
+		return frames
 	for spec in [["wild_side", [0], "idle", 3.0], ["wild_walk_side", WALK_CYCLE_FRAMES, "walk", 12.0], ["wild_walk_down", WALK_CYCLE_FRAMES, "walk_down", 12.0], ["wild_walk_up", WALK_CYCLE_FRAMES, "walk_up", 12.0], ["wild_walk_diag_down", WALK_CYCLE_FRAMES, "walk_diag_down", 12.0], ["wild_walk_diag_up", WALK_CYCLE_FRAMES, "walk_diag_up", 12.0]]:
 		var anim: String = spec[0]
 		frames.add_animation(spec[2])

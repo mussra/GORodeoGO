@@ -116,11 +116,12 @@ func _ready() -> void:
 	_update_chunks()
 	# Primera pintura completa: la 3x3 inicial se construye de una vez (es el
 	# momento de carga); el streaming en marcha ya va repartido por frames.
-	while not _build_queue.is_empty():
-		_step_chunk_build()
-	_update_chunks()
+	# First paint is responsive; preserve pre-game safety until the same initial3x3 exists.
+	player.set_physics_process(false)
+	_loading_label=Label.new();_loading_label.text="Cargando frontera...";_loading_label.position=Vector2(450,300);_loading_label.add_theme_font_size_override("font_size",30);_hud.add_child(_loading_label)
 
 func _physics_process(delta:float)->void:
+	if _loading_world:return
 	# One escape decision per physics step; idle updates skipped movement at low FPS.
 	_tick_taming(delta)
 	_tick_pigs(delta)
@@ -129,6 +130,11 @@ func _physics_process(delta:float)->void:
 func _process(delta: float) -> void:
 	_update_chunks()
 	_drain_chunk_builds()
+	if _loading_world:
+		if not _build_queue.is_empty():return
+		_loading_world=false
+		if is_instance_valid(_loading_label):_loading_label.queue_free()
+		player.set_physics_process(true)
 	_tick_lasso(delta)
 	_tick_rider_marker()
 	if _gauges.has("dodge"):
@@ -249,6 +255,8 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 ## Avisos progresivos ante un semental que no se fia (Ant 8-nov 15:02): la
 ## pista se concreta con cada intento (fase de sesion) y cada caballo tiene
 ## un enfriamiento para no machacar con el mismo aviso.
+var _loading_world:bool=true
+var _loading_label:Label
 var _stallion_hint_stage: int = 0
 
 func _stallion_hint(horse: Node2D) -> void:
@@ -445,9 +453,9 @@ func _advance_builder(b: Dictionary) -> void:
 			if b["frame_specs"] == null:
 				var frames := SpriteFrames.new()
 				b["frames"] = frames
-				var specs: Array = []
+				var specs: Array = PixelLabTrial.frame_specs("horse") if PixelLabTrial.active() else []
 				for spec in [["wild_side", [0], "idle", 3.0], ["wild_walk_side", range(12), "walk", 12.0], ["wild_walk_down", range(12), "walk_down", 12.0], ["wild_walk_up", range(12), "walk_up", 12.0], ["wild_walk_diag_down", range(12), "walk_diag_down", 12.0], ["wild_walk_diag_up", range(12), "walk_diag_up", 12.0]]:
-					for i in spec[1]:
+					for i in (spec[1] if not PixelLabTrial.active() else []):
 						specs.append([spec[0], i, spec[2], spec[3]])
 				b["frame_specs"] = specs
 			var step: Array = (b["frame_specs"] as Array).pop_front()
@@ -455,10 +463,12 @@ func _advance_builder(b: Dictionary) -> void:
 			if not frames.has_animation(step[2]):
 				frames.add_animation(step[2])
 				frames.set_animation_speed(step[2], step[3])
-			var base: Texture2D = load("res://art/world/wild_base/%s/frame_%02d.png" % [String(step[0]).trim_prefix("wild_"), int(step[1])])
-			frames.add_frame(step[2], HorseAppearance.texture(base, step[0], int(step[1]), traits))
+			if PixelLabTrial.active():
+				frames.add_frame(step[2],PixelLabTrial.pose_texture("horse",step[0],int(step[1]),traits))
+			else:
+				var base: Texture2D = load("res://art/world/wild_base/%s/frame_%02d.png" % [String(step[0]).trim_prefix("wild_"), int(step[1])])
+				frames.add_frame(step[2], HorseAppearance.texture(base, step[0], int(step[1]), traits))
 			if (b["frame_specs"] as Array).is_empty():
-				PixelLabTrial.apply(frames,"horse","walk",traits)
 				WildHorseArtScript.frame_cache[cache_key] = frames
 				b["herd_cursor"] = int(b["herd_cursor"])+1
 				b["frame_specs"]=null;b["frames"]=null
@@ -521,7 +531,7 @@ func _affinity(horse: Node2D) -> Dictionary:
 func _herd_guides()->Dictionary:
 	var groups:Dictionary={}
 	for horse in _herd_horses.values():
-		if not is_instance_valid(horse) or horse.is_queued_for_deletion() or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
+		if not is_instance_valid(horse) or (not horse.roped and horse.position.distance_squared_to(player.position)>700.0*700.0) or horse.is_queued_for_deletion() or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
 		var c:Vector2i=horse.get_meta("c",Vector2i(-999,-999))
 		if not groups.has(c):groups[c]=[]
 		groups[c].append(horse)
@@ -598,8 +608,9 @@ func _tick_taming(delta: float) -> void:
 		var horse: Node2D = raw
 		if horse.flight_hold and not horse.roped:continue
 		horse.herd_guide=null
+		horse.player_ref=player
 		var dist: float = player.position.distance_to(horse.position)
-		if dist > 700.0:
+		if dist > 700.0 and not horse.roped:
 			continue
 		var aff: Dictionary = _affinity(horse)
 		horse.affinity_matches = aff.matches
@@ -686,8 +697,10 @@ func _tick_pigs(delta: float) -> void:
 				continue
 			var dist: float = player.position.distance_to(pig.position)
 			if dist > 700.0 and not pig.roped:
+				pig._art.speed_scale=0.0
 				all_captured = false
 				continue
+			pig._art.speed_scale=1.0
 			var st: Dictionary
 			if WorldPigs.CHASE_MODE:
 				# Persecución (Ant 8-nov-2026): the pig flees, the rider chases and
@@ -1259,7 +1272,8 @@ func _tick_goats(delta:float)->void:
 	if not is_instance_valid(_prototype_goats):return
 	for goat in _prototype_goats.get_children():
 		var dist:float=player.position.distance_to(goat.position)
-		if dist>700 and not goat.roped:continue
+		if dist>700 and not goat.roped:
+			goat.movement=Vector2.ZERO;continue
 		var st:Dictionary=WorldGoats.tick(goat.state,dist,goat.roped,delta)
 		goat.state=st
 		if st.break_rope:
