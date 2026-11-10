@@ -20,6 +20,12 @@ const HOME_POS := Vector2(0, 160)
 const SAVE_EVERY := 4.0
 const ARROWS: Array[String] = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"]
 
+var _npc_block:Control
+var _npc_dialog:NpcDialog
+var _npc_button:Button
+var _quest_label:Label
+var _story_flower:Sprite2D
+var _flower_button:Button
 var _prototype_goats:Node2D
 var player: CharacterBody2D
 var _chunks: Dictionary = {}
@@ -108,6 +114,7 @@ func _ready() -> void:
 	add_child(test_zone)
 	_build_hud()
 	_setup_goat_prototype()
+	_setup_npcs()
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
 	_hoof_player.volume_db = -12.0
@@ -121,13 +128,14 @@ func _ready() -> void:
 	_loading_label=Label.new();_loading_label.text="Cargando frontera...";_loading_label.position=Vector2(450,300);_loading_label.add_theme_font_size_override("font_size",30);_hud.add_child(_loading_label)
 
 func _physics_process(delta:float)->void:
-	if _loading_world:return
+	if _loading_world or is_instance_valid(_npc_dialog):return
 	# One escape decision per physics step; idle updates skipped movement at low FPS.
 	_tick_taming(delta)
 	_tick_pigs(delta)
 	_tick_goats(delta)
 
 func _process(delta: float) -> void:
+	if is_instance_valid(_npc_dialog):return
 	_update_chunks()
 	_drain_chunk_builds()
 	if _loading_world:
@@ -135,6 +143,7 @@ func _process(delta: float) -> void:
 		_loading_world=false
 		if is_instance_valid(_loading_label):_loading_label.queue_free()
 		player.set_physics_process(true)
+	_tick_npcs()
 	_tick_lasso(delta)
 	_tick_rider_marker()
 	if _gauges.has("dodge"):
@@ -149,7 +158,7 @@ func _process(delta: float) -> void:
 	if player.gait != _last_gait:
 		_last_gait = player.gait
 		_gait_label.text = tr(WorldGait.gait_names()[_last_gait])
-	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 60.0)
+	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.0)
 	_board_button.visible = player.position.distance_to(BOARD_POS) < 150.0
 	_save_timer += delta
 	if _save_timer >= SAVE_EVERY:
@@ -237,6 +246,8 @@ func _end_lasso() -> void:
 ## The shared controller resolved a capture: start the hold session (trust
 ## fills while the animal is held in place; it flees/spooks when the hold ends).
 func _on_lasso_prey_captured(prey: Node2D) -> void:
+	if prey.get_script()==PigScript and not NpcQuests.can_capture(SaveData.world_quests,"pig"):return
+	if prey.get_script()==GoatScript and not NpcQuests.can_capture(SaveData.world_quests,"goat"):return
 	_lasso_horse = prey
 	prey.roped = true
 	prey.rider = player
@@ -269,7 +280,7 @@ func _stallion_hint(horse: Node2D) -> void:
 	_stallion_hint_stage += 1
 
 func _toast(text: String) -> void:
-	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 60.0)
+	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.0)
 	_toasts.push(text)
 
 func _update_chunks() -> void:
@@ -686,13 +697,14 @@ func _tick_pigs(delta: float) -> void:
 				else:
 					st = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
 				pig.state = st
-			if WorldPigs.captured(st):
+			if WorldPigs.captured(st) and NpcQuests.can_capture(SaveData.world_quests,"pig"):
 				if pig == _lasso_horse:
 					_end_lasso()
 				_audio.play("return")
 				if WorldPigs.CHASE_MODE:
 					SaveData.equipment_points += WorldPigs.CHASE_REWARD_POINTS
 					_toast(tr("WORLD_PIG_REWARD") % WorldPigs.CHASE_REWARD_POINTS)
+				_quest_event("capture_animal","pig",_pen_id_for(Vector2i(node.get_meta("c")))+":"+str(pig.name))
 				pig.queue_free()  # captured: counts right away (roped or walk-up)
 			else:
 				all_captured = false
@@ -815,6 +827,9 @@ func _tick_stamina(delta: float) -> void:
 
 func _refresh_missions() -> void:
 	var counts: Dictionary = WorldMissions.counts()
+	for q in SaveData.world_quests.values():
+		if q.status=="active":counts.encargo+=1
+		elif q.status=="done":counts.done+=1
 	_missions_label.text = tr("WORLD_MISSIONS") % [counts.get("offered", 0) + counts.get("encargo", 0), counts.get("done", 0)]
 
 func _home() -> void:
@@ -915,8 +930,8 @@ func _build_hud() -> void:
 		for key in _herd_horses:
 			if is_instance_valid(_herd_horses[key]):
 				out.append(_herd_horses[key])
-		out.append_array(_lasso_pigs())
-		out.append_array(_prototype_goats.get_children())
+		if NpcQuests.can_capture(SaveData.world_quests,"pig"):out.append_array(_lasso_pigs())
+		if NpcQuests.can_capture(SaveData.world_quests,"goat"):out.append_array(_prototype_goats.get_children())
 		return out
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
@@ -1227,8 +1242,8 @@ func _exit_tree()->void:
 ## Additive, repeatable near-ranch prototype; does not alter chunk RNG or saves.
 func _setup_goat_prototype()->void:
 	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";add_child(_prototype_goats)
-	for pos in [Vector2(-200,400),Vector2(-90,470)]:
-		var goat=GoatScript.new();goat.setup({"pos":pos});_prototype_goats.add_child(goat)
+	for pos in [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)]:
+		var goat=GoatScript.new();goat.setup({"pos":pos});goat.set_meta("origin",pos);_prototype_goats.add_child(goat)
 	var sign:=Label.new();sign.position=Vector2(-300,280);sign.text=tr("WORLD_GOAT_PROTOTYPE");sign.add_theme_font_size_override("font_size",19);add_child(sign)
 func _tick_goats(delta:float)->void:
 	if not is_instance_valid(_prototype_goats):return
@@ -1244,9 +1259,59 @@ func _tick_goats(delta:float)->void:
 			if goat==_lasso_horse:_end_lasso()
 			if contact:player.stun()
 			_toast(tr("WORLD_GOAT_ESCAPED"))
-		elif float(st.progress)>=1.0:
+		elif float(st.progress)>=1.0 and NpcQuests.can_capture(SaveData.world_quests,"goat"):
 			if goat==_lasso_horse:_end_lasso()
+			_quest_event("capture_animal","goat","goat:"+str(goat.get_meta("origin",goat.position)))
 			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED"))
 			continue
 		if goat.roped or dist<260:goat.move_from_or_towards(player.position,delta,goat.roped)
 		else:goat.movement=Vector2.ZERO
+
+
+func _setup_npcs()->void:
+	for data in NpcQuests.NPCS:
+		var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
+	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
+	_npc_button.pressed.connect(func():_open_npc(NpcQuests.NPCS[0]))
+	_quest_label=Label.new();_quest_label.position=Vector2(20,66);_quest_label.size=Vector2(1000,60);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);_hud.add_child(_quest_label)
+	_story_flower=Sprite2D.new();_story_flower.texture=DecorScript.FLOWER_TEXS[14];_story_flower.scale=Vector2.ONE*30.0/_story_flower.texture.get_height();_story_flower.visible=false;add_child(_story_flower)
+	_flower_button=Button.new();_flower_button.position=Vector2(500,520);_flower_button.size=Vector2(280,48);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
+	_flower_button.pressed.connect(_collect_story_flower)
+func _open_npc(data:Dictionary)->void:
+	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>155.0:return
+	player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
+	_npc_block=Control.new();_npc_block.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_npc_block.mouse_filter=Control.MOUSE_FILTER_STOP;_hud.add_child(_npc_block)
+	_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests);_hud.add_child(_npc_dialog)
+	_npc_dialog.closed.connect(_close_npc)
+	_npc_dialog.accepted.connect(func(id:String):
+		if NpcQuests.accept(SaveData.world_quests,id):
+			SaveData.save_world_state(player.position);_toast(NpcQuests.QUESTS[id].active);_refresh_missions()
+		_close_npc())
+func _close_npc()->void:
+	if is_instance_valid(_npc_dialog):_npc_dialog.queue_free()
+	if is_instance_valid(_npc_block):_npc_block.queue_free()
+	_npc_dialog=null;player.set_physics_process(true)
+func _quest_event(kind:String,target:String,event_id:String)->void:
+	for id in NpcQuests.record(SaveData.world_quests,kind,target,event_id):
+		var q:Dictionary=NpcQuests.QUESTS[id];var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
+		_toast(q.done if state.status=="done" else q.active+" · %d/%d"%[state.count,q.goal])
+		SaveData.save_world_state(player.position)
+	_refresh_missions()
+func _tick_npcs()->void:
+	_npc_button.visible=player.position.distance_to(NpcQuests.NPCS[0].position)<155.0
+	var lines:PackedStringArray=[]
+	for id in NpcQuests.activate_triggers(SaveData.world_quests,player.position):
+		_toast(NpcQuests.QUESTS[id].text);SaveData.save_world_state(player.position)
+	for id in NpcQuests.QUESTS:
+		var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
+		if state.status=="active":lines.append(NpcQuests.QUESTS[id].active+" · %d/%d"%[state.count,NpcQuests.QUESTS[id].goal])
+	_quest_label.text=" · ".join(lines) if not lines.is_empty() else "Encargos: habla con el granjero del rancho"
+	var flower:Dictionary=NpcQuests.state(SaveData.world_quests,"east_flower")
+	_story_flower.visible=flower.status=="active" and flower.has("spawn")
+	if flower.has("spawn"):_story_flower.position=flower.spawn
+	_flower_button.visible=_story_flower.visible and player.position.distance_to(_story_flower.position)<120.0
+
+func _collect_story_flower()->void:
+	var state:Dictionary=NpcQuests.state(SaveData.world_quests,"east_flower")
+	if state.status!="active" or not state.has("spawn") or player.position.distance_to(state.spawn)>120.0:return
+	_quest_event("find_object","east_flower","story:east_flower")

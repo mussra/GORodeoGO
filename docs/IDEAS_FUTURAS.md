@@ -69,3 +69,22 @@ Fuentes: mensajes de WhatsApp del 7 de noviembre de 2026, 8:58 a 9:01 CET:
 ### Autorización de implementación (7 de noviembre de 2026, 9:00-9:02 CET)
 
 Antonio pidió implementarlo: "Impleméntalo, añádelo al menú principal" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQ0IzRTFENUNFMDlGMjIzRDRCRDFDRDA3OTMzMjBBNwA=`) y confirmó el alcance con "Y crea un mundo para probarlo" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzU5OEQ3NUM3OUU4MTQ2QjEzNzdGNDg1ODQ5M0RENAA=`). Alcance autorizado: primera prueba jugable de mundo con entrada desde el menú principal, doma de caballos salvajes y el atributo de calma, en rama aparte, sin sustituir los niveles actuales ni perder progreso.
+
+## PNJ, encargos y objetos de historia (10-nov-2026)
+
+Petición de Antonio: más personajes y misiones, empezando por un granjero que pide capturar cerdos salvajes para su negocio. Después cabras. Lucía quiere explorar y capturar cosas silvestres: un personaje puede pedir encontrar una flor concreta.
+
+Primer prototipo: registro de PNJ y encargos por datos, un motor para aceptar/progresar/completar y guardar. Tipos `capture_animal` y `find_object`. Cerdos bloqueados para captura hasta aceptar el encargo. Tras tres cerdos, el mismo granjero ofrece tres cabras. Sin premios nuevos añadidos: siguen los puntos existentes por cerdo. El objetivo cuenta solo desde la aceptación y los eventos no se duplican.
+
+Historia no aleatoria: reglas configurables por dirección/distancia desde el rancho y umbral en bloques (un bloque es un chunk de1024px). Ejemplo jugable: al superar15 bloques hacia el este aparece cerca una flor del arte existente, la historia avisa y se puede recoger. La posición queda guardada: no cambia al regresar ni se duplica. Las flores decorativas aleatorias no cuentan como esa flor.
+
+Arte pendiente de Antonio/ChatGPT: granjero con gorro de granjero, sin ojos visibles, mismo estilo que el vaquero. Se usa un marcador rotulado “PNJ provisional”, no arte nuevo ni personaje terminado. No generar sin aprobación.
+
+Ideas propuestas, no aprobadas como contenido final:
+- Botánica: pide una flor azul concreta; enseña a explorar sin capturar animales.
+- Pastora: cabras alejadas del camino; encargo posterior al granjero.
+- Guardabosques: encontrar una arboleda o una planta; sin consumo ni recompensa económica definidos.
+- Mensajera: visitar dos PNJ para abrir una ruta, con condiciones de historia no aleatorias.
+- Herrero: misiones de materiales y herramientas, sin fijar precios/recompensas aún.
+
+Por decidir: nombres e ilustraciones, diálogos definitivos, cantidad final de objetivos, premios y si algunos encargos se repiten. El prototipo no implica aprobaciones de arte o economía.

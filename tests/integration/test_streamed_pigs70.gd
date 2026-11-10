@@ -1,6 +1,7 @@
 extends GutTest
 func test_generated_pigs_register_flee_lasso_capture_reward_and_save()->void:
  SaveData.save_path="user://qa-streamed-pigs70.dat";SaveData.world_seed=7781;SaveData.world_position=Vector2(-360,400);SaveData.world_edits.clear();SaveData.world_tamed.clear();SaveData.world_pigs.clear();SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
+ SaveData.world_quests={}
  var world=load("res://src/Presentation/frontier_world.gd").new();add_child_autofree(world)
  while world._loading_world:await wait_process_frames(1)
  world.set_process(false);world.set_physics_process(false);world.player.set_physics_process(false)
@@ -16,6 +17,10 @@ func test_generated_pigs_register_flee_lasso_capture_reward_and_save()->void:
  assert_eq(world._lasso_pigs().size(),actual.size(),"Todos los generados están registrados, no solo un pen ficticio")
  if world._lasso_pigs().is_empty():return
  var pig=world._lasso_pigs()[0];var start:Vector2=pig.position
+ assert_false(world.player.lasso.prey_provider.call().has(pig),"Sin aceptar, cerdos fuera de los objetivos del lazo")
+ world._on_lasso_prey_captured(pig);assert_null(world._lasso_horse,"Tampoco se salta el bloqueo con una llamada directa")
+ NpcQuests.accept(SaveData.world_quests,"farmer_pigs")
+ assert_true(world.player.lasso.prey_provider.call().has(pig),"Tras aceptar, objetivo capturable")
  world.player.position=pig.position-Vector2(160,0);world._tick_pigs(.1)
  assert_gt(pig.position.distance_to(start),10.0,"El cerdo generado huye")
  pig.state.run=WorldPigs.CHASE_TIRE_SECONDS-.01;world._tick_pigs(.1)

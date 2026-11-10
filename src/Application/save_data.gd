@@ -37,6 +37,7 @@ var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
+var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
 var world_pigs: Array[String] = []  # captured pig-pen ids ("pig_cx_cy")
 var world_edits: Array = []  # world-editor ops (see WorldEdits), layered over the seed
@@ -77,6 +78,7 @@ func save_progress() -> bool:
 	config.set_value("world", "discovered", world_discovered)
 	config.set_value("world", "tamed", world_tamed)
 	config.set_value("world", "position", world_position)
+	config.set_value("world", "quests", world_quests)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
 	config.set_value("world", "edits", world_edits)
@@ -111,6 +113,7 @@ func load_progress() -> void:
 	world_discovered.clear()
 	world_tamed.clear()
 	world_position = Vector2(0, 160)
+	world_quests.clear()
 	world_missions.clear()
 	world_pigs.clear()
 	world_edits.clear()
@@ -160,6 +163,7 @@ func load_progress() -> void:
 	if typeof(we)==TYPE_ARRAY:
 		for op in we:
 			if WorldEdits.valid_op(op):world_edits.append(op)
+	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
@@ -288,7 +292,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
