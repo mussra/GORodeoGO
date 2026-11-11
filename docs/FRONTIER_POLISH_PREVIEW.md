@@ -22,3 +22,6 @@ PC headless,seed752026,caché fría,1200pasos a500px/s. Es tiempo de trabajo en 
 MediaStore para fotos creadas por la propia app,no acceso general a biblioteca. Android10+no necesita permisos de almacenamiento para los archivos multimedia que la app crea;versiones antiguas requieren tratamiento aparte. Sharesheet con URI de contenido y permiso temporal. No se ha implementado el puente nativo.
 
 Rama de pruebas,sin merge a main. Previews inspeccionadas y enviadas antes de cualquier APK.
+
+## Validación final
+466/466unitarias,54982aserciones. Dirigidas carga+encargos+accesos4/4,75aserciones. Ajustado test de zona fija para consultar sus dos accesos actuales compartidos en WorldPaths; ya no existe Zone.TRAILS. Sin Android real ni ejecución de toda integración.
