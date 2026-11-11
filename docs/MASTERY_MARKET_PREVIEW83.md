@@ -50,3 +50,9 @@ El color se mantiene lavanda hasta completar los20 niveles; solo las estrellas p
 ## Astro rey (13:42)
 
 Disco luminoso y12rayos suaves en pecho del maestro, con resplandor azul. Parámetro `mastery_sun` exclusivo maestro y centro UV de esta pose de retrato. No toca escudos, emblemas, genes ni máscaras fuente. Gameplay pendiente de centros por pose y visibilidad de pecho recortada al pelaje. No equivale a arte completo para otras poses.
+
+## Luna y propuesta Alfa/Omega (13:43-13:46)
+
+La luna creciente ocupa el lugar del emblema en el muslo. Decisión posterior de Ant: manda la luna. El shader oculta el emblema solo mientras se cumplen las condiciones de maestro y luna, sin borrar ni modificar el emblema guardado. Si deja de ser maestro, vuelve a verse. No se modifican archivos de máscaras ni el sistema de genes/emblemas.
+
+Sol=principio y luna=final, tema Alfa y Omega. Dos láminas de propuesta: sin letras y con Α/Ω procedurales bajo cada astro. Letras desactivadas por defecto. Cinco colores candidatos (azul, rosa con azul, verde, rojo con azul, negro), cada uno a70/100/140% del tamaño actual. No se desbloquean cinco variantes de maestro; esperando elección. Normal conserva un lavanda. Tamaño por defecto1, letras apagadas. Gameplay aún pendiente.

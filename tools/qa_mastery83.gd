@@ -3,6 +3,7 @@ func _ready():run.call_deferred()
 func run():
  get_tree().root.size=Vector2i(1280,720);TranslationServer.set_locale("es");SaveData.horse_collection.seed_trial();SaveData.horse_collection.add_trial_parents()
  var h=SaveData.horse_collection.find("trial_a");h.traits.finish="galaxy";h.name="Galaxy · ejemplo de maestría";h["completed_levels"]=[]
+ h.traits["emblem"]=HorseEmblem.DEFAULT.duplicate(true)
  var panel=HorsePanel.new();panel.page="detail";panel.focus_id=h.id;add_child(panel)
  for stage in 4:
   h["completed_levels"]=[]
