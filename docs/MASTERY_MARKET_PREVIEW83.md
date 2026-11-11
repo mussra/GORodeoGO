@@ -68,3 +68,7 @@ Azul/S70/sin letras confirmado para maestro. Gris y marrón se aclararon despué
 El aura de maestros toma ahora el color base (`galaxy_light`), no azul fijo para todas las paletas. Las cinco paletas siguen propuestas, no variantes activadas.
 
 WIP gameplay: HorseGalaxyLook transporta maestría de un caballo concreto fuera de los genes y las claves de caché incluyen el estado. Adaptados provisionalmente PixelLab montado/libre, clásico, beber, miniaturas y precarga seleccionada. Nebulosas/estrellas se calculan una vez por textura, no en cada fotograma. Anclajes de sol/luna por vista con UV y halo fuera de píxeles transparentes del caballo. No toca máscaras fuente. AÚN NO cerrado: revisar todos los frames, anclajes y coste de carga/Android, así como resolver elección de color normal. No se presenta como terminado. El trabajo de anclajes queda en pausa tras la aclaración del13:50. Sin APK.
+
+## Nebulosa normal en tono original (14:00)
+
+Ant aclara que busca más Galaxy, no una copia casi plana del original: nebulosa y estrellas con el naranja/castaño del primer caballo. Nueva propuesta solo en generador: paleta oscura#351707/luz#d0742f, base neutra cálida, intensidad0,72 (maestro1,0). Nubes visibles incluso a0%, estrellas progresivas0/50/95%. Sin aura, astros ni letras. No cambia la paleta activa ni las máscaras. `galaxy-original-nebula-progress83.png` sustituye la propuesta casi original para esta decisión.
