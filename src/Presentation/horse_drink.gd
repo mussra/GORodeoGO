@@ -10,14 +10,15 @@ var elapsed:float=0
 var active:bool=false
 var source:HorseWater
 func _init(owner_body):actor=owner_body
-static func texture(pose:int,traits:Dictionary,hat:String)->Texture2D:
- var key=str(pose)+str(traits)+hat
+static func texture(pose:int,traits:Dictionary,hat:String,horse:Dictionary={})->Texture2D:
+ var look=HorseGalaxyLook.state(horse)
+ var key=str(pose)+str(traits)+hat+str(look)
  if cache.has(key):return cache[key]
  var original:Texture2D=load(BASE+"pose_%d.png"%pose)
  var mask:Image=load(BASE+"color_%d.png"%pose).get_image()
  var uv:Image=load(BASE+"uv_%d.png"%pose).get_image()
  var eyes:Image=load(BASE+"eyes_%d.png"%pose).get_image()
- var image=HorseAppearance.texture(original,"walk_side",pose,traits,mask,uv).get_image().duplicate()
+ var image=HorseAppearance.texture(original,"walk_side",pose,traits,mask,uv,look,"drink"+str(pose)).get_image().duplicate()
  var raw=original.get_image()
  for y in image.get_height():
   for x in image.get_width():
@@ -47,6 +48,6 @@ func step(delta:float,wish:Vector2)->bool:
   visual.scale=sprite.scale;visual.position=Vector2(sprite.position.x,sprite.position.y+(44+sprite.offset.y)*sprite.scale.y)
  actor.velocity=Vector2.ZERO;elapsed+=delta
  var horse=SaveData.horse_collection.find(SaveData.horse_collection.selected)
- visual.texture=texture(0 if elapsed<.45 else 1,horse.get("traits",{}),SaveData.hat_color)
+ visual.texture=texture(0 if elapsed<.45 else 1,horse.get("traits",{}),SaveData.hat_color,horse)
  visual.flip_h=facing<0;visual.visible=true;actor._sprite_swap._sprite.visible=false
  return true

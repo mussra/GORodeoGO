@@ -3,7 +3,7 @@ extends RefCounted
 ## Shared horse selector: every option has an image, selected horse has a preview.
 static func thumbnail(h:Dictionary)->Texture2D:
  var foal:bool=h.get("stage","adult")=="foal"
- return HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits) if foal else PixelLabTrial.pose_texture("rider","diag_down",0,h.traits)
+ return HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,h.traits) if foal else PixelLabTrial.pose_texture("rider","diag_down",0,h.traits,h)
 static func preview(host:Control,h:Dictionary,pos:Vector2,extent:float)->TextureRect:
  var view:=TextureRect.new();view.name="HorsePreview";view.mouse_filter=Control.MOUSE_FILTER_IGNORE;view.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;view.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;view.position=pos;view.size=Vector2.ONE*extent
  if not h.is_empty():

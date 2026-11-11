@@ -76,10 +76,10 @@ func _warm_selected():
  if swap.has_sprite():
   for anim in swap._frames.get_animation_names():
    for i in swap._frames.get_frame_count(anim):
-    HorseAppearance.texture(swap._frames.get_frame_texture(anim,i),anim,i,traits)
+    HorseAppearance.texture(swap._frames.get_frame_texture(anim,i),anim,i,traits,null,null,HorseGalaxyLook.state(horse))
     await get_tree().process_frame
  for step in PixelLabTrial.frame_specs("rider"):
-  PixelLabTrial.pose_texture("rider",step[0],step[1],traits)
+  PixelLabTrial.pose_texture("rider",step[0],step[1],traits,horse)
   await get_tree().process_frame
  host.free()
 func _write_metrics():

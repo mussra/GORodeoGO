@@ -7,8 +7,10 @@ uniform vec4 eye_color: source_color = vec4(.6,.3,.1,1);
 uniform bool custom_eyes = false;
 uniform int eye_style = 0;
 uniform bool galaxy = false;
+uniform bool galaxy_original_base = false;
 // Art-direction intensity, independent of mastery progress.
 uniform float galaxy_intensity: hint_range(0.,1.) = 1.;
+uniform vec4 galaxy_quiet: source_color=vec4(.36,.33,.43,1.);
 // Mastery-only silhouette halo. Disabled for regular Galaxy and all other horses.
 uniform bool mastery_aura = false;
 uniform bool mastery_sun = false;
@@ -157,18 +159,20 @@ void fragment(){
    vec3 galaxy_rgb=galaxy_color(p*.12);
    // Turn down chroma and local contrast, never darken the base into saturation.
    float luma=dot(galaxy_rgb,vec3(.2126,.7152,.0722));
-   vec3 quiet=mix(vec3(.36,.33,.43),vec3(luma),.18);
+   vec3 quiet=mix(galaxy_quiet.rgb,vec3(luma),.18);
    c=mix(quiet,galaxy_rgb,galaxy_intensity);
   }
   float coat_shade=shade;
   if(pattern==4)coat_shade=mix(shade,min(shade+.12,1.2),texture(light_legs_mask,UV).r);
+  if(galaxy && galaxy_original_base)c=mix(src.rgb/max(coat_shade,.01),c,.12);
   col=mix(col,c*coat_shade,m.r);
   vec3 mane=rainbow?soft_rainbow(p.x<540.?(p.y-300.)/340.:(p.y-80.)/275.):mane_color.rgb;
   if(galaxy){
    vec3 galaxy_rgb=galaxy_color(p*.12);
    float luma=dot(galaxy_rgb,vec3(.2126,.7152,.0722));
-   mane=mix(mix(vec3(.36,.33,.43),vec3(luma),.18),galaxy_rgb,galaxy_intensity);
+   mane=mix(mix(galaxy_quiet.rgb,vec3(luma),.18),galaxy_rgb,galaxy_intensity);
   }
+  if(galaxy && galaxy_original_base)mane=mix(src.rgb/max(shade,.01),mane,.12);
   col=mix(col,mane*shade,m.g);
  }
  if(custom_legs){
@@ -185,6 +189,10 @@ void fragment(){
   float horse_only=step(.5,m.r)*step(.01,src.a);
   col=mix(col,opposite,edge*.9*horse_only);col=mix(col,fg,ink*horse_only);
  }
+ if(galaxy && galaxy_original_base && !original_horse){
+  float original_stars=galaxy_stars((UV*vec2(800.,840.)+vec2(240.,0.))*.12);
+  col=mix(col,vec3(.98,.99,1.),original_stars*.55*max(m.r,m.g));
+ }
  // The mastery moon takes visual priority; saved emblems stay untouched.
  if(mastery_moon && galaxy){
   vec2 q=(UV*vec2(936.,983.)-vec2(305.,618.))/mastery_mark_scale;
@@ -193,7 +201,7 @@ void fragment(){
   float crescent=outer*(1.-cut)*m.r*src.a;
   float glow=exp(-dot(q,q)/1400.)*.22*m.r*src.a;
   col=mix(col,vec3(.84,.94,1.),crescent*.96);
-  col+=vec3(.25,.52,1.)*glow;
+  col+=mix(galaxy_light.rgb,vec3(1.),.10)*glow;
  }
  // A separate mastery mark, never written to hereditary emblems or masks.
  if(mastery_sun && galaxy){
@@ -206,7 +214,7 @@ void fragment(){
   float coat_only=m.r*src.a;
   vec3 sun_color=mix(vec3(1.,.69,.20),vec3(1.,.96,.72),disc*.8);
   col=mix(col,sun_color,(disc*.94+rays*.80)*coat_only);
-  col+=vec3(.30,.56,1.)*glow*coat_only;
+  col+=mix(galaxy_light.rgb,vec3(1.),.10)*glow*coat_only;
  }
  if(mastery_greek_preview && mastery_sun && mastery_moon && galaxy){
   vec2 a=((UV-mastery_sun_center)*vec2(936.,983.))/mastery_mark_scale-vec2(0.,49.);
@@ -235,9 +243,9 @@ void fragment(){
   }
   float aura=clamp(halo*.72*mastery_aura_strength,0.,.80)*(1.-src.a);
   float horse_here=max(m.r,m.g);
-  col+=mastery_aura_color.rgb*(1.-rim)*horse_here*.20*mastery_aura_strength;
+  col+=mix(galaxy_light.rgb,vec3(1.),.10)*(1.-rim)*horse_here*.20*mastery_aura_strength;
   out_alpha=src.a+aura;
-  col=(col*src.a+mastery_aura_color.rgb*aura)/max(out_alpha,.0001);
+  col=(col*src.a+mix(galaxy_light.rgb,vec3(1.),.10)*aura)/max(out_alpha,.0001);
  }
  COLOR=vec4(col,out_alpha);
 }

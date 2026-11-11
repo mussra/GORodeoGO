@@ -120,9 +120,9 @@ static func eye_color_at(index:int,p:Vector2)->Color:
  for star in [Vector2(.25,.25),Vector2(.65,.38),Vector2(.42,.72),Vector2(.78,.75)]:
   if p.distance_to(star)<.022:return Color("f4f7ff")
  return color
-static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_override:Image=null,uv_override:Image=null)->Texture2D:
+static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_override:Image=null,uv_override:Image=null,look:Dictionary={},pose_view:String="")->Texture2D:
  if t.get("finish","")=="original" and not t.has("emblem") and HorseCollection.legs_index(t)<0:return source
- var key:String=source.resource_path+str(t)+(":pixellab-v5" if mask_override!=null else "")
+ var key:String=source.resource_path+str(t)+str(look)+pose_view+(":pixellab-v5" if mask_override!=null else "")
  if cache.has(key):return cache[key]
  var path:String="res://art/horse_masks/%s/frame_%02d.png"%[anim,frame]
  if anim=="stunned":path="res://art/horse_masks/stunned/frame_0.png"
@@ -177,7 +177,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
     elif int(t.pattern)==2 and uv!=null:color=color.lerp(HorsePatternMap.color(t),natural_spot_coverage(Vector2(px,py)))
     elif int(t.pattern) in [9,10,11]:color=color.lerp(HorsePatternMap.color(t),HorsePatternMap.coverage(Vector2(px,py),int(t.pattern)))
     elif mark:color=HorsePatternMap.color(t)
-   if t.get("finish","")=="galaxy":color=galaxy_color(Vector2(float(x)*96.0/image.get_width(),float(y-bob)*96.0/image.get_height()))
+   if t.get("finish","")=="galaxy":color=HorseGalaxyLook.color_at(body_point(uv,x,y,bob),look)
    if anim=="foal":
     shade=clampf(maxf(old.r,maxf(old.g,old.b))*(1.0 if m.g>m.r else 1.10),0.12,1.0)
    var tinted:=Color(minf(color.r*shade,1),minf(color.g*shade,1),minf(color.b*shade,1),old.a)
@@ -213,14 +213,15 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
     var eye:Color=eye_color_at(eye_id,Vector2((float(x)-202.0)/30.0,(float(y)-122.0)/23.0))
     var old:Color=image.get_pixel(x,y);var shade:=clampf(maxf(old.r,maxf(old.g,old.b))/.65,.15,1.15)
     image.set_pixel(x,y,old.lerp(Color(eye.r*shade,eye.g*shade,eye.b*shade,old.a),weight))
- if mask_override==null and HorseEmblem.valid(t.get("emblem")):
+ if mask_override==null and HorseEmblem.valid(t.get("emblem")) and not look.get("master",false):
   var zone_path:String="res://art/lineage_masks/%s/frame_%02d.png"%[anim,frame]
   if ResourceLoader.exists(zone_path):
    var zone:Image=load(zone_path).get_image()
    if zone.is_compressed():zone.decompress()
    HorseEmblem.stamp(image,zone,t.emblem,mask)
+ if t.get("finish","")=="galaxy":HorseGalaxyLook.finish(image,mask,uv,pose_view if not pose_view.is_empty() else anim,bob,look)
  var tex:=ImageTexture.create_from_image(image);cache[key]=tex;return tex
-static func apply(frames:SpriteFrames,t:Dictionary)->void:
+static func apply(frames:SpriteFrames,t:Dictionary,horse:Dictionary={})->void:
  for anim in frames.get_animation_names():
   for i in range(frames.get_frame_count(anim)):
-   frames.set_frame(anim,i,texture(frames.get_frame_texture(anim,i),anim,i,t))
+   frames.set_frame(anim,i,texture(frames.get_frame_texture(anim,i),anim,i,t,null,null,HorseGalaxyLook.state(horse)))

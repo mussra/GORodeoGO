@@ -5,10 +5,11 @@ static var image_cache:Dictionary={}
 static var texture_cache:Dictionary={}
 static func cache_key(t:Dictionary)->String:
  return str(t)
-static func pose_texture(kind:String,view:String,i:int,traits:Dictionary)->Texture2D:
+static func pose_texture(kind:String,view:String,i:int,traits:Dictionary,horse:Dictionary={})->Texture2D:
  var base:Texture2D=load("res://art/experimental/pixellab/%s/%s/frame_%02d.png"%[kind,view,i])
  if traits.is_empty():return HatAppearance.tint(base,"res://art/hat_masks_v10/hat-pixellab-%s-%02d.png"%[view,i],SaveData.hat_color) if kind=="rider" else base
- var key:String=kind+view+str(i)+str(traits)+(SaveData.hat_color if kind=="rider" else "")
+ var look=HorseGalaxyLook.state(horse)
+ var key:String=kind+view+str(i)+str(traits)+str(look)+(SaveData.hat_color if kind=="rider" else "")
  if texture_cache.has(key):return texture_cache[key]
  var pose:String=kind+view+str(i)
  if not image_cache.has(pose):
@@ -18,20 +19,20 @@ static func pose_texture(kind:String,view:String,i:int,traits:Dictionary)->Textu
   if uv.is_compressed():uv.decompress()
   image_cache[pose]=[mask,uv]
  var images:Array=image_cache[pose]
- var result:Texture2D=HorseAppearance.texture(base,"walk_"+view,i,traits,images[0],images[1])
+ var result:Texture2D=HorseAppearance.texture(base,"walk_"+view,i,traits,images[0],images[1],look,view)
  if kind=="rider":result=HatAppearance.tint(result,"res://art/hat_masks_v10/hat-pixellab-%s-%02d.png"%[view,i],SaveData.hat_color)
  if texture_cache.size()>600:texture_cache.clear()
  texture_cache[key]=result;return result
 
-static func apply(frames:SpriteFrames,kind:String,animation:String,traits:Dictionary={})->void:
+static func apply(frames:SpriteFrames,kind:String,animation:String,traits:Dictionary={},horse:Dictionary={})->void:
  for view in ["side","down","up","diag_down","diag_up"]:
   var target:String=("walk" if view=="side" else "walk_"+view) if kind=="horse" else "walk_"+view
   if frames.has_animation(target):frames.remove_animation(target)
   frames.add_animation(target);frames.set_animation_speed(target,9.0)
-  for i in 9:frames.add_frame(target,pose_texture(kind,view,i,traits))
+  for i in 9:frames.add_frame(target,pose_texture(kind,view,i,traits,horse))
  # Rest remains deliberate, not an arbitrary running frame.
  if frames.has_animation("idle"):frames.remove_animation("idle")
- frames.add_animation("idle");frames.add_frame("idle",pose_texture(kind,"side",0,traits))
+ frames.add_animation("idle");frames.add_frame("idle",pose_texture(kind,"side",0,traits,horse))
 
 static func animal_views(kind:String)->Array:
  var views:Array=[]

@@ -60,3 +60,11 @@ Sol=principio y luna=final, tema Alfa y Omega. Dos láminas de propuesta: sin le
 ## Selección de Ant (13:47)
 
 TamañoS70% para sol y luna, SIN letras. Aplicado como valor de Galaxy maestro en HorsePortrait. Colores aún no elegidos, se conserva azul provisional; las otras paletas siguen siendo propuestas. La opción de letras queda solo en el generador de propuesta, explícitamente apagada en la configuración de juego.
+
+## Aclaraciones y trabajo en curso (13:48-13:53)
+
+Azul/S70/sin letras confirmado para maestro. Gris y marrón se aclararon después como candidatos de Galaxy NO maestro: las primeras capturas con aura de esos colores quedan descartadas para esa elección. No se ha cambiado aún el normal activo lavanda. El marrón revisado conserva la base real de `adult_hd.png` (pelaje naranja/castaño y crin/cola marfil), no una reinterpretación oscura. Shader de propuesta `galaxy_original_base` apagado por defecto. La lámina compara original real con candidato al20%.
+
+El aura de maestros toma ahora el color base (`galaxy_light`), no azul fijo para todas las paletas. Las cinco paletas siguen propuestas, no variantes activadas.
+
+WIP gameplay: HorseGalaxyLook transporta maestría de un caballo concreto fuera de los genes y las claves de caché incluyen el estado. Adaptados provisionalmente PixelLab montado/libre, clásico, beber, miniaturas y precarga seleccionada. Nebulosas/estrellas se calculan una vez por textura, no en cada fotograma. Anclajes de sol/luna por vista con UV y halo fuera de píxeles transparentes del caballo. No toca máscaras fuente. AÚN NO cerrado: revisar todos los frames, anclajes y coste de carga/Android, así como resolver elección de color normal. No se presenta como terminado. El trabajo de anclajes queda en pausa tras la aclaración del13:50. Sin APK.
