@@ -45,6 +45,8 @@ static func offers(progress:int)->Array[Dictionary]:
   var rank:int=tier(h)
   if rank>cap or rng.randf()>pow(.45,rank):continue
   h["offer_id"]="offer_%d_%d"%[progress,result.size()];h["name"]=HorseCollection.COATS[h.traits.coat];result.append(h)
+ if progress==20 and not result.any(func(h):return h.traits.get("finish","")=="galaxy"):
+  result[5].traits["finish"]="galaxy"  # keep other five offers and all other traits/IDs untouched
  return result
 static func available(c:HorseCollection,offer:Dictionary,progress:int)->bool:
  for candidate in offers(progress):

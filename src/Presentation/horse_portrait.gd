@@ -29,4 +29,9 @@ static func apply_horse(view:TextureRect,horse:Dictionary,hat:String="original")
  if horse.get("stage","adult")=="foal":
   view.material=null
   view.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,horse.traits)
- else:apply(view,horse.traits,hat)
+ else:
+  apply(view,horse.traits,hat)
+  if HorseMastery.galaxy_master(horse):
+   view.material.set_shader_parameter("galaxy_palette_preview",true)
+   view.material.set_shader_parameter("galaxy_dark",Color("030b20"))
+   view.material.set_shader_parameter("galaxy_light",Color("477ce7"))

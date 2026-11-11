@@ -31,6 +31,7 @@ var _tranquilizer_available: bool = false
 var _level_number: int = 1
 var _max_simultaneous_captures: int = 1
 var _obstacle_rects: Array = []
+var _mounted_horse_id:String=""
 var _training_session:Dictionary={}
 var _training_before:Dictionary={}
 var _training_status:Label
@@ -353,6 +354,7 @@ func _apply_unlocked_upgrades() -> void:
 	player.dodge_available=reach>0 and HorseTraining.knows(trained_horse,"dodge")
 	player.dodge_recharge_seconds=2.5*HorseTraining.recovery(trained_horse,"dodge")
 	player.jump_recovery_multiplier=HorseTraining.recovery(trained_horse,"jump")
+	_mounted_horse_id=SaveData.horse_collection.selected
 	_training_session=HorseTraining.session(SaveData.horse_collection)
 	_training_before=TrainingReport.snapshot(SaveData.horse_collection,_training_session)
 	if not _training_session.is_empty():_show_training_companion()
@@ -545,7 +547,7 @@ func _trigger_win() -> void:
 		return
 	_game_over = true
 	_freeze_gameplay()
-	var reward:int=SaveData.record_victory(_level_number,_training_session)
+	var reward:int=SaveData.record_victory(_level_number,_training_session,_mounted_horse_id)
 	hud.show_win()
 	hud.end_label.text += "\nENSAYO AISLADO: sin premios ni progreso guardado" if SaveData.trial_session_active else "\n+%d puntos · Saldo: %d\nEquipo y precios en prueba" % [reward,SaveData.equipment_points]
 	_show_training_result()

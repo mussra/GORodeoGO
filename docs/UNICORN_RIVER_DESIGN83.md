@@ -47,3 +47,11 @@ Idea de Ant, no decisión cerrada: ir montado en Galaxy maestro, con N generacio
 Maestro: existen maestrías 0-100 de salto/regate que crecen haciendo misiones con el aprendiz montado. Serenidad es estadística de calma y no certifica misiones. Recomendación pendiente: Galaxy adulto + umbral de maestría configurable (ejemplo 80%) conseguido jugando con él; N configurable. Para “N generaciones consecutivas Galaxy”, decidir todas las ramas frente a una línea dominante. Recomiendo todas las ramas conocidas hasta N para que sea difícil y la ficha explique qué antepasado falta. El cálculo de color seguiría usando toda la ascendencia, no solo esas N generaciones.
 
 Flujo propuesto: loco del pueblo ofrece pistas graduales; el rastro arcoíris confirma hitos en el mundo sin revelar toda la ruta de golpe; la fuente revisa montura maestra y genealogía antes de permitir el ritual. No gastar ni criar automáticamente al tocar el agua. Falta decidir si allí nace cría unicornio de dos padres, evoluciona una montura, o se encuentra uno. No implementar hasta aclarar esa diferencia.
+
+## Decisiones posteriores 13:29-13:32
+
+Ant elige catálogo20 con una oferta Galaxy garantizada, otras5intactas. MaestríaGalaxy=100%:todoslos20niveles distintos completadosconESAcaballo. Umbralconfigurable,default100. NoSerenidad,nomediasdesalto/regate. Ficha lista nivelesymaestríageneral;registrar desde nuevas victorias,noatribuirretroactivamentenivelesglobales.
+
+Galaxymaestro usa looknebulosaspero NOseconvierteenunicornio. Unicorniose distinguiráporcuernoyrastroarcoíris. Barras de nuevas habilidades serán exclusivasdeunicornios,noapareceránenGalaxymaestro;salto/regate permanecencomohastaahora. No hay aún catálogo/reglas de esashabilidades,porloqueno se pintanbarrasfalsasdeNadar.
+
+Fuente mágicaylocodelpueblo:Antconfirmaqueloscrearemosmásadelantejuntos,noimplementarahora. RecetaNascendenciayrastro siguenpendientes.

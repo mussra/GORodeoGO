@@ -148,6 +148,11 @@ func detail_view()->void:
  sprite(h,Vector2(30,205),390)
  var scroll:=ScrollContainer.new();scroll.position=Vector2(470,130);scroll.size=Vector2(770,540);content.add_child(scroll)
  var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(735,0);box.add_theme_constant_override("separation",12);scroll.add_child(box)
+ if owned:
+  var completed:=Label.new();completed.text=HorseMastery.level_text(h);completed.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;completed.add_theme_font_size_override("font_size",20);box.add_child(completed)
+  HorseStatBars.row(box,"Maestría general · %d%%"%roundi(HorseMastery.percent(h)),HorseMastery.percent(h))
+  if h.traits.get("finish","")=="galaxy":
+   var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: necesita %d%% de maestría general"%roundi(HorseMastery.GALAXY_MASTER_THRESHOLD);galaxy.add_theme_font_size_override("font_size",20);box.add_child(galaxy)
  for text in HorseValues.visual(t)+(HorseValues.hidden_genes(t) if owned else [])+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
   var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);box.add_child(line)
  HorseStatBars.create(box,h,owned)
