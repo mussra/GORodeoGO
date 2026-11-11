@@ -36,8 +36,8 @@ var _herd_horses: Dictionary = {}
 ## se reparte en pasos con presupuesto de ms por frame y se adelanta en la
 ## dirección de la marcha. El conjunto ACTIVO sigue siendo el 3x3 alrededor del
 ## jinete: nodos al árbol, descubrimiento y guardado solo ocurren al activar.
-const CHUNK_BUILD_BUDGET_MS := 6.0
-const CHUNK_LOOKAHEAD_SECONDS := 1.6
+const CHUNK_BUILD_BUDGET_MS := 3.0
+const CHUNK_LOOKAHEAD_SECONDS := 3.0
 var _chunk_pending: Dictionary = {}  # key -> builder en curso (fuera del árbol)
 var _chunk_built: Dictionary = {}    # key -> builder terminado (caché fuera del árbol)
 var _build_queue: Array = []         # keys pendientes, lo más cercano primero
@@ -84,6 +84,7 @@ var _marker: Node2D = null
 var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
+	FrontierTransition.obtain(get_tree())
 	y_sort_enabled = true
 	SaveData.ensure_world_seed()
 	var base := ColorRect.new()
@@ -125,7 +126,7 @@ func _ready() -> void:
 	# momento de carga); el streaming en marcha ya va repartido por frames.
 	# First paint is responsive; preserve pre-game safety until the same initial3x3 exists.
 	player.set_physics_process(false)
-	_loading_label=Label.new();_loading_label.text="Cargando frontera...";_loading_label.position=Vector2(450,300);_loading_label.add_theme_font_size_override("font_size",30);_hud.add_child(_loading_label)
+	# Keep the construction hidden until the original safety ring is ready.
 
 func _physics_process(delta:float)->void:
 	if _loading_world or is_instance_valid(_npc_dialog):return
@@ -141,7 +142,7 @@ func _process(delta: float) -> void:
 	if _loading_world:
 		if not _build_queue.is_empty():return
 		_loading_world=false
-		if is_instance_valid(_loading_label):_loading_label.queue_free()
+		FrontierTransition.obtain(get_tree()).reveal()
 		player.set_physics_process(true)
 	_tick_npcs()
 	_tick_lasso(delta)
@@ -268,7 +269,6 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 ## pista se concreta con cada intento (fase de sesion) y cada caballo tiene
 ## un enfriamiento para no machacar con el mismo aviso.
 var _loading_world:bool=true
-var _loading_label:Label
 var _stallion_hint_stage: int = 0
 
 func _stallion_hint(horse: Node2D) -> void:
@@ -1194,6 +1194,11 @@ class DiscoveryMap extends Control:
 			var m2: Vector2 = _to_map(p2, mins, cell, origin)
 			if clip.has_point(m2):
 				draw_circle(m2, dot, col)
+
+		if c==Vector2i.ZERO:
+			for lane in WorldPaths.access_lanes(seed):
+				for j in lane.size()-1:
+					draw_line(_to_map(lane[j],mins,cell,origin),_to_map(lane[j+1],mins,cell,origin),col,maxf(1.0,cell*.03),true)
 
 	func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		var dot: float = maxf(1.6, cell * 0.035)

@@ -117,7 +117,7 @@ func _build_menu() -> void:
 	_world_button.pressed.connect(func():
 		if _transitioning:return
 		_transitioning=true
-		get_tree().change_scene_to_file("res://src/Presentation/frontier_world.tscn"))
+		FrontierTransition.obtain(get_tree(),false).enter_world())
 	_hero.add_child(_world_button)
 	_equipment_panel=EquipmentPanel.new()
 	_equipment_panel.visible=false

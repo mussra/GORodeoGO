@@ -23,10 +23,6 @@ const HOUSES := [
 	{"pos": Vector2(-75, -215), "body": Color("9c6b3f"), "roof": Color("6d4a2f")},
 	{"pos": Vector2(90, -205), "body": Color("8a5a33"), "roof": Color("b4452f")},
 ]
-const TRAILS := [
-	{"from": Vector2(-290, 145), "to": Vector2(390, 145)},
-	{"from": Vector2(-100, -335), "to": Vector2(-100, -150)},
-]
 const PIGS: Array[Vector2] = [Vector2(155, -5), Vector2(215, 30)]
 
 const DrawNode := preload("res://src/Presentation/world_draw_node.gd")
@@ -131,12 +127,4 @@ func _rail_nodes_v(world: Node2D, x: float, y0: float, y1: float, gap := Vector2
 			_rail_seg(world, Vector2(x, y), false)
 		y += 30.0
 
-func _draw() -> void:
-	for t in TRAILS:
-		_draw_trail(t["from"], t["to"])
-
-func _draw_trail(a: Vector2, b: Vector2) -> void:
-	# narrow lane via the shared RoadTiles component (same art as the world)
-	RoadTiles.stamp_polyline(self, PackedVector2Array([a, b]), 40.0, 32.0)
-
-
+# Access roads are drawn by FrontierTrail from shared WorldPaths data.

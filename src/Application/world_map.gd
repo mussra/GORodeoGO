@@ -66,7 +66,7 @@ static func branch_x_at(seed:int,y:float)->float:
  return _trail_wander("y",seed,y)
 
 static func trail_distance(seed:int,pos:Vector2)->float:
- return minf(absf(pos.y-trail_y_at(seed,pos.x)),absf(pos.x-branch_x_at(seed,pos.y)))
+ return minf(minf(absf(pos.y-trail_y_at(seed,pos.x)),absf(pos.x-branch_x_at(seed,pos.y))),WorldPaths.distance_to_access(seed,pos))
 
 static func on_trail(seed:int,pos:Vector2)->bool:
  return trail_distance(seed,pos)<TRAIL_WIDTH

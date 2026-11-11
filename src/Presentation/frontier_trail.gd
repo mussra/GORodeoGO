@@ -18,6 +18,9 @@ func _draw() -> void:
 	var origin: Vector2 = Vector2(c) * WorldMap.CHUNK_SIZE
 	_stamp_axis(origin, true, seed)
 	_stamp_axis(origin, false, seed)
+	# Local access lanes are drawn once per owning chunk, never random branches.
+	if c==Vector2i.ZERO:
+		for lane in WorldPaths.access_lanes(seed):RoadTiles.stamp_polyline(self,lane,40.0,28.0)
 
 func _stamp_axis(origin: Vector2, main: bool, seed: int) -> void:
 	var n: int = int(WorldMap.CHUNK_SIZE / SAMPLE) + 5
