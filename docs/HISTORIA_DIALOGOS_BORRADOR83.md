@@ -9,6 +9,7 @@ Llegas a un rancho junto a una tierra llena de caminos.
 Tu caballo y tú podéis superar retos en los corrales o salir a explorar.
 El rancho es vuestro punto de partida: allí podéis preparar la siguiente salida y conocer a quienes necesitan ayuda.
 Entre misiones, encuentros y nuevos caballos, iréis formando vuestra propia cuadra.
+En los caminos conoceréis a la florista. Sus encargos os invitan a buscar flores y regresar a su tienda.
 No hay un único camino: podéis alternar las dos aventuras.
 
 ## Quién lo cuenta
@@ -17,7 +18,7 @@ El vaquero del juego es el narrador. Cercano, tranquilo y con ganas de salir de 
 
 Su identidad visual se conserva: el ala del sombrero tapa siempre sus ojos. Ni un gesto ni un asentimiento los descubre. En la prueba se mueve la ilustración existente entera; no se ha dibujado ninguna cara ni boca nueva.
 
-El granjero existente conserva sus propios encargos. Más personajes se podrán proponer después. No se añaden aquí la fuente mágica, el loco del pueblo ni una historia de adquisición de unicornios.
+El granjero existente conserva sus propios encargos. La florista, creada por Ant, pide ayuda para encontrar flores y tiene una floristería rodeada de flores, también en la entrada. Su diseño y sus diálogos se desarrollan en FLORISTA_BORRADOR83.md. Más personajes se podrán proponer después. No se añaden aquí la fuente mágica, el loco del pueblo ni una historia de adquisición de unicornios.
 
 ## Guion y disparadores propuestos
 
