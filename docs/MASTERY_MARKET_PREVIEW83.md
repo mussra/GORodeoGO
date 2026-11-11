@@ -72,3 +72,7 @@ WIP gameplay: HorseGalaxyLook transporta maestría de un caballo concreto fuera 
 ## Nebulosa normal en tono original (14:00)
 
 Ant aclara que busca más Galaxy, no una copia casi plana del original: nebulosa y estrellas con el naranja/castaño del primer caballo. Nueva propuesta solo en generador: paleta oscura#351707/luz#d0742f, base neutra cálida, intensidad0,72 (maestro1,0). Nubes visibles incluso a0%, estrellas progresivas0/50/95%. Sin aura, astros ni letras. No cambia la paleta activa ni las máscaras. `galaxy-original-nebula-progress83.png` sustituye la propuesta casi original para esta decisión.
+
+## Marrón más claro (14:15)
+
+Revisión solo de propuesta: base oscura#5a2c10 y luz#e99a4c, neutro cálido más claro. Mantiene intensidad0,72, nebulosa desde0% y mismas estrellas progresivas. Comparativa anterior/nueva a0/50/95%. Sin aura, astros ni letras. No cambia colores activos ni máscaras. `galaxy-brown-lighter-comparison83.png`.

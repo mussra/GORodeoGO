@@ -23,9 +23,9 @@ func run():
    tex.material.set_shader_parameter("mastery_greek_preview",greek)
    tex.material.set_shader_parameter("galaxy_original_base",false)
    tex.material.set_shader_parameter("original_horse",false)
-   tex.material.set_shader_parameter("galaxy_quiet",Color(.38,.24,.13))
+   tex.material.set_shader_parameter("galaxy_quiet",Color(.49,.32,.18))
    tex.material.set_shader_parameter("galaxy_intensity",.72)
-   tex.material.set_shader_parameter("galaxy_dark",Color("351707"));tex.material.set_shader_parameter("galaxy_light",Color("d0742f"));tex.material.set_shader_parameter("galaxy_blue_mix",false);tex.material.set_shader_parameter("mastery_mark_scale",.7)
+   tex.material.set_shader_parameter("galaxy_dark",Color("5a2c10"));tex.material.set_shader_parameter("galaxy_light",Color("e99a4c"));tex.material.set_shader_parameter("galaxy_blue_mix",false);tex.material.set_shader_parameter("mastery_mark_scale",.7)
    label_at("Nebulosa + estrellas",Vector2(col*360,510+row*380),360,24)
  await get_tree().create_timer(.8).timeout;await RenderingServer.frame_post_draw
- canvas.get_texture().get_image().save_png("/downloads/galaxy-master-marks-greek83.png" if greek else "/downloads/galaxy-original-nebula-progress83.png");get_tree().quit()
+ canvas.get_texture().get_image().save_png("/downloads/galaxy-master-marks-greek83.png" if greek else "/downloads/galaxy-original-nebula-lighter83.png");get_tree().quit()
