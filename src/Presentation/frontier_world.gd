@@ -404,12 +404,8 @@ func _advance_builder(b: Dictionary) -> void:
 			var node := Node2D.new()
 			node.set_meta("c", Vector2i(cx, cy))
 			node.y_sort_enabled=true
-			var ground := ColorRect.new()
-			ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			ground.color = Color("32653a").lerp(Color("3a7142"), float(absi(hash(WorldMap.chunk_key(cx, cy))) % 100) / 220.0)
-			ground.size = Vector2(WorldMap.CHUNK_SIZE, WorldMap.CHUNK_SIZE)
-			ground.position = Vector2(cx, cy) * WorldMap.CHUNK_SIZE
-			ground.z_index = -9
+			var ground := WorldGrassTexture.new()
+			ground.c=Vector2i(cx,cy)
 			node.add_child(ground)
 			b["node"] = node
 			b["decor_todo"] = (b["data"] as Dictionary).get("decor", []).duplicate()

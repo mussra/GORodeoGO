@@ -11,6 +11,7 @@ var c: Vector2i = Vector2i.ZERO
 
 func _ready() -> void:
 	z_index = -8
+	texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
 	queue_redraw()
 
 func _draw() -> void:
@@ -22,12 +23,12 @@ func _draw() -> void:
 	if c==Vector2i.ZERO:
 		var junctions={}
 		for lane in WorldPaths.access_lanes(seed):
-			RoadTiles.stamp_access(self,lane,40.0,28.0)
+			ContinuousRoadArt.access(self,lane,32.0)
 			var branch=(lane[1]-lane[0]).normalized()
 			if not junctions.has(lane[0]):
-				RoadTiles.junction(self,"t",lane[0],Vector2.DOWN.angle_to(branch),40.0*85.0/117.0)
+				ContinuousRoadArt.junction_soil(self,lane[0],23)
 				junctions[lane[0]]=true
-		RoadTiles.junction(self,"cross",Vector2.ZERO,0.0,LENGTH*85.0/117.0)
+		ContinuousRoadArt.junction_soil(self,Vector2.ZERO,28)
 
 func _stamp_axis(origin: Vector2, main: bool, seed: int) -> void:
 	var n: int = int(WorldMap.CHUNK_SIZE / SAMPLE) + 5
@@ -44,4 +45,4 @@ func _stamp_axis(origin: Vector2, main: bool, seed: int) -> void:
 		if center.x < origin.x - 80.0 or center.x > origin.x + WorldMap.CHUNK_SIZE + 80.0:
 			continue
 		pts.append(center)
-	RoadTiles.stamp_polyline(self, pts, LENGTH, LENGTH * 0.8)
+	ContinuousRoadArt.ribbon(self,pts,45.0)
