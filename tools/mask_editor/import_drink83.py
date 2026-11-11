@@ -7,9 +7,11 @@ import argparse,base64,json,subprocess,time,urllib.request,tempfile,shutil
 from pathlib import Path
 import websocket
 from PIL import Image
-ap=argparse.ArgumentParser();ap.add_argument('project',type=Path);ap.add_argument('--editor',type=Path,required=True);ap.add_argument('--out',type=Path,required=True);ap.add_argument('--apply',action='store_true');args=ap.parse_args()
+ap=argparse.ArgumentParser();ap.add_argument('project',type=Path);ap.add_argument('--editor',type=Path,required=True);ap.add_argument('--out',type=Path,required=True);ap.add_argument('--apply',action='store_true');ap.add_argument('--include-portrait',action='store_true');ap.add_argument('--hat-v9',action='store_true');args=ap.parse_args()
 root=Path(__file__).resolve().parents[2];manifest=json.loads((root/'tools/mask_editor/drink83-import-manifest.json').read_text());doc=json.loads(args.project.read_text())
-if doc.get('baseline')!='rancho-20261111-drink-v8' or doc.get('format')!='rancho-mask-review' or doc.get('version')!=2:raise ValueError('Not a complete v8 project')
+if doc.get('baseline')!=('rancho-20261111-drink-v9' if args.hat_v9 else 'rancho-20261111-drink-v8') or doc.get('format')!='rancho-mask-review' or doc.get('version')!=2:raise ValueError('Not a complete v8 project')
+if args.hat_v9:manifest=json.loads((root/'tools/mask_editor/drink83-hat-import-manifest.json').read_text())
+if args.include_portrait:manifest['portrait-color']=json.loads((root/'tools/mask_editor/v7-import-manifest.json').read_text())['portrait-color']
 bases={x['id']:x for x in doc['bases']}
 if len(bases)!=101:raise ValueError('Expected 101 distinct base masks')
 for id,item in manifest.items():

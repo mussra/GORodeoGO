@@ -1,0 +1,38 @@
+[
+  {
+    "pose": 0,
+    "mask": "color",
+    "pixels_changed": 548,
+    "coat_before": 1327,
+    "coat_after": 1435,
+    "hair_before": 514,
+    "hair_after": 801
+  },
+  {
+    "pose": 0,
+    "mask": "eyes",
+    "pixels_changed": 17,
+    "coat_before": 0,
+    "coat_after": 0,
+    "hair_before": 0,
+    "hair_after": 0
+  },
+  {
+    "pose": 1,
+    "mask": "color",
+    "pixels_changed": 321,
+    "coat_before": 1342,
+    "coat_after": 1495,
+    "hair_before": 574,
+    "hair_after": 641
+  },
+  {
+    "pose": 1,
+    "mask": "eyes",
+    "pixels_changed": 19,
+    "coat_before": 0,
+    "coat_after": 0,
+    "hair_before": 0,
+    "hair_after": 0
+  }
+]
