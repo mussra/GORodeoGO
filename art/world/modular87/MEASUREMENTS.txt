@@ -1,0 +1,16 @@
+Grass 1: original mean RGB edge difference X=7.20/255, Y=12.18/255
+Grass 2: original mean RGB edge difference X=7.27/255, Y=14.84/255
+Grass 3: original mean RGB edge difference X=9.31/255, Y=11.40/255
+straight E: dirt 109px / 256px (42.6%), centre 120.0px (46.9%), offset from midpoint -7.5px
+straight W: dirt 109px / 256px (42.6%), centre 121.0px (47.3%), offset from midpoint -6.5px
+corner S: dirt 103px / 264px (39.0%), centre 185.0px (70.1%), offset from midpoint +53.5px
+corner W: dirt 101px / 256px (39.5%), centre 106.0px (41.4%), offset from midpoint -21.5px
+tee E: dirt 92px / 256px (35.9%), centre 112.5px (43.9%), offset from midpoint -15.0px
+tee S: dirt 90px / 262px (34.4%), centre 128.5px (49.0%), offset from midpoint -2.0px
+tee W: dirt 93px / 256px (36.3%), centre 113.0px (44.1%), offset from midpoint -14.5px
+cross N: dirt 89px / 261px (34.1%), centre 130.0px (49.8%), offset from midpoint +0.0px
+cross E: dirt 94px / 255px (36.9%), centre 116.5px (45.7%), offset from midpoint -10.5px
+cross S: dirt 88px / 261px (33.7%), centre 130.5px (50.0%), offset from midpoint +0.5px
+cross W: dirt 94px / 255px (36.9%), centre 117.5px (46.1%), offset from midpoint -9.5px
+end W: dirt 104px / 255px (40.8%), centre 120.5px (47.3%), offset from midpoint -6.5px
+dot: internal dirt bbox 167x155px, centre 126.0,132.0px; no open port
