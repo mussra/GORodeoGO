@@ -11,11 +11,11 @@ const DecorScript := preload("res://src/Presentation/world_decor.gd")
 const PigScript := preload("res://src/Presentation/wild_pig.gd")
 
 const ZONE_POS := Vector2(160, 650)
-const MEADOW := Rect2(-195, -105, 235, 215)
-const PEN := Rect2(110, -50, 170, 120)
+const MEADOW := Rect2(-730, -105, 235, 215)
+const PEN := Rect2(240, -50, 170, 120)
 const HORSES := [
-	{"home": Vector2(-120, -35), "traits": {"coat": 10, "pattern": 0, "mane": 0, "eyes": 0, "finish": "normal"}},
-	{"home": Vector2(-45, 40), "traits": {"coat": 1, "pattern": 2, "mane": 1, "eyes": 1, "finish": "normal"}},
+	{"home": Vector2(-655, -35), "traits": {"coat": 10, "pattern": 0, "mane": 0, "eyes": 0, "finish": "normal"}},
+	{"home": Vector2(-580, 40), "traits": {"coat": 1, "pattern": 2, "mane": 1, "eyes": 1, "finish": "normal"}},
 ]
 const TREES: Array[Vector2] = [Vector2(-235, -125), Vector2(305, -115)]
 const CACTI: Array[Vector2] = [Vector2(-255, 95), Vector2(335, 75)]
@@ -23,7 +23,7 @@ const HOUSES := [
 	{"pos": Vector2(-75, -215), "body": Color("9c6b3f"), "roof": Color("6d4a2f")},
 	{"pos": Vector2(90, -205), "body": Color("8a5a33"), "roof": Color("b4452f")},
 ]
-const PIGS: Array[Vector2] = [Vector2(155, -5), Vector2(215, 30)]
+const PIGS: Array[Vector2] = [Vector2(285, -5), Vector2(345, 30)]
 
 const DrawNode := preload("res://src/Presentation/world_draw_node.gd")
 const Physics := preload("res://src/Presentation/world_physics.gd")

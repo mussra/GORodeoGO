@@ -38,7 +38,7 @@ func _warm_showcase():
   var frames=SpriteFrames.new();var start=Time.get_ticks_usec()
   for step in PixelLabTrial.frame_specs("horse"):
    PixelLabTrial.append_pose(frames,"horse",step,traits)
-   if Time.get_ticks_usec()-start>3000:
+   if Time.get_ticks_usec()-start>8000:
     await get_tree().process_frame;start=Time.get_ticks_usec()
   art.frame_cache[key]=frames
 func reveal():

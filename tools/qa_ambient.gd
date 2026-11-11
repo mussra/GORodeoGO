@@ -2,7 +2,7 @@ extends Node
 func _ready():run.call_deferred()
 func run():
  get_tree().root.size=Vector2i(1280,720);TranslationServer.set_locale("es")
- SaveData.save_path="user://qa-ambient.cfg";SaveData.trial_session_active=true;SaveData.world_quests={};SaveData.world_seed=752026;SaveData.world_position=Vector2(220,520)
+ SaveData.save_path="user://qa-ambient.cfg";SaveData.trial_session_active=true;SaveData.world_quests={};SaveData.world_seed=752026;SaveData.world_position=Vector2(0,520)
  var world=load("res://src/Presentation/frontier_world.tscn").instantiate();add_child(world)
  while world._loading_world:await get_tree().process_frame
  world.player.set_physics_process(false);world.set_physics_process(false)

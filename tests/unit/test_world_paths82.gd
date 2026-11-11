@@ -14,3 +14,12 @@ func test_paths_do_not_change_generated_content_or_touch_save_data():
  var before=WorldMap.generate(752026,0,0);var discovered=SaveData.world_discovered.duplicate();var edits=SaveData.world_edits.duplicate(true)
  for seed in [1,2,752026]:WorldPaths.access_lanes(seed)
  assert_eq(WorldMap.generate(752026,0,0),before);assert_eq(SaveData.world_discovered,discovered);assert_eq(SaveData.world_edits,edits)
+func test_animal_parcels_keep_clear_of_every_possible_trunk_and_access():
+ for seed in [1,2,99,12345,752026,7781]:
+  for pen in [WorldTestZone.MEADOW,WorldTestZone.PEN]:
+   for x in range(int(pen.position.x),int(pen.end.x)+1,20):
+    for y in range(int(pen.position.y),int(pen.end.y)+1,20):
+     var pos=WorldTestZone.ZONE_POS+Vector2(x,y)
+     assert_gt(WorldMap.trail_distance(seed,pos),64.0)
+ for h in WorldTestZone.HORSES:assert_true(WorldTestZone.MEADOW.grow(-60).has_point(h.home))
+ for p in WorldTestZone.PIGS:assert_true(WorldTestZone.PEN.grow(-24).has_point(p))

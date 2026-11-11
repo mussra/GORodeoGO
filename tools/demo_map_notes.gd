@@ -30,17 +30,17 @@ func build():
   label("Flores junto al arroyo",Vector2(838,130),385,27)
   label("Icono: Flor · aquí queda mi nota",Vector2(838,180),385,18)
   button("Añadir captura del juego",Vector2(838,250),Vector2(385,60),func():stage=2;build())
-  label("Opcional. Una imagen pequeña para recordar este lugar.",Vector2(838,342),385,22)
+  label("Opcional. Copia privada del juego. No se envía a la galería automáticamente.",Vector2(838,342),385,22)
   button("Borrar marca · demo",Vector2(838,490),Vector2(385,48),func():stage=0;build())
  else:
   label("Flores junto al arroyo",Vector2(838,130),385,27)
   label("Icono: Flor · aquí queda mi nota",Vector2(838,180),385,18)
-  var photo=TextureRect.new();photo.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;photo.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;photo.position=Vector2(838,220);photo.size=Vector2(385,190);photo.texture=ImageTexture.create_from_image(Image.load_from_file("/downloads/frontier-paths.png"));canvas.add_child(photo)
-  label("Captura del juego · miniatura local",Vector2(838,415),385,18)
+  var photo=TextureRect.new();photo.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;photo.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;photo.position=Vector2(838,220);photo.size=Vector2(385,190);photo.texture=load("res://tools/preview_assets/map-note-example.jpg");canvas.add_child(photo)
+  label("Copia privada · exportar es opcional",Vector2(838,415),385,18)
   button("Guardar en galería",Vector2(838,454),Vector2(385,48),func():stage=3;build())
   button("Compartir...",Vector2(838,511),Vector2(385,48),func():stage=3;build())
  if stage==3:
-  label("Solo con tu toque: copia a galería o menú de compartir de Android.\nEl juego no sube nada. Prueba en móvil pendiente.",Vector2(30,610),1220,23).modulate=Color("e8bb67")
+  label("Galería y compartir: solo al pulsar dentro del juego. Nunca automáticamente.\nLa marca usa su copia privada: borrar la galería no la afecta.\nSi falta/corrompe la foto: imagen neutra, sin bloquear nota ni guardado.",Vector2(30,610),1220,23).modulate=Color("e8bb67")
  else:
   label("Las marcas se verían en el mapa y el minimapa.\nPropuesta: nota hasta 60 letras + 1 miniatura por marca, guardado por mundo.",Vector2(30,610),1220,23)
 func paint_map(n:Node2D):

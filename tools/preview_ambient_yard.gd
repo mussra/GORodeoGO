@@ -10,7 +10,7 @@ func _ready():
    var frames=SpriteFrames.new();PixelLabTrial.apply_animal(frames,kind);shared_frames[kind]=frames
  for i in 8:
   var kind="pig" if i<4 else "goat"
-  var base=Vector2(305+(i%2)*65,625+(i/2%2)*28) if i<4 else Vector2(25+(i%2)*65,625+(i/2%2)*45)
+  var base=Vector2(435+(i%2)*65,625+(i/2%2)*28) if i<4 else Vector2(-510+(i%2)*65,625+(i/2%2)*45)
   var sprite=AnimatedSprite2D.new();sprite.sprite_frames=shared_frames[kind];sprite.centered=false;sprite.offset=Vector2(-80,-144);sprite.scale=Vector2.ONE*.32;sprite.position=base;world.add_child(sprite);sprite.play("run");sprite.speed_scale=.25
   animals.append({"node":sprite,"home":base,"phase":i*1.7})
  # Flower shop uses existing right-hand house, not invented new building art.

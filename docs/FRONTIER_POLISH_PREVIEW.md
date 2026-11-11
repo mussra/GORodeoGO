@@ -2,7 +2,7 @@
 
 ## Cambios preparados para el juego, sin APK todavía
 - Transición persistente menú→mundo: fundido0,22s,órbita discreta sin texto, calentamiento incremental del arte de exhibición, mundo completo antes de revelar en0,4s. Mismo bloqueo de seguridad inicial hasta9chunks.
-- Presupuesto de construcción3msen vez de6ms,anticipación3sen vez de1,6s. No es un límite duro: una textura puede superar el presupuesto.
+- Presupuesto durante juego3msen vez de6ms,12msmientras la pantalla está cubierta,anticipación3sen vez de1,6s. No es un límite duro: una textura puede superar el presupuesto.
 - Caminos: ramal desde tronco seeded a casa principal y acceso compartido desde delante de las dos casas de la zona fija. Accesos compartidos entre vista del mundo,minimapa y consulta on_trail. Sin cambiar RNG,contenido de chunks,estado descubierto o esquema de guardado. Quitados dos senderos sueltos de la zona fija.
 
 ### Medición local, sin Android
@@ -24,4 +24,11 @@ MediaStore para fotos creadas por la propia app,no acceso general a biblioteca. 
 Rama de pruebas,sin merge a main. Previews inspeccionadas y enviadas antes de cualquier APK.
 
 ## Validación final
-466/466unitarias,54982aserciones. Dirigidas carga+encargos+accesos4/4,75aserciones. Ajustado test de zona fija para consultar sus dos accesos actuales compartidos en WorldPaths; ya no existe Zone.TRAILS. Sin Android real ni ejecución de toda integración.
+467/467unitarias,56154aserciones. Dirigidas carga+encargos+accesos4/4,75aserciones. Ajustado test de zona fija para consultar sus dos accesos actuales compartidos en WorldPaths; ya no existe Zone.TRAILS. Sin Android real ni ejecución de toda integración.
+
+## Revisión posterior a feedback
+Recintos fijos desplazados fuera de la banda de caminos; hogares de animales desplazados con ellos. Cobertura geométrica en6semillas,muestreo interior y perímetro,distancia>64px. Prototipo ambiental también fuera de los caminos.
+
+Ruta real menú vigente verificada con la cortina persistente y9chunks al terminar. Primer arnés con menú alternativo obsoleto/sesión trial sin snapshot fue descartado,no usado para validar. Render completo de escritorio por software,entrada fría:11,37scon presupuesto inicial3ms;7,40scon12mscubierto y calentamiento8ms. No comparable al tiempo headless CPU2,6s. Sigue habiendo espera visible;no prometer imperceptible ni extrapolar a Android. Vídeo de grabación a FPS fijos solo demuestra presentación.
+
+Fotos:original privado por marca;galería es una copia creada solo al tocar el botón. Compartir también explícito desde la imagen. Borrar copia de galería no afecta la privada. Ausencia/corrupción de archivo privado:miniatura neutra,la nota sigue,y guardado no falla. Faltan pruebas de borrado externo,reinstalación,disco lleno y exportación cancelada. No exportar automáticamente ni pedir acceso a biblioteca completa.
