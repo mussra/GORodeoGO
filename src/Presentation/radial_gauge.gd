@@ -31,14 +31,19 @@ func _draw() -> void:
 	# Ant's supplied clock, cropped only; same shared indicator in both modes.
 	var art:Texture2D=ART.get(skill,ART.stamina)
 	draw_texture_rect(art,Rect2(Vector2(3,3),size-Vector2(6,6)),false)
-	# Filled part keeps the original bright art. Only the unfilled remainder
-	# is dimmed, so readiness grows clockwise from twelve, not darkness.
-	var face_radius=(minf(size.x,size.y)-6.0)*.37
+	# Dim the pending part with the same texture as an alpha mask. This includes
+	# the wooden rim without painting a dark disk outside the supplied artwork.
 	var dim=Color(0.05,0.08,0.08,0.72)
+	var art_rect=Rect2(Vector2(3,3),size-Vector2(6,6))
 	if capable and ratio <= 0.0:
-		draw_circle(c,face_radius,dim)
+		draw_texture_rect(art,art_rect,false,dim)
 	elif capable and ratio < 1.0:
-		draw_colored_polygon(unfilled_sector(c,face_radius,ratio),dim)
+		# The sector reaches beyond the square. Texture UVs and original alpha
+		# keep the overlay exactly on the clock, not its transparent corners.
+		var pts=unfilled_sector(c,size.length()*.5,ratio)
+		var uvs=PackedVector2Array()
+		for p in pts:uvs.append((p-art_rect.position)/art_rect.size)
+		draw_polygon(pts,PackedColorArray([dim]),uvs,art)
 	if not capable:
 		draw_line(c + Vector2(-r * 0.55, -r * 0.55), c + Vector2(r * 0.55, r * 0.55), Color("e9a59b"), 5.0, true)
 

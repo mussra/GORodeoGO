@@ -15,3 +15,7 @@ Verificación: imagen real de los tres a 76px, con 0/25/50/75/100% y sobre damer
 ## Revisión: lleno encendido, vacío apagado
 
 Ant pidió invertir la lectura visual. Ahora al 0% la cara está completamente atenuada, al 100% se ve el arte original sin tinte, y a 25/50/75% la parte encendida crece desde las 12 en sentido horario. Solo se cubre con un sector oscuro el porcentaje pendiente. El marco de madera conserva su aspecto. No se modifica ningún PNG, el ratio de energía o las reglas de recarga. Captura de los cinco estados a 76px inspeccionada; tres pruebas del componente, 47 aserciones. Sin APK nueva.
+
+## Revisión elegida: el marco también se apaga
+
+Ant eligió que la madera participe en el mismo barrido. El sector pendiente ahora usa la textura original como máscara alfa y oscurece cara y marco. Así no se pinta un disco opaco fuera del reloj ni se modifican los PNG. Al 0% se atenúa todo el reloj; al 100% no hay overlay. La parte encendida crece desde las 12 en sentido horario. Captura de 0/25/50/75/100 a 76px inspeccionada.
