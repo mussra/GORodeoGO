@@ -970,7 +970,7 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Mapa modular nuevo","hint":"Prueba aislada, sin cambiar tu partida"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
@@ -978,6 +978,7 @@ func _navigation_selected(id:String)->void:
 	_close_navigation()
 	match id:
 		"map":_toggle_map()
+		"modular_preview":_open_modular_preview93()
 		"editor":_toggle_edit()
 		"home":_home()
 		"exit":_menu()
@@ -1381,3 +1382,21 @@ func _collect_story_flower()->void:
 	var state:Dictionary=NpcQuests.state(SaveData.world_quests,"east_flower")
 	if state.status!="active" or not state.has("spawn") or player.position.distance_to(state.spawn)>120.0:return
 	_quest_event("find_object","east_flower","story:east_flower")
+
+func _open_modular_preview93()->void:
+	# Keep the live world and its data in memory, untouched, until returning.
+	var preview=load("res://src/Presentation/modular_world93.tscn").instantiate()
+	var prior_mode=process_mode
+	var prior_camera=get_viewport().get_camera_2d()
+	visible=false;process_mode=Node.PROCESS_MODE_DISABLED
+	if _hud!=null:_hud.visible=false
+	var touch=get_node_or_null("TouchControls")
+	if touch!=null:touch.visible=false
+	get_tree().root.add_child(preview)
+	preview.return_requested.connect(func():
+		preview.player.cancel_input()
+		preview.queue_free()
+		visible=true;process_mode=prior_mode
+		if _hud!=null:_hud.visible=true
+		if touch!=null:touch.visible=not _edit_mode
+		if is_instance_valid(prior_camera):prior_camera.make_current())
