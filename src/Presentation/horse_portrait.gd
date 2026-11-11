@@ -10,7 +10,8 @@ static func material_for(traits:Dictionary,hat:String="original")->ShaderMateria
  var m:=ShaderMaterial.new();m.shader=SHADER;m.set_shader_parameter("spot_data",PackedVector4Array(HorseAppearance.spots()));m.set_shader_parameter("spot_count",HorseAppearance.spots().size());m.set_shader_parameter("eye_mask",EYES);m.set_shader_parameter("custom_eyes",traits.has("eyes"));m.set_shader_parameter("eye_color",HorseAppearance.eye_color_at(HorseCollection.eye_index(traits),Vector2(.5,.5)));m.set_shader_parameter("region_mask",MASK);m.set_shader_parameter("light_legs_mask",LIGHT_LEGS);m.set_shader_parameter("lower_legs_mask",LOWER_LEGS);m.set_shader_parameter("custom_legs",HorseCollection.legs_index(traits)>=0);m.set_shader_parameter("legs_color",Color("33302e") if HorseCollection.legs_index(traits)==0 else Color(HorseAppearance.COLORS[maxi(0,HorseCollection.legs_index(traits))]))
  m.set_shader_parameter("eye_style",HorseCollection.eye_index(traits) if HorseCollection.eye_index(traits)>=20 else 0)
  m.set_shader_parameter("galaxy",traits.get("finish","")=="galaxy")
- m.set_shader_parameter("galaxy_intensity",.65)
+ m.set_shader_parameter("galaxy_intensity",.30)
+ m.set_shader_parameter("galaxy_star_density",.12)
  m.set_shader_parameter("galaxy_palette_preview",traits.get("finish","")=="galaxy")
  m.set_shader_parameter("original_horse",traits.get("finish","normal")=="original")
  m.set_shader_parameter("coat_color",Color(HorseAppearance.COLORS[int(traits.get("coat",10))]))
@@ -33,9 +34,13 @@ static func apply_horse(view:TextureRect,horse:Dictionary,hat:String="original")
   view.texture=HorseAppearance.texture(load("res://art/foal/base.png"),"foal",0,horse.traits)
  else:
   apply(view,horse.traits,hat)
+  if horse.traits.get("finish","")=="galaxy":
+   view.material.set_shader_parameter("galaxy_star_density",.04+.96*HorseMastery.percent(horse)/100.)
   if HorseMastery.galaxy_master(horse):
    view.material.set_shader_parameter("galaxy_palette_preview",true)
    view.material.set_shader_parameter("mastery_aura",true)
+   view.material.set_shader_parameter("mastery_aura_strength",1.8)
+   view.material.set_shader_parameter("galaxy_star_density",1.)
    view.material.set_shader_parameter("galaxy_intensity",1.)
    view.material.set_shader_parameter("galaxy_dark",Color("030b20"))
    view.material.set_shader_parameter("galaxy_light",Color("477ce7"))

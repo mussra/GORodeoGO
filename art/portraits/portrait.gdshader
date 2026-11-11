@@ -11,6 +11,8 @@ uniform bool galaxy = false;
 uniform float galaxy_intensity: hint_range(0.,1.) = 1.;
 // Mastery-only silhouette halo. Disabled for regular Galaxy and all other horses.
 uniform bool mastery_aura = false;
+uniform float mastery_aura_strength: hint_range(0.,2.) = 1.;
+uniform float galaxy_star_density: hint_range(0.,1.) = 1.;
 uniform vec4 mastery_aura_color: source_color=vec4(.24,.57,1.,1.);
 // Opt-in palette study. Defaults retain the released Galaxy appearance exactly.
 uniform bool galaxy_palette_preview = false;
@@ -88,7 +90,7 @@ float galaxy_stars(vec2 p){
  vec2 grid=p/4.3;vec2 cell=floor(grid);float brightness=0.;
  for(int yy=-1;yy<=1;yy++){for(int xx=-1;xx<=1;xx++){
   vec2 c=cell+vec2(float(xx),float(yy));float h=galaxy_hash(c);
-  if(h>.38)continue;
+  if(h>.38*galaxy_star_density)continue;
   vec2 place=c+vec2(.18+.64*galaxy_hash(c+37.),.18+.64*galaxy_hash(c+93.));
   vec2 d=(grid-place)*4.3;float r=length(d);float radius=mix(.10,.27,galaxy_hash(c+11.));
   float core=1.-smoothstep(radius*.3,radius+.10,r);
@@ -142,12 +144,22 @@ void fragment(){
   else if(pattern>=5)c=mix(c,spot_color.rgb,genetic_pattern(p*.12,pattern));
   else if(pattern==4)c=mix(c,vec3(.96,.93,.85),texture(light_legs_mask,UV).r);
   else if(mark)c=spot_color.rgb;
-  if(galaxy)c=mix(vec3(.08,.08,.16),galaxy_color(p*.12),galaxy_intensity);
+  if(galaxy){
+   vec3 galaxy_rgb=galaxy_color(p*.12);
+   // Turn down chroma and local contrast, never darken the base into saturation.
+   float luma=dot(galaxy_rgb,vec3(.2126,.7152,.0722));
+   vec3 quiet=mix(vec3(.36,.33,.43),vec3(luma),.18);
+   c=mix(quiet,galaxy_rgb,galaxy_intensity);
+  }
   float coat_shade=shade;
   if(pattern==4)coat_shade=mix(shade,min(shade+.12,1.2),texture(light_legs_mask,UV).r);
   col=mix(col,c*coat_shade,m.r);
   vec3 mane=rainbow?soft_rainbow(p.x<540.?(p.y-300.)/340.:(p.y-80.)/275.):mane_color.rgb;
-  if(galaxy)mane=mix(vec3(.08,.08,.16),galaxy_color(p*.12),galaxy_intensity);
+  if(galaxy){
+   vec3 galaxy_rgb=galaxy_color(p*.12);
+   float luma=dot(galaxy_rgb,vec3(.2126,.7152,.0722));
+   mane=mix(mix(vec3(.36,.33,.43),vec3(luma),.18),galaxy_rgb,galaxy_intensity);
+  }
   col=mix(col,mane*shade,m.g);
  }
  if(custom_legs){
@@ -180,9 +192,9 @@ void fragment(){
    vec2 q=UV+dir*px*3.;
    rim+=texture(TEXTURE,q).a/16.;
   }
-  float aura=clamp(halo*.72,0.,.55)*(1.-src.a);
+  float aura=clamp(halo*.72*mastery_aura_strength,0.,.80)*(1.-src.a);
   float horse_here=max(m.r,m.g);
-  col+=mastery_aura_color.rgb*(1.-rim)*horse_here*.20;
+  col+=mastery_aura_color.rgb*(1.-rim)*horse_here*.20*mastery_aura_strength;
   out_alpha=src.a+aura;
   col=(col*src.a+mastery_aura_color.rgb*aura)/max(out_alpha,.0001);
  }

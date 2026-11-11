@@ -36,3 +36,13 @@ Fuente mágica y loco del pueblo: Ant confirmó que se crearán juntos más adel
 - `galaxy_intensity` y `mastery_aura` son parámetros independientes, no alteran progreso ni genética.
 - Gameplay pendiente: compartir parámetros desde HorseMastery y adaptar muestreo a máscaras/UV de cada pose (montado, libre y beber). No aplicar halo sobre cuadros de atlas sin margen porque podría contaminar poses vecinas. Requiere comprobación visual de todas las vistas y coste real en Android antes de cerrar.
 - Preview comparada: `galaxy-aura-comparison83.png`. No APK.
+
+## Revisión final de retrato (13:39-13:41)
+
+La versión anterior con mezcla hacia negro se veía más intensa. Se corrige mezclando hacia lavanda neutro claro a intensidad0,30, bajando saturación/contraste sin apagar las nubes. Un solo color fijo para el normal: lavanda, misma familia que el Galaxy anterior. No hay paletas por afinidad ni variantes elegibles. Azul es el estado maestro del mismo caballo.
+
+Petición posterior: estrellas progresivas por maestría. `galaxy_star_density` es independiente de intensidad y de `mastery_aura_strength`. Densidad=0,04+0,96×maestría/100: pocos puntos a0%,52% del campo a50%,95,2% a95%,100% a100%. Campo determinista: crecen los puntos sin cambiar posiciones. El maestro recibe aura1,8 (antes1,0), además del azul y la intensidad1.
+
+El color se mantiene lavanda hasta completar los20 niveles; solo las estrellas progresan. Se recomienda conservar el salto de color y aura como recompensa del100%. Un cambio gradual de color no está aplicado y requeriría cambiar la regla de color único del normal.
+
+`galaxy-mastery-progress83.png`: misma Ficha real a0/50/95/100%, sin raster nuevo. Gameplay/beber sigue pendiente de adaptación de máscaras/UV y revisión de rendimiento Android. Sin APK, sin merge.
