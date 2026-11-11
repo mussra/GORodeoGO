@@ -15,5 +15,10 @@ static func create(host:Node,h:Dictionary,concrete:bool,compact:bool=false)->Hor
  for skill in ["jump","dodge"]:
   var title:String="Salto" if skill=="jump" else "Esquiva"
   var known:bool=HorseTraining.knows(h,skill)
-  row(view,title+" · dominio" if known else title+" · aprendizaje",HorseTraining.mastery(h,skill) if known else HorseTraining.progress(h,skill),0,100,compact)
+  row(view,title+(" · adquirido" if known else " · aprendizaje"),learned_value(h,skill),0,100,compact)
+  if known:row(view,title+" · dominio",HorseTraining.mastery(h,skill),0,100,compact)
  return view
+
+## Availability is complete learning, not a gift of mastery or recovery bonus.
+static func learned_value(h:Dictionary,skill:String)->float:
+ return 100.0 if HorseTraining.knows(h,skill) else HorseTraining.progress(h,skill)

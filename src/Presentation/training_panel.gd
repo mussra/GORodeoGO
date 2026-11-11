@@ -38,7 +38,7 @@ func build()->void:
   var m:Dictionary=c.find(mentor);var l:Dictionary=c.find(learner);var affinity:float=float(c.affinities.get(HorseTraining.pair_key(mentor,learner),0))
   var stats:=VBoxContainer.new();stats.position=Vector2(35,310);stats.size.x=1140;content.add_child(stats)
   HorseStatBars.row(stats,"Mentor · dominio",HorseTraining.mastery(m,skill),0,100,true)
-  HorseStatBars.row(stats,"Aprendiz · aprendizaje",HorseTraining.progress(l,skill),0,100,true)
+  HorseStatBars.row(stats,"Aprendiz · aprendizaje",HorseStatBars.learned_value(l,skill),0,100,true)
   HorseStatBars.row(stats,"Aprendiz · dominio",HorseTraining.mastery(l,skill),0,100,true)
   HorseStatBars.row(stats,"Afinidad",affinity,0,100,true)
   label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else "El aprendiz desbloquea la técnica al llenar la barra. El mentor conserva la suya.",Vector2(35,420),20)

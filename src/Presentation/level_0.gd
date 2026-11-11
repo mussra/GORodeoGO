@@ -730,7 +730,7 @@ func _update_training_status()->void:
 	var previous=_training_status.get_parent().get_node_or_null("TrainingBars")
 	if previous!=null:previous.free()
 	var bars:=VBoxContainer.new();bars.name="TrainingBars";bars.position=Vector2(90,40);bars.size.x=290;_training_status.get_parent().add_child(bars)
-	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],current[spec[1]],0,100,true)
+	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],HorseStatBars.learned_value(SaveData.horse_collection.find(_training_session.learner),_training_session.skill) if spec[1]=="learning" else current[spec[1]],0,100,true)
 
 func _show_training_result()->void:
 	if _training_session.is_empty():return
@@ -740,7 +740,7 @@ func _show_training_result()->void:
 	summary.text=str(after.name).left(24)+" · "+("Salto" if after.skill=="jump" else "Esquiva")
 	summary.size.y=30
 	var bars:=VBoxContainer.new();bars.name="TrainingResultBars";bars.position=Vector2(25,190);bars.size.x=462;hud.end_panel.add_child(bars)
-	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],after[spec[1]],0,100,true)
+	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],HorseStatBars.learned_value(SaveData.horse_collection.find(_training_session.learner),_training_session.skill) if spec[1]=="learning" else after[spec[1]],0,100,true)
 
 	hud.end_panel.offset_top=-210;hud.end_panel.offset_bottom=210
 	hud.end_label.position.y=12;hud.end_label.size.y=125
