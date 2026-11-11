@@ -70,6 +70,7 @@ func _ready() -> void:
 	drink=HorseDrink.new(self)
 	collision_mask|=HorseJump.FENCE_LAYER
 	lasso = LassoController.new()
+	lasso.visual_hand = effect_hand_local
 	lasso.rider_velocity = func()->Vector2:return velocity
 	lasso.throw_guard = func() -> bool: return _jump_time<=0 and _stun_time_remaining <= 0.0 and is_physics_processing()
 	# Ant 22:55 ("el lazo no vuela en el modo frontera"): the flight rope and the
@@ -185,13 +186,13 @@ func _physics_process(delta: float) -> void:
 ## Same dodge drawing as the corral rider (DodgeVisuals): trail, bullet-time
 ## preview, recharge bar and dust.
 func _draw() -> void:
-	DodgeVisuals.draw_trail(self, dodge.skid_trail, dodge.trail_fade)
+	DodgeVisuals.draw_trail(self, dodge.skid_trail, dodge.trail_fade, Vector2.ZERO)
 	if dodge.drawing:
 		DodgeVisuals.draw_drawing(self, dodge.preview_points(dodge.draw_points))
 	if dodge_available:
 		DodgeVisuals.draw_recharge(self, Vector2(0, -110), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
 	if dodge.remaining > 0.0:
-		DodgeVisuals.draw_dash_dust(self, dodge.direction)
+		DodgeVisuals.draw_dash_dust(self, dodge.direction, Vector2.ZERO)
 	# Charge-aim circle: shared with the corral rider (Ant 21:47, it was missing here).
 	lasso.draw_charge_aim(self)
 
@@ -204,3 +205,11 @@ func cancel_input()->void:
 	if drink!=null:drink.stop()
 	if _jump_time>0:HorseJumpMotion.finish(self,true)
 	lasso.cancel_all_actions();dodge.cancel();velocity=Vector2.ZERO
+
+## Art's classic hand (8,-12) follows the sprite's scale, feet offset and facing.
+## Ground effects remain at the physics/hoof origin, not the old centered canvas.
+func effect_hand_local()->Vector2:
+	if _sprite_swap==null or not _sprite_swap.has_sprite():return Vector2(8,-12)
+	var sprite:AnimatedSprite2D=_sprite_swap._sprite
+	var hand=Vector2(-8 if sprite.flip_h else 8,-12)
+	return to_local(sprite.to_global(hand+sprite.offset))

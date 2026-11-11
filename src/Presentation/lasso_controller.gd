@@ -31,6 +31,13 @@ signal release_requested
 @export var lasso_travel_time: float = .8  # seconds between release and actual capture resolution
 @export var capture_area_visual_radius: float = 58.0
 
+# Optional sprite-aware hand anchor in rider-local coordinates. Does not move landing/capture.
+var visual_hand:Callable=Callable()
+func charge_origin_local()->Vector2:
+	return visual_hand.call() if visual_hand.is_valid() else Vector2.ZERO
+func flight_origin_global()->Vector2:
+	return get_parent().to_global(visual_hand.call() if visual_hand.is_valid() else Vector2(8,-12))
+
 var aim_direction: Vector2 = Vector2.RIGHT
 ## Velocity in game-world units/sec, same clock as rope tween and rider physics.
 var rider_velocity:Callable=func()->Vector2:return Vector2.ZERO
@@ -150,7 +157,7 @@ func _start_charging() -> void:
 
 func _update_charge_visual() -> void:
 	if _charge_visual != null:
-		_charge_visual.points = PackedVector2Array([Vector2.ZERO, inherited_landing(Vector2.ZERO,aim_direction,_charge_distance,rider_velocity.call(),lasso_travel_time)])
+		_charge_visual.points = PackedVector2Array([charge_origin_local(), inherited_landing(Vector2.ZERO,aim_direction,_charge_distance,rider_velocity.call(),lasso_travel_time)])
 
 ## The charge-aim target circle, drawn identically by the corral rider and the
 ## world rider (Ant 21:47: "El círculo de apuntar el lazo no aparece" — the
@@ -256,7 +263,8 @@ func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> voi
 	var rope:=LassoRope.new()
 	_flight_line=rope
 	rope.rider=get_parent()
-	rope.start=throw_origin
+	rope.origin_provider=flight_origin_global
+	rope.start=flight_origin_global() if visual_hand.is_valid() else throw_origin
 	rope.landing=landing_point
 	rope.landing_radius=capture_area_visual_radius
 	rope_parent.call().add_child(rope)

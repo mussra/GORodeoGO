@@ -6,11 +6,11 @@ extends RefCounted
 ## same recharge bar, same dust (Ant's unification rule: same graphics).
 
 ## Skid trail under the rider while it fades.
-static func draw_trail(item: CanvasItem, skid_trail: Array, trail_fade: float) -> void:
+static func draw_trail(item: CanvasItem, skid_trail: Array, trail_fade: float, ground_offset: Vector2 = Vector2(0,27)) -> void:
 	if skid_trail.size() > 1 and trail_fade > 0.0:
 		var local_trail := PackedVector2Array()
 		for point in skid_trail:
-			local_trail.append(item.to_local(point) + Vector2(0, 27))
+			local_trail.append(item.to_local(point) + ground_offset)
 		draw_flash_path(item, local_trail, trail_fade / .7)
 
 ## The freehand trace while bullet-time drawing is armed (points must already
@@ -26,14 +26,14 @@ static func draw_recharge(item: CanvasItem, anchor: Vector2, recharge: float) ->
 	item.draw_line(anchor + Vector2(-22, 0), anchor + Vector2(-22 + 44 * recharge, 0), Color("77dbd5") if recharge < 1 else Color("efb950"), 4.0)
 
 ## Dust kicked up while the dash runs.
-static func draw_dash_dust(item: CanvasItem, direction: Vector2) -> void:
+static func draw_dash_dust(item: CanvasItem, direction: Vector2, ground_offset: Vector2 = Vector2(0,28)) -> void:
 	var back: Vector2 = -direction
 	var side: Vector2 = direction.orthogonal()
 	for i in range(4):
-		var dust: Vector2 = back * (24.0 + i * 13.0) + Vector2(0, 28)
+		var dust: Vector2 = back * (24.0 + i * 13.0) + ground_offset
 		item.draw_circle(dust + side * (8 if i % 2 else -8), 9.0 - i, Color(.85, .69, .42, .55 - i * .1))
 	for side_sign in [-1, 1]:
-		item.draw_line(back * 12 + side * side_sign * 13 + Vector2(0, 28), back * 54 + side * side_sign * 13 + Vector2(0, 28), Color(.35, .24, .13, .6), 3.0, true)
+		item.draw_line(back * 12 + side * side_sign * 13 + ground_offset, back * 54 + side * side_sign * 13 + ground_offset, Color(.35, .24, .13, .6), 3.0, true)
 
 ## Layered light ribbon with moving star glints, never a plain solid line.
 static func draw_flash_path(item: CanvasItem, points: PackedVector2Array, alpha: float) -> void:

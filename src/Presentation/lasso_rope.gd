@@ -1,6 +1,7 @@
 class_name LassoRope
 extends Node2D
 var rider:Node2D
+var origin_provider:Callable=Callable()
 var start:Vector2
 var landing:Vector2
 var progress:float=0.0
@@ -12,7 +13,7 @@ func _draw() -> void:
 	draw_circle(landing,landing_radius,Color(1,.84,.5,.055))
 	draw_arc(landing,landing_radius,0,TAU,48,Color(.95,.79,.5,.48),1.5,true)
 	draw_circle(landing,3,Color(.95,.79,.5,.7))
-	var origin:Vector2=rider.global_position+Vector2(8,-12)
+	var origin:Vector2=origin_provider.call() if origin_provider.is_valid() else rider.global_position+Vector2(8,-12)
 	var tip:Vector2=start.lerp(landing,progress)+Vector2(0,-sin(progress*PI)*45)
 	var edge:Vector2=loop_edge(tip,origin)
 	var points:=PackedVector2Array()
