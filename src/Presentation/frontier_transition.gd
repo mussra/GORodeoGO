@@ -3,7 +3,8 @@ extends CanvasLayer
 ## One curtain across menu -> world. Existing art/cache only; no saved state.
 const NODE_NAME="FrontierTransition"
 var curtain:Control
-var phase:float=0.0
+var parade:LoadingParade
+var entered_usec:int=0
 var revealing:bool=false
 static func obtain(tree:SceneTree,opaque:bool=true)->FrontierTransition:
  var old=tree.root.get_node_or_null(NODE_NAME)
@@ -15,19 +16,17 @@ func _ready():
  layer=200
  curtain=Control.new();curtain.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);curtain.mouse_filter=Control.MOUSE_FILTER_STOP;add_child(curtain)
  curtain.draw.connect(_paint)
-func _process(delta:float):
- phase+=delta;curtain.queue_redraw()
+ parade=LoadingParade.new();curtain.add_child(parade)
+func _process(_delta:float):
+ if is_instance_valid(parade):parade.scale=get_viewport().get_visible_rect().size/Vector2(1280,720)
+ curtain.queue_redraw()
 func _paint():
- var size=get_viewport().get_visible_rect().size
- curtain.draw_rect(Rect2(Vector2.ZERO,size),Color("10252d"))
- var center=size*.5
- # Small warm orbit, no loading words or percent that could lie about progress.
- curtain.draw_arc(center,23,0,TAU,64,Color("25434a"),3,true)
- curtain.draw_arc(center,23,phase*2.6,phase*2.6+1.6,24,Color("dfbe7c"),3,true)
- curtain.draw_circle(center,4.0+sin(phase*2)*.6,Color("dfbe7c"))
+ curtain.draw_rect(Rect2(Vector2.ZERO,get_viewport().get_visible_rect().size),Color("10252d"))
 func enter_world():
+ entered_usec=Time.get_ticks_usec()
  var fade=create_tween();fade.tween_property(curtain,"modulate:a",1.0,.22).set_trans(Tween.TRANS_SINE)
  await fade.finished
+ if not parade.prepared:await parade.preparation_finished
  await _warm_showcase()
  get_tree().change_scene_to_file("res://src/Presentation/frontier_world.tscn")
 func _warm_showcase():
@@ -44,5 +43,8 @@ func _warm_showcase():
 func reveal():
  if revealing:return
  revealing=true
- var fade=create_tween();fade.tween_property(curtain,"modulate:a",0.0,.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+ if not parade.prepared:await parade.preparation_finished
+ parade.finish()
+ if entered_usec>0:print("LOAD_PARADE chunks_ready_ms=",(Time.get_ticks_usec()-entered_usec)/1000.0)
+ var fade=create_tween();fade.tween_property(curtain,"modulate:a",0.0,.5)
  await fade.finished;queue_free()
