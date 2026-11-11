@@ -16,4 +16,4 @@ func _draw():
  var points=PackedVector2Array();var uvs=PackedVector2Array()
  for corner in [Vector2.ZERO,Vector2.RIGHT,Vector2.ONE,Vector2.DOWN]:
   var p=origin+corner*WorldMap.CHUNK_SIZE;points.append(p);uvs.append(uv_at(SaveData.world_seed,p))
- draw_polygon(points,PackedColorArray([Color.WHITE]),uvs,CACHE)
+ draw_polygon(points,PackedColorArray([Color.WHITE]),uvs,WorldTerrainPreview92.GRASS if WorldTerrainPreview92.alternative else CACHE)

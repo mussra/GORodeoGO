@@ -34,7 +34,7 @@ static func ribbon(node:CanvasItem,points:PackedVector2Array,width:float=45,junc
    var na:Vector2=normals[i].lerp(normals[i+1],a);var nb:Vector2=normals[i].lerp(normals[i+1],b)
    var ua=lerpf(uv[i],uv[i+1],a);var ub=lerpf(uv[i],uv[i+1],b)
    var polygon=PackedVector2Array([p+na,q+nb,q-nb,p-na])
-   node.draw_polygon(polygon,PackedColorArray([Color.WHITE]),PackedVector2Array([Vector2(ua,1),Vector2(ub,1),Vector2(ub,0),Vector2(ua,0)]),STRIP)
+   node.draw_polygon(polygon,PackedColorArray([Color.WHITE]),PackedVector2Array([Vector2(ua,1),Vector2(ub,1),Vector2(ub,0),Vector2(ua,0)]),WorldTerrainPreview92.STRIP if WorldTerrainPreview92.alternative else STRIP)
 static func _inside_interval(p:Vector2,q:Vector2,half:Vector2)->Array:
  var lo=0.0;var hi=1.0;var d=q-p
  for axis in 2:
@@ -50,7 +50,7 @@ static func draw_junction(node:CanvasItem,junction:Dictionary):
  for corner in [Vector2(-1,-1),Vector2(1,-1),Vector2(1,1),Vector2(-1,1)]:
   polygon.append(junction.frame*(corner*h))
   uv.append(Vector2.ONE*.5+(corner*.25).rotated(-junction.rotation))
- node.draw_polygon(polygon,PackedColorArray([Color.WHITE]),uv,PIECES[junction.kind])
+ node.draw_polygon(polygon,PackedColorArray([Color.WHITE]),uv,WorldTerrainPreview92.PIECES[junction.kind] if WorldTerrainPreview92.alternative else PIECES[junction.kind])
 static func rounded(points:PackedVector2Array,width:float)->PackedVector2Array:
  var out=PackedVector2Array([points[0]])
  for i in range(1,points.size()-1):
