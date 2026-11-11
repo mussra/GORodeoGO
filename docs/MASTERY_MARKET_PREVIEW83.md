@@ -76,3 +76,7 @@ Ant aclara que busca más Galaxy, no una copia casi plana del original: nebulosa
 ## Marrón más claro (14:15)
 
 Revisión solo de propuesta: base oscura#5a2c10 y luz#e99a4c, neutro cálido más claro. Mantiene intensidad0,72, nebulosa desde0% y mismas estrellas progresivas. Comparativa anterior/nueva a0/50/95%. Sin aura, astros ni letras. No cambia colores activos ni máscaras. `galaxy-brown-lighter-comparison83.png`.
+
+## Segundo aclarado de propuesta (14:18)
+
+Un paso adicional: oscura#78401a/luz#f3b065/neutro(.58,.39,.23). Misma intensidad0,72, nubes y estrellas0/50/95%. Comparativa con el paso c01e07a. Solo preview, sin cambio de paletas activas ni máscaras. `galaxy-brown-lighter2-comparison83.png`.
