@@ -32,5 +32,5 @@ func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
  if movement.length()<1:movement=Vector2.RIGHT
  var speed:float=WorldGoats.CHARGE_SPEED if charge else WorldGoats.FLEE_SPEED
  var target:Vector2=position+movement.normalized()*speed*delta
- if charge or home.distance_to(target)<550:position=target
- else:movement=Vector2.ZERO
+ if not charge:target=WorldEscapeMotion.bounded_step(position,home,point,target-position,550.0)
+ movement=(target-position).normalized();position=target

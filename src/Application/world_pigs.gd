@@ -46,20 +46,19 @@ static func captured(state:Dictionary)->bool:
 const CHASE_MODE:bool=true  # false restores the walk-up trust capture
 const CHASE_TRIGGER_RANGE:float=260.0
 const CHASE_FLEE_SPEED:float=225.0  # trote (~187) can't catch it; galope (260) can
-const CHASE_TIRE_SECONDS:float=7.0  # running this long tires the pig
-const CHASE_ROPED_TIRE_MULT:float=1.5  # roped running tires it faster
-const CHASE_RECOVER_SECONDS:float=5.0  # tired rest before it can run again
-const CHASE_RESTED_FRACTION:float=0.35  # fraction of the run budget restored
-const CHASE_TIRED_FILL:float=0.8  # capture fill/s while roped+tired
+const CHASE_TIRE_SECONDS:float=AnimalFatigue.RUN_SECONDS  # running this long tires the pig
+const CHASE_ROPED_TIRE_MULT:float=AnimalFatigue.ROPED_MULTIPLIER  # roped running tires it faster
+const CHASE_RECOVER_SECONDS:float=AnimalFatigue.RECOVER_SECONDS  # tired rest before it can run again
+const CHASE_RESTED_FRACTION:float=AnimalFatigue.RESTED_FRACTION  # fraction of the run budget restored
+const CHASE_TIRED_FILL:float=1.0  # capture fill/s while roped+tired
 const CHASE_ROPE_MAX_SECONDS:float=20.0  # safety net; chase rules end it first
 const CHASE_REWARD_POINTS:int=40
 const CHASE_ROPE_RANGE:float=240.0
 const MIN_ROPED_RUN_SECONDS:float=3.0
 
-## Every new lasso requires real chase time, even if already exhausted.
+## New rope keeps existing fatigue; exhaustion is the capture window (11-Nov).
 static func begin_rope(state:Dictionary)->Dictionary:
- var out:Dictionary=state.duplicate()
- out.rope_run=0.0;out.progress=0.0;out.tired=false;out.flee=true
+ var out:Dictionary=state.duplicate();out.progress=0.0;out["rope_run"]=0.0
  return out
 
 
@@ -73,34 +72,14 @@ static func chase_tick(state:Dictionary,dist:float,_speed:float,roped:bool,delta
  if roped and dist>CHASE_ROPE_RANGE:
   out.break_rope=true;out.progress=0.0
   return out
- if roped and float(out.get("rope_run",0.0))<MIN_ROPED_RUN_SECONDS:
-  out.rope_run=minf(MIN_ROPED_RUN_SECONDS,float(out.get("rope_run",0.0))+delta)
-  out.tired=false;out.flee=true;out.progress=0.0
-  out.run=minf(CHASE_TIRE_SECONDS,float(out.run)+delta*CHASE_ROPED_TIRE_MULT)
-  return out
- if bool(out.tired):
-  out.flee=false
-  if roped:
-   out.progress=minf(1.0,float(out.progress)+CHASE_TIRED_FILL*delta)
-  else:
-   out.rest=float(out.rest)+delta
-   if float(out.rest)>=CHASE_RECOVER_SECONDS:
-    out.tired=false;out.rest=0.0
-    out.run=CHASE_TIRE_SECONDS*CHASE_RESTED_FRACTION
-  return out
- out.rest=0.0
- var fleeing:bool=roped or dist<CHASE_TRIGGER_RANGE
- out.flee=fleeing
- if fleeing:
-  out.run=minf(CHASE_TIRE_SECONDS,float(out.run)+delta*(CHASE_ROPED_TIRE_MULT if roped else 1.0))
-  if float(out.run)>=CHASE_TIRE_SECONDS:
-   out.tired=true;out.flee=false
- out.still=0.0  # distance, not rider speed, determines rope tension now
+ out=AnimalFatigue.tick(out,roped or dist<CHASE_TRIGGER_RANGE,roped,delta)
+ out["rope_run"]=float(out.get("rope_run",0.0))+(delta if roped and not out.tired else 0.0)
+ out.still=0.0
  return out
 
 ## After a rope break the pig bolts but keeps its fatigue: re-roping a
 ## half-tired pig is worth it.
 static func after_rope_break(state:Dictionary)->Dictionary:
  var out:Dictionary=new_chase_state()
- out.run=float(state.get("run",0.0));out.flee=true
+ out.run=float(state.get("run",0.0));out.tired=bool(state.get("tired",false));out.rest=float(state.get("rest",0.0));out.flee=not out.tired
  return out

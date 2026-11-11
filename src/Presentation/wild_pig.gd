@@ -63,15 +63,16 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 		var chase_time:float=float(state.get("rope_run",0.0))
 		away=away.rotated(sin(chase_time*2.6+home.x*.01)*.7)
 	var target: Vector2 = position + away.normalized() * speed * delta
-	if roped or home.distance_to(target) < WorldPigs.FLEE_LEASH:
-		position = target
-	flip_h = away.x < 0.0
-	movement=away.normalized()
+	if not roped:target=WorldEscapeMotion.bounded_step(position,home,from,target-position,WorldPigs.FLEE_LEASH)
+	movement=(target-position).normalized()
+	position = target
+	flip_h = movement.x < 0.0
 
 func face_towards(point: Vector2) -> void:
 	flip_h = point.x < position.x
 
 func _draw() -> void:
+	AnimalFatigueBar.draw(self,state)
 	# Rope visuals identical to a held corral bull; while trust builds unroped
 	# (walk-up capture) the same trust bar shows progress.
 	if roped and is_instance_valid(rider):

@@ -13,11 +13,12 @@ func test_live_world_capture_gates_dialog_save_sequence_and_flower():
  assert_eq(SaveData.world_quests.farmer_pigs.status,"active");assert_null(world._npc_dialog)
  world._on_lasso_prey_captured(pig);assert_eq(world._lasso_horse,pig);assert_true(pig.roped);world._end_lasso();pig.queue_free()
  for event in ["one","two","three"]:world._quest_event("capture_animal","pig",event)
+ NpcQuests.acknowledge(SaveData.world_quests,"farmer_pigs")
  world._open_npc(NpcQuests.NPCS[0]);world._npc_dialog.accepted.emit("farmer_goats");await wait_process_frames(1)
  assert_eq(SaveData.world_quests.farmer_goats.status,"active")
  var goats=world._prototype_goats.get_children();assert_eq(goats.size(),3)
  for goat in goats:
-  goat.state.progress=1.0;goat.roped=true;goat.position=world.player.position+Vector2(160,0)
+  goat.state.progress=1.0;goat.state.tired=true;goat.roped=true;goat.position=world.player.position+Vector2(160,0)
  world._tick_goats(.01);await wait_process_frames(1)
  assert_eq(SaveData.world_quests.farmer_goats.status,"done");assert_eq(SaveData.world_quests.farmer_goats.count,3)
  world.player.position=Vector2(15*1024,0);world._tick_npcs();assert_false(world._story_flower.visible)

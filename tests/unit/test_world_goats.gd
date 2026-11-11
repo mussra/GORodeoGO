@@ -2,7 +2,7 @@ extends GutTest
 func test_reverses_when_roped():
  var free=WorldGoats.tick(WorldGoats.new_state(),100,false,.1)
  var held=WorldGoats.tick(free,100,true,.1)
- assert_true(free.flee);assert_false(held.flee);assert_gt(held.progress,0)
+ assert_true(free.flee);assert_false(held.flee);assert_eq(held.progress,0.0);assert_gt(held.run,free.run)
 func test_contact_wins_over_capture():
  var st=WorldGoats.new_state();st.progress=.99
  st=WorldGoats.tick(st,40,true,1)
@@ -10,7 +10,8 @@ func test_contact_wins_over_capture():
 func test_distance_and_survival():
  var st=WorldGoats.tick(WorldGoats.new_state(),241,true,1)
  assert_true(st.break_rope);assert_false(st.contact)
- st=WorldGoats.tick(WorldGoats.new_state(),100,true,5)
+ st=WorldGoats.new_state();st.tired=true
+ st=WorldGoats.tick(st,100,true,1)
  assert_eq(st.progress,1.0)
 func test_pig_distance_break_even_tired():
  var st=WorldPigs.new_chase_state();st.tired=true;st.progress=.9

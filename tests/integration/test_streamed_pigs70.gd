@@ -31,7 +31,7 @@ func test_generated_pigs_register_flee_lasso_capture_reward_and_save()->void:
  world.player.set_physics_process(false)
  assert_eq(world._lasso_horse,pig);assert_true(pig.roped);assert_eq(world._lasso_state,"hold")
  world._tick_pigs(.2)
- assert_true(pig.state.flee);assert_false(pig.state.tired)
+ assert_false(pig.state.flee);assert_true(pig.state.tired)
  var points:int=SaveData.equipment_points
  for i in 60:
   if not is_instance_valid(pig) or pig.is_queued_for_deletion():break

@@ -104,7 +104,9 @@ func _physics_process(delta: float) -> void:
 		if (is_instance_valid(herd_guide) and herd_guide!=self) or home.distance_to(target) < WorldTaming.FLEE_LEASH:
 			velocity = _flee
 		else:
-			velocity = Vector2.ZERO
+			var threat:Vector2=player_ref.position if is_instance_valid(player_ref) else position-_flee
+			var step:Vector2=WorldEscapeMotion.bounded_step(position,home,threat,target-position,WorldTaming.FLEE_LEASH)
+			velocity=(step-position)/maxf(delta,.001)
 		_flee = Vector2.ZERO
 	elif wander:
 		_art.speed_scale=1.0

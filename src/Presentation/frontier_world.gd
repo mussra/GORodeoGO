@@ -1244,7 +1244,7 @@ func _setup_goat_prototype()->void:
 	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";add_child(_prototype_goats)
 	for pos in [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)]:
 		var goat=GoatScript.new();goat.setup({"pos":pos});goat.set_meta("origin",pos);_prototype_goats.add_child(goat)
-	var sign:=Label.new();sign.position=Vector2(-300,280);sign.text=tr("WORLD_GOAT_PROTOTYPE");sign.add_theme_font_size_override("font_size",19);add_child(sign)
+	var sign:=Label.new();sign.position=Vector2(-300,280);sign.text="Cabras · persigue con el lazo hasta agotar su energía";sign.add_theme_font_size_override("font_size",19);add_child(sign)
 func _tick_goats(delta:float)->void:
 	if not is_instance_valid(_prototype_goats):return
 	for goat in _prototype_goats.get_children():
@@ -1264,7 +1264,7 @@ func _tick_goats(delta:float)->void:
 			_quest_event("capture_animal","goat","goat:"+str(goat.get_meta("origin",goat.position)))
 			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED"))
 			continue
-		if goat.roped or dist<260:goat.move_from_or_towards(player.position,delta,goat.roped)
+		if not bool(st.get("tired",false)) and (goat.roped or dist<260):goat.move_from_or_towards(player.position,delta,goat.roped)
 		else:goat.movement=Vector2.ZERO
 
 
@@ -1279,14 +1279,18 @@ func _setup_npcs()->void:
 	_flower_button.pressed.connect(_collect_story_flower)
 func _open_npc(data:Dictionary)->void:
 	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>155.0:return
+	_refresh_quest_hud()
 	player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
 	_npc_block=Control.new();_npc_block.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_npc_block.mouse_filter=Control.MOUSE_FILTER_STOP;_hud.add_child(_npc_block)
 	_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests);_hud.add_child(_npc_dialog)
 	_npc_dialog.closed.connect(_close_npc)
+	_npc_dialog.acknowledged.connect(func(id:String):
+		if NpcQuests.acknowledge(SaveData.world_quests,id):SaveData.save_world_state(player.position)
+		_refresh_quest_hud())
 	_npc_dialog.accepted.connect(func(id:String):
 		if NpcQuests.accept(SaveData.world_quests,id):
 			SaveData.save_world_state(player.position);_toast(NpcQuests.QUESTS[id].active);_refresh_missions()
-		_close_npc())
+		_refresh_quest_hud();_close_npc())
 func _close_npc()->void:
 	if is_instance_valid(_npc_dialog):_npc_dialog.queue_free()
 	if is_instance_valid(_npc_block):_npc_block.queue_free()
@@ -1296,16 +1300,14 @@ func _quest_event(kind:String,target:String,event_id:String)->void:
 		var q:Dictionary=NpcQuests.QUESTS[id];var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
 		_toast(q.done if state.status=="done" else q.active+" · %d/%d"%[state.count,q.goal])
 		SaveData.save_world_state(player.position)
-	_refresh_missions()
+	_refresh_missions();_refresh_quest_hud()
+func _refresh_quest_hud()->void:
+	if is_instance_valid(_quest_label):_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)
 func _tick_npcs()->void:
 	_npc_button.visible=player.position.distance_to(NpcQuests.NPCS[0].position)<155.0
-	var lines:PackedStringArray=[]
 	for id in NpcQuests.activate_triggers(SaveData.world_quests,player.position):
 		_toast(NpcQuests.QUESTS[id].text);SaveData.save_world_state(player.position)
-	for id in NpcQuests.QUESTS:
-		var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
-		if state.status=="active":lines.append(NpcQuests.QUESTS[id].active+" · %d/%d"%[state.count,NpcQuests.QUESTS[id].goal])
-	_quest_label.text=" · ".join(lines) if not lines.is_empty() else "Encargos: habla con el granjero del rancho"
+	_refresh_quest_hud()
 	var flower:Dictionary=NpcQuests.state(SaveData.world_quests,"east_flower")
 	_story_flower.visible=flower.status=="active" and flower.has("spawn")
 	if flower.has("spawn"):_story_flower.position=flower.spawn

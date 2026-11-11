@@ -31,6 +31,8 @@ static func can_capture(states:Dictionary,target:String)->bool:
  return false
 static func next_for(states:Dictionary,npc:Dictionary)->String:
  for id in npc.quests:
+  if state(states,id).status=="done" and not bool(state(states,id).get("thanked",false)):return id
+ for id in npc.quests:
   if state(states,id).status!="done" and available(states,id):return id
  return str(npc.quests[-1])
 static func clean(raw:Variant)->Dictionary:
@@ -47,6 +49,7 @@ static func clean(raw:Variant)->Dictionary:
    if event is String and not events.has(event):events.append(event)
   var n:int=mini(int(QUESTS[id].goal),mini(count_value,events.size()))
   out[id]={"status":"done" if n==int(QUESTS[id].goal) else "active","count":n,"events":events}
+  if s.has("thanked"):out[id]["thanked"]=bool(s.get("thanked",false))
   if s.get("spawn") is Vector2 and s.spawn.is_finite():out[id]["spawn"]=s.spawn
  return out
 
@@ -69,3 +72,15 @@ static func activate_triggers(states:Dictionary,position:Vector2)->Array[String]
   if trigger_matches(q.trigger,position) and accept(states,id):
    states[id]["spawn"]=position+Vector2(95,0);activated.append(id)
  return activated
+
+static func acknowledge(states:Dictionary,id:String)->bool:
+ if state(states,id).status!="done" or bool(state(states,id).get("thanked",false)):return false
+ states[id]["thanked"]=true;return true
+static func hud_text(states:Dictionary)->String:
+ var lines:PackedStringArray=[]
+ for id in QUESTS:
+  var s:Dictionary=state(states,id);var q:Dictionary=QUESTS[id]
+  if s.status=="active":lines.append(q.active+" · %d/%d"%[s.count,q.goal])
+  elif s.status=="done" and q.npc=="farmer" and not bool(s.get("thanked",false)):
+   lines.append("Completado: "+q.active+" · %d/%d · habla con el granjero"%[q.goal,q.goal])
+ return " · ".join(lines) if not lines.is_empty() else "Encargos: habla con el granjero del rancho"
