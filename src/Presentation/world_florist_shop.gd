@@ -8,7 +8,7 @@ const BASE=Vector2(650,400)
 const HEIGHT=200.0
 const WIDTH=300.0
 const DOOR=Vector2(680,398)
-const FLORIST_FEET=Vector2(740,430)
+const FLORIST_FEET=Vector2(780,430)
 const RESERVED=Rect2(475,180,350,280)
 const BODY=Rect2(540,285,235,85)
 static func keep_decor(d:Dictionary,seed:int)->bool:

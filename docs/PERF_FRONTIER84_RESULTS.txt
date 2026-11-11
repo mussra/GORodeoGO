@@ -1,0 +1,12 @@
+PERF84 minimap_regeneration {"label":"9 cells","max_ms":0.208,"n":25,"p50_ms":0.151,"p95_ms":0.181} decor_per_redraw=91
+PERF84 minimap_regeneration {"label":"100 cells","max_ms":1.924,"n":25,"p50_ms":1.72,"p95_ms":1.754} decor_per_redraw=1017
+PERF84 minimap_regeneration {"label":"400 cells","max_ms":7.151,"n":25,"p50_ms":6.709,"p95_ms":6.858} decor_per_redraw=3990
+PERF84 rendered {"label":"9 cells","max_ms":46.372,"n":60,"p50_ms":28.371,"p95_ms":41.352} process_ms=29.973 draw_calls=279.0 nodes=1104.0 terrain_rebuilds=<null> texture_mib=85.6594696044922
+PERF84 rendered {"label":"100 cells","max_ms":66.862,"n":60,"p50_ms":47.764,"p95_ms":60.51} process_ms=41.053 draw_calls=1416.0 nodes=1104.0 terrain_rebuilds=<null> texture_mib=85.6594696044922
+PERF84 rendered {"label":"400 cells","max_ms":132.72,"n":60,"p50_ms":106.859,"p95_ms":125.685} process_ms=59.511 draw_calls=4893.0 nodes=1104.0 terrain_rebuilds=<null> texture_mib=85.6594696044922
+PERF84 minimap_regeneration {"label":"9 cells","max_ms":0.214,"n":25,"p50_ms":0.152,"p95_ms":0.185} decor_per_redraw=91
+PERF84 minimap_regeneration {"label":"100 cells","max_ms":1.947,"n":25,"p50_ms":1.722,"p95_ms":1.765} decor_per_redraw=1017
+PERF84 minimap_regeneration {"label":"400 cells","max_ms":6.977,"n":25,"p50_ms":6.777,"p95_ms":6.958} decor_per_redraw=3990
+PERF84 rendered {"label":"9 cells","max_ms":47.784,"n":60,"p50_ms":28.903,"p95_ms":43.284} process_ms=34.331 draw_calls=279.0 nodes=1105.0 terrain_rebuilds=5 texture_mib=85.6594696044922
+PERF84 rendered {"label":"100 cells","max_ms":48.171,"n":60,"p50_ms":36.264,"p95_ms":44.41} process_ms=38.292 draw_calls=1416.0 nodes=1105.0 terrain_rebuilds=6 texture_mib=85.6594696044922
+PERF84 rendered {"label":"400 cells","max_ms":73.046,"n":60,"p50_ms":55.743,"p95_ms":71.36} process_ms=63.174 draw_calls=4893.0 nodes=1105.0 terrain_rebuilds=7 texture_mib=85.6594696044922

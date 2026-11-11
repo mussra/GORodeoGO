@@ -30,7 +30,7 @@ Colocación de prueba aplicada: cerca del rancho, en un desvío corto que puede 
 - La florista espera junto a la entrada, no en medio del paso.
 - Las flores de la tienda son decoración. Las flores de un encargo se identifican por separado para no recoger sin querer el escaparate.
 
-La tienda está en (650, 400), con la puerta en (680, 398) y la florista junto a ella en (740, 430). Un árbol de la zona de prueba se recoloca a (350, 600) para que su copa no tape el nuevo tramo. El sendero comparte `WorldPaths` y `RoadTiles`, conecta desde el ramal por y=530 y llega a la puerta. El cuerpo del edificio es sólido; no hay interior visitable. Se aparta decoración generada que invada la tienda o el paso, sin borrar datos del mapa ni colocaciones editadas por el jugador.
+La tienda está en (650, 400), con la puerta en (680, 398) y la florista junto a ella en (780, 430). Un árbol de la zona de prueba se recoloca a (350, 600) para que su copa no tape el nuevo tramo. El sendero comparte `WorldPaths` y `RoadTiles`, conecta desde el ramal por y=530 y llega a la puerta. El cuerpo del edificio es sólido; no hay interior visitable. Se aparta decoración generada que invada la tienda o el paso, sin borrar datos del mapa ni colocaciones editadas por el jugador.
 
 ## Diálogos propuestos
 

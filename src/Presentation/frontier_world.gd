@@ -1050,6 +1050,39 @@ class DiscoveryMap extends Control:
 	var _pulse: float = 0.0
 	var _close_btn: Button = null
 	var _zoom_btns: Array = []
+	# Retain terrain draw commands. Only the rider marker animates each frame.
+	# Hash values, not array identity: edits can be appended or changed in place.
+	var _terrain: Control
+	var _terrain_signature: int = 0
+	var _terrain_valid: bool = false
+	var _map_geometry: Dictionary = {}
+	var terrain_rebuilds: int = 0
+
+	func _ensure_terrain() -> void:
+		if _terrain == null:
+			_terrain = Control.new()
+			_terrain.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_terrain.show_behind_parent = true
+			_terrain.draw.connect(_draw_terrain)
+			add_child(_terrain)
+		var signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, size, expanded, zoom, pan])
+		if _terrain_valid and signature == _terrain_signature:return
+		_terrain_signature = signature
+		_terrain_valid = true
+		var data = _cells()
+		var area = Rect2(Vector2(12, 12), size - Vector2(24, 24))
+		var cols: int = data.maxs.x - data.mins.x + 1
+		var rows: int = data.maxs.y - data.mins.y + 1
+		var cell: float = minf(72.0, minf((area.size.x - 16.0) / cols, (area.size.y - 16.0) / rows)) * (zoom if expanded else 1.0)
+		var content = Vector2(cols, rows) * cell
+		var limit = ((content - area.size) / 2.0) + Vector2(48, 48)
+		limit.x = maxf(limit.x, 0.0);limit.y = maxf(limit.y, 0.0)
+		pan = pan.clamp(-limit, limit)
+		_map_geometry = {"data":data,"area":area,"cell":cell,"origin":area.position + (area.size - content) / 2.0 + (pan if expanded else Vector2.ZERO)}
+		# Store the normalized pan so clamping does not trigger a second rebuild.
+		_terrain_signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, size, expanded, zoom, pan])
+		terrain_rebuilds += 1
+		_terrain.queue_redraw()
 
 	func _layout() -> void:
 		var viewport: Vector2 = get_viewport_rect().size
@@ -1065,6 +1098,7 @@ class DiscoveryMap extends Control:
 				_close_btn.visible = expanded
 			for b in _zoom_btns:
 				b.visible = expanded
+			_ensure_terrain()
 			queue_redraw()
 
 	func _ready() -> void:
@@ -1148,34 +1182,22 @@ class DiscoveryMap extends Control:
 	func _to_map(pos: Vector2, mins: Vector2i, cell: float, origin: Vector2) -> Vector2:
 		return origin + (pos / WorldMap.CHUNK_SIZE - Vector2(mins)) * cell
 
-	func _draw() -> void:
-		# same shell as the arena minimap: dark framed box, content inside
-		draw_style_box(MapAppearance.frame(), Rect2(Vector2.ZERO, size))
-		var area: Rect2 = Rect2(Vector2(12, 12), size - Vector2(24, 24))
-		if area.size.x <= 0.0 or area.size.y <= 0.0:
-			return
-		draw_rect(area, MapAppearance.floor_color("10252d"), true)
-		var data: Dictionary = _cells()
-		if (data.cells as Array).is_empty():
-			return
+	func _draw_terrain() -> void:
+		_terrain.draw_style_box(MapAppearance.frame(), Rect2(Vector2.ZERO, size))
+		var area: Rect2 = _map_geometry.area
+		if area.size.x <= 0.0 or area.size.y <= 0.0:return
+		_terrain.draw_rect(area, MapAppearance.floor_color("10252d"), true)
+		var data: Dictionary = _map_geometry.data
+		if (data.cells as Array).is_empty():return
 		var mins: Vector2i = data.mins
-		var maxs: Vector2i = data.maxs
-		var cols: int = maxs.x - mins.x + 1
-		var rows: int = maxs.y - mins.y + 1
-		var cell: float = minf(72.0, minf((area.size.x - 16.0) / cols, (area.size.y - 16.0) / rows)) * (zoom if expanded else 1.0)
-		# Ant 22:54: clamp the pan so the zoomed map always keeps content in view.
-		var content: Vector2 = Vector2(cols, rows) * cell
-		var limit: Vector2 = ((content - area.size) / 2.0) + Vector2(48, 48)
-		limit.x = maxf(limit.x, 0.0)
-		limit.y = maxf(limit.y, 0.0)
-		pan = pan.clamp(-limit, limit)
-		var origin: Vector2 = area.position + (area.size - content) / 2.0 + (pan if expanded else Vector2.ZERO)
+		var cell: float = _map_geometry.cell
+		var origin: Vector2 = _map_geometry.origin
 		var font: Font = get_theme_default_font()
 		for c in data.cells:
 			var r: Rect2 = _chunk_rect(c, mins, cell, origin)
 			# cartoon ground tile with a soft rim
-			draw_rect(r.grow(1.0), Color.TRANSPARENT, true)
-			draw_rect(r, MapAppearance.terrain_over_base("3f7a45"), true)
+			_terrain.draw_rect(r.grow(1.0), Color.TRANSPARENT, true)
+			_terrain.draw_rect(r, MapAppearance.terrain_over_base("3f7a45"), true)
 			var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, c.x, c.y), SaveData.world_edits, c.x, c.y)
 			_draw_trails(c, mins, cell, origin, r)
 			_draw_decor(chunk, mins, cell, origin, r)
@@ -1186,8 +1208,14 @@ class DiscoveryMap extends Control:
 				var pid: String = WorldEdits.edited_pen_id(pen.get("pos", Vector2.ZERO)) if pen.get("edited", false) else WorldMap.pig_id(c.x, c.y)
 				var pc: Vector2 = _to_map(pen.get("pos", Vector2.ZERO), mins, cell, origin)
 				var col: Color = Color("f2a7b8") if not SaveData.world_pigs.has(pid) else Color("f2a7b866")
-				draw_circle(pc, maxf(3.0, cell * 0.07), col)
+				_terrain.draw_circle(pc, maxf(3.0, cell * 0.07), col)
 			_mission_mark(c, r, font, cell)
+	func _draw() -> void:
+		_ensure_terrain()
+		if (_map_geometry.data.cells as Array).is_empty():return
+		var mins: Vector2i = _map_geometry.data.mins
+		var cell: float = _map_geometry.cell
+		var origin: Vector2 = _map_geometry.origin
 		# player marker (Ant 7-nov-2026: "ver claramente donde esta mi vaquero"):
 		# pulsing ring, high-contrast dot and facing arrow
 		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
@@ -1216,17 +1244,17 @@ class DiscoveryMap extends Control:
 			var p1 := Vector2(wx, WorldMap.trail_y_at(seed, wx))
 			var m1: Vector2 = _to_map(p1, mins, cell, origin)
 			if clip.has_point(m1):
-				draw_circle(m1, dot, col)
+				_terrain.draw_circle(m1, dot, col)
 			var wy: float = worigin.y + i * WorldMap.CHUNK_SIZE / 8.0
 			var p2 := Vector2(WorldMap.branch_x_at(seed, wy), wy)
 			var m2: Vector2 = _to_map(p2, mins, cell, origin)
 			if clip.has_point(m2):
-				draw_circle(m2, dot, col)
+				_terrain.draw_circle(m2, dot, col)
 
 		if c==Vector2i.ZERO:
 			for lane in WorldPaths.access_lanes(seed):
 				for j in lane.size()-1:
-					draw_line(_to_map(lane[j],mins,cell,origin),_to_map(lane[j+1],mins,cell,origin),col,maxf(1.0,cell*.03),true)
+					_terrain.draw_line(_to_map(lane[j],mins,cell,origin),_to_map(lane[j+1],mins,cell,origin),col,maxf(1.0,cell*.03),true)
 
 	func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		var dot: float = maxf(1.6, cell * 0.035)
@@ -1236,38 +1264,38 @@ class DiscoveryMap extends Control:
 				continue
 			match d.get("kind", ""):
 				"tree", "fruit_tree":
-					draw_circle(p, dot * 1.4, Color("2f5d33"))
+					_terrain.draw_circle(p, dot * 1.4, Color("2f5d33"))
 				"pine":
-					draw_colored_polygon(PackedVector2Array([p + Vector2(-dot * 1.4, dot), p + Vector2(0, -dot * 1.6), p + Vector2(dot * 1.4, dot)]), Color("2f5d33"))
+					_terrain.draw_colored_polygon(PackedVector2Array([p + Vector2(-dot * 1.4, dot), p + Vector2(0, -dot * 1.6), p + Vector2(dot * 1.4, dot)]), Color("2f5d33"))
 				"rock":
-					draw_circle(p, dot, Color("9fabb6"))
+					_terrain.draw_circle(p, dot, Color("9fabb6"))
 				"bush":
-					draw_circle(p, dot, Color("63a06b"))
+					_terrain.draw_circle(p, dot, Color("63a06b"))
 				"cactus":
-					draw_rect(Rect2(p - Vector2(dot * 0.5, dot), Vector2(dot, dot * 2.0)), Color("3e7d46"))
+					_terrain.draw_rect(Rect2(p - Vector2(dot * 0.5, dot), Vector2(dot, dot * 2.0)), Color("3e7d46"))
 				"flower":
-					draw_circle(p, dot, Color("e86a8a"))
+					_terrain.draw_circle(p, dot, Color("e86a8a"))
 
 	func _draw_ranch(r: Rect2) -> void:
 		# little house: brown body + red roof, cartoon icon for home
 		var center: Vector2 = r.position + Vector2(r.size.x * 0.16, r.size.y * 0.2)
 		var s: float = maxf(4.0, r.size.x * 0.09)
-		draw_rect(Rect2(center - Vector2(s, s * 0.4), Vector2(s * 2.0, s * 1.2)), Color("8a5a33"))
-		draw_colored_polygon(PackedVector2Array([center + Vector2(-s * 1.2, -s * 0.4), center + Vector2(0, -s * 1.3), center + Vector2(s * 1.2, -s * 0.4)]), Color("b4452f"))
+		_terrain.draw_rect(Rect2(center - Vector2(s, s * 0.4), Vector2(s * 2.0, s * 1.2)), Color("8a5a33"))
+		_terrain.draw_colored_polygon(PackedVector2Array([center + Vector2(-s * 1.2, -s * 0.4), center + Vector2(0, -s * 1.3), center + Vector2(s * 1.2, -s * 0.4)]), Color("b4452f"))
 
 	func _mission_mark(c: Vector2i, r: Rect2, font: Font, cell: float) -> void:
 		var mission_id: String = WorldMap.herd_mission_id(c.x, c.y)
 		var state: String = SaveData.world_missions.get(mission_id, "")
 		var pos: Vector2 = r.position + Vector2(r.size.x - cell * 0.34, r.size.y - cell * 0.1)
 		if SaveData.world_tamed.has(mission_id) or state == "done":
-			draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("b3f6df"))
-			draw_string(font, pos - Vector2(cell * 0.22, cell * 0.14), "✓", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+			_terrain.draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("b3f6df"))
+			_terrain.draw_string(font, pos - Vector2(cell * 0.22, cell * 0.14), "✓", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
 		elif state == "encargo":
-			draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("f2d987"))
-			draw_string(font, pos - Vector2(cell * 0.17, cell * 0.14), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+			_terrain.draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("f2d987"))
+			_terrain.draw_string(font, pos - Vector2(cell * 0.17, cell * 0.14), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
 		elif state == "offered":
-			draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("ffffff"))
-			draw_string(font, pos - Vector2(cell * 0.2, cell * 0.14), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+			_terrain.draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("ffffff"))
+			_terrain.draw_string(font, pos - Vector2(cell * 0.2, cell * 0.14), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
 
 func _exit_tree()->void:
 	if is_instance_valid(_navigation):get_tree().paused=_navigation_was_paused
