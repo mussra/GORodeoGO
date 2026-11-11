@@ -11,4 +11,7 @@ func run():
  camera.position=Vector2(400,310);camera.zoom=Vector2(1.15,1.15)
  await get_tree().create_timer(.5).timeout;await RenderingServer.frame_post_draw
  get_viewport().get_texture().get_image().save_png("/downloads/florista-camino-preview83.png")
+ camera.position=Vector2(-20,-40);camera.zoom=Vector2(1.5,1.5)
+ await get_tree().create_timer(.5).timeout;await RenderingServer.frame_post_draw
+ get_viewport().get_texture().get_image().save_png("/downloads/road-ranch-junction84.png")
  get_tree().quit()

@@ -20,7 +20,14 @@ func _draw() -> void:
 	_stamp_axis(origin, false, seed)
 	# Local access lanes are drawn once per owning chunk, never random branches.
 	if c==Vector2i.ZERO:
-		for lane in WorldPaths.access_lanes(seed):RoadTiles.stamp_polyline(self,lane,40.0,28.0)
+		var junctions={}
+		for lane in WorldPaths.access_lanes(seed):
+			RoadTiles.stamp_access(self,lane,40.0,28.0)
+			var branch=(lane[1]-lane[0]).normalized()
+			if not junctions.has(lane[0]):
+				RoadTiles.junction(self,"t",lane[0],Vector2.DOWN.angle_to(branch),40.0*85.0/117.0)
+				junctions[lane[0]]=true
+		RoadTiles.junction(self,"cross",Vector2.ZERO,0.0,LENGTH*85.0/117.0)
 
 func _stamp_axis(origin: Vector2, main: bool, seed: int) -> void:
 	var n: int = int(WorldMap.CHUNK_SIZE / SAMPLE) + 5
