@@ -22,13 +22,14 @@ Con pocas zonas no hay mejora demostrada fuera del ruido. Con 100/400 zonas esta
 
 ## Verificación
 - 491 pruebas unitarias, 58.119 aserciones.
-- Caché del minimapa: 13 aserciones, incluida invalidación de cambios in situ y estabilidad de su pulso.
+- Caché del minimapa: 14 aserciones, incluida invalidación de cambios in situ y estabilidad de su pulso.
 - Floristería: 158 aserciones sobre el mundo real y acceso despejado.
 - Inspección visual del minimapa pequeño y ampliado y de la florista desplazada. Comparación del minimapa pequeño antes/después: diferencias limitadas al marcador animado, no al terreno.
 - Paquete Android, versión y firma comprobados tras exportar.
 
 ## Pendiente
 - Sin prueba en un dispositivo o emulador Android. No están medidas la GPU, térmicas, memoria, controles ni fluidez en el móvil de Ant.
+- En la captura sintética ampliada falta visualizar el botón +, también en la versión anterior sin optimización; no se atribuye como mejora ni regresión de esta caché. Hay que comprobarlo en uso normal.
 - No se ha completado el barrido de integración general ni el nuevo perfil de cruces de zona. La carga inicial y el streaming pueden tener otros costes.
 - Curvas, cruces, T y finales del camino todavía no activados: la APK no espera ese cambio.
 - Florista sin diálogo o misiones nuevas. Historia/río sin cambios de implementación.

@@ -1065,6 +1065,7 @@ class DiscoveryMap extends Control:
 			_terrain.show_behind_parent = true
 			_terrain.draw.connect(_draw_terrain)
 			add_child(_terrain)
+			move_child(_terrain, 0) # Terrain must stay below X and both zoom buttons.
 		var signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, size, expanded, zoom, pan])
 		if _terrain_valid and signature == _terrain_signature:return
 		_terrain_signature = signature

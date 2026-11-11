@@ -6,6 +6,7 @@ func test_map_retains_terrain_and_invalidates_all_persisted_inputs():
  # No input path is used; only the cache and drawing data are under test.
  map.size=Vector2(180,112)
  map._ensure_terrain();assert_eq(map.terrain_rebuilds,1)
+ assert_eq(map._terrain.get_index(),0,"cached terrain stays behind controls")
  for i in 120:map._pulse+=.016;map._ensure_terrain()
  assert_eq(map.terrain_rebuilds,1,"rider animation does not rebuild terrain")
  SaveData.world_discovered.append("1,0");map._ensure_terrain();assert_eq(map.terrain_rebuilds,2)

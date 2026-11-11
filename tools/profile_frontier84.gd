@@ -32,6 +32,9 @@ func run():
   print("PERF84 rendered ",JSON.stringify(stats(str(side*side)+" cells",samples))," process_ms=",Performance.get_monitor(Performance.TIME_PROCESS)*1000," draw_calls=",Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)," nodes=",Performance.get_monitor(Performance.OBJECT_NODE_COUNT)," terrain_rebuilds=",map.get("terrain_rebuilds")," texture_mib=",Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED)/1048576.0)
   if side==10:get_viewport().get_texture().get_image().save_png("/downloads/frontier84-minimap-"+OS.get_environment("PERF_LABEL")+".png")
  map.expanded=true;map.zoom=1.4;map.pan=Vector2(40,20);map._process(0);map._pulse=0;map.queue_redraw()
- await get_tree().process_frame;await RenderingServer.frame_post_draw
+ await get_tree().create_timer(.5).timeout;await RenderingServer.frame_post_draw
+ for b in map._zoom_btns:b.queue_redraw()
+ await get_tree().create_timer(.2).timeout;await RenderingServer.frame_post_draw
+ for b in map._zoom_btns:print("CONTROL84 ",b.text," rect=",b.get_global_rect()," visible=",b.visible)
  get_viewport().get_texture().get_image().save_png("/downloads/frontier84-expanded-"+OS.get_environment("PERF_LABEL")+".png")
  get_tree().quit()
