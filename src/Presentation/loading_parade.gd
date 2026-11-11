@@ -56,6 +56,7 @@ func _draw():
   draw_line(Vector2(x,512+i%3*23),Vector2(x+13,512+i%3*23),Color("294146"),2)
 func _process(delta:float):
  if not prepared:return
+ rider.visible=true
  age+=delta
  var t=fposmod(age,cycle)
  rider.position=Vector2(drift_x(age if ready_age<0 else ready_age),345)

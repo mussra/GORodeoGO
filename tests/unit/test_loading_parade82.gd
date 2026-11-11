@@ -20,3 +20,11 @@ func test_cosmetics_use_only_side_and_no_saved_state():
  assert_false(source.contains('"down"'))
  assert_true(source.contains("RandomNumberGenerator.new()"))
  assert_eq(LoadingParade.FADE,.5)
+func test_rider_visible_when_prepared_and_finish_keeps_inside():
+ var parade=LoadingParade.new()
+ parade.rider=AnimatedSprite2D.new();parade.rider.visible=false;parade.add_child(parade.rider)
+ parade.prepared=true;parade._process(.1)
+ assert_true(parade.rider.visible)
+ parade.age=18;parade.finish();parade._process(.5)
+ assert_lt(parade.rider.position.x,1000.0)
+ parade.free()

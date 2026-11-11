@@ -10,7 +10,7 @@ Escena compartida LoadingParade usada por preview y transición real, no copias.
 Incluye trabajo de caminos/accesos a puertas y recintos apartados de caminos ya preparado en la rama. Ambiente/floristería y notas/fotos siguen como prototipos aislados, no funciones de juego. No exportación automática de fotos, ni nuevo puente Android de galería.
 
 ## Pruebas
-469/469unitarias,56344aserciones, perfil limpio. Nueva cobertura de curva monótona/desaceleración/límites y aislamiento de estado cosmético.
+470/470unitarias,56346aserciones, perfil limpio. Nueva cobertura de curva monótona/desaceleración/límites y aislamiento de estado cosmético.
 Integración dirigida de encargos del granjero1/1,18aserciones.
 Ruta REAL desde menú:9chunks al terminar y transición eliminada después del fundido. Inspección de vídeo real, captura de transición y mundo final.
 
@@ -22,4 +22,6 @@ No Android real. Pendientes tacto, rendimiento y espera reales en móvil.
 
 ## APK
 com.example.rancho.review, arm64,2.7.82código341,SDKmínimo24/objetivo36. Firma idéntica a anterior:46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb. Firma v2/v3 verificada. Paquete de pruebas, no publicación en tienda.
-Tamaño53104740bytes. SHA2564045693c1344ed158488da4fd9f7f95a3a4b5c693a47e26b9d7f2be7c993cd0d.
+Tamaño53104740bytes. SHA256ef6c61ae56d0ecf53ef5b1662574366d9f1132cfa0195e9c2be54913400cb016.
+
+Revisión final detectó antes de publicar que un cambio de ocultación inicial dejaba oculto al jinete. Corregido, añadido test de visibilidad al estar preparado y repetida batería unitaria completa, grabación real, inspección de píxeles y compilación. El APK entregado incluye la corrección.
