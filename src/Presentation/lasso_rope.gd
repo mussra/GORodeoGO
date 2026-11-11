@@ -20,15 +20,8 @@ func _draw() -> void:
 	for i in range(17):
 		var t:float=float(i)/16
 		points.append(origin.lerp(edge,t)+Vector2(0,sin(t*PI)*14*progress))
-	draw_polyline(points,Color("62452d"),5,true)
-	draw_polyline(points,Color("e9c98e"),3,true)
-	for i in range(1,points.size(),2):draw_line(points[i]-Vector2(1,1),points[i]+Vector2(1,1),Color("ad814d"),1,true)
-	var loop:=PackedVector2Array()
-	for i in range(33):
-		var angle:float=i*TAU/32
-		loop.append(tip+Vector2(cos(angle)*22,sin(angle)*11))
-	draw_polyline(loop,Color("62452d"),5,true)
-	draw_polyline(loop,Color("f4d69d"),2.8,true)
+	LassoRopeStyle.draw_cord(self,points)
+	LassoRopeStyle.draw_loop(self,tip)
 
 static func loop_edge(center:Vector2,origin:Vector2)->Vector2:
 	var direction:Vector2=origin-center

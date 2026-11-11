@@ -1333,6 +1333,7 @@ func _setup_npcs()->void:
 	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
 	_npc_button.pressed.connect(func():_open_npc(NpcQuests.NPCS[0]))
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(16,56);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
+	QuestButtonStyle.apply(_quest_toggle)
 	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(16,102);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
 	_quest_label=Label.new();_quest_label.custom_minimum_size=Vector2(590,0);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);_quest_panel.add_child(_quest_label)
 	_quest_toggle.pressed.connect(func():

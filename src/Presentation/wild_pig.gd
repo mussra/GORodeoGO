@@ -77,7 +77,7 @@ func _draw() -> void:
 	# Rope visuals identical to a held corral bull; while trust builds unroped
 	# (walk-up capture) the same trust bar shows progress.
 	if roped and is_instance_valid(rider):
-		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), false)
+		HeldVisuals.draw_hold(self, rider, float(state.get("progress", 0.0)), false)
 	else:
 		var progress: float = float(state.get("progress", 0.0))
 		if progress > 0.01:

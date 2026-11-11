@@ -127,7 +127,7 @@ func _physics_process(delta: float) -> void:
 ## (walk-up taming) the same trust bar shows progress.
 func _draw() -> void:
 	if roped and is_instance_valid(rider):
-		HeldVisuals.draw_hold(self, rider.global_position, float(state.get("progress", 0.0)), false, ROPE_ANCHOR_Y)
+		HeldVisuals.draw_hold(self, rider, float(state.get("progress", 0.0)), false, ROPE_ANCHOR_Y)
 	else:
 		var progress: float = float(state.get("progress", 0.0))
 		if progress > 0.01:

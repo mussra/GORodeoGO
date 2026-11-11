@@ -13,9 +13,15 @@ const BAR_FILL: Color = Color("84d5a5")
 
 ## Tow line to the player, the hold ring under the animal and the trust bar
 ## (progress 0..1), or the check mark once the animal is controlled/tamed.
-static func draw_hold(item: CanvasItem, player_global: Vector2, progress: float, controlled: bool, anchor_y: float = 0.0) -> void:
+static func draw_hold(item: CanvasItem, rider: Node2D, progress: float, controlled: bool, anchor_y: float = 0.0) -> void:
 	var color: Color = CONTROLLED_COLOR if controlled else HOLD_COLOR
-	item.draw_line(Vector2(0, 12 + anchor_y), item.to_local(player_global) + Vector2(0, 12), ROPE_COLOR, 3.0, true)
+	var center=Vector2(0,12+anchor_y)
+	var hand=item.to_local(LassoRopeStyle.rider_hand(rider))
+	var edge=LassoRope.loop_edge(center,hand)
+	var points=PackedVector2Array()
+	for i in 25:points.append(hand.lerp(edge,i/24.0))
+	LassoRopeStyle.draw_cord(item,points)
+	LassoRopeStyle.draw_loop(item,center)
 	item.draw_arc(Vector2(0, 25 + anchor_y), 29, 0, TAU, 40, color, 2.5, true)
 	if not controlled:
 		draw_progress(item, progress, anchor_y)

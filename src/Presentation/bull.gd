@@ -458,7 +458,7 @@ func _draw() -> void:
 	if controller.is_held() and is_instance_valid(_player):
 		# Same rope visuals the open world draws on its captures (HeldVisuals).
 		var trust: float = 1.0 - controller.current_nerves() / NervesValue.MAX_VALUE
-		HeldVisuals.draw_hold(self, _player.global_position, trust, controller.current_state() == BullState.State.CONTROLLED)
+		HeldVisuals.draw_hold(self, _player, trust, controller.current_state() == BullState.State.CONTROLLED)
 	elif _distraction.active():
 		var label: String = tr("Bebiendo...") if _distraction.kind == "water" else tr("Comiendo...")
 		draw_style_box(RanchTheme.box(Color("244b40"), Color("9dd5af"), 6), Rect2(-50, -73, 100, 25))
