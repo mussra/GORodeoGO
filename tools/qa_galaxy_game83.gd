@@ -8,7 +8,7 @@ func run():
  var bg=ColorRect.new();bg.color=Color("10252d");bg.size=Vector2(1440,1040);canvas.add_child(bg)
  text("Galaxy maestro · gameplay / beber · estudio de poses",Vector2(0,12),1440)
  var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy"
- for n in range(1,21):HorseMastery.record(c,h.id,n)
+ for n in range(1,20 if OS.get_cmdline_user_args().has("normal") else 21):HorseMastery.record(c,h.id,n)
  var views=["side","down","up","diag_down","diag_up"]
  for row in 3:
   for col in 5:
@@ -19,4 +19,4 @@ func run():
    else:tex.texture=HorseAppearance.texture(load("res://art/player/%s/frame_%s.png"%[["idle","jump_side","stunned"][col-2],"0" if col==4 else "00"]),["idle","jump_side","stunned"][col-2],0,h.traits,null,null,HorseGalaxyLook.state(h))
    text(("Montado " if row==0 else "Libre ")+views[col] if row<2 else (["Beber arriba","Beber abajo","Idle clásico","Salto clásico","Aturdido"][col]),origin+Vector2(0,280),288)
  await get_tree().create_timer(.5).timeout;await RenderingServer.frame_post_draw
- canvas.get_texture().get_image().save_png("/downloads/galaxy-game83.png");get_tree().quit()
+ canvas.get_texture().get_image().save_png("/downloads/galaxy-normal-game83.png" if OS.get_cmdline_user_args().has("normal") else "/downloads/galaxy-game83.png");get_tree().quit()

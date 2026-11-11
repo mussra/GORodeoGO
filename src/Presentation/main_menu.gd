@@ -138,7 +138,7 @@ func _build_menu() -> void:
 	_hero.add_child(rider_host)
 	rider_host.name = "Rider"
 	_hd_rider = Sprite2D.new()
-	HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
+	HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color);HorseGalaxyLook.configure_portrait(_hd_rider.material,SaveData.horse_collection.find(SaveData.horse_collection.selected))
 	_hd_rider.position = Vector2(0,0)
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
@@ -257,7 +257,7 @@ func _refresh_points_caption()->void:
 	if is_instance_valid(_equipment_caption):
 		var id:String=SaveData.equipment_equipped.get("whip","")
 		_equipment_caption.text=tr("UI_013")+(str(EquipmentCatalog.ITEMS[id].name) if EquipmentCatalog.ITEMS.has(id) else tr("UI_014"))
-	if is_instance_valid(_hd_rider):HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color)
+	if is_instance_valid(_hd_rider):HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color);HorseGalaxyLook.configure_portrait(_hd_rider.material,SaveData.horse_collection.find(SaveData.horse_collection.selected))
 	_caption.text=tr("UI_015") % [SaveData.highest_level_completed,SaveData.equipment_points]
 
 func _show_equipment()->void:

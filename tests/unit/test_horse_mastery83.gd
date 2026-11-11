@@ -26,7 +26,7 @@ func test_level20_one_galaxy_offer_other_five_unchanged():
 func test_portrait_glow_is_master_only_and_intensity_is_configurable():
  var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy"
  var view=TextureRect.new();HorsePortrait.apply_horse(view,h)
- assert_eq(view.material.get_shader_parameter("galaxy_intensity"),.30)
+ assert_eq(view.material.get_shader_parameter("galaxy_intensity"),.72)
  assert_ne(view.material.get_shader_parameter("mastery_aura"),true)
  assert_ne(view.material.get_shader_parameter("mastery_sun"),true)
  assert_ne(view.material.get_shader_parameter("mastery_moon"),true)
@@ -69,3 +69,45 @@ func test_gameplay_look_uses_horse_progress_not_genes_and_does_not_mutate():
  h["completed_levels"]=[]
  assert_false(HorseGalaxyLook.state(h).master);assert_eq(h.traits.emblem,HorseEmblem.DEFAULT)
  assert_eq(HorseGalaxyLook.marks(Vector2(69,57),"up").x,0.)
+func test_galaxy_mane_tail_coverage_all_nominal_views_without_mask_edits():
+ var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy";h["completed_levels"]=[1,2,3,4,5,6,7,8,9,10]
+ for view in ["side","down","up","diag_down","diag_up"]:
+  for frame in 9:
+   var raw:Image=load("res://art/experimental/pixellab/rider/%s/frame_%02d.png"%[view,frame]).get_image()
+   var mask:Image=load("res://art/experimental/pixellab_masks_review_v5/rider/%s/color_%02d.png"%[view,frame]).get_image()
+   var out:Image=PixelLabTrial.pose_texture("rider",view,frame,h.traits,h).get_image()
+   var mane=0;var changed=0;var alpha_errors=0;var protected_errors=0
+   for y in raw.get_height():
+    for x in raw.get_width():
+     var m=mask.get_pixel(x,y);var before=raw.get_pixel(x,y);var after=out.get_pixel(x,y)
+     if m.g>.5 and before.a>.1:
+      mane+=1
+      if before!=after:changed+=1
+     if absf(before.a-after.a)>.005:alpha_errors+=1
+     if maxf(m.r,m.g)<.02 and before!=after:protected_errors+=1
+   assert_eq(changed,mane,"entire mane/tail recoloured "+view+str(frame))
+   assert_eq(alpha_errors,0,"normal never adds halo "+view+str(frame))
+   assert_eq(protected_errors,0,"rider/tack stay original "+view+str(frame))
+func test_master_all_views_protect_original_rider_and_keeps_marks_on_coat():
+ var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy"
+ for n in range(1,21):HorseMastery.record(c,h.id,n)
+ for view in ["side","down","up","diag_down","diag_up"]:
+  for frame in 9:
+   var raw:Image=load("res://art/experimental/pixellab/rider/%s/frame_%02d.png"%[view,frame]).get_image()
+   var mask:Image=load("res://art/experimental/pixellab_masks_review_v5/rider/%s/color_%02d.png"%[view,frame]).get_image()
+   var uv:Image=load("res://art/experimental/pixellab_preview_uv/rider/%s/frame_%02d.png"%[view,frame]).get_image()
+   var out:Image=PixelLabTrial.pose_texture("rider",view,frame,h.traits,h).get_image()
+   var errors=0;var sun=0;var moon=0
+   for y in raw.get_height():
+    for x in raw.get_width():
+     var before=raw.get_pixel(x,y);var m=mask.get_pixel(x,y)
+     if maxf(m.r,m.g)<.02 and before.a>.02 and before!=out.get_pixel(x,y):errors+=1
+     if m.r>.5:
+      var ink=HorseGalaxyLook.marks(HorseAppearance.body_point(uv,x,y,0),view)
+      if ink.x>.15:sun+=1
+      if ink.y>.15:moon+=1
+   assert_eq(errors,0,"master rider/tack unchanged "+view+str(frame))
+   if view in ["side","down","diag_down"]:assert_gt(sun,0,"chest sun visible "+view+str(frame))
+   else:assert_eq(sun,0,"no chest sun from rear")
+   if view!="down":assert_gt(moon,0,"thigh moon visible "+view+str(frame))
+   else:assert_eq(moon,0,"no thigh moon from front")

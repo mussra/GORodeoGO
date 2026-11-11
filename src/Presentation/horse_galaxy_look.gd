@@ -15,7 +15,7 @@ static func cloud(p:Vector2)->float:
  return n
 static func color_at(p:Vector2,look:Dictionary)->Color:
  var master=bool(look.get("master",false));var density=.04+.96*float(look.get("percent",0.))/100.
- var dark=Color("030b20") if master else Color("18031a");var light=Color("477ce7") if master else Color("ed4fa6")
+ var dark=Color("030b20") if master else Color("78401a");var light=Color("477ce7") if master else Color("f3b065")
  var cl=cloud(p*.105);var dust=cloud(p*.30+Vector2(8.1,4.2));var ribbon=exp(-pow((p.y-(.46*p.x+21.+sin(p.x*.12)*5.))/6.,2.))
  var wisps=smoothstep(.35,.77,cl)*(.30+.70*dust)
  var c=(dark*.4).lerp(light,.14+.55*wisps+.32*ribbon)
@@ -33,23 +33,24 @@ static func color_at(p:Vector2,look:Dictionary)->Color:
  c=c.lerp(Color(.98,.99,1.),clampf(stars,0.,1.))
  if not master:
   var lum=c.r*.2126+c.g*.7152+c.b*.0722
-  c=Color(.36,.33,.43).lerp(Color(lum,lum,lum),.18).lerp(c,.30)
+  c=Color(.58,.39,.23).lerp(Color(lum,lum,lum),.18).lerp(c,.72)
  c.a=1.;return c
 static func configure_portrait(material:ShaderMaterial,horse:Dictionary)->void:
  var look=state(horse);var master=look.get("master",false)
- material.set_shader_parameter("galaxy_intensity",1. if master else .30)
+ material.set_shader_parameter("galaxy_intensity",1. if master else .72)
  material.set_shader_parameter("galaxy_star_density",.04+.96*float(look.get("percent",0.))/100.)
  material.set_shader_parameter("mastery_aura",master);material.set_shader_parameter("mastery_aura_strength",1.8)
  material.set_shader_parameter("mastery_sun",master);material.set_shader_parameter("mastery_moon",master)
  material.set_shader_parameter("mastery_mark_scale",.7);material.set_shader_parameter("mastery_greek_preview",false)
- if master:
-  material.set_shader_parameter("galaxy_dark",Color("030b20"));material.set_shader_parameter("galaxy_light",Color("477ce7"))
+ material.set_shader_parameter("galaxy_dark",Color("030b20") if master else Color("78401a"))
+ material.set_shader_parameter("galaxy_light",Color("477ce7") if master else Color("f3b065"))
+ material.set_shader_parameter("galaxy_quiet",Color(.58,.39,.23))
 ## UV anchors are explicit per view. Rear-facing views never show a chest sun.
 static func marks(p:Vector2,view:String)->Vector2:
- var sun=Vector2(69,57);var moon=Vector2(29,57);var show_sun=true;var show_moon=true
- if view in ["down","walk_down"]:sun=Vector2(48,63);show_moon=false
- elif view in ["up","walk_up"]:show_sun=false;moon=Vector2(47,61)
- elif "diag_down" in view:sun=Vector2(59,62);moon=Vector2(33,54)
+ var sun=Vector2(69,57);var moon=Vector2(37,53);var show_sun=true;var show_moon=true
+ if view in ["down","walk_down","jump_down"]:sun=Vector2(61,49);show_moon=false
+ elif view in ["up","walk_up","jump_up"]:show_sun=false;moon=Vector2(55,56)
+ elif "diag_down" in view:sun=Vector2(71,53);moon=Vector2(33,54)
  elif "diag_up" in view:show_sun=false;moon=Vector2(39,61)
  elif view.begins_with("drink"):sun=Vector2(70,64);moon=Vector2(33,57)
  var q=(p-sun)/.7;var r=q.length();var angle=q.angle()
