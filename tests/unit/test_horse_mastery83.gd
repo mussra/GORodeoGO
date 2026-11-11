@@ -23,3 +23,16 @@ func test_victory_credits_mounted_snapshot_and_rolls_back_with_save():
 func test_level20_one_galaxy_offer_other_five_unchanged():
  var offers=HorseMarket.offers(20);assert_eq(offers.size(),6);assert_eq(offers.filter(func(h):return h.traits.finish=="galaxy").size(),1)
  assert_eq(offers[5].offer_id,"offer_20_5");assert_eq(offers,HorseMarket.offers(20));assert_true(HorseMarket.available(HorseCollection.new(),offers[5],20));assert_false(HorseMarket.available(HorseCollection.new(),offers[5],19))
+func test_portrait_glow_is_master_only_and_intensity_is_configurable():
+ var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy"
+ var view=TextureRect.new();HorsePortrait.apply_horse(view,h)
+ assert_eq(view.material.get_shader_parameter("galaxy_intensity"),.65)
+ assert_ne(view.material.get_shader_parameter("mastery_aura"),true)
+ assert_true(view.material.get_shader_parameter("galaxy_palette_preview"))
+ for n in range(1,21):HorseMastery.record(c,h.id,n)
+ HorsePortrait.apply_horse(view,h)
+ assert_true(view.material.get_shader_parameter("mastery_aura"))
+ assert_eq(view.material.get_shader_parameter("galaxy_intensity"),1.)
+ h.traits.finish="normal";HorsePortrait.apply_horse(view,h)
+ assert_ne(view.material.get_shader_parameter("mastery_aura"),true)
+ assert_false(view.material.get_shader_parameter("galaxy_palette_preview"));view.free()

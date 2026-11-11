@@ -27,3 +27,12 @@ Nuevas habilidades exclusivas de unicornio: aún no hay catálogo/reglas impleme
 485/485 unitarias, 57.573 aserciones, con casos 95%-100%, duplicados, adulto/cría, Galaxy/Normal, Serenidad/maestría de técnicas sin atajo, carga, guardado fallido, modo ensayo y catálogo20. Integraciones dirigidas con nueva prueba real de arranque de nivel, montura capturada, atribución y ficha. Capturas95%/100% revisadas. Avisos auxiliares de fixtures/leaks conocidos. No prueba Android física.
 
 Fuente mágica y loco del pueblo: Ant confirmó que se crearán juntos más adelante. No se implementan. Receta de N generaciones Galaxy, rastro y río por mapa siguen pendientes; no hay conversión automática en unicornio.
+
+## Revisión visual de las 13:36: aura e intensidad
+
+- Peticiones de Ant: aura o brillo para el maestro; bajar moderadamente la intensidad del normal.
+- Retratos: normal con nebulosas/estrellas moradas a intensidad parametrizada 0,65. Maestro azul a 1,0 con halo suave de silueta del caballo, excluyendo jinete y sombrero.
+- Solo shader: no hay cambios de PNG, cuerno ni rastro arcoíris.
+- `galaxy_intensity` y `mastery_aura` son parámetros independientes, no alteran progreso ni genética.
+- Gameplay pendiente: compartir parámetros desde HorseMastery y adaptar muestreo a máscaras/UV de cada pose (montado, libre y beber). No aplicar halo sobre cuadros de atlas sin margen porque podría contaminar poses vecinas. Requiere comprobación visual de todas las vistas y coste real en Android antes de cerrar.
+- Preview comparada: `galaxy-aura-comparison83.png`. No APK.

@@ -7,6 +7,11 @@ uniform vec4 eye_color: source_color = vec4(.6,.3,.1,1);
 uniform bool custom_eyes = false;
 uniform int eye_style = 0;
 uniform bool galaxy = false;
+// Art-direction intensity, independent of mastery progress.
+uniform float galaxy_intensity: hint_range(0.,1.) = 1.;
+// Mastery-only silhouette halo. Disabled for regular Galaxy and all other horses.
+uniform bool mastery_aura = false;
+uniform vec4 mastery_aura_color: source_color=vec4(.24,.57,1.,1.);
 // Opt-in palette study. Defaults retain the released Galaxy appearance exactly.
 uniform bool galaxy_palette_preview = false;
 uniform vec4 galaxy_dark: source_color=vec4(.12,.03,.09,1.);
@@ -137,12 +142,12 @@ void fragment(){
   else if(pattern>=5)c=mix(c,spot_color.rgb,genetic_pattern(p*.12,pattern));
   else if(pattern==4)c=mix(c,vec3(.96,.93,.85),texture(light_legs_mask,UV).r);
   else if(mark)c=spot_color.rgb;
-  if(galaxy)c=galaxy_color(p*.12);
+  if(galaxy)c=mix(vec3(.08,.08,.16),galaxy_color(p*.12),galaxy_intensity);
   float coat_shade=shade;
   if(pattern==4)coat_shade=mix(shade,min(shade+.12,1.2),texture(light_legs_mask,UV).r);
   col=mix(col,c*coat_shade,m.r);
   vec3 mane=rainbow?soft_rainbow(p.x<540.?(p.y-300.)/340.:(p.y-80.)/275.):mane_color.rgb;
-  if(galaxy)mane=galaxy_color(p*.12);
+  if(galaxy)mane=mix(vec3(.08,.08,.16),galaxy_color(p*.12),galaxy_intensity);
   col=mix(col,mane*shade,m.g);
  }
  if(custom_legs){
@@ -159,5 +164,27 @@ void fragment(){
   float horse_only=step(.5,m.r)*step(.01,src.a);
   col=mix(col,opposite,edge*.9*horse_only);col=mix(col,fg,ink*horse_only);
  }
- COLOR=vec4(col,src.a);
+ float out_alpha=src.a;
+ if(mastery_aura && galaxy){
+  float halo=0.;float rim=0.;
+  vec2 px=TEXTURE_PIXEL_SIZE;
+  // Three soft rings around the horse-only region, not around the rider/hat.
+  for(int k=0;k<16;k++){
+   float angle=float(k)*.39269908;vec2 dir=vec2(cos(angle),sin(angle));
+   for(int ring=1;ring<=3;ring++){
+    vec2 q=UV+dir*px*float(ring)*7.;
+    vec3 region=texture(region_mask,q).rgb;
+    float horse=max(region.r,region.g)*texture(TEXTURE,q).a;
+    halo+=horse*(ring==1?.5:(ring==2?.32:.18))/16.;
+   }
+   vec2 q=UV+dir*px*3.;
+   rim+=texture(TEXTURE,q).a/16.;
+  }
+  float aura=clamp(halo*.72,0.,.55)*(1.-src.a);
+  float horse_here=max(m.r,m.g);
+  col+=mastery_aura_color.rgb*(1.-rim)*horse_here*.20;
+  out_alpha=src.a+aura;
+  col=(col*src.a+mastery_aura_color.rgb*aura)/max(out_alpha,.0001);
+ }
+ COLOR=vec4(col,out_alpha);
 }
