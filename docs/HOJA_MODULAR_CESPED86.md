@@ -4,7 +4,7 @@ Hoja aportada por Ant el 11 de noviembre. Original conservado sin cambios en `ar
 
 ## Recorte directo
 
-La hoja mide 2172×724 y ya tiene alfa fuera de las piezas. Dentro de cada cuadrado la hierba es opaca. Se separan sus seis piezas: recto, esquina, T, cruce, final y punto. El ejemplo enlaza 19 celdas y usa rotaciones de las seis piezas.
+La hoja mide 2172×724 y ya tiene alfa fuera de las piezas. Dentro de cada cuadrado la hierba es opaca. Se separan sus seis piezas: recto, esquina, T, cruce, final y punto. El ejemplo enlaza 16 celdas y usa rotaciones de las seis piezas.
 
 El montaje directo no es continuo: aparecen bordes cuadrados, pequeñas diferencias de centro y ancho, cambios de color y textura, además de las esquinas exteriores redondeadas.
 
