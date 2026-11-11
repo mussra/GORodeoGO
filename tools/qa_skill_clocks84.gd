@@ -16,4 +16,4 @@ func _draw():
    draw_rect(Rect2(704+x*20,14+y*20,20,20),Color("89bdb7") if (x+y)%2==0 else Color("10252d"))
 func capture():
  await get_tree().create_timer(.2).timeout;await RenderingServer.frame_post_draw
- get_viewport().get_texture().get_image().save_png("/downloads/skill-clocks76-preview84.png");get_tree().quit()
+ get_viewport().get_texture().get_image().save_png("/downloads/skill-clocks76-inverted84.png");get_tree().quit()

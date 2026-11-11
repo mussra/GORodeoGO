@@ -11,3 +11,7 @@ Los tres se usan en el componente compartido `RadialGauge`, tanto en Frontera co
 El sector dinámico se dibuja sobre la cara del reloj, a las 12 y en sentido horario, con el ratio y transparencia anteriores. Se limita al interior para no teñir el marco de madera. No se pinta recarga dentro de los PNG. Las habilidades no disponibles se ocultan igual que antes.
 
 Verificación: imagen real de los tres a 76px, con 0/25/50/75/100% y sobre damero para comprobar transparencia. 493 pruebas unitarias, 58.151 aserciones. Pruebas del canal alfa exterior, dimensiones, valores del ratio y ocultación. Sin prueba Android.
+
+## Revisión: lleno encendido, vacío apagado
+
+Ant pidió invertir la lectura visual. Ahora al 0% la cara está completamente atenuada, al 100% se ve el arte original sin tinte, y a 25/50/75% la parte encendida crece desde las 12 en sentido horario. Solo se cubre con un sector oscuro el porcentaje pendiente. El marco de madera conserva su aspecto. No se modifica ningún PNG, el ratio de energía o las reglas de recarga. Captura de los cinco estados a 76px inspeccionada; tres pruebas del componente, 47 aserciones. Sin APK nueva.

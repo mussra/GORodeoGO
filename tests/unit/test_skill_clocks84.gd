@@ -13,3 +13,11 @@ func test_states_remain_dynamic_and_unavailable_skill_hidden():
  g.set_state(false,.5);assert_false(g.visible)
  g.set_state(true,2.);assert_eq(g.ratio,1.)
  g.set_state(true,-1.);assert_eq(g.ratio,0.)
+
+func test_unfilled_sector_shrinks_clockwise_as_charge_increases():
+ for fill in [.25,.5,.75]:
+  var sector=RadialGauge.unfilled_sector(Vector2.ZERO,20.0,fill)
+  assert_eq(sector.size(),30)
+  var start=Vector2(cos(-PI/2.+fill*TAU),sin(-PI/2.+fill*TAU))*20.
+  assert_almost_eq(sector[1].x,start.x,.001);assert_almost_eq(sector[1].y,start.y,.001)
+  assert_almost_eq(sector[-1].x,0.,.001);assert_almost_eq(sector[-1].y,-20.,.001)
