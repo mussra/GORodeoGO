@@ -64,11 +64,25 @@ static func spots()->Array[Vector4]:
   if separate:spot_layout.append(Vector4(center.x,center.y,rng.randf_range(.7,2.15),rng.randf_range(-.7,.7)))
   if spot_layout.size()>=128:break
  return spot_layout
+# Conservative spatial buckets only discard spots that cannot reach this point.
+# Original spot order and all coverage math stay unchanged, so output is exact.
+static var spot_buckets:Dictionary={}
+const SPOT_BUCKET_SIZE=8.0
+static func nearby_spots(p:Vector2)->Array:
+ if spot_buckets.is_empty():
+  for item in spots():
+   var radius=item.z*2.0+2.0
+   for bx in range(floori((item.x-radius)/SPOT_BUCKET_SIZE),floori((item.x+radius)/SPOT_BUCKET_SIZE)+1):
+    for by in range(floori((item.y-radius)/SPOT_BUCKET_SIZE),floori((item.y+radius)/SPOT_BUCKET_SIZE)+1):
+     var key=Vector2i(bx,by)
+     if not spot_buckets.has(key):spot_buckets[key]=[]
+     spot_buckets[key].append(item)
+ return spot_buckets.get(Vector2i(floori(p.x/SPOT_BUCKET_SIZE),floori(p.y/SPOT_BUCKET_SIZE)),[])
 static func natural_spot(p:Vector2)->bool:
  return natural_spot_coverage(p)>.5
 static func natural_spot_coverage(p:Vector2)->float:
  var coverage:float=0.0
- for item in spots():
+ for item in nearby_spots(p):
   var q:Vector2=(p-Vector2(item.x,item.y)).rotated(item.w)
   var edge:float=maxf(absf(q.x)-item.z,absf(q.y)-item.z*.85)
   if edge>.5:continue
@@ -95,7 +109,7 @@ static func shape_point(q:Vector2,pattern:int)->bool:
  return absf(q.x)<1.0 and absf(q.y)<.85
 static func genetic_mark(p:Vector2,pattern:int)->bool:
  if pattern in [9,10,11]:return HorsePatternMap.coverage(p,pattern)>.5
- for item in spots():
+ for item in nearby_spots(p):
   var q:Vector2=(p-Vector2(item.x,item.y)).rotated(item.w)/item.z
   if q.length_squared()>3.5:continue
   if shape_point(q,pattern):return true

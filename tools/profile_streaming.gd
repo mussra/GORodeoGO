@@ -6,7 +6,7 @@ func metrics(label:String,values:Array):
 func run():
  SaveData.save_path="user://streaming-profile.cfg";SaveData.trial_session_active=true;SaveData.world_seed=752026;SaveData.world_position=Vector2(310,270);SaveData.world_discovered=[];SaveData.world_quests={}
  var cover=FrontierTransition.obtain(get_tree());var warm=Time.get_ticks_usec();await cover._warm_showcase();print("STREAM showcase_warm_ms=",(Time.get_ticks_usec()-warm)/1000.0)
- var start=Time.get_ticks_usec();world=load("res://src/Presentation/frontier_world.gd").new();add_child(world);world.set_process(false);world.set_physics_process(false);world.player.set_physics_process(false)
+ var start=Time.get_ticks_usec();world=load("res://tools/profiled_frontier84.gd" if OS.get_environment("FRONTIER_PROFILE_PHASES")=="1" else "res://src/Presentation/frontier_world.gd").new();add_child(world);world.set_process(false);world.set_physics_process(false);world.player.set_physics_process(false)
  print("STREAM ready_ms=",(Time.get_ticks_usec()-start)/1000.0)
  var samples=[];var iterations=0
  while world._loading_world:
@@ -22,4 +22,6 @@ func run():
   if not world._chunks.has(WorldMap.chunk_key(c.x,c.y)):misses+=1
   maxqueue=maxi(maxqueue,world._build_queue.size());await get_tree().process_frame
  metrics("travel",samples);print("STREAM missing_current_frames=",misses," max_queue=",maxqueue," active=",world._chunks.size()," cached=",world._chunk_built.size())
+ if world.get("builder_samples")!=null:
+  for phase in world.builder_samples:metrics("builder_phase_"+str(phase),world.builder_samples[phase])
  get_tree().quit()

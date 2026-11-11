@@ -1,0 +1,81 @@
+BEFORE
+STREAM showcase_warm_ms=1199.202
+STREAM ready_ms=303.521
+STREAM initial_elapsed_ms=1661.725 iterations=111 active=9
+STREAM initial n=111 p50_ms=10.525 p95_ms=18.29 max_ms=20.424
+STREAM travel n=1200 p50_ms=3.394 p95_ms=10.537 max_ms=27.049
+STREAM missing_current_frames=0 max_queue=4 active=12 cached=2
+STREAM builder_phase_0 n=42 p50_ms=0.041 p95_ms=0.082 max_ms=0.089
+STREAM builder_phase_1 n=421 p50_ms=0.008 p95_ms=0.023 max_ms=0.087
+STREAM builder_phase_2 n=62 p50_ms=0.005 p95_ms=0.024 max_ms=0.025
+STREAM builder_phase_3 n=42 p50_ms=0.003 p95_ms=0.005 max_ms=0.009
+STREAM builder_phase_4 n=1088 p50_ms=3.426 p95_ms=14.205 max_ms=26.945
+STREAM builder_phase_5 n=41 p50_ms=0.001 p95_ms=0.001 max_ms=0.001
+
+AFTER
+STREAM showcase_warm_ms=750.604
+STREAM ready_ms=307.484
+STREAM initial_elapsed_ms=1036.923 iterations=70 active=9
+STREAM initial n=70 p50_ms=10.345 p95_ms=13.155 max_ms=13.227
+STREAM travel n=1200 p50_ms=3.395 p95_ms=6.855 max_ms=8.406
+STREAM missing_current_frames=0 max_queue=4 active=12 cached=2
+STREAM builder_phase_0 n=42 p50_ms=0.044 p95_ms=0.081 max_ms=0.094
+STREAM builder_phase_1 n=421 p50_ms=0.008 p95_ms=0.025 max_ms=0.045
+STREAM builder_phase_2 n=62 p50_ms=0.005 p95_ms=0.023 max_ms=0.025
+STREAM builder_phase_3 n=42 p50_ms=0.004 p95_ms=0.006 max_ms=0.029
+STREAM builder_phase_4 n=1088 p50_ms=3.404 p95_ms=6.827 max_ms=8.301
+STREAM builder_phase_5 n=41 p50_ms=0.001 p95_ms=0.002 max_ms=0.002
+
+PATTERN TEXTURES BEFORE
+PATTERN84 horse pattern=0 total_ms=41.268
+PATTERN84 horse pattern=1 total_ms=51.588
+PATTERN84 horse pattern=2 total_ms=238.577
+PATTERN84 horse pattern=3 total_ms=48.94
+PATTERN84 horse pattern=4 total_ms=48.672
+PATTERN84 horse pattern=5 total_ms=173.415
+PATTERN84 horse pattern=6 total_ms=180.174
+PATTERN84 horse pattern=7 total_ms=178.321
+PATTERN84 horse pattern=8 total_ms=206.994
+PATTERN84 horse pattern=9 total_ms=77.531
+PATTERN84 horse pattern=10 total_ms=76.557
+PATTERN84 horse pattern=11 total_ms=78.471
+PATTERN84 rider pattern=0 total_ms=41.17
+PATTERN84 rider pattern=1 total_ms=48.597
+PATTERN84 rider pattern=2 total_ms=202.858
+PATTERN84 rider pattern=3 total_ms=46.913
+PATTERN84 rider pattern=4 total_ms=46.257
+PATTERN84 rider pattern=5 total_ms=148.943
+PATTERN84 rider pattern=6 total_ms=153.695
+PATTERN84 rider pattern=7 total_ms=149.965
+PATTERN84 rider pattern=8 total_ms=149.564
+PATTERN84 rider pattern=9 total_ms=70.366
+PATTERN84 rider pattern=10 total_ms=69.499
+PATTERN84 rider pattern=11 total_ms=75.841
+PATTERN84 total_ms=2605.634 frames=360
+
+PATTERN TEXTURES AFTER
+PATTERN84 horse pattern=0 total_ms=42.288
+PATTERN84 horse pattern=1 total_ms=53.023
+PATTERN84 horse pattern=2 total_ms=73.122
+PATTERN84 horse pattern=3 total_ms=49.468
+PATTERN84 horse pattern=4 total_ms=49.036
+PATTERN84 horse pattern=5 total_ms=71.689
+PATTERN84 horse pattern=6 total_ms=73.712
+PATTERN84 horse pattern=7 total_ms=69.911
+PATTERN84 horse pattern=8 total_ms=71.133
+PATTERN84 horse pattern=9 total_ms=78.159
+PATTERN84 horse pattern=10 total_ms=76.908
+PATTERN84 horse pattern=11 total_ms=79.097
+PATTERN84 rider pattern=0 total_ms=42.058
+PATTERN84 rider pattern=1 total_ms=50.297
+PATTERN84 rider pattern=2 total_ms=65.879
+PATTERN84 rider pattern=3 total_ms=47.434
+PATTERN84 rider pattern=4 total_ms=49.23
+PATTERN84 rider pattern=5 total_ms=65.122
+PATTERN84 rider pattern=6 total_ms=68.946
+PATTERN84 rider pattern=7 total_ms=64.544
+PATTERN84 rider pattern=8 total_ms=64.474
+PATTERN84 rider pattern=9 total_ms=70.722
+PATTERN84 rider pattern=10 total_ms=69.904
+PATTERN84 rider pattern=11 total_ms=72.012
+PATTERN84 total_ms=1519.397 frames=360
