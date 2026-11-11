@@ -6,6 +6,7 @@ extends Node2D
 const PlayerScript := preload("res://src/Presentation/world_player.gd")
 const WildHorseScript := preload("res://src/Presentation/wild_horse.gd")
 const DecorScript := preload("res://src/Presentation/world_decor.gd")
+const FloristShopScript=preload("res://src/Presentation/world_florist_shop.gd")
 const RanchScript := preload("res://src/Presentation/world_ranch.gd")
 const GoatScript := preload("res://src/Presentation/wild_goat.gd")
 const PigScript := preload("res://src/Presentation/wild_pig.gd")
@@ -112,6 +113,7 @@ func _ready() -> void:
 	camera.make_current()
 	var ranch := RanchScript.new()
 	add_child(ranch)
+	add_child(FloristShopScript.new())
 	register_occluder("ranch_house", Rect2(Vector2(-130, -262), Vector2(170, 142)))
 	# fixed showcase zone near the ranch (Ant, 7-nov-2026): additive overlay,
 	# no effect on chunk seeds, streaming or saves
@@ -418,6 +420,7 @@ func _advance_builder(b: Dictionary) -> void:
 				b["phase"] = 2
 				return
 			var d: Dictionary = todo.pop_front()
+			if not WorldFloristShop.keep_decor(d,SaveData.world_seed):return
 			var decor := DecorScript.new()
 			decor.kind = d["kind"]
 			decor.size_scale = d["scale"]

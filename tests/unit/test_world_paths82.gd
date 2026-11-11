@@ -2,7 +2,7 @@ extends GutTest
 func test_accesses_are_deterministic_connected_and_end_at_thresholds():
  for seed in [1,99,752026]:
   var lanes=WorldPaths.access_lanes(seed)
-  assert_eq(lanes,WorldPaths.access_lanes(seed));assert_eq(lanes.size(),3)
+  assert_eq(lanes,WorldPaths.access_lanes(seed));assert_eq(lanes.size(),4)
   assert_eq(lanes[0][-1],WorldPaths.RANCH_DOOR)
   assert_almost_eq(lanes[0][0].y,WorldMap.trail_y_at(seed,lanes[0][0].x),.001)
   assert_eq(lanes[1][-1],WorldPaths.ZONE_DOORS[0]);assert_eq(lanes[2][-1],WorldPaths.ZONE_DOORS[1])

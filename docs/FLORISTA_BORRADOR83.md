@@ -1,7 +1,7 @@
 # La florista y los caminos de flores
 
 Diseño y guion para revisar. 11 de noviembre de 2026.
-No implementado. Sin APK nueva ni cambios del mapa.
+Colocación visual implementada en la rama de prueba; diálogos y misiones siguen como diseño. Sin APK nueva.
 
 ## Lo que ha decidido Ant
 
@@ -22,7 +22,7 @@ Nombre propio pendiente. En el guion aparece como "Florista". No se le asignan p
 
 Requisito confirmado: floristería con flores abundantes alrededor y a la entrada.
 
-Propuesta de colocación, todavía no aplicada: cerca del rancho, en un desvío corto que pueda encontrarse en la primera exploración. Mantener libres la puerta, el camino y el espacio para acercarse a hablar. No desplazar la casa, el granero, el estanque ni al granjero.
+Colocación de prueba aplicada: cerca del rancho, en un desvío corto que puede encontrarse en la primera exploración. Mantener libres la puerta, el camino y el espacio para acercarse a hablar. No desplazar la casa, el granero, el estanque ni al granjero.
 
 - Dos grupos de flores enmarcan la entrada; la puerta sigue visible.
 - Macetas y grupos de flores recorren los laterales de la tienda.
@@ -30,7 +30,7 @@ Propuesta de colocación, todavía no aplicada: cerca del rancho, en un desvío 
 - La florista espera junto a la entrada, no en medio del paso.
 - Las flores de la tienda son decoración. Las flores de un encargo se identifican por separado para no recoger sin querer el escaparate.
 
-No se ha elegido una coordenada definitiva ni se han cambiado colisiones.
+La tienda está en (650, 400), con la puerta en (680, 398) y la florista junto a ella en (740, 430). Un árbol de la zona de prueba se recoloca a (350, 600) para que su copa no tape el nuevo tramo. El sendero comparte `WorldPaths` y `RoadTiles`, conecta desde el ramal por y=530 y llega a la puerta. El cuerpo del edificio es sólido; no hay interior visitable. Se aparta decoración generada que invada la tienda o el paso, sin borrar datos del mapa ni colocaciones editadas por el jugador.
 
 ## Diálogos propuestos
 
@@ -129,18 +129,14 @@ No prometer rotación diaria, espera real ni misiones infinitas sin decidir esas
 ### Disponible
 
 - Imagen de la florista enviada por Ant: sirve para un retrato de diálogo y como figura estática provisional, reducida. No tiene vistas de espalda, marcha ni piezas separadas.
-- Seis PNG de flores en `art/world/cartoon/flower_1.png` a `flower_6.png`, ya usados por la decoración. Se pueden reutilizar para llenar el entorno y para una prueba de búsqueda, sin generar flores nuevas.
-- Casa y granero existentes. Una casa podría indicar temporalmente la huella de un edificio en una maqueta, pero no es una floristería terminada. No se presenta como tal.
-
-### Pieza principal que falta para el mapa final
-
-**Edificio de floristería:** PNG con transparencia, vista de tres cuartos compatible con las casas del mapa actual, puerta mirando al camino, base completa visible, espacio despejado delante y sin personaje incrustado. Puede incluir escaparate y un cartel con motivo floral; mejor sin letras pequeñas. No incluir un suelo rectangular de fondo.
-
-Enviar a Ant una referencia de las casas existentes junto a la florista para conservar escala visual, perspectiva y estilo. La ilustración de la florista es más detallada que las flores y casas actuales: decidir juntos si se conserva esa mezcla o se prepara una versión simplificada para mapa. No retocar su imagen sin aprobación.
+- Veinte texturas de flores en el catálogo compartido `WorldDecor.FLOWER_TEXS`. La tienda usa 18 flores existentes, sin generar arte nuevo.
+- Edificio de floristería enviado por Ant, conservado sin retoques en `art/world/supplied/florist_shop.png`. Solo se reduce y coloca en el mapa.
+- Camino de tiles ya disponible en el componente común. No hace falta otra imagen de camino.
+- El cartel español "Floristería" permanece en el PNG original. Ant ha indicado que se revisará después; no se ha pintado encima ni traducido.
 
 ### Opcionales, no bloquean una maqueta
 
-- Dos o tres grupos de flores en maceta o cubo para la entrada, con transparencia y separados del edificio. Las seis flores actuales permiten empezar; no hace falta pedirlas otra vez.
+- Dos o tres grupos de flores en maceta o cubo para la entrada, con transparencia y separados del edificio. Las flores actuales permiten empezar; no hace falta pedirlas otra vez.
 - Flor objetivo especial, solo si se quiere una variedad que no existe. Una imagen por variedad, reconocible al tamaño del mapa, con tallo y silueta distintos.
 - Figura de la florista preparada para mapa si la reducción del retrato pierde demasiado detalle. Misma ropa, sombrero, ramo e identidad; ojos siempre tapados. Una pose quieta basta para una primera versión.
 
@@ -154,3 +150,12 @@ No hacen falta interiores, animación de caminar ni labios para esta propuesta.
 - No subir el nivel de campaña por entregar flores. Mercado y maestría conservan sus reglas.
 - No fijar recompensas, ubicación final o cantidades como aprobadas. Las propuestas se revisan antes de implementarlas.
 - No confundir las flores ornamentales de la tienda con objetos recogibles de misión.
+
+## Verificación de la colocación
+
+- PNG originales conservados byte a byte. Ojos ocultos, sin cambios de dibujo.
+- 491 pruebas unitarias, 58.119 aserciones.
+- Integración del mundo real: 158 aserciones, recorrido del acceso cada 4 píxeles, entrada libre y edificio sólido.
+- Comparación de datos de encargos y ediciones antes/después: sin cambios.
+- Capturas de cerca y del acceso inspeccionadas con render de escritorio. No certifica rendimiento ni controles Android.
+- Sin APK, sin merge a main. Misiones y recompensas aún no implementadas.

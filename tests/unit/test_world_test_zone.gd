@@ -16,7 +16,7 @@ func test_zone_has_all_requested_elements():
  assert_eq(Zone.TREES.size(),2)
  assert_eq(Zone.CACTI.size(),2)
  assert_eq(Zone.HOUSES.size(),2)
- assert_eq(WorldPaths.access_lanes(752026).slice(1).size(),2) # shared door accesses replace the two disconnected trails
+ assert_eq(WorldPaths.access_lanes(752026).slice(1,3).size(),2) # shared door accesses replace the two disconnected trails
  assert_eq(Zone.PIGS.size(),2)
  assert_true(Zone.MEADOW.has_area())
  assert_true(Zone.PEN.has_area())

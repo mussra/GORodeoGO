@@ -17,7 +17,7 @@ const HORSES := [
 	{"home": Vector2(-655, -35), "traits": {"coat": 10, "pattern": 0, "mane": 0, "eyes": 0, "finish": "normal"}},
 	{"home": Vector2(-580, 40), "traits": {"coat": 1, "pattern": 2, "mane": 1, "eyes": 1, "finish": "normal"}},
 ]
-const TREES: Array[Vector2] = [Vector2(-235, -125), Vector2(305, -115)]
+const TREES: Array[Vector2] = [Vector2(-235, -125), Vector2(190, -50)]
 const CACTI: Array[Vector2] = [Vector2(-255, 95), Vector2(335, 75)]
 const HOUSES := [
 	{"pos": Vector2(-75, -215), "body": Color("9c6b3f"), "roof": Color("6d4a2f")},
