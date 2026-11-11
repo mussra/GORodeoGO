@@ -1,0 +1,30 @@
+{
+  "drink83-0-color": {
+    "path": "art/experimental/drink_preview83/color_0.png",
+    "source": "art/experimental/drink_preview83/pose_0.png",
+    "hash": "4bb9c431a27e0e9a8addda73d19daf6b1379ea24d161a6b9a7140770f21017fc",
+    "w": 112,
+    "h": 96
+  },
+  "drink83-0-eyes": {
+    "path": "art/experimental/drink_preview83/eyes_0.png",
+    "source": "art/experimental/drink_preview83/pose_0.png",
+    "hash": "1bf8cde33e9af5a9048994ec674d614c8e6b767c51be3ac3a155b94a6ffdd8ad",
+    "w": 112,
+    "h": 96
+  },
+  "drink83-1-color": {
+    "path": "art/experimental/drink_preview83/color_1.png",
+    "source": "art/experimental/drink_preview83/pose_1.png",
+    "hash": "2b2c6d4cb1b903a42b9a1bdb41d64afd65895c639eef18a8642e5eca38f356f4",
+    "w": 112,
+    "h": 96
+  },
+  "drink83-1-eyes": {
+    "path": "art/experimental/drink_preview83/eyes_1.png",
+    "source": "art/experimental/drink_preview83/pose_1.png",
+    "hash": "1790d3c34cdfea17968ca46e354bc456c3ebaa043ca3e8121ff9e0e25a1e1283",
+    "w": 112,
+    "h": 96
+  }
+}
