@@ -7,6 +7,11 @@ uniform vec4 eye_color: source_color = vec4(.6,.3,.1,1);
 uniform bool custom_eyes = false;
 uniform int eye_style = 0;
 uniform bool galaxy = false;
+// Opt-in palette study. Defaults retain the released Galaxy appearance exactly.
+uniform bool galaxy_palette_preview = false;
+uniform vec4 galaxy_dark: source_color=vec4(.12,.03,.09,1.);
+uniform vec4 galaxy_light: source_color=vec4(.95,.30,.65,1.);
+uniform bool galaxy_blue_mix=false;
 uniform sampler2D region_mask: filter_linear;
 uniform sampler2D light_legs_mask: filter_linear;
 uniform sampler2D lower_legs_mask: filter_linear;
@@ -65,6 +70,14 @@ float genetic_pattern(vec2 p,int shape){
 vec3 galaxy_color(vec2 p){
  float wave=(sin(p.x*.22+p.y*.12)+cos(p.y*.29-p.x*.09)+2.)/4.;float neb=exp(-pow((p.y-(.45*p.x+21.))/9.,2.));
  vec3 c=vec3(30.+105.*wave+45.*neb,28.+40.*wave+60.*neb,80.+100.*wave+55.*neb)/255.;
+ if(galaxy_palette_preview){
+  c=mix(galaxy_dark.rgb,galaxy_light.rgb,.18+.72*wave)+neb*galaxy_light.rgb*.15;
+  if(galaxy_blue_mix){
+   float blend=smoothstep(.26,.72,(sin(p.x*.13-p.y*.09)+cos(p.y*.17)+2.)/4.);
+   vec3 blue=mix(vec3(.025,.065,.20),vec3(.18,.46,.94),wave)+neb*vec3(.08,.16,.25);
+   c=mix(c,blue,blend);
+  }
+ }
  vec2 stars[10]={vec2(27,48),vec2(32,60),vec2(60,56),vec2(69,38),vec2(77,45),vec2(62,65),vec2(24,69),vec2(72,67),vec2(53,73),vec2(67,28)};
  for(int i=0;i<10;i++)if(distance(p,stars[i])<.5)c=vec3(.957,.969,1.);
  return c;

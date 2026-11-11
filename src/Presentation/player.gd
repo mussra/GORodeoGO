@@ -22,6 +22,7 @@ signal dodge_started
 signal dodge_finished
 signal jump_started
 signal jump_finished
+var drink:HorseDrink
 var can_jump:bool=false
 var _jump_time:float=0.0
 var _jump_direction:Vector2=Vector2.RIGHT
@@ -157,6 +158,8 @@ var _active_capture_count: int = 0
 var _max_captures: int = 1
 
 func _ready() -> void:
+	collision_mask|=64
+	drink=HorseDrink.new(self)
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.unreplaced_rider_animations(ANIM_NAMES))
 	if _sprite_swap.has_sprite():
 		var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
@@ -242,9 +245,11 @@ func _on_move_released(direction: Vector2) -> void:
 	dodge.on_move_released(direction)
 
 func request_dodge_path(points: PackedVector2Array) -> bool:
+	if drink!=null:drink.stop()
 	return dodge.request_path(points)
 
 func request_dodge(direction: Vector2) -> bool:
+	if drink!=null:drink.stop()
 	return dodge.request_dash(direction)
 
 
@@ -268,6 +273,7 @@ func stun(duration: float) -> void:
 	cancel_input()
 
 func _physics_process(delta: float) -> void:
+	if drink.step(delta,Input.get_vector("move_left","move_right","move_up","move_down")):return
 	dodge.world_bounds = world_bounds
 	# Ground trail keeps fading even while jump/stun branches return early.
 	if dodge.fade_trail(delta):
@@ -353,6 +359,7 @@ func cancel_all_actions() -> void:
 	lasso.cancel_all_actions()
 
 func cancel_input() -> void:
+	if drink!=null:drink.stop()
 	dodge.cancel()
 	lasso.cancel_input()
 	velocity = Vector2.ZERO

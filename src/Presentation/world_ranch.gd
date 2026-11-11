@@ -86,7 +86,8 @@ func _ready() -> void:
 	_prop(world, BARREL_TEX, Vector2(-52, 100), 26.0, Rect2(-60, 92, 16, 12))
 	_prop(world, CRATE_TEX, Vector2(-26, 106), 26.0, Rect2(-36, 96, 20, 14))
 	_prop(world, CART_TEX, Vector2(-60, 230), 55.0, Rect2(-92, 222, 64, 14))
-	_prop(world, POND_TEX, Vector2(520, 260), 100.0, Rect2(462, 232, 116, 56))
+	_prop(world, POND_TEX, Vector2(520, 260), 100.0, Rect2(462, 190, 116, 56))
+	HorseWater.add(world,Rect2(462,190,116,56),"pond")
 	# Second props pass: gate leaf at the south opening (hinged on the east
 	# boundary post, swung open inward), signpost by the gate-road junction,
 	# woodcutting corner NW (stump + log), hay bales by the barn and grass
@@ -143,6 +144,7 @@ func _prop(world: Node2D, tex: Texture2D, base: Vector2, h: float, solid := Rect
 	node.draw_fn = func(n):
 		var w := h * tex.get_width() / float(tex.get_height())
 		n.draw_texture_rect(tex, Rect2(base - Vector2(w * 0.5, h), Vector2(w, h)), false)
+	if tex==POND_TEX:node.z_index=-7  # water is ground, never occlude the drinking head
 	world.add_child(node)
 	if solid.has_area():
 		Physics.add_box(world, solid)

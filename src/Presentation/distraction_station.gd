@@ -6,6 +6,7 @@ var kind: String = "water"
 var _time: float = 0.0
 func _ready() -> void:
 	z_index = -2
+	if kind=="water":HorseWater.add(self,Rect2(-43,-20,86,45),"trough")
 func _process(delta: float) -> void:
 	_time += delta
 	queue_redraw()

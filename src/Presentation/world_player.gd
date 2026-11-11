@@ -7,6 +7,7 @@ extends CharacterBody2D
 
 signal jump_started
 signal jump_finished
+var drink:HorseDrink
 var can_jump:bool=false
 var world_bounds:Rect2=Rect2(-1000000,-1000000,2000000,2000000)
 var _jump_time:float=0
@@ -65,6 +66,8 @@ var _sprite_swap: SpriteSwap
 var lasso: LassoController = null
 
 func _ready() -> void:
+	collision_mask|=64
+	drink=HorseDrink.new(self)
 	collision_mask|=HorseJump.FENCE_LAYER
 	lasso = LassoController.new()
 	lasso.rider_velocity = func()->Vector2:return velocity
@@ -115,6 +118,7 @@ func _ready() -> void:
 	_sprite_swap.play("idle")
 
 func stun(duration: float = STUN_SECONDS) -> void:
+	if drink!=null:drink.stop()
 	if _jump_time>0:HorseJumpMotion.finish(self,true)
 	if _stun_time_remaining <= 0.0:
 		stunned.emit()
@@ -132,12 +136,15 @@ func _input(event: InputEvent) -> void:
 	dodge.handle_input(event)
 
 func request_dodge(direction: Vector2) -> bool:
+	if drink!=null:drink.stop()
 	return dodge.request_dash(direction)
 
 func request_dodge_path(points: PackedVector2Array) -> bool:
+	if drink!=null:drink.stop()
 	return dodge.request_path(points)
 
 func _physics_process(delta: float) -> void:
+	if drink.step(delta,Input.get_vector("move_left","move_right","move_up","move_down")):return
 	_jump_cooldown=maxf(0,_jump_cooldown-delta)
 	if _jump_time>0:HorseJumpMotion.process(self,delta);return
 	if can_jump and velocity.length()>60 and HorseJumpMotion.try_ahead(self):return
@@ -181,7 +188,7 @@ func _draw() -> void:
 	if dodge.drawing:
 		DodgeVisuals.draw_drawing(self, dodge.preview_points(dodge.draw_points))
 	if dodge_available:
-		DodgeVisuals.draw_recharge(self, Vector2(0, -59), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
+		DodgeVisuals.draw_recharge(self, Vector2(0, -110), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
 	if dodge.remaining > 0.0:
 		DodgeVisuals.draw_dash_dust(self, dodge.direction)
 	# Charge-aim circle: shared with the corral rider (Ant 21:47, it was missing here).
@@ -193,5 +200,6 @@ func _update_animation(delta: float) -> void:
 
 func request_jump(direction:Vector2)->bool:return HorseJumpMotion.request(self,direction)
 func cancel_input()->void:
+	if drink!=null:drink.stop()
 	if _jump_time>0:HorseJumpMotion.finish(self,true)
 	lasso.cancel_all_actions();dodge.cancel();velocity=Vector2.ZERO
