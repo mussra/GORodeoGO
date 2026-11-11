@@ -46,3 +46,7 @@ Petición posterior: estrellas progresivas por maestría. `galaxy_star_density` 
 El color se mantiene lavanda hasta completar los20 niveles; solo las estrellas progresan. Se recomienda conservar el salto de color y aura como recompensa del100%. Un cambio gradual de color no está aplicado y requeriría cambiar la regla de color único del normal.
 
 `galaxy-mastery-progress83.png`: misma Ficha real a0/50/95/100%, sin raster nuevo. Gameplay/beber sigue pendiente de adaptación de máscaras/UV y revisión de rendimiento Android. Sin APK, sin merge.
+
+## Astro rey (13:42)
+
+Disco luminoso y12rayos suaves en pecho del maestro, con resplandor azul. Parámetro `mastery_sun` exclusivo maestro y centro UV de esta pose de retrato. No toca escudos, emblemas, genes ni máscaras fuente. Gameplay pendiente de centros por pose y visibilidad de pecho recortada al pelaje. No equivale a arte completo para otras poses.

@@ -11,6 +11,8 @@ uniform bool galaxy = false;
 uniform float galaxy_intensity: hint_range(0.,1.) = 1.;
 // Mastery-only silhouette halo. Disabled for regular Galaxy and all other horses.
 uniform bool mastery_aura = false;
+uniform bool mastery_sun = false;
+uniform vec2 mastery_sun_center=vec2(.70,.60);
 uniform float mastery_aura_strength: hint_range(0.,2.) = 1.;
 uniform float galaxy_star_density: hint_range(0.,1.) = 1.;
 uniform vec4 mastery_aura_color: source_color=vec4(.24,.57,1.,1.);
@@ -175,6 +177,19 @@ void fragment(){
   float lum=original_horse?.25:dot(coat_color.rgb,vec3(.2126,.7152,.0722));vec3 fg=emblem_color.rgb;vec3 opposite=lum>.46?vec3(.125,.106,.11):vec3(1.,.95,.85);
   float horse_only=step(.5,m.r)*step(.01,src.a);
   col=mix(col,opposite,edge*.9*horse_only);col=mix(col,fg,ink*horse_only);
+ }
+ // A separate mastery mark, never written to hereditary emblems or masks.
+ if(mastery_sun && galaxy){
+  vec2 q=(UV-mastery_sun_center)*vec2(936.,983.);
+  float r=length(q);float angle=atan(q.y,q.x);
+  float disc=1.-smoothstep(21.,25.,r);
+  float ray_shape=pow(max(0.,cos(angle*12.)),8.);
+  float rays=ray_shape*smoothstep(20.,27.,r)*(1.-smoothstep(28.,43.,r));
+  float glow=exp(-r*r/1250.)*.42;
+  float coat_only=m.r*src.a;
+  vec3 sun_color=mix(vec3(1.,.69,.20),vec3(1.,.96,.72),disc*.8);
+  col=mix(col,sun_color,(disc*.94+rays*.80)*coat_only);
+  col+=vec3(.30,.56,1.)*glow*coat_only;
  }
  float out_alpha=src.a;
  if(mastery_aura && galaxy){

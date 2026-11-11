@@ -39,6 +39,7 @@ static func apply_horse(view:TextureRect,horse:Dictionary,hat:String="original")
   if HorseMastery.galaxy_master(horse):
    view.material.set_shader_parameter("galaxy_palette_preview",true)
    view.material.set_shader_parameter("mastery_aura",true)
+   view.material.set_shader_parameter("mastery_sun",true)
    view.material.set_shader_parameter("mastery_aura_strength",1.8)
    view.material.set_shader_parameter("galaxy_star_density",1.)
    view.material.set_shader_parameter("galaxy_intensity",1.)
