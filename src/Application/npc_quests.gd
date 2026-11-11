@@ -1,7 +1,7 @@
 class_name NpcQuests
 extends RefCounted
 ## Data only: the same accept/event/completion flow serves every NPC/objective.
-const NPCS=[{"id":"farmer","name":"Granjero","position":Vector2(310,190),"placeholder":true,"quests":["farmer_pigs","farmer_goats"]}]
+const NPCS=[{"id":"farmer","name":"Granjero","position":Vector2(310,190),"placeholder":false,"quests":["farmer_pigs","farmer_goats"]}]
 const QUESTS={
  "east_flower":{"npc":"story","title":"Una flor al este","kind":"find_object","target":"east_flower","goal":1,"requires":"","trigger":{"axis":"east","chunks":15,"comparison":"gt"},"text":"Has cruzado más de 15 bloques hacia el este. Hay una flor silvestre especial cerca: búscala.","active":"Más de 15 bloques al este: encuentra la flor azul","done":"Has encontrado la flor del este."},
  "farmer_pigs":{"npc":"farmer","title":"Un favor para el granjero","kind":"capture_animal","target":"pig","goal":3,"requires":"","text":"¿Me harías un favor? Necesito tres cerdos salvajes para mi negocio. Persíguelos con el lazo hasta capturarlos.","active":"Captura 3 cerdos salvajes","done":"¡Gracias! Ya tengo los tres cerdos. Me has ayudado mucho."},
