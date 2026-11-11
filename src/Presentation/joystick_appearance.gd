@@ -26,8 +26,13 @@ static func apply(level:Node)->void:
  var h:Dictionary=save.horse_collection.find(save.horse_collection.selected)
  var traits:Dictionary=h.get("traits",{"coat":10,"pattern":0,"mane":1})
  var key:String=str(traits)
- if not cache.has(key):cache[key]=[texture_for(traits,false),texture_for(traits,true)]
- for v in [level.get_node("TouchControls/MoveJoystick"),level.aim_joystick]:
+ var sticks=[level.get_node("TouchControls/MoveJoystick"),level.aim_joystick]
+ var needs_textures=false
+ for v in sticks:
+  if "joystick_texture" in v or "tip_texture" in v:needs_textures=true
+ # Native sticks only consume theme colors. Do not synthesize unused220pxart.
+ if needs_textures and not cache.has(key):cache[key]=[texture_for(traits,false),texture_for(traits,true)]
+ for v in sticks:
   # Godot 4.7 native VirtualJoystick has no texture properties (custom stick era did);
   # assign only when present so apply() never aborts mid-theming.
   if "joystick_texture" in v:v.joystick_texture=cache[key][0]

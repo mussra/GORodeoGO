@@ -37,12 +37,26 @@ func enter_world():
  var fade=create_tween();fade.tween_property(curtain,"modulate:a",1.0,.22).set_trans(Tween.TRANS_SINE)
  await fade.finished
  if not parade.prepared:await parade.preparation_finished
+ # ResourceLoader owns background I/O/import; nodes and gameplay caches remain on main.
+ var scene_path="res://src/Presentation/frontier_world.tscn"
+ var request_error=ResourceLoader.load_threaded_request(scene_path,"PackedScene")
  phase_name="warm_selected"
  await _warm_selected()
  phase_name="warm_showcase"
  await _warm_showcase()
+ phase_name="world_resource"
+ if request_error==OK:
+  while ResourceLoader.load_threaded_get_status(scene_path)==ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+   await get_tree().process_frame
+  if ResourceLoader.load_threaded_get_status(scene_path)==ResourceLoader.THREAD_LOAD_LOADED:
+   var scene:PackedScene=ResourceLoader.load_threaded_get(scene_path)
+   phase_name="scene_ready_chunks"
+   get_tree().change_scene_to_packed(scene)
+   return
+ # Failure retains the established route instead of trapping the loading cover.
+ push_warning("Background world load unavailable; using ordinary scene load")
  phase_name="scene_ready_chunks"
- get_tree().change_scene_to_file("res://src/Presentation/frontier_world.tscn")
+ get_tree().change_scene_to_file(scene_path)
 func _warm_showcase():
  var art=load("res://src/Presentation/wild_horse_art.gd")
  for horse in WorldTestZone.HORSES:

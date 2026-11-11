@@ -37,7 +37,7 @@ var _herd_horses: Dictionary = {}
 ## dirección de la marcha. El conjunto ACTIVO sigue siendo el 3x3 alrededor del
 ## jinete: nodos al árbol, descubrimiento y guardado solo ocurren al activar.
 const CHUNK_BUILD_BUDGET_MS := 3.0
-const CHUNK_COVERED_BUILD_BUDGET_MS := 2.0
+const CHUNK_COVERED_BUILD_BUDGET_MS := 8.0
 const CHUNK_LOOKAHEAD_SECONDS := 3.0
 var _chunk_pending: Dictionary = {}  # key -> builder en curso (fuera del árbol)
 var _chunk_built: Dictionary = {}    # key -> builder terminado (caché fuera del árbol)

@@ -9,7 +9,7 @@ La velocidad inicial suma vectorialmente la del caballo al soltarse: destino=ori
 AnimalFatigue compartido solo drena si está enlazado. Huir libre no drena; recupera incluso mientras huye. Ruptura por distancia/contacto comienza recuperación en ese mismo tick, preservando la fatiga restante. Los animales lejanos también recuperan aunque no se dibuje su movimiento. No cambia encargo requerido, recompensas, captura de agotados con lazo ni regla de soltar al recibir golpe.
 
 ## Carga: candidato experimental, no arreglo móvil certificado
-Presupuesto cubierto12→2ms; calentamiento repartido por frame; texturas del mismo jinete seleccionado precalentadas antes de crear mundo; mundo aún incompleto no se dibuja debajo de la cortina opaca. Recolor/upload por textura y creación de escena siguen siendo indivisibles. No traslado inseguro de nodos/cachés a otro hilo.
+Presupuesto cubierto12→8ms(tras comparar variante2ms); calentamiento repartido por frame; texturas del mismo jinete seleccionado precalentadas antes de crear mundo; mundo aún incompleto no se dibuja debajo de la cortina opaca. Recolor/upload por textura y creación de escena siguen siendo indivisibles. No traslado inseguro de nodos/cachés a otro hilo.
 
 Comparativa real mismo escritorio con Vulkan por software, perfiles limpios, no grabación aFPSfijos:
 2.7.82:8,64shasta listo; p5052,9ms,p9564,5ms,máximo186,2ms,2frames>100ms.
@@ -32,4 +32,15 @@ Prueba real desde(14000,160)hasta(0,160),9chunkslistos,velocidad0. Vídeo recort
 ## QA
 Unitarias completas con test de proyección:474/474,57207aserciones. Test de vuelo real nuevo normal/tiempo bala para ambos modos y test de vuelta:2/2,35aserciones. Frontera/lazo9/9,31aserciones. Fixture actualizado: el antiguo test exigía agotamiento huyendo libre y no abría el encargo obligatorio. No se quitó ningún gate de producción. Test de lazo nuevo fuerza velocidad constante para comprobar herencia; preview controlada usa componentes reales con movimiento guionizado, no es una partida libre.
 
-Batería final repetida:474/474unitarias y2/2integraciones dirigidas(35aserciones). Pendiente: confirmar suelta al volver a casa, feedback de previews, diagnóstico móvil y posterior autorización para APK. No toda integración ni certificación móvil.
+Batería final repetida:474/474unitarias y2/2integraciones dirigidas(35aserciones). Confirmado por Ant a las12:14: volver a casa suelta el animal donde estaba, sin captura/transporte gratis. Pendiente: feedback de previews, diagnóstico móvil y posterior autorización para APK. No toda integración ni certificación móvil.
+
+## Seguimiento12:20: fuentes concretas de pausas
+Sondas temporales(no retenidas en producción): _build_hud82,3ms, de los cuales70,4ms eran JoystickAppearance generando dos texturas220pxque el VirtualJoystick nativo no consume. Se omite generación si ningún joystick tiene propiedades de textura, manteniendo compatibilidad con consumidores antiguos y mismos colores de tema. Otra sonda midió145,8msen change_scene_to_file(carga de recurso síncrona). Ahora ResourceLoader carga el PackedScene en segundo plano mientras se precalienta; nodos, escenas y cachés de juego siguen en hilo principal. Se espera estado LOADED antes de obtenerlo; si falla conserva ruta original para no atrapar cortina.
+
+Con ambos cambios, nuevas mediciones reales de escritorio/software, perfiles de usuario distintos:
+-2ms:13,59s,p5040,3ms,p9560,0ms,máximo92,9ms,0>100ms. Dos repeticiones tuvieron13,06/13,44sy máximos115,7/125,6msen fase prepare,1>100ms. No desaparece toda pausa ni es un dato Android.
+-8ms:12,09s,p5043,1ms,p9562,4ms,máximo90,8ms,0>100ms.
+-12ms:11,12s,p5043,5ms,p9565,8ms,máximo101,1ms,1>100ms.
+Se conserva8mscomo candidato equilibrado, no certificación de mejora móvil. Los números anteriores de2mscon escena síncrona siguen arriba como comparación y no representan el código final. El mayor pico de escena se redujo, pero prepare/warm_selected todavía pueden producir>100msy la entrada sigue más larga que2.7.82.
+
+QA final del candidato con carga de recurso en segundo plano y presupuesto8ms:475/475unitarias,57210aserciones; integración casa/velocidad2/2,35aserciones; frontera/lazo9/9,31aserciones. Suite unitaria sigue emitiendo avisos de orphans/leaks y error de guardado en fixture de entrenamiento; pasar aserciones no equivale a ausencia de esos avisos. Captura final de entrada real inspeccionada: actor visible y cortina retirada,9chunksactivos. Sin nuevo APK.
