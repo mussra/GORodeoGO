@@ -32,6 +32,10 @@ signal release_requested
 @export var capture_area_visual_radius: float = 58.0
 
 var aim_direction: Vector2 = Vector2.RIGHT
+## Velocity in game-world units/sec, same clock as rope tween and rider physics.
+var rider_velocity:Callable=func()->Vector2:return Vector2.ZERO
+static func inherited_landing(origin:Vector2,aim:Vector2,distance:float,velocity:Vector2,travel:float)->Vector2:
+	return origin+aim.normalized()*distance+velocity*travel
 var throw_guard: Callable = func() -> bool: return true
 var prey_provider: Callable = func() -> Array: return []
 var can_capture: Callable = func() -> bool: return true
@@ -146,7 +150,7 @@ func _start_charging() -> void:
 
 func _update_charge_visual() -> void:
 	if _charge_visual != null:
-		_charge_visual.points = PackedVector2Array([Vector2.ZERO, aim_direction * _charge_distance])
+		_charge_visual.points = PackedVector2Array([Vector2.ZERO, inherited_landing(Vector2.ZERO,aim_direction,_charge_distance,rider_velocity.call(),lasso_travel_time)])
 
 ## The charge-aim target circle, drawn identically by the corral rider and the
 ## world rider (Ant 21:47: "El círculo de apuntar el lazo no aparece" — the
@@ -156,7 +160,7 @@ func draw_charge_aim(canvas: Node2D) -> void:
 		return
 	# Draw exactly at the charge rope's endpoint (Ant 22:23, "el círculo de
 	# apuntar se separa"): circle and rope can never drift apart.
-	var target: Vector2 = aim_direction * charge_distance()
+	var target: Vector2 = inherited_landing(Vector2.ZERO,aim_direction,charge_distance(),rider_velocity.call(),lasso_travel_time)
 	if _charge_visual != null and _charge_visual.points.size() == 2:
 		target = _charge_visual.points[1]
 	canvas.draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
@@ -202,13 +206,13 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 		aim_direction = final_vector.normalized()
 		_charge_distance = LassoAim.throw_distance(final_vector, max_throw_distance)
 
-	var landing_point: Vector2 = get_parent().global_position + aim_direction * _charge_distance
+	var landing_point: Vector2 = inherited_landing(get_parent().global_position,aim_direction,_charge_distance,rider_velocity.call(),lasso_travel_time)
 	var throw_origin: Vector2 = get_parent().global_position
 	_cancel_charge()
 
 	# Simulated flight time (GAMEPLAY_SPEC.md #Lanzamiento: "sensación de altura" — the rope
 	# travels before landing; the prey can move away in the meantime). The line animates in
-	# world space: destination stays fixed but the rope origin follows the rider.
+	# world space: destination includes velocity at release; later rider changes do not steer it.
 	lasso_released.emit()
 	_lasso_in_flight = true
 	_flight_generation += 1

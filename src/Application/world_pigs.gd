@@ -70,6 +70,7 @@ static func chase_tick(state:Dictionary,dist:float,_speed:float,roped:bool,delta
  var out:Dictionary=state.duplicate()
  out.break_rope=false
  if roped and dist>CHASE_ROPE_RANGE:
+  out=AnimalFatigue.tick(out,dist<CHASE_TRIGGER_RANGE,false,delta)
   out.break_rope=true;out.progress=0.0
   return out
  out=AnimalFatigue.tick(out,roped or dist<CHASE_TRIGGER_RANGE,roped,delta)
@@ -77,8 +78,7 @@ static func chase_tick(state:Dictionary,dist:float,_speed:float,roped:bool,delta
  out.still=0.0
  return out
 
-## After a rope break the pig bolts but keeps its fatigue: re-roping a
-## half-tired pig is worth it.
+## Break preserves remaining fatigue, already recovering from the break tick.
 static func after_rope_break(state:Dictionary)->Dictionary:
  var out:Dictionary=new_chase_state()
  out.run=float(state.get("run",0.0));out.tired=bool(state.get("tired",false));out.rest=float(state.get("rest",0.0));out.flee=not out.tired

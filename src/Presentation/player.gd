@@ -164,6 +164,7 @@ func _ready() -> void:
 	cue_layer.layer=16
 	add_child(cue_layer)
 	lasso = LassoController.new()
+	lasso.rider_velocity = func()->Vector2:return velocity
 	lasso.max_throw_distance = max_throw_distance
 	lasso.charge_speed = charge_speed
 	lasso.lasso_travel_time = lasso_travel_time

@@ -23,7 +23,19 @@ func actor(kind:String,sizing:float)->AnimatedSprite2D:
   if Time.get_ticks_usec()-start>8000:
    await get_tree().process_frame;start=Time.get_ticks_usec()
  var sprite=AnimatedSprite2D.new();sprite.sprite_frames=frames;sprite.scale=Vector2.ONE*sizing
- sprite.play("side");sprite.speed_scale=.52;sprite.visible=false
+ sprite.play("side");sprite.speed_scale=.52 if kind=="rider" else 1.0;sprite.visible=false
+ if kind in ["pig","goat","horse"]:
+  var feet:Array=[]
+  for i in 9:
+   var image=frames.get_frame_texture("side",i).get_image()
+   if image.is_compressed():image.decompress()
+   var bottom:int=0
+   for y in image.get_height():
+    for x in image.get_width():
+     if image.get_pixel(x,y).a>.15:bottom=maxi(bottom,y)
+   feet.append(bottom)
+  var reference:float=feet[0]
+  sprite.frame_changed.connect(func():sprite.offset.y=reference-float(feet[sprite.frame]))
  add_child(sprite);return sprite
 func _ready():
  prepare.call_deferred()
@@ -52,7 +64,7 @@ func _draw():
  draw_rect(Rect2(0,394,1280,326),Color("142c33"))
  draw_line(Vector2(0,394),Vector2(1280,394),Color("385052"),2)
  for i in 24:
-  var x=fposmod(i*61.0-age*235.0,1280.0)
+  var x=fposmod(i*61.0-age*160.0,1280.0)
   draw_line(Vector2(x,512+i%3*23),Vector2(x+13,512+i%3*23),Color("294146"),2)
 func _process(delta:float):
  if not prepared:return
@@ -62,9 +74,9 @@ func _process(delta:float):
  rider.position=Vector2(drift_x(age if ready_age<0 else ready_age),345)
  for a in actors:
   var local=fposmod(t-a.delay,cycle)
-  a.sprite.visible=local<5.0
+  a.sprite.visible=local<7.8
   if not a.sprite.visible:continue
-  a.sprite.position=Vector2(lerpf(1420,-140,local/5.0),465 if a.kind=="horse" else 462)
+  a.sprite.position=Vector2(lerpf(1420,-140,local/7.8),465 if a.kind=="horse" else 462)
   if a.kind=="farmer":
    a.sprite.position.y=433+sin(local*8.0)*2.0;a.sprite.rotation=sin(local*4.0)*.018
  if ready_age>=0:

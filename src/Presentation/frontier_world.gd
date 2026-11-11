@@ -37,7 +37,7 @@ var _herd_horses: Dictionary = {}
 ## dirección de la marcha. El conjunto ACTIVO sigue siendo el 3x3 alrededor del
 ## jinete: nodos al árbol, descubrimiento y guardado solo ocurren al activar.
 const CHUNK_BUILD_BUDGET_MS := 3.0
-const CHUNK_COVERED_BUILD_BUDGET_MS := 12.0
+const CHUNK_COVERED_BUILD_BUDGET_MS := 2.0
 const CHUNK_LOOKAHEAD_SECONDS := 3.0
 var _chunk_pending: Dictionary = {}  # key -> builder en curso (fuera del árbol)
 var _chunk_built: Dictionary = {}    # key -> builder terminado (caché fuera del árbol)
@@ -86,6 +86,7 @@ var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
 func _ready() -> void:
 	FrontierTransition.obtain(get_tree())
+	visible=false
 	y_sort_enabled = true
 	SaveData.ensure_world_seed()
 	var base := ColorRect.new()
@@ -143,6 +144,9 @@ func _process(delta: float) -> void:
 	if _loading_world:
 		if not _build_queue.is_empty():return
 		_loading_world=false
+		visible=true
+		if _returning_home:
+			_returning_home=false;_home_pending=false;SaveData.save_world_state(player.position)
 		FrontierTransition.obtain(get_tree()).reveal()
 		player.set_physics_process(true)
 	_tick_npcs()
@@ -270,6 +274,8 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 ## pista se concreta con cada intento (fase de sesion) y cada caballo tiene
 ## un enfriamiento para no machacar con el mismo aviso.
 var _loading_world:bool=true
+var _returning_home:bool=false
+var _home_pending:bool=false
 var _stallion_hint_stage: int = 0
 
 func _stallion_hint(horse: Node2D) -> void:
@@ -674,6 +680,7 @@ func _tick_pigs(delta: float) -> void:
 				continue
 			var dist: float = player.position.distance_to(pig.position)
 			if dist > 700.0 and not pig.roped:
+				pig.state=WorldPigs.chase_tick(pig.state,dist,player.velocity.length(),false,delta)
 				pig._art.speed_scale=0.0
 				all_captured = false
 				continue
@@ -834,9 +841,17 @@ func _refresh_missions() -> void:
 	_missions_label.text = tr("WORLD_MISSIONS") % [counts.get("offered", 0) + counts.get("encargo", 0), counts.get("done", 0)]
 
 func _home() -> void:
-	var tween := create_tween()
-	tween.tween_property(player, "position", HOME_POS, 0.6).set_trans(Tween.TRANS_SINE)
-	tween.tween_callback(func(): SaveData.save_world_state(player.position))
+	if _loading_world or _home_pending:return
+	_home_pending=true
+	var cover=FrontierTransition.obtain(get_tree(),false)
+	var fade=cover.create_tween();fade.tween_property(cover.curtain,"modulate:a",1.0,.22)
+	await fade.finished
+	if not cover.parade.prepared:await cover.parade.preparation_finished
+	_release_held_horse()
+	player.lasso.cancel_all_actions();player.dodge.cancel();player.velocity=Vector2.ZERO;player.set_physics_process(false)
+	_loading_world=true;_returning_home=true;visible=false
+	player.position=HOME_POS
+	_update_chunks()
 
 func _menu() -> void:
 	SaveData.save_world_state(player.position)
@@ -1256,6 +1271,7 @@ func _tick_goats(delta:float)->void:
 	for goat in _prototype_goats.get_children():
 		var dist:float=player.position.distance_to(goat.position)
 		if dist>700 and not goat.roped:
+			goat.state=WorldGoats.tick(goat.state,dist,false,delta)
 			goat.movement=Vector2.ZERO;continue
 		var st:Dictionary=WorldGoats.tick(goat.state,dist,goat.roped,delta)
 		goat.state=st

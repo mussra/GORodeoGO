@@ -20,6 +20,7 @@ func _fresh_world() -> Node2D:
 	SaveData.world_tamed.clear()
 	SaveData.world_missions.clear()
 	SaveData.world_pigs.clear()
+	SaveData.world_quests={};NpcQuests.accept(SaveData.world_quests,"farmer_pigs")
 	SaveData.world_edits.clear()
 	SaveData.horse_collection.seed_trial()
 	SaveData.world_position = Vector2(0, 160)
@@ -170,13 +171,9 @@ func test_lasso_ropes_pig_and_timer_captures() -> void:
 	world.player.position = Vector2(0, 160)
 	var pig:Node2D=world._lasso_pigs()[0]
 	world.player.position=pig.position+Vector2(-140,0)
-	# The pig bolts as soon as the rider is close; nearly tired, it stops soon.
-	pig.state["run"] = WorldPigs.CHASE_TIRE_SECONDS - 0.2
-	for i in range(30):
-		await wait_physics_frames(3)
-		if bool(pig.state.get("tired", false)):
-			break
-	assert_true(bool(pig.state.get("tired", false)), "the fleeing pig tires")
+	# Free chase no longer drains energy. Exhaustion only happens on a rope.
+	pig.state["run"] = WorldPigs.CHASE_TIRE_SECONDS
+	pig.state["tired"] = true
 	world.player.position = pig.position + Vector2(-140, 0)
 	await wait_physics_frames(2)
 	world.player.lasso._release_throw(Vector2(140.0 / 220.0, 0))
@@ -197,6 +194,7 @@ func test_lasso_ropes_pig_and_timer_captures() -> void:
 
 func test_distance_snaps_the_pig_rope():
 	var w=_fresh_world()
+	while w._loading_world:await wait_process_frames(1)
 	await wait_physics_frames(2)
 	w.set_process(false);w.set_physics_process(false);w.player.set_physics_process(false)
 	var chunk=w._chunks.values()[0]

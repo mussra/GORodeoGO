@@ -16,7 +16,7 @@ func test_tired_unroped_pig_recovers_and_restarts_repeatedly():
  var st=WorldPigs.new_chase_state()
  for cycle in 3:
   st.run=WorldPigs.CHASE_TIRE_SECONDS-.01
-  st=WorldPigs.chase_tick(st,80,700,false,.1)
+  st=WorldPigs.chase_tick(st,80,700,true,.1)
   assert_true(st.tired);assert_false(st.flee)
   for frame in 51:st=WorldPigs.chase_tick(st,80,0,false,.1)
   assert_false(st.tired);assert_true(st.flee,"Recupera aunque el jinete siga cerca y quieto")
@@ -45,10 +45,10 @@ func test_wild_horse_does_not_freeze_at_home_leash():
 func test_pig_and_goat_share_visible_energy_exhaustion_capture_and_recovery():
  for goat in [false,true]:
   var st=WorldGoats.new_state() if goat else WorldPigs.new_chase_state();var previous=1.0
-  for frame in 69:
-   st=WorldGoats.tick(st,100,false,.1) if goat else WorldPigs.chase_tick(st,100,260,false,.1)
+  for frame in 46:
+   st=WorldGoats.tick(st,100,true,.1) if goat else WorldPigs.chase_tick(st,100,260,true,.1)
    assert_false(st.tired);var energy=AnimalFatigue.energy(st);assert_lt(energy,previous);previous=energy
-  st=WorldGoats.tick(st,100,false,.1) if goat else WorldPigs.chase_tick(st,100,260,false,.1)
+  st=WorldGoats.tick(st,100,true,.1) if goat else WorldPigs.chase_tick(st,100,260,true,.1)
   assert_true(st.tired);assert_eq(AnimalFatigue.energy(st),0.0)
   var held=st.duplicate(true)
   held=WorldGoats.tick(held,100,true,.9) if goat else WorldPigs.chase_tick(held,100,260,true,.9)

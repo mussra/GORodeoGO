@@ -38,12 +38,12 @@ func test_chase_pig_flees_when_rider_close():
  st=WorldPigs.chase_tick(st,600.0,260.0,false,0.1)
  assert_false(st.flee)
 
-func test_chase_running_tires_the_pig():
+func test_chase_running_without_rope_never_tires_the_pig():
  var st:=WorldPigs.new_chase_state()
  for i in int(WorldPigs.CHASE_TIRE_SECONDS/0.1)+2:
   st=WorldPigs.chase_tick(st,100.0,260.0,false,0.1)
- assert_true(st.tired)
- assert_false(st.flee)
+ assert_false(st.tired)
+ assert_true(st.flee)
 
 func test_chase_roped_runs_within_rope_and_tires_faster():
  var st:=WorldPigs.new_chase_state()

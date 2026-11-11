@@ -53,6 +53,7 @@ var lasso: LassoController = null
 
 func _ready() -> void:
 	lasso = LassoController.new()
+	lasso.rider_velocity = func()->Vector2:return velocity
 	lasso.throw_guard = func() -> bool: return _stun_time_remaining <= 0.0 and is_physics_processing()
 	# Ant 22:55 ("el lazo no vuela en el modo frontera"): the flight rope and the
 	# landing flash use WORLD coordinates, so they must hang from the world (like

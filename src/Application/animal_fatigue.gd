@@ -20,7 +20,7 @@ static func tick(state:Dictionary,running:bool,roped:bool,delta:float)->Dictiona
     out.tired=false;out.rest=0.0;out.run=RUN_SECONDS*RESTED_FRACTION;out.flee=running
   return out
  out.rest=0.0;out.progress=0.0;out["flee"]=running
- if running:
+ if running and roped:
   out.run=minf(RUN_SECONDS,out.run+delta*(ROPED_MULTIPLIER if roped else 1.0))
   if out.run>=RUN_SECONDS-.00001:out.tired=true;out.flee=false
  elif not roped:out.run=maxf(0.0,out.run-delta*RUN_SECONDS/RECOVER_SECONDS)
