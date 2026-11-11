@@ -10,3 +10,16 @@ static func visual(t:Dictionary)->Array[String]:
 static func performance(h:Dictionary,concrete:bool)->Array[String]:
  if not concrete:return ["Rendimiento y habilidades:", "no definidos hasta conseguirlo."]
  return ["Rendimiento: consulta las barras", "Salto: "+("Disponible" if HorseJump.capable(h) else "Por aprender"),"Esquiva: "+("Disponible" if HorseTraining.knows(h,"dodge") else "Por aprender")]
+## Read-only explanation of existing traits, never extra genes or inheritance rules.
+static func hidden_genes(t:Dictionary)->Array[String]:
+ var lines:Array[String]=[]
+ var pattern:int=int(t.get("pattern",0));var spots:int=HorseCollection.spots_index(t)
+ var covered:bool=t.get("finish","normal") in ["galaxy","original"]
+ var same_color:bool=spots==int(t.get("coat",10))
+ # Original giraffe pigment is the same brown as the Castaño coat.
+ if spots<0 and ((pattern==10 and int(t.get("coat",10))==10) or (pattern==11 and int(t.get("coat",10))==0)):same_color=true
+ if pattern>0 and pattern<HorseCollection.PATTERNS.size() and (covered or (same_color and pattern!=4)):
+  lines.append("Lleva gen: "+HorseCollection.PATTERNS[pattern]+" (oculto)")
+ if spots>=0 and spots<HorseCollection.COATS.size() and (pattern in [0,4] or covered):
+  lines.append("Lleva gen: color de manchas "+HorseCollection.COATS[spots]+" (oculto)")
+ return lines

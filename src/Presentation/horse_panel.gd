@@ -148,7 +148,7 @@ func detail_view()->void:
  sprite(h,Vector2(30,205),390)
  var scroll:=ScrollContainer.new();scroll.position=Vector2(470,130);scroll.size=Vector2(770,540);content.add_child(scroll)
  var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(735,0);box.add_theme_constant_override("separation",12);scroll.add_child(box)
- for text in HorseValues.visual(t)+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
+ for text in HorseValues.visual(t)+(HorseValues.hidden_genes(t) if owned else [])+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
   var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);box.add_child(line)
  HorseStatBars.create(box,h,owned)
  if not owned:
