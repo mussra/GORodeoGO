@@ -1,0 +1,667 @@
+{
+  "hat-pixellab-diag_down-00": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-00.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_00.png",
+    "hash": "94c2fef19827ad8e96e7722d610f63a9deba2a54ba3836593f3f2f32e03bdf4e",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-01": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-01.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_01.png",
+    "hash": "980b324a5f46df404a4a56b6c9c79d9be3405bec7f0fcb235452430e49376316",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-02": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-02.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_02.png",
+    "hash": "a430a9bcc0e62457df669f83ff2a1ad7ad839ed051d8ce04ba0838b97c54d524",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-03": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-03.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_03.png",
+    "hash": "77f332fdff4bda6c6fa6a46dc91e0ade9a82c34e6a0f98300d66f4064f1d3f20",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-04": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-04.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_04.png",
+    "hash": "e0a2a1fe1f9f5888b5ffb72c2212a5e027ee28e009b92995a56f13ac5d904337",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-05": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-05.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_05.png",
+    "hash": "972745c18a0a1faf4273a99997cb02e37013c5497f9228618c4cf6bfc6d73a44",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-06": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-06.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_06.png",
+    "hash": "2d8547d5310d3bf05ca9d47c50d64feec0308b2b63e8aa3d062242c14b1f0b3f",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-07": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-07.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_07.png",
+    "hash": "d42a6bec5d94a25b182cc0867e9be6a5a4b06b662b540719d20ad79ce0da40e3",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_down-08": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_down-08.png",
+    "source": "art/experimental/pixellab/rider/diag_down/frame_08.png",
+    "hash": "5fb93ae117cb376b534b433fe5e97374228682b4b0c6b6fa5753f34d0f308f17",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-00": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-00.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_00.png",
+    "hash": "7926caeac825230289aed6c86213deff38ae2858ef9e80091057688702a9b2a2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-01": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-01.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_01.png",
+    "hash": "2add9568e2fe21f8a67bf01a12135ab87a78bc809ec00f24ebcd7a5392d3785a",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-02": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-02.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_02.png",
+    "hash": "c0770357a2d01742425280adb3fa60458aeb5eba7e4f03d80421a662ed7aaaf8",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-03": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-03.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_03.png",
+    "hash": "d8654f9d153f7d4d066a222435532f86efb62bd0f440b43ce1b2e373f17baf79",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-04": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-04.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_04.png",
+    "hash": "33fd5bd8c33a6eb39a6d71638bc11e0a76ffb5d63077a77d9871bcf360d620a8",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-05": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-05.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_05.png",
+    "hash": "b720fde7878c044b948d844a9920052bb92031e2e05ede29c53239f633010dd5",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-06": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-06.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_06.png",
+    "hash": "1add0d45fb314f7283d6e0527a37f99f4a4569a19db77f6c37cedac583c71eb8",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-07": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-07.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_07.png",
+    "hash": "ee124c4b544c9b6670744c8ac0152f3147f3ab68955444ab7116dbb83de760a7",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-diag_up-08": {
+    "path": "art/hat_masks_v10/hat-pixellab-diag_up-08.png",
+    "source": "art/experimental/pixellab/rider/diag_up/frame_08.png",
+    "hash": "7f5d6f28dc7349fd0a6dab990cfe14755a6516d81d374d253df1eac62f0f8aca",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-00": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-00.png",
+    "source": "art/experimental/pixellab/rider/down/frame_00.png",
+    "hash": "b2647e1eb337ee8934211742699a0cf192c3c7ef1cf687794d0fdf9a2c06c149",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-01": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-01.png",
+    "source": "art/experimental/pixellab/rider/down/frame_01.png",
+    "hash": "a282195a25687acce9e49747b6441a1a94bc885480190af8cacccd8507d35030",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-02": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-02.png",
+    "source": "art/experimental/pixellab/rider/down/frame_02.png",
+    "hash": "3dd30bc3c0e1cc6046233ca654492a385a64b354fec61d04091b51afc2baedb7",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-03": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-03.png",
+    "source": "art/experimental/pixellab/rider/down/frame_03.png",
+    "hash": "03ee18bc715c0f6b1d05849ddb99c0e996a677acbf89f24d7f2df017964e5272",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-04": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-04.png",
+    "source": "art/experimental/pixellab/rider/down/frame_04.png",
+    "hash": "0a604c487165889b961e1661ddc154bc65e392334808733ea1accffd74d89898",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-05": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-05.png",
+    "source": "art/experimental/pixellab/rider/down/frame_05.png",
+    "hash": "9c846cfb932bf9eade49858e00dbb723c284896652f28fd0e00877cca1ee2501",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-06": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-06.png",
+    "source": "art/experimental/pixellab/rider/down/frame_06.png",
+    "hash": "77e63966950179b38a60762ecba5b8018ee8ebc72a0ba30464f8c7fd091d4d11",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-07": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-07.png",
+    "source": "art/experimental/pixellab/rider/down/frame_07.png",
+    "hash": "598593e4925e1ccdcfe48289e0fa5ae14c9712b35af6cd43544114b300e324d0",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-down-08": {
+    "path": "art/hat_masks_v10/hat-pixellab-down-08.png",
+    "source": "art/experimental/pixellab/rider/down/frame_08.png",
+    "hash": "5a9128b5fabb117af668f1c9ddf54542b2575a5199c0a5746c0f33ef1a9c4d9c",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-00": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-00.png",
+    "source": "art/experimental/pixellab/rider/side/frame_00.png",
+    "hash": "6bff86f99be499cce9ea29ae4c3909bdfb067ef90507a7e68817d5bb33be0266",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-01": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-01.png",
+    "source": "art/experimental/pixellab/rider/side/frame_01.png",
+    "hash": "5243c978a746f978d7b2faec2ae9c2eb45d0ed07509e8dad4c366266f30552ec",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-02": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-02.png",
+    "source": "art/experimental/pixellab/rider/side/frame_02.png",
+    "hash": "313c60781c1020c2ca86ebde037ce51e13e7e9d9e62c66c1df706b1870f2bf5e",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-03": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-03.png",
+    "source": "art/experimental/pixellab/rider/side/frame_03.png",
+    "hash": "33606ceaffb8cdbdf0f77ff5a0ee320940c44639d3354cf190711f01f49b22e0",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-04": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-04.png",
+    "source": "art/experimental/pixellab/rider/side/frame_04.png",
+    "hash": "5bb5ef2d063b7a6dcdc70f8a1f4dca523941c8229419129625b6d5b0b2b4a823",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-05": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-05.png",
+    "source": "art/experimental/pixellab/rider/side/frame_05.png",
+    "hash": "ef4b6ff4632d1760c3d83e6fa388651871135ef1fb8dfe926f58025d74d01ec7",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-06": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-06.png",
+    "source": "art/experimental/pixellab/rider/side/frame_06.png",
+    "hash": "b59ed7359e684b3bca8243ee7b4967b81d313f4198a7fd4f7a875522e243fd9b",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-07": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-07.png",
+    "source": "art/experimental/pixellab/rider/side/frame_07.png",
+    "hash": "c79a097d399aebc4238bac9c120087113bd790c5f28c217c82eb963eee776e57",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-side-08": {
+    "path": "art/hat_masks_v10/hat-pixellab-side-08.png",
+    "source": "art/experimental/pixellab/rider/side/frame_08.png",
+    "hash": "df33003d5a1875f2c5088d3e98d8bb2dfcec5801dd7f739591f3173f340fffb4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-00": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-00.png",
+    "source": "art/experimental/pixellab/rider/up/frame_00.png",
+    "hash": "6edc8d7d33c7beb07136f0e757b743e8222c68fae5412b319221a6c59157f554",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-01": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-01.png",
+    "source": "art/experimental/pixellab/rider/up/frame_01.png",
+    "hash": "6e048fa78ceb20dde586b557cc2565df595225368216d69897d0446752dc87ae",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-02": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-02.png",
+    "source": "art/experimental/pixellab/rider/up/frame_02.png",
+    "hash": "9d3b0a058591389115ece707d34fa9fc7094c7f633306dd2b74e761af3165ad7",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-03": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-03.png",
+    "source": "art/experimental/pixellab/rider/up/frame_03.png",
+    "hash": "17fe8c61825f19269e11e1cc0aa3e8692e6c97d3ac4419bc368fa8539a468898",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-04": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-04.png",
+    "source": "art/experimental/pixellab/rider/up/frame_04.png",
+    "hash": "af62e662b1d1faeaf4fca4ab7f44a2afa09fd35ad22df622468b6366e9b88565",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-05": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-05.png",
+    "source": "art/experimental/pixellab/rider/up/frame_05.png",
+    "hash": "077250d75bb6a7d0f092b3f82abf856f16375b4b986e7a929179bedc4dd5a16a",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-06": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-06.png",
+    "source": "art/experimental/pixellab/rider/up/frame_06.png",
+    "hash": "095f28f5cb0a26defc17852f3e0d3183f1752fd62cf9b42c1186fd7faa47755e",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-07": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-07.png",
+    "source": "art/experimental/pixellab/rider/up/frame_07.png",
+    "hash": "9f10983593476bae77924e82a33b96e5e9b29d0441de67ef4158c2f75f3b1166",
+    "w": 96,
+    "h": 96
+  },
+  "hat-pixellab-up-08": {
+    "path": "art/hat_masks_v10/hat-pixellab-up-08.png",
+    "source": "art/experimental/pixellab/rider/up/frame_08.png",
+    "hash": "567e306cbc2579bf38b59eabb69a7b7f8432f12e4f961cb069a882a5e8cb5a30",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-idle-frame_00": {
+    "path": "art/hat_masks_v10/hat-classic-idle-frame_00.png",
+    "source": "art/player/idle/frame_00.png",
+    "hash": "e8bcae28a5595a4638ea3b34f69758c51a3298f3430bbc578031df51707084e8",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-idle-frame_01": {
+    "path": "art/hat_masks_v10/hat-classic-idle-frame_01.png",
+    "source": "art/player/idle/frame_01.png",
+    "hash": "2ea822726eef4c0829ea5db79af4b78a848b7b1e865dbfeeb29308ca4eb44978",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-idle-frame_02": {
+    "path": "art/hat_masks_v10/hat-classic-idle-frame_02.png",
+    "source": "art/player/idle/frame_02.png",
+    "hash": "03e4e450dda74bef2dd307d88fcfe2ea96693b097e8f7c27a8ef1f1ca38d2b34",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-idle-frame_03": {
+    "path": "art/hat_masks_v10/hat-classic-idle-frame_03.png",
+    "source": "art/player/idle/frame_03.png",
+    "hash": "e69bcb1fa2c97efd96f1fb3c0ab171f34c8347aa7a6af736427b78d62881a350",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-idle-frame_04": {
+    "path": "art/hat_masks_v10/hat-classic-idle-frame_04.png",
+    "source": "art/player/idle/frame_04.png",
+    "hash": "dffcaf8a7813735df576eccd6609fb944ddf7d8d1f7956694b7250013b447ae8",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-idle-frame_05": {
+    "path": "art/hat_masks_v10/hat-classic-idle-frame_05.png",
+    "source": "art/player/idle/frame_05.png",
+    "hash": "3fe49fe68592cfa75f73b003b12cc1384ed768a99397cc0c396a3f88c0cbac04",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_00": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_00.png",
+    "source": "art/player/jump_diag_down/frame_00.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_01": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_01.png",
+    "source": "art/player/jump_diag_down/frame_01.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_02": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_02.png",
+    "source": "art/player/jump_diag_down/frame_02.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_03": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_03.png",
+    "source": "art/player/jump_diag_down/frame_03.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_04": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_04.png",
+    "source": "art/player/jump_diag_down/frame_04.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_05": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_05.png",
+    "source": "art/player/jump_diag_down/frame_05.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_06": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_06.png",
+    "source": "art/player/jump_diag_down/frame_06.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_down-frame_07": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_down-frame_07.png",
+    "source": "art/player/jump_diag_down/frame_07.png",
+    "hash": "13337b4c6f6f223e3f73bd92a12d1d5fbcc017d309432e5384eb90d0f1ff6fc4",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_00": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_00.png",
+    "source": "art/player/jump_diag_up/frame_00.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_01": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_01.png",
+    "source": "art/player/jump_diag_up/frame_01.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_02": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_02.png",
+    "source": "art/player/jump_diag_up/frame_02.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_03": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_03.png",
+    "source": "art/player/jump_diag_up/frame_03.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_04": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_04.png",
+    "source": "art/player/jump_diag_up/frame_04.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_05": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_05.png",
+    "source": "art/player/jump_diag_up/frame_05.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_06": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_06.png",
+    "source": "art/player/jump_diag_up/frame_06.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_diag_up-frame_07": {
+    "path": "art/hat_masks_v10/hat-classic-jump_diag_up-frame_07.png",
+    "source": "art/player/jump_diag_up/frame_07.png",
+    "hash": "419216f7f30f36007ed60d3aae8e11c9fd95620aa69deb5d2370aff0537a8659",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_00": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_00.png",
+    "source": "art/player/jump_down/frame_00.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_01": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_01.png",
+    "source": "art/player/jump_down/frame_01.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_02": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_02.png",
+    "source": "art/player/jump_down/frame_02.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_03": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_03.png",
+    "source": "art/player/jump_down/frame_03.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_04": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_04.png",
+    "source": "art/player/jump_down/frame_04.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_05": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_05.png",
+    "source": "art/player/jump_down/frame_05.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_06": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_06.png",
+    "source": "art/player/jump_down/frame_06.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_down-frame_07": {
+    "path": "art/hat_masks_v10/hat-classic-jump_down-frame_07.png",
+    "source": "art/player/jump_down/frame_07.png",
+    "hash": "0667f2e43926c22cf2f4e569d988c54c06dd9e3b7d30c0205f78c5f91787e395",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_00": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_00.png",
+    "source": "art/player/jump_side/frame_00.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_01": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_01.png",
+    "source": "art/player/jump_side/frame_01.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_02": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_02.png",
+    "source": "art/player/jump_side/frame_02.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_03": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_03.png",
+    "source": "art/player/jump_side/frame_03.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_04": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_04.png",
+    "source": "art/player/jump_side/frame_04.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_05": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_05.png",
+    "source": "art/player/jump_side/frame_05.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_06": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_06.png",
+    "source": "art/player/jump_side/frame_06.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_side-frame_07": {
+    "path": "art/hat_masks_v10/hat-classic-jump_side-frame_07.png",
+    "source": "art/player/jump_side/frame_07.png",
+    "hash": "4abe4964adb8ed3d601af71504864e20de381cbb1e707f2d30ea9375aa05d9d2",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_00": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_00.png",
+    "source": "art/player/jump_up/frame_00.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_01": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_01.png",
+    "source": "art/player/jump_up/frame_01.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_02": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_02.png",
+    "source": "art/player/jump_up/frame_02.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_03": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_03.png",
+    "source": "art/player/jump_up/frame_03.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_04": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_04.png",
+    "source": "art/player/jump_up/frame_04.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_05": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_05.png",
+    "source": "art/player/jump_up/frame_05.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_06": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_06.png",
+    "source": "art/player/jump_up/frame_06.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-jump_up-frame_07": {
+    "path": "art/hat_masks_v10/hat-classic-jump_up-frame_07.png",
+    "source": "art/player/jump_up/frame_07.png",
+    "hash": "f3f8793f3093973f57cfb045b9b090b676b569a9c9274cb5826a38e223a6b087",
+    "w": 96,
+    "h": 96
+  },
+  "hat-classic-stunned-frame_0": {
+    "path": "art/hat_masks_v10/hat-classic-stunned-frame_0.png",
+    "source": "art/player/stunned/frame_0.png",
+    "hash": "776031b06e9ad24e05d0fdc01c0950fbf18fab3cb310917763b9fca62b246140",
+    "w": 96,
+    "h": 96
+  },
+  "hat-portrait": {
+    "path": "art/hat_masks_v10/hat-portrait.png",
+    "source": "art/portraits/adult_hd.png",
+    "hash": "7aae6c8aaa0fcbe7397e220340c8f718fc3ff62feefb3c911c8bf325b53033a7",
+    "w": 936,
+    "h": 983
+  },
+  "hat-drink-0": {
+    "path": "art/hat_masks_v10/hat-drink-0.png",
+    "source": "art/experimental/drink_preview83/pose_0.png",
+    "hash": "4d7711d24e27c06d3019dcd0884b4dba6bee6dba5da601175ada0e6c44e7df9e",
+    "w": 112,
+    "h": 96
+  },
+  "hat-drink-1": {
+    "path": "art/hat_masks_v10/hat-drink-1.png",
+    "source": "art/experimental/drink_preview83/pose_1.png",
+    "hash": "086a55e252417afb47ce5c185920a734cb00b9db337da9aef9c2b643919d5632",
+    "w": 112,
+    "h": 96
+  }
+}

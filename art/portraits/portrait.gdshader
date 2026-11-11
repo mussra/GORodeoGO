@@ -12,6 +12,8 @@ uniform bool galaxy_palette_preview = false;
 uniform vec4 galaxy_dark: source_color=vec4(.12,.03,.09,1.);
 uniform vec4 galaxy_light: source_color=vec4(.95,.30,.65,1.);
 uniform bool galaxy_blue_mix=false;
+uniform sampler2D hat_mask: filter_linear;
+uniform bool separate_hat_mask=false;
 uniform sampler2D region_mask: filter_linear;
 uniform sampler2D light_legs_mask: filter_linear;
 uniform sampler2D lower_legs_mask: filter_linear;
@@ -67,16 +69,51 @@ float genetic_pattern(vec2 p,int shape){
  for(int i=0;i<128;i++){if(i>=spot_count)break;vec4 spot=spot_data[i];vec2 q=p-spot.xy;float cs=cos(spot.w),sn=sin(spot.w);q=mat2(vec2(cs,-sn),vec2(sn,cs))*q/spot.z;if(dot(q,q)>3.5)continue;cover=max(cover,shape_cover(q,shape));}
  return cover;
 }
+float galaxy_hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float galaxy_noise(vec2 p){
+ vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(galaxy_hash(i),galaxy_hash(i+vec2(1,0)),f.x),mix(galaxy_hash(i+vec2(0,1)),galaxy_hash(i+vec2(1,1)),f.x),f.y);
+}
+float galaxy_cloud(vec2 p){
+ float n=0.,amp=.56;
+ for(int i=0;i<4;i++){n+=amp*galaxy_noise(p);p=mat2(vec2(.8,.6),vec2(-.6,.8))*p*2.1+vec2(13.2,7.1);amp*=.48;}
+ return n;
+}
+float galaxy_stars(vec2 p){
+ vec2 grid=p/4.3;vec2 cell=floor(grid);float brightness=0.;
+ for(int yy=-1;yy<=1;yy++){for(int xx=-1;xx<=1;xx++){
+  vec2 c=cell+vec2(float(xx),float(yy));float h=galaxy_hash(c);
+  if(h>.38)continue;
+  vec2 place=c+vec2(.18+.64*galaxy_hash(c+37.),.18+.64*galaxy_hash(c+93.));
+  vec2 d=(grid-place)*4.3;float r=length(d);float radius=mix(.10,.27,galaxy_hash(c+11.));
+  float core=1.-smoothstep(radius*.3,radius+.10,r);
+  float glow=exp(-r*r/(radius*radius*7.))*.30;
+  float rays=(exp(-abs(d.x)*25.)*exp(-abs(d.y)*3.)+exp(-abs(d.y)*25.)*exp(-abs(d.x)*3.))*.38;
+  brightness=max(brightness,core+glow+(h<.075?rays:0.));
+ }}
+ return clamp(brightness,0.,1.);
+}
 vec3 galaxy_color(vec2 p){
  float wave=(sin(p.x*.22+p.y*.12)+cos(p.y*.29-p.x*.09)+2.)/4.;float neb=exp(-pow((p.y-(.45*p.x+21.))/9.,2.));
  vec3 c=vec3(30.+105.*wave+45.*neb,28.+40.*wave+60.*neb,80.+100.*wave+55.*neb)/255.;
  if(galaxy_palette_preview){
-  c=mix(galaxy_dark.rgb,galaxy_light.rgb,.18+.72*wave)+neb*galaxy_light.rgb*.15;
+  float cloud=galaxy_cloud(p*.105);
+  float dust=galaxy_cloud(p*.30+vec2(8.1,4.2));
+  float ribbon=exp(-pow((p.y-(.46*p.x+21.+sin(p.x*.12)*5.))/6.,2.));
+  float wisps=smoothstep(.35,.77,cloud)*(.30+.70*dust);
+  c=mix(galaxy_dark.rgb*.40,galaxy_light.rgb,.14+.55*wisps+.32*ribbon);
   if(galaxy_blue_mix){
-   float blend=smoothstep(.26,.72,(sin(p.x*.13-p.y*.09)+cos(p.y*.17)+2.)/4.);
-   vec3 blue=mix(vec3(.025,.065,.20),vec3(.18,.46,.94),wave)+neb*vec3(.08,.16,.25);
+   float blend=smoothstep(.28,.70,galaxy_cloud(p*.07+vec2(19,7)));
+   vec3 blue=mix(vec3(.008,.018,.09),vec3(.08,.34,.82),.20+.65*cloud+.20*ribbon);
    c=mix(c,blue,blend);
   }
+  // Pale nebula filaments, deep dust lanes and a seeded point-star field.
+  float filament=smoothstep(.58,.78,dust)*ribbon;
+  c+=mix(galaxy_light.rgb,vec3(.55,.76,1.),galaxy_blue_mix?.65:.18)*(ribbon*.28+filament*.44);
+  c*=1.-smoothstep(.59,.79,galaxy_cloud(p*.19+29.))* .47;
+  float stars=galaxy_stars(p);
+  c=mix(c,vec3(.98,.99,1.),stars);
+  return clamp(c,0.,1.);
  }
  vec2 stars[10]={vec2(27,48),vec2(32,60),vec2(60,56),vec2(69,38),vec2(77,45),vec2(62,65),vec2(24,69),vec2(72,67),vec2(53,73),vec2(67,28)};
  for(int i=0;i<10;i++)if(distance(p,stars[i])<.5)c=vec3(.957,.969,1.);
@@ -113,7 +150,7 @@ void fragment(){
   if(pattern==4)coverage=max(coverage,step(.01,texture(light_legs_mask,UV).r));
   col=mix(col,legs_color.rgb*shade,coverage);
  }
- if(!original_hat)col=mix(col,hat_color.rgb*shade,m.b);
+ if(!original_hat)col=mix(col,hat_color.rgb*shade,(separate_hat_mask?texture(hat_mask,UV).b:m.b));
  if(custom_eyes){vec3 eye=eye_color.rgb;if(eye_style>=20)eye=special_eye(vec2((UV.x*936.-748.)/118.,(UV.y*983.-244.)/25.));col=mix(col,eye*clamp(max(src.r,max(src.g,src.b))/.65,.15,1.15),texture(eye_mask,UV).r);}
  if(emblem_enabled){
   vec2 step_uv=1./vec2(936.,983.);float ink=texture(emblem_mask,UV).a;float edge=ink;

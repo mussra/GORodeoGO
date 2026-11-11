@@ -7,8 +7,8 @@ static func cache_key(t:Dictionary)->String:
  return str(t)
 static func pose_texture(kind:String,view:String,i:int,traits:Dictionary)->Texture2D:
  var base:Texture2D=load("res://art/experimental/pixellab/%s/%s/frame_%02d.png"%[kind,view,i])
- if traits.is_empty():return base
- var key:String=kind+view+str(i)+str(traits)
+ if traits.is_empty():return HatAppearance.tint(base,"res://art/hat_masks_v10/hat-pixellab-%s-%02d.png"%[view,i],SaveData.hat_color) if kind=="rider" else base
+ var key:String=kind+view+str(i)+str(traits)+(SaveData.hat_color if kind=="rider" else "")
  if texture_cache.has(key):return texture_cache[key]
  var pose:String=kind+view+str(i)
  if not image_cache.has(pose):
@@ -19,6 +19,7 @@ static func pose_texture(kind:String,view:String,i:int,traits:Dictionary)->Textu
   image_cache[pose]=[mask,uv]
  var images:Array=image_cache[pose]
  var result:Texture2D=HorseAppearance.texture(base,"walk_"+view,i,traits,images[0],images[1])
+ if kind=="rider":result=HatAppearance.tint(result,"res://art/hat_masks_v10/hat-pixellab-%s-%02d.png"%[view,i],SaveData.hat_color)
  if texture_cache.size()>600:texture_cache.clear()
  texture_cache[key]=result;return result
 

@@ -23,12 +23,7 @@ static func texture(pose:int,traits:Dictionary,hat:String)->Texture2D:
   for x in image.get_width():
    if eyes.get_pixel(x,y).r>.5 and traits.has("eyes"):
     var old=image.get_pixel(x,y);var c=HorseAppearance.eye_color_at(HorseCollection.eye_index(traits),Vector2(x/112.0,y/96.0));image.set_pixel(x,y,Color(c.r,c.g,c.b,old.a))
-   if mask.get_pixel(x,y).b>.5:
-    var old=raw.get_pixel(x,y)
-    if HatAppearance.sanitize(hat)=="original":image.set_pixel(x,y,old)
-    else:
-     var c=Color("415c81") if hat=="blue" else Color("c8b994");var shade=clampf(maxf(old.r,maxf(old.g,old.b))/.65,.25,1.18);image.set_pixel(x,y,Color(c.r*shade,c.g*shade,c.b*shade,old.a))
- var tex=ImageTexture.create_from_image(image);cache[key]=tex;return tex
+ var tex=HatAppearance.tint(ImageTexture.create_from_image(image),"res://art/hat_masks_v10/hat-drink-%d.png"%pose,hat);cache[key]=tex;return tex
 func stop()->void:
  active=false;idle=0;elapsed=0;source=null
  if is_instance_valid(visual):visual.visible=false

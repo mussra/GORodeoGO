@@ -109,6 +109,7 @@ func _ready() -> void:
 	_sprite_swap = SpriteSwap.new(self, placeholder, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.unreplaced_rider_animations(ANIM_NAMES))
 	if not horse.is_empty() and _sprite_swap.has_sprite():
 		HorseAppearance.apply(_sprite_swap._frames, horse.traits)
+	if _sprite_swap.has_sprite():HatAppearance.apply_classic(_sprite_swap._frames,SaveData.hat_color)
 	if _sprite_swap.has_sprite():PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}))
 	if not horse.is_empty():
 		max_speed = HorseStats.read(horse).speed

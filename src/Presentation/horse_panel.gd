@@ -229,6 +229,7 @@ func _on_atlas_filter(idx:int,pid:String,values:Array)->void:
 func atlas_view()->void:
  label(tr("MARKET_BALANCE")%SaveData.equipment_points if page=="market" else tr("UI_121"),Vector2(35,105),25)
  if page=="atlas":
+  button("Unicornios",Vector2(760,100),func():add_child(UnicornAtlasPanel.new()),235)
   var order_btn:=button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(1015,575),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),230)
   order_btn.add_theme_font_size_override("font_size",14)
  _atlas_filter_bar()
