@@ -9,11 +9,13 @@ var capable: bool = true
 var ratio: float = 1.0  # 0..1, 1 = ready
 
 func _ready() -> void:
+	visible=capable
 	custom_minimum_size = Vector2(72, 72)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	queue_redraw()
 
 func set_state(p_capable: bool, p_ratio: float) -> void:
+	visible=p_capable
 	if capable == p_capable and is_equal_approx(ratio, p_ratio):
 		return
 	capable = p_capable

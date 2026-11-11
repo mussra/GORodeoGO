@@ -3,6 +3,7 @@ extends "res://src/Presentation/wild_pig.gd"
 ## Shares lasso target, release, rope and nonblocking Node2D with pigs.
 const IS_GOAT:bool=true
 static var frames_cache:Dictionary={}
+var _fence_jump:float=0
 var goat_art:AnimatedSprite2D
 var pixellab_views:Array=[]
 func setup(p_pen:Dictionary)->void:
@@ -19,6 +20,9 @@ func _ready()->void:
  goat_art.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
  add_child(goat_art);goat_art.play("run")
 func _process(delta:float)->void:
+ _fence_jump=maxf(0,_fence_jump-delta)
+ z_index=30 if _fence_jump>0 else 0
+ goat_art.position.y=-sin(PI*(1-_fence_jump/.48))*28 if _fence_jump>0 else 0
  touch_grace=maxf(0,touch_grace-delta)
  if roped:held=maxf(0,held-delta)
  var wanted:String=AnimalDirection.available_view(movement,pixellab_views)
@@ -33,4 +37,5 @@ func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
  var speed:float=WorldGoats.CHARGE_SPEED if charge else WorldGoats.FLEE_SPEED
  var target:Vector2=position+movement.normalized()*speed*delta
  if not charge:target=WorldEscapeMotion.bounded_step(position,home,point,target-position,550.0)
+ if _fence_jump<=0 and WorldFence.crosses(self,target+movement.normalized()*20):_fence_jump=.48
  movement=(target-position).normalized();position=target

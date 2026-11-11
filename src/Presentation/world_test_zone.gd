@@ -98,20 +98,8 @@ func _add_house(world: Node2D, h: Dictionary) -> void:
 	Physics.add_box(world, Rect2(base + Vector2(73, 60), Vector2(47, 10)))
 
 func _rail_seg(world: Node2D, pos: Vector2, horizontal: bool) -> void:
-	var size := Vector2(28, 8) if horizontal else Vector2(8, 28)
-	# upright post + rails along the run direction (only the rails rotate)
-	var node := DrawNode.new()
-	node.position = ZONE_POS + pos + Vector2(0, 4)
-	node.draw_origin = Vector2(0, -4)
-	var ang := 0.0 if horizontal else PI * 0.5
-	node.draw_fn = func(n):
-		n.draw_set_transform(Vector2(0, -16), ang, Vector2.ONE)
-		n.draw_texture_rect(RAILS_TEX, Rect2(Vector2(-17, -9), Vector2(34, 18)), false)
-		n.draw_set_transform(Vector2.ZERO)
-		var pw := 34.0 * POST_TEX.get_width() / float(POST_TEX.get_height())
-		n.draw_texture_rect(POST_TEX, Rect2(Vector2(-pw * 0.5, -30), Vector2(pw, 34)), false)
-	world.add_child(node)
-	Physics.add_box(world, Rect2(ZONE_POS + pos - size / 2, size))
+	var axis=Vector2.RIGHT if horizontal else Vector2.DOWN
+	WorldFence.segment(world,ZONE_POS+pos-axis*15,ZONE_POS+pos+axis*15)
 
 func _rail_nodes_h(world: Node2D, y: float, x0: float, x1: float, gap := Vector2(-1, -1)) -> void:
 	var x := x0

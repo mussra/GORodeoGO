@@ -57,6 +57,7 @@ func setup(p_herd: Dictionary) -> void:
 	home = herd.get("pos", Vector2.ZERO)
 
 func _ready() -> void:
+	collision_mask|=HorseJump.FENCE_LAYER
 	position = home
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()

@@ -26,8 +26,10 @@ var can_jump:bool=false
 var _jump_time:float=0.0
 var _jump_direction:Vector2=Vector2.RIGHT
 var _jump_mask:int=0
+var _jump_z:int=0
 var _jump_from:Vector2
 var _jump_sprite_base:Vector2
+var _jump_sprite_scale:Vector2=Vector2.ONE
 var _jump_cooldown:float=0.0
 
 var jump_recovery_multiplier:float=1.0
@@ -385,54 +387,11 @@ func dodge_preview_points(points: PackedVector2Array) -> PackedVector2Array:
 	return dodge.preview_points(points)
 
 # Auto-jump only over explicitly marked internal fences. Perimeter and rocks stay solid.
-func _try_fence_ahead()->bool:
-	if _jump_cooldown>0 or _stun_time_remaining>0 or _drawing_dodge:return false
-	var direction:Vector2=velocity.normalized()
-	var ray:=PhysicsRayQueryParameters2D.create(global_position,global_position+direction*62,32,[get_rid()])
-	var hit:Dictionary=get_world_2d().direct_space_state.intersect_ray(ray)
-	if hit.is_empty():return false
-	return request_jump(direction)
-func request_jump(direction:Vector2)->bool:
-	if not can_jump or _jump_time>0 or _jump_cooldown>0 or _stun_time_remaining>0 or direction.length()<.2:return false
-	var landing:Vector2=global_position+direction.normalized()*HorseJump.DISTANCE
-	if not world_bounds.grow(-28).has_point(landing):return false
-	var query:=PhysicsShapeQueryParameters2D.new();query.shape=$CollisionShape2D.shape;query.collision_mask=collision_mask;query.exclude=[get_rid()];query.transform=Transform2D(0,landing)
-	if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return false
-	# The whole corridor must be clear of solid non-jumpable objects.
-	query.collision_mask=collision_mask & ~32
-	for i in range(1,9):
-		query.transform=Transform2D(0,global_position.lerp(landing,float(i)/8))
-		if not get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return false
-	_jump_direction=direction.normalized();_jump_from=global_position;_jump_time=HorseJump.DURATION;_jump_mask=collision_mask;collision_mask&=~32;_jump_cooldown=1.2*jump_recovery_multiplier
-	cancel_input();_jump_time=HorseJump.DURATION
-	if _sprite_swap.has_sprite():_jump_sprite_base=_sprite_swap._sprite.position
-	jump_started.emit();return true
+func _try_fence_ahead()->bool:return HorseJumpMotion.try_ahead(self)
+func request_jump(direction:Vector2)->bool:return HorseJumpMotion.request(self,direction)
 func _overhead_bar_anchor()->Vector2:
 	var lift:float=0.0
 	if _jump_time>0 and _sprite_swap.has_sprite():lift=_sprite_swap._sprite.position.y-_jump_sprite_base.y
 	return Vector2(0,-59+lift)
-func _process_jump(delta:float)->void:
-	_jump_time=maxf(0,_jump_time-delta);var t:float=1-_jump_time/HorseJump.DURATION
-	velocity=_jump_direction*HorseJump.DISTANCE/HorseJump.DURATION
-	var hit:=move_and_collide(velocity*delta)
-	var info:Array=SpriteSwap.direction_suffix(_jump_direction)
-	if _sprite_swap.has_sprite():
-		_sprite_swap.play("jump_"+info[0]);_sprite_swap.set_flip_h(info[1])
-		_sprite_swap._sprite.pause();_sprite_swap._sprite.frame=mini(7,int(t*8))
-		# Frame animation keeps the gallop articulate. Separate squash, suspension and landing.
-		var sprite:AnimatedSprite2D=_sprite_swap._sprite
-		sprite.position=_jump_sprite_base+Vector2(0,-HorseJump.arc(t));sprite.scale=Vector2(1+.08*sin(PI*t),1-.08*sin(PI*t))
-	queue_redraw()
-	if hit!=null:_jump_time=0
-	if _jump_time<=0:
-		_finish_jump(false)
-func _finish_jump(interrupted:bool)->void:
-	_jump_time=0
-	collision_mask=_jump_mask
-	if interrupted or test_move(global_transform,Vector2.ZERO):global_position=_jump_from
-	if _sprite_swap.has_sprite():
-		_sprite_swap._sprite.position=_jump_sprite_base
-		_sprite_swap._sprite.scale=Vector2.ONE
-	velocity=Vector2.ZERO
-	jump_finished.emit()
-	queue_redraw()
+func _process_jump(delta:float)->void:HorseJumpMotion.process(self,delta)
+func _finish_jump(interrupted:bool)->void:HorseJumpMotion.finish(self,interrupted)

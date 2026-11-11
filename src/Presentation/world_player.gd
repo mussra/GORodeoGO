@@ -5,9 +5,22 @@ extends CharacterBody2D
 ## trail and recharge bar — Ant: mismo codigo); stun uses the same API and
 ## rules as the corral rider.
 
+signal jump_started
+signal jump_finished
+var can_jump:bool=false
+var world_bounds:Rect2=Rect2(-1000000,-1000000,2000000,2000000)
+var _jump_time:float=0
+var _jump_direction:Vector2=Vector2.RIGHT
+var _jump_mask:int=0
+var _jump_z:int=0
+var _jump_from:Vector2
+var _jump_sprite_base:Vector2
+var _jump_sprite_scale:Vector2=Vector2.ONE
+var _jump_cooldown:float=0
+var jump_recovery_multiplier:float=1
 signal stunned
 
-const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "gallop_side"]
+const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_diag_down", "walk_diag_up", "gallop_side", "jump_side", "jump_up", "jump_down", "jump_diag_down", "jump_diag_up"]
 
 var max_speed: float = 260.0
 var acceleration: float = 900.0
@@ -52,9 +65,10 @@ var _sprite_swap: SpriteSwap
 var lasso: LassoController = null
 
 func _ready() -> void:
+	collision_mask|=HorseJump.FENCE_LAYER
 	lasso = LassoController.new()
 	lasso.rider_velocity = func()->Vector2:return velocity
-	lasso.throw_guard = func() -> bool: return _stun_time_remaining <= 0.0 and is_physics_processing()
+	lasso.throw_guard = func() -> bool: return _jump_time<=0 and _stun_time_remaining <= 0.0 and is_physics_processing()
 	# Ant 22:55 ("el lazo no vuela en el modo frontera"): the flight rope and the
 	# landing flash use WORLD coordinates, so they must hang from the world (like
 	# the corral's level), not from the moving rider.
@@ -62,7 +76,7 @@ func _ready() -> void:
 	add_child(lasso)
 	dodge = DodgeController.new()
 	dodge.owner_body = self
-	dodge.can_start = func() -> bool: return _stun_time_remaining <= 0.0 and is_physics_processing()
+	dodge.can_start = func() -> bool: return _jump_time<=0 and _stun_time_remaining <= 0.0 and is_physics_processing()
 	dodge.resumed = func(dir: Vector2) -> void: velocity = dir * max_speed
 	dodge.on_moved = func() -> void:
 		_update_animation(get_physics_process_delta_time())
@@ -77,6 +91,7 @@ func _ready() -> void:
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()
 	fr.size = Vector2(18, 10)
+	feet.name="CollisionShape2D"
 	feet.shape = fr
 	feet.position = Vector2(0, -2)
 	add_child(feet)
@@ -94,10 +109,13 @@ func _ready() -> void:
 	if _sprite_swap.has_sprite():PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}))
 	if not horse.is_empty():
 		max_speed = HorseStats.read(horse).speed
-	if _sprite_swap.has_sprite():WorldActorScale.rider(_sprite_swap._sprite)
+	if _sprite_swap.has_sprite():
+		WorldActorScale.rider(_sprite_swap._sprite)
+		_sprite_swap._sprite.offset.y-=44.0/_sprite_swap._sprite.scale.y  # visual hooves share physics/y-sort origin
 	_sprite_swap.play("idle")
 
 func stun(duration: float = STUN_SECONDS) -> void:
+	if _jump_time>0:HorseJumpMotion.finish(self,true)
 	if _stun_time_remaining <= 0.0:
 		stunned.emit()
 	_stun_time_remaining = maxf(_stun_time_remaining, duration * stun_resistance_multiplier)
@@ -120,6 +138,9 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 	return dodge.request_path(points)
 
 func _physics_process(delta: float) -> void:
+	_jump_cooldown=maxf(0,_jump_cooldown-delta)
+	if _jump_time>0:HorseJumpMotion.process(self,delta);return
+	if can_jump and velocity.length()>60 and HorseJumpMotion.try_ahead(self):return
 	lasso.process_throw_input(delta)
 	dodge.cooldown = maxf(0.0, dodge.cooldown - delta)
 	if dodge.fade_trail(delta):
@@ -169,3 +190,8 @@ func _draw() -> void:
 func _update_animation(delta: float) -> void:
 	if _sprite_swap == null:return
 	RiderGaitVisual.apply(_sprite_swap,velocity,max_speed,gait,delta)
+
+func request_jump(direction:Vector2)->bool:return HorseJumpMotion.request(self,direction)
+func cancel_input()->void:
+	if _jump_time>0:HorseJumpMotion.finish(self,true)
+	lasso.cancel_all_actions();dodge.cancel();velocity=Vector2.ZERO

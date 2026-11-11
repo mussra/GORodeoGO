@@ -24,6 +24,9 @@ var _npc_block:Control
 var _npc_dialog:NpcDialog
 var _npc_button:Button
 var _quest_label:Label
+var _quest_toggle:Button
+var _quest_panel:PanelContainer
+var _quests_expanded:bool=false
 var _story_flower:Sprite2D
 var _flower_button:Button
 var _prototype_goats:Node2D
@@ -143,6 +146,7 @@ func _process(delta: float) -> void:
 	_drain_chunk_builds()
 	if _loading_world:
 		if not _build_queue.is_empty():return
+		WorldFence.clear_spawn(player)
 		_loading_world=false
 		visible=true
 		if _returning_home:
@@ -158,6 +162,10 @@ func _process(delta: float) -> void:
 		var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
 		player.dodge_available = HorseTraining.knows(horse, "dodge")
 		player.dodge_recharge_seconds = 2.5 * HorseTraining.recovery(horse, "dodge")
+		_gauges["dodge"].visible=player.dodge_available
+		player.can_jump=HorseJump.capable(horse);player.jump_recovery_multiplier=HorseTraining.recovery(horse,"jump")
+		_gauges["jump"].visible=player.can_jump
+		_gauges["jump"].set_state(player.can_jump,1.0-player._jump_cooldown/maxf(.01,1.2*player.jump_recovery_multiplier))
 		_gauges["dodge"].set_state(player.dodge_available, 1.0 - player.dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds))
 	_tick_hoofbeats(delta)
 	_tick_stamina(delta)
@@ -188,7 +196,7 @@ func _tick_rider_marker() -> void:
 	_marker.visible = hidden
 	if hidden:
 		var bob: float = absf(sin(Time.get_ticks_msec() / 220.0)) * 8.0
-		_marker.position = player.position + Vector2(0, -70 - bob)
+		_marker.position = player.position + Vector2(0, -114 - bob)
 		_marker.queue_redraw()
 
 
@@ -848,7 +856,7 @@ func _home() -> void:
 	await fade.finished
 	if not cover.parade.prepared:await cover.parade.preparation_finished
 	_release_held_horse()
-	player.lasso.cancel_all_actions();player.dodge.cancel();player.velocity=Vector2.ZERO;player.set_physics_process(false)
+	player.cancel_input();player.set_physics_process(false)
 	_loading_world=true;_returning_home=true;visible=false
 	player.position=HOME_POS
 	_update_chunks()
@@ -895,6 +903,7 @@ func _build_hud() -> void:
 		g.position = Vector2(1046 + i * 84, 636)
 		g.size = Vector2(76, 76)
 		g.set_state(abilities[i][1], 1.0)
+		g.visible=abilities[i][1]
 		_gauges[abilities[i][0]] = g
 		_hud.add_child(g)
 	var menu_button:=Button.new();menu_button.name="WorldNavigation";menu_button.text="Menú";menu_button.position=Vector2(1100,4);menu_button.size=Vector2(160,42);menu_button.pressed.connect(_open_navigation);_hud.add_child(menu_button)
@@ -1295,7 +1304,11 @@ func _setup_npcs()->void:
 		var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
 	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
 	_npc_button.pressed.connect(func():_open_npc(NpcQuests.NPCS[0]))
-	_quest_label=Label.new();_quest_label.position=Vector2(20,66);_quest_label.size=Vector2(1000,60);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);_hud.add_child(_quest_label)
+	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(16,56);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
+	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(16,102);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
+	_quest_label=Label.new();_quest_label.custom_minimum_size=Vector2(590,0);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);_quest_panel.add_child(_quest_label)
+	_quest_toggle.pressed.connect(func():
+		_quests_expanded=not _quests_expanded;_quest_panel.visible=_quests_expanded;_quest_toggle.text="Encargos ▾" if _quests_expanded else "Encargos ▸")
 	_story_flower=Sprite2D.new();_story_flower.texture=DecorScript.FLOWER_TEXS[14];_story_flower.scale=Vector2.ONE*30.0/_story_flower.texture.get_height();_story_flower.visible=false;add_child(_story_flower)
 	_flower_button=Button.new();_flower_button.position=Vector2(500,520);_flower_button.size=Vector2(280,48);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)

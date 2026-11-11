@@ -52,15 +52,8 @@ func _ready() -> void:
 		if p.x == INF:
 			continue
 		var pn: Vector2 = pts[(i + 1) % 32]
-		var seg := DrawNode.new()
-		seg.position = p + Vector2(0, 4)
-		seg.draw_origin = Vector2(0, -4)
-		if pn.x == INF:
-			seg.draw_fn = func(n): _draw_post(n)
-		else:
-			seg.draw_fn = func(n): _draw_fence_seg(n, p, pn)
-		world.add_child(seg)
-		Physics.add_box(world, Rect2(p - Vector2(14, 4), Vector2(28, 8)))
+		if pn.x!=INF:WorldFence.segment(world,p,pn)
+
 	# Ranch house: solid walls, open interior, door gap on the front wall.
 	var house := DrawNode.new()
 	house.position = Vector2(-45, -120)

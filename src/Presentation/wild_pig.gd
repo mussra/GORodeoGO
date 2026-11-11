@@ -64,6 +64,7 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 		away=away.rotated(sin(chase_time*2.6+home.x*.01)*.7)
 	var target: Vector2 = position + away.normalized() * speed * delta
 	if not roped:target=WorldEscapeMotion.bounded_step(position,home,from,target-position,WorldPigs.FLEE_LEASH)
+	if WorldFence.crosses(self,target):target=position
 	movement=(target-position).normalized()
 	position = target
 	flip_h = movement.x < 0.0
