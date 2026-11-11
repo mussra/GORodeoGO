@@ -44,6 +44,7 @@ func test_portrait_glow_is_master_only_and_intensity_is_configurable():
  assert_true(view.material.get_shader_parameter("mastery_sun"))
  assert_true(view.material.get_shader_parameter("mastery_moon"))
  assert_ne(view.material.get_shader_parameter("mastery_greek_preview"),true)
+ assert_eq(view.material.get_shader_parameter("mastery_mark_scale"),.7)
  assert_eq(view.material.get_shader_parameter("galaxy_intensity"),1.)
  assert_eq(view.material.get_shader_parameter("galaxy_star_density"),1.)
  assert_eq(view.material.get_shader_parameter("mastery_aura_strength"),1.8)

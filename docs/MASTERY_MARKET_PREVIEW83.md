@@ -56,3 +56,7 @@ Disco luminoso y12rayos suaves en pecho del maestro, con resplandor azul. Parám
 La luna creciente ocupa el lugar del emblema en el muslo. Decisión posterior de Ant: manda la luna. El shader oculta el emblema solo mientras se cumplen las condiciones de maestro y luna, sin borrar ni modificar el emblema guardado. Si deja de ser maestro, vuelve a verse. No se modifican archivos de máscaras ni el sistema de genes/emblemas.
 
 Sol=principio y luna=final, tema Alfa y Omega. Dos láminas de propuesta: sin letras y con Α/Ω procedurales bajo cada astro. Letras desactivadas por defecto. Cinco colores candidatos (azul, rosa con azul, verde, rojo con azul, negro), cada uno a70/100/140% del tamaño actual. No se desbloquean cinco variantes de maestro; esperando elección. Normal conserva un lavanda. Tamaño por defecto1, letras apagadas. Gameplay aún pendiente.
+
+## Selección de Ant (13:47)
+
+TamañoS70% para sol y luna, SIN letras. Aplicado como valor de Galaxy maestro en HorsePortrait. Colores aún no elegidos, se conserva azul provisional; las otras paletas siguen siendo propuestas. La opción de letras queda solo en el generador de propuesta, explícitamente apagada en la configuración de juego.
