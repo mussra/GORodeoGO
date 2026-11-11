@@ -1,10 +1,7 @@
 extends Node2D
 ## Draws the seeded dirt caminos crossing one chunk (Ant: caminos, 7-nov-2026).
-## Road tiles via the shared RoadTiles component (art sheet 23:06) stamped
-## along the seeded wander. Purely decorative - the rider can leave the path.
-
-## In-game stamp length along the path; dirt band lands at ~48px wide.
-const LENGTH := 62.0
+## Continuous one-straight ribbons and explicit derived T/cross junctions.
+## Purely decorative - the rider can leave the path.
 const SAMPLE := 24.0
 
 var c: Vector2i = Vector2i.ZERO
@@ -17,20 +14,18 @@ func _ready() -> void:
 func _draw() -> void:
 	var seed: int = SaveData.world_seed
 	var origin: Vector2 = Vector2(c) * WorldMap.CHUNK_SIZE
-	_stamp_axis(origin, true, seed)
-	_stamp_axis(origin, false, seed)
-	# Local access lanes are drawn once per owning chunk, never random branches.
+	var junctions=WorldRoadJunctions.layout(seed)
+	_stamp_axis(origin, true, seed,junctions)
+	_stamp_axis(origin, false, seed,junctions)
 	if c==Vector2i.ZERO:
-		var junctions={}
 		for lane in WorldPaths.access_lanes(seed):
-			ContinuousRoadArt.access(self,lane,32.0)
-			var branch=(lane[1]-lane[0]).normalized()
-			if not junctions.has(lane[0]):
-				ContinuousRoadArt.junction_soil(self,lane[0],23)
-				junctions[lane[0]]=true
-		ContinuousRoadArt.junction_soil(self,Vector2.ZERO,28)
+			ContinuousRoadArt.access(self,lane,32.0,junctions)
+	# Each junction has one owner, including junctions at negative coordinates.
+	for junction in junctions:
+		var owner=Vector2i((junction.center/WorldMap.CHUNK_SIZE).floor())
+		if c==owner:ContinuousRoadArt.draw_junction(self,junction)
 
-func _stamp_axis(origin: Vector2, main: bool, seed: int) -> void:
+func _stamp_axis(origin: Vector2, main: bool, seed: int,junctions:Array) -> void:
 	var n: int = int(WorldMap.CHUNK_SIZE / SAMPLE) + 5
 	var pts := PackedVector2Array()
 	for i in n:
@@ -45,4 +40,4 @@ func _stamp_axis(origin: Vector2, main: bool, seed: int) -> void:
 		if center.x < origin.x - 80.0 or center.x > origin.x + WorldMap.CHUNK_SIZE + 80.0:
 			continue
 		pts.append(center)
-	ContinuousRoadArt.ribbon(self,pts,45.0)
+	ContinuousRoadArt.ribbon(self,pts,45.0,junctions)
