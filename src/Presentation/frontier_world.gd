@@ -23,9 +23,11 @@ const ARROWS: Array[String] = ["↑", "↗", "→", "↘", "↓", "↙", "←", 
 
 var _npc_block:Control
 var _flora_layer138:FlowerExpansion138
+var _cousin_layer140:CousinLayer140
+var _journal140:Panel
 var _roaming139:WorldHerdPositions139
 var _flower_sample138:WorldFlowerTarget105
-var _npc_dialog:NpcDialog
+var _npc_dialog:Control
 var _npc_button:Button
 var _quest_label:Label
 var _quest_toggle:Button
@@ -142,6 +144,8 @@ func _ready() -> void:
 	_build_hud()
 	if SaveData.ensure_flora138():
 		_flora_layer138=FlowerExpansion138.new();_flora_layer138.name="FlowerExpansion138";_flora_layer138.z_index=-1;add_child(_flora_layer138)
+	if SaveData.ensure_cousins140():
+		_cousin_layer140=CousinLayer140.new();add_child(_cousin_layer140)
 	_setup_goat_prototype()
 	_setup_npcs()
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
@@ -158,14 +162,14 @@ func _ready() -> void:
 	# Keep the construction hidden until the original safety ring is ready.
 
 func _physics_process(delta:float)->void:
-	if _loading_world or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
+	if _loading_world or is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	# One escape decision per physics step; idle updates skipped movement at low FPS.
 	_tick_taming(delta)
 	_tick_pigs(delta)
 	_tick_goats(delta)
 
 func _process(delta: float) -> void:
-	if is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
+	if is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	_update_chunks()
 	_drain_chunk_builds()
 	if _loading_world:
@@ -442,7 +446,7 @@ func _advance_builder(b: Dictionary) -> void:
 				return
 			var d: Dictionary = todo.pop_front()
 			if SaveData.world_generator_version>=3 and not d.get("edited",false):
-				if FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):return
+				if CousinLayer140.reserved(SaveData.world_cousins140,d.pos) or FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):return
 			if WorldNominal98.enabled():
 				if not WorldNominal98.keep_decor(d,_get_surface98()):return
 				if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,d.pos,40.):return
@@ -1159,7 +1163,7 @@ class DiscoveryMap extends Control:
 				_background106.draw_style_box(MapAppearance.frame(),Rect2(Vector2.ZERO,size))
 				_background106.draw_rect(Rect2(Vector2(12,12),(size-Vector2(24,24)).max(Vector2.ZERO)),MapAppearance.floor_color("10252d")))
 			add_child(_background106);move_child(_background106,0);move_child(_terrain,1)
-		var signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, SaveData.world_flora138, size, expanded, zoom, pan])
+		var signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, SaveData.world_flora138, SaveData.world_cousins140, size, expanded, zoom, pan])
 		if _terrain_valid and signature == _terrain_signature:return
 		_terrain_signature = signature
 		_terrain_valid = true
@@ -1174,7 +1178,7 @@ class DiscoveryMap extends Control:
 		pan = pan.clamp(-limit, limit)
 		_map_geometry = {"data":data,"area":area,"cell":cell,"origin":area.position + (area.size - content) / 2.0 + (pan if expanded else Vector2.ZERO)}
 		# Store the normalized pan so clamping does not trigger a second rebuild.
-		_terrain_signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, SaveData.world_flora138, size, expanded, zoom, pan])
+		_terrain_signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, SaveData.world_flora138, SaveData.world_cousins140, size, expanded, zoom, pan])
 		if _clip106==null:
 			_clip106=Control.new();_clip106.mouse_filter=Control.MOUSE_FILTER_IGNORE;_clip106.clip_contents=true;_clip106.show_behind_parent=true;add_child(_clip106)
 			_terrain.reparent(_clip106)
@@ -1408,6 +1412,16 @@ class DiscoveryMap extends Control:
 		for points in FloristJourney138.lanes(SaveData.world_flora138):
 			for segment in Geometry2D.intersect_polyline_with_polygon(points,clip):
 				for i in segment.size()-1:_terrain.draw_line(_to_map(segment[i],mins,cell,origin),_to_map(segment[i+1],mins,cell,origin),Color("bb9460"),maxf(1.,cell*.03))
+		if not SaveData.world_cousins140.is_empty():
+			for id in VillageCousins140.IDS:
+				var cousin:Vector2=VillageCousins140.point(SaveData.world_cousins140,id)
+				var lane:=PackedVector2Array([Vector2(cousin.x,470),cousin])
+				for segment in Geometry2D.intersect_polyline_with_polygon(lane,clip):
+					for i in segment.size()-1:_terrain.draw_line(_to_map(segment[i],mins,cell,origin),_to_map(segment[i+1],mins,cell,origin),Color("bb9460"),maxf(1.,cell*.03))
+				if box.has_point(cousin):
+					var point:Vector2=_to_map(cousin,mins,cell,origin)
+					_terrain.draw_circle(point,3.,Color("efb950"))
+					if expanded and cell>24.:_terrain.draw_string(get_theme_default_font(),point+Vector2(8,0),str(VillageCousins140.LABELS[id]),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("fff2bc"))
 		var destination:Vector2=FloristJourney138.door(SaveData.world_flora138)
 		if box.has_point(destination):
 			var point:Vector2=_to_map(destination,mins,cell,origin)
@@ -1476,7 +1490,7 @@ class DiscoveryMap extends Control:
 		var dot: float = maxf(1.6, cell * 0.035)
 		for d in chunk.get("decor", []):
 			if SaveData.world_generator_version>=3 and not d.get("edited",false):
-				if FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):continue
+				if CousinLayer140.reserved(SaveData.world_cousins140,d.pos) or FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):continue
 			if WorldNominal98.enabled() and not WorldNominal98.keep_decor(d,world._get_surface98()):continue
 			if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,d.pos,40.):continue
 			var p: Vector2 = _to_map(d["pos"], mins, cell, origin)
@@ -1571,6 +1585,7 @@ func _setup_npcs()->void:
 			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
 	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
 	_npc_button.pressed.connect(func():_open_npc(_nearest_npc105()))
+	var journal_button:=Button.new();journal_button.text="Primos";journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(902,4);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
 	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(652,56);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
@@ -1584,6 +1599,7 @@ func _setup_npcs()->void:
 	_flower_button=Button.new();_flower_button.position=Vector2(500,520);_flower_button.size=Vector2(280,48);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)
 func _open_npc(data:Dictionary)->void:
+	if data.has("cousin140"):_open_cousin140(str(data.cousin140));return
 	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>155.0:return
 	_refresh_quest_hud()
 	player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
@@ -1679,6 +1695,8 @@ func _npcs98()->Array:
 		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)+Vector2(110,-20)
 	else:data[1].position=WorldFloristShop.FLORIST_FEET
 	if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista del Camino del Este","position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
+	if SaveData.world_generator_version>=3 and not SaveData.world_cousins140.is_empty():
+		for id in VillageCousins140.IDS:data.append({"id":"cousin140:"+id,"name":"Loco del pueblo","position":VillageCousins140.point(SaveData.world_cousins140,id),"cousin140":id,"quests":[]})
 	return data
 
 func mountain_step103(a:Vector2,b:Vector2)->Vector2:
@@ -1855,3 +1873,18 @@ func _resume_roaming139()->void:
 				var horse:=_spawn_horse139(member,origin)
 				# setup/road safety can shift spawn. Persisted terrain location wins exactly.
 				horse.position=row.pos;horse.home=row.pos;horse.player_ref=player
+
+func _open_cousin140(id:String)->void:
+	if SaveData.world_cousins140.is_empty() or is_instance_valid(_npc_dialog) or player.position.distance_to(VillageCousins140.point(SaveData.world_cousins140,id))>155.:return
+	var next:Dictionary=SaveData.world_cousins140.duplicate(true)
+	if VillageCousins140.hear(next,id) and not SaveData.commit_cousins140(next,player.position):_toast(tr("WORLD_SAVE_FAILED104"));return
+	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
+	var dialog:=CousinDialog140.new();dialog.setup(id,SaveData.world_cousins140,VillageCousins140.surprised(SaveData.horse_collection.find(SaveData.horse_collection.selected)));_hud.add_child(dialog);_npc_dialog=dialog
+	dialog.closed.connect(_close_npc);dialog.journal_requested.connect(_show_journal140)
+func _show_journal140()->void:
+	if SaveData.world_cousins140.is_empty() or is_instance_valid(_journal140):return
+	player.cancel_input();player.set_physics_process(false)
+	_journal140=Panel.new();_journal140.position=Vector2(250,110);_journal140.size=Vector2(780,550);_journal140.z_index=150;_journal140.add_theme_stylebox_override("panel",RanchTheme.box(RanchTheme.INK,Color("6d9b94"),12));_hud.add_child(_journal140)
+	var scroll:=ScrollContainer.new();scroll.position=Vector2(24,24);scroll.size=Vector2(732,430);_journal140.add_child(scroll)
+	var body:=Label.new();body.text=VillageCousins140.journal(SaveData.world_cousins140);body.custom_minimum_size.x=700;body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",21);scroll.add_child(body)
+	var back:=Button.new();back.text="Cerrar diario";back.position=Vector2(230,475);back.size=Vector2(320,52);_journal140.add_child(back);back.pressed.connect(func():_journal140.queue_free();_journal140=null;player.set_physics_process(not is_instance_valid(_npc_dialog)))

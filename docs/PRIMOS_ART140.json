@@ -1,0 +1,52 @@
+[
+  {
+    "mode": "normal",
+    "source": "art/npc/source/primos140/loco-normal-original.png",
+    "source_sha256": "482aeda8af336c3742d1dd0380224a4100ff3b3b94783ab22c2061dd08ac35be",
+    "source_size": [
+      1254,
+      1254
+    ],
+    "crop": [
+      299,
+      136,
+      943,
+      1120
+    ],
+    "sprite_size": [
+      94,
+      144
+    ],
+    "canvas": [
+      192,
+      192
+    ],
+    "display_scale": 0.625,
+    "display_visible_height": 90
+  },
+  {
+    "mode": "sorpresa",
+    "source": "art/npc/source/primos140/loco-sorpresa-original.png",
+    "source_sha256": "c9236430f94cb8c1e4a9b85553f3bf6c4c9e103966715ea57f64f56994b41752",
+    "source_size": [
+      1254,
+      1254
+    ],
+    "crop": [
+      294,
+      29,
+      911,
+      1211
+    ],
+    "sprite_size": [
+      75,
+      144
+    ],
+    "canvas": [
+      192,
+      192
+    ],
+    "display_scale": 0.625,
+    "display_visible_height": 90
+  }
+]

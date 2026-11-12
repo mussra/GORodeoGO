@@ -99,7 +99,7 @@ func _remote_tick()->void:
   var npc:=Sprite2D.new();npc.texture=WorldFloristShop.FLORIST;npc.position=door+Vector2(110,32);npc.scale=Vector2.ONE*92./npc.texture.get_height();npc.offset=Vector2(0,-npc.texture.get_height()/2.);remote.add_child(npc)
   var label:=Label.new();label.text="Floristería del Camino del Este";label.position=door+Vector2(-150,-238);label.add_theme_font_size_override("font_size",20);remote.add_child(label)
   for side in [-1,1]:
-   var home:=Sprite2D.new();home.texture=WorldTestZone.HOUSE_TEX;home.position=door+Vector2(side*550,-110);home.scale=Vector2.ONE*116./home.texture.get_height();home.offset=Vector2(0,-home.texture.get_height()/2.);remote.add_child(home)
+   var home:=Sprite2D.new();home.texture=WorldTestZone.HOUSE_TEX;home.position=door+Vector2(side*550,-260);home.scale=Vector2.ONE*116./home.texture.get_height();home.offset=Vector2(0,-home.texture.get_height()/2.);remote.add_child(home)
    WorldPhysics.add_box(remote,Rect2(home.position+Vector2(-58,-50),Vector2(116,30)))
   _make_gardens(remote,door)
  if not near and is_instance_valid(remote):remote.queue_free();remote=null

@@ -38,6 +38,7 @@ var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
+var world_cousins140:Dictionary={} # Four-town journal, separate additive V3 state.
 var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
 var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
@@ -90,6 +91,7 @@ func save_progress() -> bool:
 	config.set_value("world", "quests", world_quests)
 	config.set_value("world","flora138",world_flora138)
 	config.set_value("world","roaming139",world_roaming139)
+	config.set_value("world","cousins140",world_cousins140)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
 	config.set_value("world","notes106",world_notes106)
@@ -132,6 +134,7 @@ func load_progress() -> void:
 	world_quests.clear()
 	world_flora138.clear()
 	world_roaming139.clear()
+	world_cousins140.clear()
 	world_missions.clear()
 	world_pigs.clear()
 	world_notes106.clear();world_notes_revision106+=1
@@ -195,6 +198,7 @@ func load_progress() -> void:
 	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
 	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
+	world_cousins140=VillageCousins140.clean(config.get_value("world","cousins140",{}),world_seed)
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
@@ -540,3 +544,15 @@ func commit_flora138(next:Dictionary,pos:Vector2)->bool:
 	world_flora138=clean
 	if save_world_state(pos):return true
 	world_flora138=before;world_position=previous;return false
+
+func ensure_cousins140()->bool:
+	if world_generator_version<3:return false
+	if not world_cousins140.is_empty():return true
+	return commit_cousins140(VillageCousins140.fresh(world_seed,world_discovered,world_flora138),world_position)
+func commit_cousins140(next:Dictionary,pos:Vector2)->bool:
+	var clean:=VillageCousins140.clean(next,world_seed)
+	if clean.is_empty():return false
+	var before:Dictionary=world_cousins140;var old_pos:Vector2=world_position
+	world_cousins140=clean
+	if save_world_state(pos):return true
+	world_cousins140=before;world_position=old_pos;return false
