@@ -1,12 +1,12 @@
 extends GutTest
-func test_new_world_picks_v2_but_seeded_world_keeps_legacy():
+func test_new_world_picks_v3_but_seeded_world_keeps_legacy():
  var script=load("res://src/Application/save_data.gd");var save=script.new();add_child_autofree(save)
  save.save_path="user://nominal98-only.dat";save.trial_session_active=true
  save.world_seed=777;save.world_generator_version=1
  assert_eq(save.ensure_world_seed(),777);assert_eq(save.world_generator_version,1)
  save.world_seed=0
- assert_gt(save.ensure_world_seed(),0);assert_eq(save.world_generator_version,2)
- assert_eq(save.world_position,WorldNominal98.home())
+ assert_gt(save.ensure_world_seed(),0);assert_eq(save.world_generator_version,3)
+ assert_eq(save.world_position,ModularWorldLayout93.world(WorldTerrain103.plan(save.world_seed).doors.ranch)+Vector2(0,70))
 func test_version_roundtrip_legacy_default_unknown_rejected():
  var script=load("res://src/Application/save_data.gd");var save=script.new();add_child_autofree(save)
  save.save_path="user://nominal98-version-only.dat";save.world_seed=12345;save.world_generator_version=2;save.trial_session_active=false;save.world_missions={"herd_1,0":"done"};save.world_tamed.assign(["herd_1,0#0"]);save.world_position=Vector2(4567,470)

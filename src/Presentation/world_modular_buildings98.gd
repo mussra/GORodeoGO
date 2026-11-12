@@ -1,9 +1,11 @@
 class_name WorldModularBuildings98
 extends Node2D
 const Layout=preload("res://src/Presentation/modular_world_layout93.gd")
+var doors:Dictionary=Layout.DOORS
 var collision_rects:Array[Rect2]=[]
 func _ready():
  y_sort_enabled=true
+ if WorldNominal98.enabled() and get_parent().has_method("_get_surface98"):doors=WorldNominal98.doors()
  _buildings()
 func _sprite(texture:Texture2D,feet:Vector2,height:float,name_:String)->Sprite2D:
  var sprite=Sprite2D.new();sprite.texture=texture;sprite.position=feet;sprite.offset=Vector2(0,-texture.get_height()/2.);sprite.scale=Vector2.ONE*height/texture.get_height();sprite.name=name_;add_child(sprite)
@@ -14,15 +16,15 @@ func _sprite(texture:Texture2D,feet:Vector2,height:float,name_:String)->Sprite2D
 func _solid(rect:Rect2):collision_rects.append(rect);WorldPhysics.add_box(self,rect)
 func _buildings():
  for id in ["house_west","house_east"]:
-  var door=Layout.world(Layout.DOORS[id]);var width=140.;var height=116.
+  var door=Layout.world(doors[id]);var width=140.;var height=116.
   # Ant's house door at 37% of the art width, threshold at the base.
   var feet=door+Vector2((.5-.37)*width,0)
   _sprite(WorldTestZone.HOUSE_TEX,feet,height,id)
   _solid(Rect2(feet+Vector2(-58,-50),Vector2(116,30)))
- var ranch=Layout.world(Layout.DOORS.ranch)
+ var ranch=Layout.world(doors.ranch)
  _sprite(preload("res://src/Presentation/world_ranch.gd").BARN_TEX,ranch+Vector2(8,0),120,"RanchBarn")
  _solid(Rect2(ranch+Vector2(-48,-45),Vector2(96,25)))
- var door=Layout.world(Layout.DOORS.florist);var offset=door-WorldFloristShop.DOOR
+ var door=Layout.world(doors.florist);var offset=door-WorldFloristShop.DOOR
  _sprite(WorldFloristShop.SHOP,WorldFloristShop.BASE+offset,200,"FloristShop")
  _solid(Rect2(WorldFloristShop.BODY.position+offset,WorldFloristShop.BODY.size))
  _sprite(WorldFloristShop.FLORIST,WorldFloristShop.FLORIST_FEET+offset,92,"Florist")

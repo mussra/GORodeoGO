@@ -6,12 +6,14 @@ var seed:int
 var modular:bool
 var dark:bool
 var nominal:bool=false
+var version:int=2
+var region_graphs:Dictionary={}
 var graph:Dictionary
 var pieces:Dictionary={}
 var lanes:Array=[]
 var axis_points:Dictionary={}
-func _init(world_seed:int=0,is_modular:bool=false,is_dark:bool=false,is_nominal:bool=false):
- seed=world_seed;modular=is_modular;dark=is_dark;nominal=is_nominal
+func _init(world_seed:int=0,is_modular:bool=false,is_dark:bool=false,is_nominal:bool=false,generator_version:int=2):
+ seed=world_seed;modular=is_modular;dark=is_dark;nominal=is_nominal;version=generator_version
  if modular:
   graph=ModularWorldLayout93.graph(world_seed if nominal else ModularWorldLayout93.DEFAULT_SEED)
   for cell in graph:pieces[cell]=ModularWorldLayout93.piece(graph,cell)
@@ -27,10 +29,19 @@ func contains(point:Vector2,margin:float=0.)->bool:
 func _contains(point:Vector2)->bool:
  if modular:
   var cell:Vector2i=Vector2i(((point-ModularWorldLayout93.ORIGIN)/ModularWorldLayout93.CELL+Vector2.ONE*.5).floor())
+  if nominal and version>=3:
+   var chunk:Vector2i=WorldMap.chunk_at(point)
+   if not region_graphs.has(chunk):
+    if region_graphs.size()>32:region_graphs.clear()
+    region_graphs[chunk]=WorldTerrain103.graph_for_chunk(seed,chunk)
+   var nearby:Dictionary=region_graphs[chunk]
+   if not nearby.has(cell):return false
+   if pieces.size()>2048:pieces.clear()
+   pieces[cell]=ModularWorldLayout93.piece(nearby,cell)
   if not pieces.has(cell):
    if nominal and cell.y==4:pieces[cell]={"kind":"straight","rotation":0}
    else:return false
-  if nominal and cell.y==4:
+  if nominal and version==2 and cell.y==4:
    var edges:Array=graph.get(cell,[]).duplicate()
    for next in [cell+Vector2i.LEFT,cell+Vector2i.RIGHT]:
     if not edges.has(next):edges.append(next)

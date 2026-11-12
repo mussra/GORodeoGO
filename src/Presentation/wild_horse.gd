@@ -126,6 +126,7 @@ func _physics_process(delta: float) -> void:
 			_art.grazing = not _art.grazing
 	var before94:Vector2=global_position
 	var wanted94:Vector2=before94+velocity*delta if escaping95 else WorldWildRoads94.safe_step(before94,before94+velocity*delta,road_provider94)
+	wanted94=WorldWildRoads94.terrain_step(self,before94,wanted94)
 	velocity=(wanted94-before94)/maxf(delta,.001)
 	move_and_slide()
 	if not escaping95 and not (road_provider94.is_valid() and road_provider94.call(before94,WorldWildRoads94.FOOTPRINT)) and not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94

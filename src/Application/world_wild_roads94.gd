@@ -41,3 +41,29 @@ static func bind_spawn(animal:Node2D,road:Callable)->void:
  if not safe.is_finite():animal.hide();animal.set_process(false);animal.set_physics_process(false);return
  animal.global_position=safe
  animal.home=animal.position
+ terrain_spawn(animal)
+static func terrain_step(animal:Node2D,a:Vector2,b:Vector2)->Vector2:
+ var node:Node=animal.get_parent()
+ while node!=null:
+  if node.has_method("mountain_step103"):return node.mountain_step103(a,b)
+  node=node.get_parent()
+ return b
+static func terrain_spawn(animal:Node2D)->void:
+ var node:Node=animal.get_parent()
+ while node!=null:
+  if node.has_method("mountain_spawn103"):
+   var safe:Vector2=node.mountain_spawn103(animal.global_position)
+   if safe.is_finite():
+    var road:Callable=provider(animal)
+    if road.is_valid() and road.call(safe,FOOTPRINT):
+     var found:bool=false
+     for ring in range(1,81):
+      for i in 16:
+       var candidate:Vector2=safe+Vector2.from_angle(i*TAU/16)*ring*12.
+       if not road.call(candidate,FOOTPRINT) and node.mountain_step103(candidate,candidate)==candidate and node.mountain_spawn103(candidate)==candidate:
+        safe=candidate;found=true;break
+      if found:break
+    animal.global_position=safe;animal.home=animal.position
+   else:animal.hide();animal.set_process(false);animal.set_physics_process(false)
+   return
+  node=node.get_parent()

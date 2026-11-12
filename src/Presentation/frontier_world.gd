@@ -62,7 +62,7 @@ var _edit_mode: bool = false
 var _stamina: Dictionary = {}
 var _road_surface94:WorldRoadSurface94
 func road_surface_contains94(point:Vector2,margin:float=0.)->bool:
-	if _road_surface94==null:_road_surface94=WorldRoadSurface94.new(SaveData.world_seed,WorldNominal98.enabled(),false,WorldNominal98.enabled())
+	if _road_surface94==null:_road_surface94=WorldRoadSurface94.new(SaveData.world_seed,WorldNominal98.enabled(),false,WorldNominal98.enabled(),SaveData.world_generator_version)
 	return _road_surface94.contains(point,margin)
 
 var _gauges: Dictionary = {}
@@ -427,6 +427,7 @@ func _advance_builder(b: Dictionary) -> void:
 			var d: Dictionary = todo.pop_front()
 			if WorldNominal98.enabled():
 				if not WorldNominal98.keep_decor(d,_get_surface98()):return
+				if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,d.pos,40.):return
 			elif not WorldFloristShop.keep_decor(d,SaveData.world_seed):return
 			var decor := DecorScript.new()
 			decor.kind = d["kind"]
@@ -538,6 +539,8 @@ func _activate_built(key: String) -> void:
 			add_child(horse)
 			entities.append(horse)
 			_herd_horses[key+"#"+str(member.member_index)] = horse
+	if SaveData.world_generator_version>=3:
+		var mountains=WorldMountains103.new();mountains.seed=SaveData.world_seed;mountains.chunk=Vector2i(cx,cy);(b["node"] as Node).add_child(mountains)
 	add_child(b["node"])
 	_chunks[key] = b["node"]
 	_chunk_entities[key] = entities
@@ -1234,7 +1237,11 @@ class DiscoveryMap extends Control:
 
 	func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		if WorldNominal98.enabled():
-			var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c)
+			if SaveData.world_generator_version>=3:
+				for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
+					var box:Rect2=ridge.box
+					_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),box.size/WorldMap.CHUNK_SIZE*cell),Color("777384"))
+			var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c,SaveData.world_generator_version)
 			for tile in graph:
 				var p=ModularWorldLayout93.world(tile)
 				if WorldMap.chunk_at(p)!=c:continue
@@ -1268,6 +1275,7 @@ class DiscoveryMap extends Control:
 		var dot: float = maxf(1.6, cell * 0.035)
 		for d in chunk.get("decor", []):
 			if WorldNominal98.enabled() and not WorldNominal98.keep_decor(d,world._get_surface98()):continue
+			if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,d.pos,40.):continue
 			var p: Vector2 = _to_map(d["pos"], mins, cell, origin)
 			if not r.grow(4.0).has_point(p):
 				continue
@@ -1423,3 +1431,8 @@ func _npcs98()->Array:
 	var data:Array=NpcQuests.NPCS.duplicate(true)
 	if WorldNominal98.enabled():data[0].position=WorldNominal98.home()+Vector2(100,10)
 	return data
+
+func mountain_step103(a:Vector2,b:Vector2)->Vector2:
+	return WorldTerrain103.safe_step(SaveData.world_seed,a,b) if SaveData.world_generator_version>=3 else b
+func mountain_spawn103(p:Vector2)->Vector2:
+	return WorldTerrain103.clear_spawn(SaveData.world_seed,p) if SaveData.world_generator_version>=3 else p

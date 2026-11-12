@@ -24,6 +24,13 @@ static func is_ranch_chunk(cx:int,cy:int)->bool:
 
 ## Deterministic content for one chunk: decoration plus an optional wild-horse herd.
 static func generate(seed:int,cx:int,cy:int)->Dictionary:
+ var chunk:Dictionary=generate_legacy(seed,cx,cy)
+ if SaveData.world_generator_version>=3:
+  for key in ["herd","pigs"]:
+   if chunk.has(key) and not chunk[key].is_empty():chunk[key].pos=WorldTerrain103.clear_spawn(seed,chunk[key].pos)
+ return chunk
+
+static func generate_legacy(seed:int,cx:int,cy:int)->Dictionary:
  var rng:=RandomNumberGenerator.new()
  rng.seed=hash("rancho-frontera-%d-%d-%d"%[seed,cx,cy])
  var origin:=Vector2(cx,cy)*CHUNK_SIZE

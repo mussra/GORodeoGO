@@ -43,4 +43,5 @@ func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
  if _fence_jump<=0 and WorldFence.crosses(self,target+movement.normalized()*20):_fence_jump=.48
  if not charge:_escape_left95=.2
  if charge and road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.safe_step(global_position,get_parent().to_global(target),road_provider94))
+ target=get_parent().to_local(WorldWildRoads94.terrain_step(self,global_position,get_parent().to_global(target))) if road_provider94.is_valid() else target
  movement=(target-position).normalized();position=target

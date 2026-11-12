@@ -66,7 +66,7 @@ var _sprite_swap: SpriteSwap
 var lasso: LassoController = null
 
 func _ready() -> void:
-	collision_mask|=64
+	collision_mask|=64|128
 	drink=HorseDrink.new(self)
 	collision_mask|=HorseJump.FENCE_LAYER
 	lasso = LassoController.new()

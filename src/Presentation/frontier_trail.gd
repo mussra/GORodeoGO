@@ -46,7 +46,7 @@ func _stamp_axis(origin: Vector2, main: bool, seed: int,junctions:Array) -> void
 	ContinuousRoadArt.ribbon(self,pts,45.0,junctions)
 
 func _draw_nominal98():
-	var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c)
+	var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c,SaveData.world_generator_version)
 	for cell in graph:
 		var pos=ModularWorldLayout93.world(cell)
 		if WorldMap.chunk_at(pos)!=c:continue
