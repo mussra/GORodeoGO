@@ -39,9 +39,13 @@ func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
  if movement.length()<1:movement=Vector2.RIGHT
  var speed:float=WorldGoats.CHARGE_SPEED if charge else WorldGoats.FLEE_SPEED
  var target:Vector2=position+movement.normalized()*speed*delta
- if not charge:target=WorldEscapeMotion.bounded_step(position,home,point,target-position,550.0)
+ if not charge and float(get_meta("escape_left110",0.))<=0.:target=WorldEscapeMotion.bounded_step(position,home,point,target-position,550.0)
  if _fence_jump<=0 and WorldFence.crosses(self,target+movement.normalized()*20):_fence_jump=.48
  if not charge:_escape_left95=.2
  if charge and road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.safe_step(global_position,get_parent().to_global(target),road_provider94))
  target=get_parent().to_local(WorldWildRoads94.terrain_step(self,global_position,get_parent().to_global(target))) if road_provider94.is_valid() else target
  movement=(target-position).normalized();position=target
+
+func _draw()->void:
+ super._draw()
+ if not roped and bool(state.get("alert110",false)) and float(state.get("spook",0.))<=0.:draw_string(ThemeDB.fallback_font,Vector2(-5,-85),"?",HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color("ffe6a0"))

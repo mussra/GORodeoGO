@@ -95,6 +95,8 @@ var _lasso_horse: Node2D = null
 ## a tall body (house, tree, cactus) covers him, so a marker floats above him
 ## (Ant 7-nov-2026 16:50: "necesito ver claramente donde esta mi vaquero").
 var _occluders: Dictionary = {}
+var _cover_index110:Dictionary={}
+var _cover_dirty110:bool=true
 var _marker: Node2D = null
 var _clop_b: AudioStream = load("res://art/audio/hoof_b.wav")
 
@@ -199,6 +201,7 @@ func register_occluder(owner, rect: Rect2) -> void:
 	if not _occluders.has(owner):
 		_occluders[owner] = []
 	_occluders[owner].append(rect)
+	_cover_dirty110=true
 
 func _tick_rider_marker() -> void:
 	var hidden: bool = false
@@ -279,6 +282,7 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 	if prey.get_script()==PigScript and not NpcQuests.can_capture(SaveData.world_quests,"pig"):return
 	if prey.get_script()==GoatScript and not NpcQuests.can_capture(SaveData.world_quests,"goat"):return
 	_lasso_horse = prey
+	if "herd" in prey or prey.get_script()==GoatScript:_panic_neighbors110(prey,prey.position)
 	prey.roped = true
 	prey.rider = player
 	if prey.get_script()==PigScript:prey.state=WorldPigs.begin_rope(prey.state)
@@ -338,7 +342,8 @@ func _update_chunks() -> void:
 			_chunk_entities.erase(key)
 			for horse_key in _herd_horses.keys():
 				if str(horse_key)==str(key) or str(horse_key).begins_with(str(key)+"#"):_herd_horses.erase(horse_key)
-		_occluders.erase(key)  # ojo: scope original (borra cada frame; bug latente, reportado)
+			_cover_dirty110=true
+			_occluders.erase(key)  # Keep loaded cover until its chunk is evicted.
 	_drop_far(pc, _chunk_pending)
 	_drop_far(pc, _chunk_built)
 	_build_queue.sort_custom(func(a, b):
@@ -514,6 +519,12 @@ func _advance_builder(b: Dictionary) -> void:
 				b["herd_cursor"] = int(b["herd_cursor"])+1
 				b["frame_specs"]=null;b["frames"]=null
 		5:
+			if not b.has("goats112"):b["goats112"]=WorldGoatPopulation112.members(SaveData.world_seed,Vector2i(cx,cy),SaveData.world_generator_version,_get_surface98())
+			if not b.goats112.is_empty():
+				var data112:Dictionary=b.goats112.pop_front()
+				if not SaveData.world_goat_captures.has(data112.id):
+					var goat112=GoatScript.new();goat112.setup(data112);goat112.set_meta("c",Vector2i(cx,cy));goat112.set_meta("capture_id112",data112.id);goat112.set_meta("origin",data112.pos);b.entities.append(goat112)
+				return
 			b["done"] = true
 
 ## El chunk construido entra en el conjunto activo (3x3): aquí es cuando sus
@@ -528,6 +539,7 @@ func _activate_built(key: String) -> void:
 	var entities: Array = b["entities"]
 	for e in entities:
 		if e.get_script()==PigScript:(b["node"] as Node).get_node("pigs").add_child(e)
+		elif e.get_script()==GoatScript:_prototype_goats.add_child(e)
 		else:add_child(e)
 	for box in b["boxes"]:
 		entities.append(Physics.add_box(self, box))
@@ -568,23 +580,53 @@ func _affinity(horse: Node2D) -> Dictionary:
 	var matches: int = WorldTaming.affinity_matches(ridden.get("traits", {}), horse.herd.get("traits", {}))
 	return {"matches": matches, "bonus": WorldTaming.affinity_bonus(matches), "leader": matches == 3 and PackLeader.is_leader(ridden, SaveData.horse_collection)}
 
+func _exit_distance110()->float:
+	var camera:Camera2D=get_viewport().get_camera_2d()
+	var zoom_:Vector2=camera.zoom if camera!=null else Vector2.ONE
+	return (get_viewport_rect().size/zoom_).length()*.5+100.
+func _flight_panic110()->void:
+	var rope=player.lasso._flight_line
+	if not is_instance_valid(rope):return
+	var selected:Node2D=null;var nearest:float=58.
+	for horse in _wild_candidates112():
+		if not is_instance_valid(horse) or horse.roped:continue
+		var distance:float=horse.position.distance_to(rope.landing)
+		if distance<nearest:selected=horse;nearest=distance
+	if selected!=null:_panic_neighbors110(selected,rope.landing)
+func _wild_candidates112()->Array:
+	var out:Array=_herd_horses.values()
+	if is_instance_valid(_prototype_goats):out.append_array(_prototype_goats.get_children())
+	return out
+func _panic_neighbors110(selected:Node2D,point:Vector2)->void:
+	for horse in _wild_candidates112():
+		if not is_instance_valid(horse) or horse==selected or horse.roped:continue
+		if "herd" in horse and _affinity(horse).leader:continue
+		if horse.position.distance_to(point)>WorldAwareness110.NEIGHBOR_RANGE and horse.get_meta("c",Vector2i(-1,-1))!=selected.get_meta("c",Vector2i(-2,-2)):continue
+		horse.set_meta("escape_left110",WorldAwareness110.PANIC_SECONDS)
+		horse.set_meta("panic_left",WorldAwareness110.PANIC_SECONDS)
+		horse.state.spook=WorldAwareness110.PANIC_SECONDS
+
 ## A guide is a movement role, distinct from the ridden horse's PackLeader skill.
 func _herd_guides()->Dictionary:
 	var groups:Dictionary={}
 	for horse in _herd_horses.values():
-		if not is_instance_valid(horse) or (not horse.roped and horse.position.distance_squared_to(player.position)>700.0*700.0) or horse.is_queued_for_deletion() or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
+		if not is_instance_valid(horse) or (not horse.roped and horse.position.distance_squared_to(player.position)>pow(maxf(700.,_exit_distance110()+200.),2)) or horse.is_queued_for_deletion() or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
 		var c:Vector2i=horse.get_meta("c",Vector2i(-999,-999))
 		if not groups.has(c):groups[c]=[]
 		groups[c].append(horse)
 	var plans:Dictionary={}
 	for c in groups:
 		var group:Array=groups[c]
-		group.sort_custom(func(a,b):return int(a.herd.get("member_index",0))<int(b.herd.get("member_index",0)))
+		group.sort_custom(func(a,b):
+			var af:bool=float(a.state.get("spook",0.))>0. or float(a.get_meta("panic_left",0.))>0.
+			var bf:bool=float(b.state.get("spook",0.))>0. or float(b.get_meta("panic_left",0.))>0.
+			if af!=bf:return af
+			return int(a.herd.get("member_index",0))<int(b.herd.get("member_index",0)))
 		var guide:Node2D=group[0]
 		var away:Vector2=(guide.position-player.position).normalized()
 		if away.length_squared()<.1:away=Vector2.RIGHT
 		# Curve back before the inherited home leash, rather than freeze at its edge.
-		if guide.position.distance_to(guide.home)>430.0:
+		if float(guide.get_meta("escape_left110",0.))<=0. and guide.position.distance_to(guide.home)>430.0:
 			away=(away+(guide.home-guide.position).normalized()*2.5).normalized()
 		var pace:float=WorldHerd.escape_speed(float(guide.get_meta("panic_left",0.0)),float(guide.get_meta("chase_time",0.0)))
 		var regroup:bool=false
@@ -604,17 +646,15 @@ func _herd_guides()->Dictionary:
 	return plans
 
 func _tick_taming(delta: float) -> void:
+	if _cover_dirty110:_cover_index110=WorldAwareness110.build_index(_occluders);_cover_dirty110=false
 	for horse in _herd_horses.values():
 		if not is_instance_valid(horse) or horse.is_queued_for_deletion():continue
+		horse.set_meta("escape_left110",maxf(0.,float(horse.get_meta("escape_left110",0.))-delta))
 		horse.set_meta("panic_left",maxf(0.0,float(horse.get_meta("panic_left",0.0))-delta))
 		var chasing:bool=not horse.roped and float(horse.state.get("spook",0.0))>0 and horse.position.distance_to(player.position)<550.0
 		horse.set_meta("chase_time",float(horse.get_meta("chase_time",0.0))+delta if chasing else 0.0)
 	var escape:Dictionary=_herd_guides()
 	var alerts:Dictionary={}
-	if player.velocity.length()>WorldTaming.SAFE_SPEED:
-		for other in _herd_horses.values():
-			if is_instance_valid(other) and not other.roped and player.position.distance_to(other.position)<WorldTaming.SPOOK_RANGE:
-				alerts[other.get_meta("c",Vector2i(-999,-999))]=true
 	for key in _herd_horses:
 		var raw = _herd_horses[key]
 		if not is_instance_valid(raw) or raw.is_queued_for_deletion():
@@ -623,7 +663,7 @@ func _tick_taming(delta: float) -> void:
 		horse.herd_guide=null
 		horse.player_ref=player
 		var dist: float = player.position.distance_to(horse.position)
-		if dist > 700.0 and not horse.roped:
+		if dist > maxf(700.,_exit_distance110()+200.) and not horse.roped:
 			continue
 		var aff: Dictionary = _affinity(horse)
 		horse.affinity_matches = aff.matches
@@ -638,9 +678,12 @@ func _tick_taming(delta: float) -> void:
 			# El semental no admitido NUNCA llena confianza en el lazo: lo rompe.
 			st = horse.state if stallion_guard else WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta, aff.bonus)
 		else:
-			if alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and not aff.leader:
-				horse.state["spook"]=WorldTaming.spook_seconds(aff.matches)
-			st = WorldTaming.tick(horse.state, dist, player.velocity.length(), player.calm(), float(horse.herd.get("temperament", 0.5)), delta, aff.bonus, WorldTaming.spook_seconds(aff.matches))
+			var cooldown:float=float(horse.get_meta("cover_clock110",0.))-delta
+			if cooldown<=0.:
+				horse.set_meta("covered110",WorldAwareness110.covered(_cover_index110,horse.position,player.position));cooldown=WorldAwareness110.COVER_CHECK_SECONDS
+			horse.set_meta("cover_clock110",cooldown)
+			st=horse.state.duplicate();st.spook=maxf(0.,float(st.get("spook",0.))-delta)
+			if not aff.leader:st=WorldAwareness110.tick(st,dist,player.velocity.length(),bool(horse.get_meta("covered110",false)),delta)
 			if stallion_guard and dist < WorldTaming.STALLION_FLEE_RANGE:
 				if float(st.get("spook", 0.0)) <= 0.0:
 					_stallion_hint(horse)
@@ -660,13 +703,15 @@ func _tick_taming(delta: float) -> void:
 				horse.approach(player.position, delta)
 			if dist < WorldTaming.CALM_RANGE * 1.5:
 				horse.face_towards(player.position)
-		elif float(horse.get_meta("panic_left",0.0))>0.0 or WorldTaming.should_flee(st, dist) or (alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and float(st.get("spook",0.0))>0 and dist<500):
+		elif (escape.has(horse) and escape[horse].guide!=horse and float(escape[horse].guide.state.get("spook",0.))>0. and horse.position.distance_to(escape[horse].guide.position)>WorldHerd.COHESION_RADIUS) or float(horse.get_meta("panic_left",0.0))>0.0 or WorldTaming.should_flee(st, dist) or (alerts.has(horse.get_meta("c",Vector2i(-998,-998))) and float(st.get("spook",0.0))>0 and dist<500):
 			if escape.has(horse):
 				horse.herd_guide=escape[horse].guide;horse.flee_velocity(escape[horse].velocity,float(horse.get_meta("panic_left",0.0))>0.0)
 			else:horse.flee_from(player.position, delta)
 			if touching and not horse._touching_rider and horse.touch_grace <= 0.0:
 				player.stun()
 				_release_held_horse()
+		elif bool(st.get("alert110",false)):
+			horse.alert_pose110(player.position)
 		elif dist < WorldTaming.CALM_RANGE * 1.5:
 			horse.face_towards(player.position)
 		horse._touching_rider = touching
@@ -954,8 +999,6 @@ func _build_hud() -> void:
 	joy.anchor_top = 0.32
 	var aim_joy: VirtualJoystick = touch.get_node("AimJoystick")
 	aim_joy.anchor_top = 0.32
-	# Shorter flight only in Frontera: a350px/s panic must remain interceptable.
-	player.lasso.lasso_travel_time=.35
 	player.lasso.set_aim_joystick(aim_joy)
 	aim_joystick = aim_joy
 	JoystickAppearance.apply(self)  # same horse-themed sticks as the levels
@@ -981,6 +1024,7 @@ func _build_hud() -> void:
 		return out
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
+	player.lasso.lasso_released.connect(func():_flight_panic110.call_deferred())
 	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _open_navigation()->void:
@@ -1457,18 +1501,27 @@ func _exit_tree()->void:
 ## Additive, repeatable near-ranch prototype; does not alter chunk RNG or saves.
 func _setup_goat_prototype()->void:
 	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";add_child(_prototype_goats)
-	for pos in ([Vector2(200,600),Vector2(320,600),Vector2(400,600)] if WorldNominal98.enabled() else [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)]):
+	for pos in ([] if SaveData.world_generator_version>=3 else ([Vector2(200,600),Vector2(320,600),Vector2(400,600)] if WorldNominal98.enabled() else [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)])):
 		if SaveData.world_goat_captures.has("goat:"+str(pos)):continue
 		var goat=GoatScript.new();goat.setup({"pos":pos});goat.set_meta("origin",pos);_prototype_goats.add_child(goat)
+	if SaveData.world_generator_version>=3:return
 	var sign:=Label.new();sign.position=Vector2(180,700) if WorldNominal98.enabled() else Vector2(-300,280);sign.text="Cabras · persigue con el lazo hasta agotar su energía";sign.add_theme_font_size_override("font_size",19);add_child(sign)
 func _tick_goats(delta:float)->void:
 	if not is_instance_valid(_prototype_goats):return
 	for goat in _prototype_goats.get_children():
 		var dist:float=player.position.distance_to(goat.position)
-		if dist>700 and not goat.roped:
+		if dist>maxf(700.,_exit_distance110()+200.) and not goat.roped:
 			goat.state=WorldGoats.tick(goat.state,dist,false,delta)
 			goat.movement=Vector2.ZERO;continue
-		var st:Dictionary=WorldGoats.tick(goat.state,dist,goat.roped,delta)
+		var panic:float=maxf(0.,float(goat.get_meta("escape_left110",0.))-delta);goat.set_meta("escape_left110",panic)
+		var aware:Dictionary=goat.state.duplicate();aware.spook=maxf(0.,float(aware.get("spook",0.))-delta)
+		if not goat.roped:
+			var clock_:float=float(goat.get_meta("cover_clock110",0.))-delta
+			if clock_<=0.:goat.set_meta("covered110",WorldAwareness110.covered(_cover_index110,goat.position,player.position));clock_=WorldAwareness110.COVER_CHECK_SECONDS
+			goat.set_meta("cover_clock110",clock_)
+			aware=WorldAwareness110.tick(aware,dist,player.velocity.length(),bool(goat.get_meta("covered110",false)),delta)
+		var escaping:bool=panic>0. or float(aware.get("spook",0.))>0.
+		var st:Dictionary=WorldGoats.tick(aware,dist if goat.roped or escaping else 1000.,goat.roped,delta)
 		goat.state=st
 		if st.break_rope:
 			var contact:bool=st.contact
@@ -1478,12 +1531,12 @@ func _tick_goats(delta:float)->void:
 			_toast(tr("WORLD_GOAT_ESCAPED"))
 		elif float(st.progress)>=1.0 and NpcQuests.can_capture(SaveData.world_quests,"goat"):
 			if goat==_lasso_horse:_end_lasso()
-			if not SaveData.record_goat104("goat:"+str(goat.get_meta("origin",goat.position))):
+			if not SaveData.record_goat104(str(goat.get_meta("capture_id112","goat:"+str(goat.get_meta("origin",goat.position))))):
 				_toast(tr("WORLD_SAVE_FAILED104"));continue
 			_refresh_quest_hud()
 			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED"))
 			continue
-		if not bool(st.get("tired",false)) and (goat.roped or dist<260):goat.move_from_or_towards(player.position,delta,goat.roped)
+		if not bool(st.get("tired",false)) and (goat.roped or escaping):goat.move_from_or_towards(player.position,delta,goat.roped)
 		else:goat.movement=Vector2.ZERO
 
 
@@ -1493,13 +1546,15 @@ func _setup_npcs()->void:
 			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
 	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
 	_npc_button.pressed.connect(func():_open_npc(_nearest_npc105()))
-	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(16,56);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
+	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(902,4);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
-	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(16,102);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
+	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(652,56);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
 	_quest_label=Label.new();_quest_label.custom_minimum_size=Vector2(590,0);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);var quest_content105=VBoxContainer.new();_quest_panel.add_child(quest_content105);quest_content105.add_child(_quest_label)
 	_flower_strip105=HBoxContainer.new();quest_content105.add_child(_flower_strip105)
 	_quest_toggle.pressed.connect(func():
-		_quests_expanded=not _quests_expanded;_quest_panel.visible=_quests_expanded;_quest_toggle.text="Encargos ▾" if _quests_expanded else "Encargos ▸")
+		_quests_expanded=not _quests_expanded;_quest_panel.visible=_quests_expanded
+		if is_instance_valid(_map_overlay) and not _map_overlay.expanded:_map_overlay.visible=not _quests_expanded
+		_quest_toggle.text="Encargos ▾" if _quests_expanded else "Encargos ▸")
 	_story_flower=Sprite2D.new();_story_flower.texture=DecorScript.FLOWER_TEXS[14];_story_flower.scale=Vector2.ONE*30.0/_story_flower.texture.get_height();_story_flower.visible=false;add_child(_story_flower)
 	_flower_button=Button.new();_flower_button.position=Vector2(500,520);_flower_button.size=Vector2(280,48);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)

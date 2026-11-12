@@ -14,7 +14,7 @@ const THROW_DISTANCE_UNLOCK_LEVEL: int = 8
 
 const SPEED_MULTIPLIER: float = 1.15
 const STUN_DURATION_MULTIPLIER: float = 0.7
-const LASSO_TRAVEL_TIME_MULTIPLIER: float = 0.75
+const LASSO_TRAVEL_TIME_MULTIPLIER: float = 1.0 # Legacy API only; flight is shared at 0.35 s.
 const THROW_DISTANCE_MULTIPLIER: float = 1.20
 
 var speed_multiplier: float = 1.0
@@ -34,8 +34,6 @@ static func for_progress(highest_level_completed: int) -> PlayerUpgrades:
 		upgrades.stun_duration_multiplier = STUN_DURATION_MULTIPLIER
 	if highest_level_completed >= DUAL_CAPTURE_UNLOCK_LEVEL:
 		upgrades.max_simultaneous_captures = 2
-	if highest_level_completed >= LASSO_SPEED_UNLOCK_LEVEL:
-		upgrades.lasso_travel_time_multiplier = LASSO_TRAVEL_TIME_MULTIPLIER
 	if highest_level_completed >= THROW_DISTANCE_UNLOCK_LEVEL:
 		upgrades.throw_distance_multiplier = THROW_DISTANCE_MULTIPLIER
 	return upgrades

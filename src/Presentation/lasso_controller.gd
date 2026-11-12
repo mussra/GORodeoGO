@@ -28,7 +28,8 @@ signal release_requested
 
 @export var max_throw_distance: float = 220.0
 @export var charge_speed: float = 300.0  # units/sec the lasso reaches out while charging (keyboard fallback)
-@export var lasso_travel_time: float = .8  # seconds between release and actual capture resolution
+const FLIGHT_SECONDS:float=.35  # Ant 12-Nov: identical in all modes, regardless of progression.
+@export var lasso_travel_time: float = FLIGHT_SECONDS  # seconds between release and actual capture resolution
 @export var capture_area_visual_radius: float = 58.0
 
 # Optional sprite-aware hand anchor in rider-local coordinates. Does not move landing/capture.

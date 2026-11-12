@@ -12,8 +12,9 @@ func test_running_alerts_group_while_slow_approach_does_not()->void:
  var w:Node2D=world();await wait_process_frames(3)
  var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":0,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
  var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
- w.player.position=horses[0].position+Vector2(-50,0);w.player.velocity=Vector2(200,0);w._tick_taming(.016)
- for horse in horses:assert_gt(float(horse.state.spook),0.0,"nearby running alerts herd members")
+ w.player.position=horses[0].position+Vector2(-50,0);w.player.velocity=Vector2(200,0)
+ for tick in 40:w._tick_taming(.016)
+ assert_gt(float(horses[0].state.spook),0.0,"fast approach flees after alert pause")
  for horse in horses:horse.state=WorldTaming.new_state()
  w.player.velocity=Vector2(80,0);w._tick_taming(.016)
  for horse in horses:assert_eq(float(horse.state.spook),0.0,"slow approach stays calm")
@@ -91,13 +92,13 @@ func test_lasso_flight_preserves_movement_and_miss_does_not_spook()->void:
  # A new throw while the rider approaches fast must NOT shield the herd.
  w.player.lasso._release_throw(Vector2(-1,0))
  w.player.position=still.position+Vector2(-70,0);w.player.velocity=Vector2(260,0)
- w._tick_taming(.016)
- assert_gt(float(still.state.spook),0.0,"normal proximity fear remains active in flight")
+ for tick in 40:w._tick_taming(.016)
+ assert_gt(float(still.state.spook),0.0,"proximity fear follows alert pause during flight")
  assert_gt(still._flee.length(),0.0)
  assert_eq(w.player.lasso.max_throw_distance,220.0)
  assert_eq(w.player.lasso.lasso_travel_time,.35)
  assert_eq(w.player.lasso.capture_area_visual_radius,58.0)
-func test_successful_landing_does_not_panic_free_herd()->void:
+func test_successful_landing_panics_companions_not_caught_horse()->void:
  var w:Node2D=world();await wait_process_frames(3)
  var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}
  var horses:Array=plant(w,Vector2i(99,99),WorldHerd.members(base,1,99,99))
@@ -107,7 +108,7 @@ func test_successful_landing_does_not_panic_free_herd()->void:
  w.player.lasso.landing_resolved.emit(horses[0].position,caught)
  assert_eq(caught,horses[0]);assert_true(caught.roped)
  for horse in horses:
-  assert_eq(float(horse.get_meta("panic_left",0.0)),0.0)
+  assert_eq(float(horse.get_meta("panic_left",0.0)),0.0 if horse==caught else WorldAwareness110.PANIC_SECONDS)
 func test_panic_group_cohesion_and_capture_remain_working()->void:
  var w:Node2D=world();await wait_process_frames(3)
  var base:Dictionary={"pos":Vector2(140,160),"traits":{"coat":0,"mane":0,"pattern":1,"eyes":0,"finish":"normal"},"temperament":.1,"stats":{"speed":260}}

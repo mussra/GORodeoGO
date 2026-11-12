@@ -1,9 +1,12 @@
 extends GutTest
 var prior:Variant
+var prior_debug:bool
 func before_each()->void:
+ prior_debug=SaveData.debug_mode;SaveData.debug_mode=true
  prior=ProjectSettings.get_setting("rancho/trial_tools",false)
  SaveData.dual_lasso_intro_shown=true
 func after_each()->void:
+ SaveData.debug_mode=prior_debug
  ProjectSettings.set_setting("rancho/trial_tools",prior)
  for a in ["move_left","move_right","move_up","move_down"]:Input.action_release(a)
 func setup_level()->Node:

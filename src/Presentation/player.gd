@@ -135,7 +135,7 @@ const ANIM_NAMES: Array = ["idle", "walk_side", "walk_up", "walk_down", "walk_di
 	set(v):
 		charge_speed = v
 		if lasso != null: lasso.charge_speed = v
-@export var lasso_travel_time: float = .8:  # seconds between release and actual capture resolution
+@export var lasso_travel_time: float = LassoController.FLIGHT_SECONDS:  # seconds between release and actual capture resolution
 	set(v):
 		lasso_travel_time = v
 		if lasso != null: lasso.lasso_travel_time = v

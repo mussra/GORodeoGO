@@ -50,7 +50,6 @@ func _ready():
  var joy=touch.get_node("MoveJoystick");joy.anchor_top=.32
  aim_joystick=touch.get_node("AimJoystick");aim_joystick.anchor_top=.32
  player.lasso.set_aim_joystick(aim_joystick);player.dodge.set_move_joystick(joy);JoystickAppearance.apply(self)
- player.lasso.lasso_travel_time=.35
  player.lasso.release_requested.connect(func():
   for horse in animals:horse.roped=false)
  _hud()

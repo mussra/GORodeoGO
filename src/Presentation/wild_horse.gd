@@ -81,7 +81,7 @@ func _ready() -> void:
 		_pick_wander_target()
 
 func _physics_process(delta: float) -> void:
-	if is_instance_valid(player_ref) and not roped and position.distance_squared_to(player_ref.position)>700.0*700.0:
+	if is_instance_valid(player_ref) and not roped and position.distance_squared_to(player_ref.position)>1000.0*1000.0 and float(get_meta("escape_left110",0.))<=0.:
 		_art.set_motion107(Vector2.ZERO);_art.speed_scale=0.0;return
 	_bob += delta
 	touch_grace = maxf(0.0, touch_grace - delta)
@@ -108,13 +108,15 @@ func _physics_process(delta: float) -> void:
 					target=position.move_toward(herd_guide.position,(WorldHerd.PANIC_SPEED+WorldHerd.FOLLOW_CATCHUP)*delta)
 				else:target=herd_guide.position+gap.normalized()*WorldHerd.COHESION_RADIUS
 			_flee=(target-position)/maxf(delta,.001)
-		if (is_instance_valid(herd_guide) and herd_guide!=self) or home.distance_to(target) < WorldTaming.FLEE_LEASH:
+		if float(get_meta("escape_left110",0.))>0. or (is_instance_valid(herd_guide) and herd_guide!=self) or home.distance_to(target) < WorldTaming.FLEE_LEASH:
 			velocity = _flee
 		else:
 			var threat:Vector2=player_ref.position if is_instance_valid(player_ref) else position-_flee
 			var step:Vector2=WorldEscapeMotion.bounded_step(position,home,threat,target-position,WorldTaming.FLEE_LEASH)
 			velocity=(step-position)/maxf(delta,.001)
 		_flee = Vector2.ZERO
+	elif bool(state.get("alert110",false)):
+		velocity=Vector2.ZERO;_art.set_motion107(Vector2.ZERO)
 	elif wander:
 		_art.speed_scale=1.0
 		velocity = _wander_vel(delta)
@@ -145,6 +147,8 @@ func _draw() -> void:
 		if progress > 0.01:
 			HeldVisuals.draw_progress(self, progress, ROPE_ANCHOR_Y)
 	_draw_affinity()
+	if not roped and bool(state.get("alert110",false)) and float(state.get("spook",0.))<=0.:
+		draw_string(ThemeDB.fallback_font,Vector2(-5,-110),"?",HORIZONTAL_ALIGNMENT_LEFT,-1,22,Color("ffe6a0"))
 
 ## Indicador de afinidad sobre la cabeza: corazon gris (sin rasgos), dorado
 ## (1), dorado brillante (2), dorado con estrella (3). Corona si el equipado
@@ -240,6 +244,9 @@ func flee_from(from: Vector2, _delta: float) -> void:
 	_flee = away.normalized() * 230.0
 	_art.flip_h = away.x < 0.0
 	_art.grazing = false
+
+func alert_pose110(point:Vector2)->void:
+	_flee=Vector2.ZERO;_art.grazing=false;_art.set_motion107(Vector2.ZERO);face_towards(point)
 
 func face_towards(point: Vector2) -> void:
 	_art.flip_h = point.x < position.x

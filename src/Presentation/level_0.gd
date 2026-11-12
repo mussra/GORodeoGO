@@ -366,7 +366,6 @@ func _apply_unlocked_upgrades() -> void:
 	if reach>0:player.dodge_path_limit=reach*horse_stats.dodge
 	player.max_speed *= _upgrades.speed_multiplier
 	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier
-	player.lasso_travel_time *= _upgrades.lasso_travel_time_multiplier
 	player.max_throw_distance *= _upgrades.throw_distance_multiplier
 	_max_simultaneous_captures = maxi(2,_upgrades.max_simultaneous_captures) if GameState.debug_cheats_active() else _upgrades.max_simultaneous_captures
 	player.set_max_captures(_max_simultaneous_captures)
