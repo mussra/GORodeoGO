@@ -64,7 +64,8 @@ func start_calming() -> bool:
 ## Called every physics frame while CAPTURED/CALMING.
 ## [param rope_distance]: current distance between player and bull.
 ## [param disturbance]: external nerve-raising pressure this frame (0 if none).
-func update_hold(delta: float, rope_distance: float, disturbance: float = 0.0) -> void:
+## [param serenity]: mounted horse calm factor. Never suppresses disturbances or rope escape.
+func update_hold(delta: float, rope_distance: float, disturbance: float = 0.0, serenity: float = 1.0) -> void:
 	if current_state() != BullState.State.CAPTURED and current_state() != BullState.State.CALMING:
 		return
 
@@ -78,7 +79,7 @@ func update_hold(delta: float, rope_distance: float, disturbance: float = 0.0) -
 	if disturbance > 0.0:
 		_nerves.increase_by(_tuning.disturbance_rate_per_second * delta * disturbance)
 	else:
-		_nerves.reduce_by(_tuning.calm_rate_per_second * delta)
+		_nerves.reduce_by(_tuning.calm_rate_per_second * HorseStats.calm_factor(serenity) * delta)
 
 	nerves_changed.emit(current_nerves())
 

@@ -131,8 +131,7 @@ func stun(duration: float = STUN_SECONDS) -> void:
 	queue_redraw()
 
 func calm() -> float:
-	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
-	return HorseStats.read(horse).calm if not horse.is_empty() else 1.0
+	return HorseStats.mounted_calm(SaveData.horse_collection)
 
 func _input(event: InputEvent) -> void:
 	dodge.handle_input(event)

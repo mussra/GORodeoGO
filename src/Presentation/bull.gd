@@ -190,7 +190,7 @@ func _physics_process(delta: float) -> void:
 		BullState.State.CAPTURED, BullState.State.CALMING:
 			_apply_tow_movement()
 			var disturbance: float = _compute_disturbance()
-			controller.update_hold(delta, global_position.distance_to(_player.global_position), disturbance)
+			controller.update_hold(delta, global_position.distance_to(_player.global_position), disturbance, float(_player.call("calm")) if _player.has_method("calm") else 1.0)
 			_update_hold_visual()
 		BullState.State.CONTROLLED:
 			_apply_tow_movement()

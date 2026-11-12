@@ -680,7 +680,7 @@ func _tick_taming(delta: float) -> void:
 		if horse.roped:
 			# Roped: trust fills fast while the horse stays put (Ant 21:47).
 			# El semental no admitido NUNCA llena confianza en el lazo: lo rompe.
-			st = horse.state if stallion_guard else WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta, aff.bonus)
+			st = horse.state if stallion_guard else WorldTaming.hold_tick(horse.state, float(horse.herd.get("temperament", 0.5)), delta, aff.bonus, player.calm())
 		else:
 			var cooldown:float=float(horse.get_meta("cover_clock110",0.))-delta
 			if cooldown<=0.:

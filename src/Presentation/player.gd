@@ -264,6 +264,9 @@ func request_dodge(direction: Vector2) -> bool:
 ## actually released, especially noticeable on fast drags.
 
 ## Called by an unroped, nervous bull on contact (GAMEPLAY_SPEC.md #Failure feedback).
+## Same equipped-horse source as the open world; no cached or colour-derived bonus.
+func calm()->float:return HorseStats.mounted_calm(SaveData.horse_collection)
+
 func stun(duration: float) -> void:
 	if _jump_time>0:_finish_jump(true)
 	if _stun_time_remaining <= 0.0:

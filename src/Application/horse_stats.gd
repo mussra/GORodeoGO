@@ -11,7 +11,7 @@ static func read(h:Dictionary)->Dictionary:
  out.power=clampf(number(s.get("power",0.6),0.6),0.5,0.9)
  out.dodge=clampf(number(s.get("dodge",1.0),1.0),0.75,1.0)
  # Serenidad (Ant, 7-nov-2026): how fast the horse calms bulls and wild horses.
- out.calm=clampf(number(s.get("calm",1.0),1.0),0.5,2.0)
+ out.calm=calm_factor(s.get("calm",1.0))
  return out
 static func inherit(a:Dictionary,b:Dictionary)->Dictionary:
  var x:=read(a);var y:=read(b);var out:Dictionary={}
@@ -21,3 +21,8 @@ static func inherit(a:Dictionary,b:Dictionary)->Dictionary:
 static func number(v:Variant,fallback:float)->float:
  if typeof(v) not in [TYPE_FLOAT,TYPE_INT]:return fallback
  return float(v) if is_finite(float(v)) else fallback
+
+## Shared bounds for horse-read values and active calming. Invalid saves keep base pace.
+static func calm_factor(value:Variant)->float:return clampf(number(value,1.0),0.5,2.0)
+static func mounted_calm(collection:HorseCollection)->float:
+ return read(collection.find(collection.selected)).calm

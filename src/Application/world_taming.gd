@@ -1,8 +1,8 @@
 class_name WorldTaming
 extends RefCounted
 ## Taming a wild horse requires a landed lasso (Ant, 10-Nov-2026).
-## Pure logic so unit tests drive it without a scene. Serenidad (calm) of the ridden
-## No passive trust. Temperament and affinity affect the lasso fill only.
+## Pure logic so unit tests drive it without a scene. No passive trust.
+## Temperament, affinity and mounted-horse Serenidad affect the lasso fill only.
 
 const CALM_RANGE:float=170.0
 const SPOOK_RANGE:float=120.0
@@ -42,9 +42,9 @@ static func should_flee(state:Dictionary,dist:float)->bool:
 const HOLD_SECONDS:float=4.0
 const HOLD_FILL:float=0.65
 
-static func hold_tick(state:Dictionary,temperament:float,delta:float,bonus:float=1.0)->Dictionary:
+static func hold_tick(state:Dictionary,temperament:float,delta:float,bonus:float=1.0,serenity:float=1.0)->Dictionary:
  var out:Dictionary=state.duplicate()
- var rate:float=HOLD_FILL*(1.0-clampf(temperament,0.0,1.0)*0.5)*bonus
+ var rate:float=HOLD_FILL*(1.0-clampf(temperament,0.0,1.0)*0.5)*bonus*HorseStats.calm_factor(serenity)
  out.progress=minf(1.0,float(out.get("progress",0.0))+rate*delta)
  return out
 
