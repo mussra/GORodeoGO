@@ -38,6 +38,7 @@ var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
+var world_places144:Dictionary={}
 var world_cousins140:Dictionary={} # Four-town journal, separate additive V3 state.
 var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
 var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
@@ -92,6 +93,7 @@ func save_progress() -> bool:
 	config.set_value("world","flora138",world_flora138)
 	config.set_value("world","roaming139",world_roaming139)
 	config.set_value("world","cousins140",world_cousins140)
+	config.set_value("world","places144",world_places144)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
 	config.set_value("world","notes106",world_notes106)
@@ -135,6 +137,7 @@ func load_progress() -> void:
 	world_flora138.clear()
 	world_roaming139.clear()
 	world_cousins140.clear()
+	world_places144.clear()
 	world_missions.clear()
 	world_pigs.clear()
 	world_notes106.clear();world_notes_revision106+=1
@@ -199,6 +202,7 @@ func load_progress() -> void:
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
 	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
 	world_cousins140=VillageCousins140.clean(config.get_value("world","cousins140",{}),world_seed)
+	world_places144=WorldPlaces144.clean(config.get_value("world","places144",{}),world_seed,world_generator_version)
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
@@ -556,3 +560,9 @@ func commit_cousins140(next:Dictionary,pos:Vector2)->bool:
 	world_cousins140=clean
 	if save_world_state(pos):return true
 	world_cousins140=before;world_position=old_pos;return false
+
+func commit_places144(state:Dictionary,pos:Vector2)->bool:
+	var before:Dictionary=world_places144;var previous:Vector2=world_position
+	world_places144=WorldPlaces144.clean(state,world_seed,world_generator_version);world_position=pos
+	if save_progress():return true
+	world_places144=before;world_position=previous;return false

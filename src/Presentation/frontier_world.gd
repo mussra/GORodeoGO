@@ -57,6 +57,7 @@ var aim_joystick: VirtualJoystick  # named like the levels so JoystickAppearance
 var _gait_label: Label
 var _missions_label: Label
 var _toasts:ToastStack
+var _travel144:SiestaTravel144
 var _map_overlay: Control
 var _board_button: Button
 var _board_panel: Control
@@ -146,6 +147,7 @@ func _ready() -> void:
 		_flora_layer138=FlowerExpansion138.new();_flora_layer138.name="FlowerExpansion138";_flora_layer138.z_index=-1;add_child(_flora_layer138)
 	if SaveData.ensure_cousins140():
 		_cousin_layer140=CousinLayer140.new();add_child(_cousin_layer140)
+	_travel144=SiestaTravel144.new();add_child(_travel144)
 	_setup_goat_prototype()
 	_setup_npcs()
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
@@ -162,13 +164,14 @@ func _ready() -> void:
 	# Keep the construction hidden until the original safety ring is ready.
 
 func _physics_process(delta:float)->void:
-	if _loading_world or is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
+	if (_travel144!=null and (_travel144.active or is_instance_valid(_travel144.panel))) or _loading_world or is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	# One escape decision per physics step; idle updates skipped movement at low FPS.
 	_tick_taming(delta)
 	_tick_pigs(delta)
 	_tick_goats(delta)
 
 func _process(delta: float) -> void:
+	if _travel144!=null and (_travel144.active or is_instance_valid(_travel144.panel)):return
 	if is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	_update_chunks()
 	_drain_chunk_builds()
@@ -182,6 +185,7 @@ func _process(delta: float) -> void:
 			_returning_home=false;_home_pending=false;SaveData.save_world_state(player.position)
 		FrontierTransition.obtain(get_tree()).reveal()
 		player.set_physics_process(true)
+	if _travel144!=null:_travel144.record_visits()
 	_tick_npcs()
 	_tick_lasso(delta)
 	_tick_rider_marker()
@@ -582,7 +586,7 @@ func _activate_built(key: String) -> void:
 			SaveData.set_world_mission(mission_id, "offered")
 			_toast(tr("WORLD_FOUND"))
 			_refresh_missions()
-			SaveData.save_world_state(player.position)
+			if _travel144==null or not _travel144.active:SaveData.save_world_state(player.position)
 
 ## Afinidad genetica (Ant 8-nov 13:33): el caballo equipado comparte rasgos
 ## visibles (pelaje/patron/crin) con el salvaje -> confia mas y se asusta
@@ -920,17 +924,7 @@ func _refresh_missions() -> void:
 	_missions_label.text = tr("WORLD_MISSIONS") % [counts.get("offered", 0) + counts.get("encargo", 0), counts.get("done", 0)]
 
 func _home() -> void:
-	if _loading_world or _home_pending:return
-	_home_pending=true
-	var cover=FrontierTransition.obtain(get_tree(),false)
-	var fade=cover.create_tween();fade.tween_property(cover.curtain,"modulate:a",1.0,.22)
-	await fade.finished
-	if not cover.parade.prepared:await cover.parade.preparation_finished
-	_release_held_horse()
-	player.cancel_input();player.set_physics_process(false)
-	_loading_world=true;_returning_home=true;visible=false
-	player.position=WorldNominal98.home() if WorldNominal98.enabled() else HOME_POS
-	_update_chunks()
+	if _travel144!=null:_travel144.choose("ranch")
 
 func _menu() -> void:
 	SaveData.save_world_state(player.position)
@@ -1134,6 +1128,7 @@ class DiscoveryMap extends Control:
 	var _pinch_distance108:float=0.
 	var _pinch_mid108:Vector2
 	var _pinch_used108:bool=false
+	var _sites144:Button
 	var _find108:Button
 	var _markers108:Control
 	var _press_time106:float=0.
@@ -1193,13 +1188,14 @@ class DiscoveryMap extends Control:
 		var viewport: Vector2 = get_viewport_rect().size
 		size = Vector2(minf(700, viewport.x - 80), minf(470, viewport.y - 105)) if expanded else Vector2(180, 112)
 		position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x - size.x - 18, 84)
+		if _sites144!=null:_sites144.visible=expanded
 		if _find108!=null:
 			_find108.visible=expanded;_find108.position=Vector2(size.x-346,16);_find108.size=Vector2(238,56)
 		if _zoom_btns.size()==2:
 			_zoom_btns[0].position=Vector2(24,size.y-76);_zoom_btns[1].position=Vector2(size.x-88,size.y-76)
 		if _zoom_slider106!=null:
 			_zoom_slider106.position=Vector2(105,size.y-64);_zoom_slider106.size=Vector2(size.x-210,40)
-			_note_help106.visible=expanded
+			_note_help106.visible=false
 			_zoom_slider106.visible=expanded;_zoom_label106.position=Vector2(size.x/2.-40,size.y-98);_zoom_label106.visible=expanded
 
 	func _process(delta: float) -> void:
@@ -1261,6 +1257,7 @@ class DiscoveryMap extends Control:
 		var thumb:ImageTexture=ImageTexture.create_from_image(thumb_image);_zoom_slider106.add_theme_icon_override("grabber",thumb);_zoom_slider106.add_theme_icon_override("grabber_highlight",thumb)
 		_zoom_slider106.value_changed.connect(_set_zoom);add_child(_zoom_slider106)
 		_zoom_label106=Label.new();_zoom_label106.add_theme_font_size_override("font_size",20);add_child(_zoom_label106)
+		_sites144=Button.new();_sites144.text="Sitios visitados";_sites144.tooltip_text="Toca un círculo dorado para viajar. Mantén pulsado el terreno para añadir una nota.";_sites144.position=Vector2(20,16);_sites144.size=Vector2(230,56);QuestButtonStyle.apply(_sites144);_sites144.pressed.connect(func():world._travel144.show_sites());add_child(_sites144)
 		_note_help106=Label.new();_note_help106.text="MAPA · Mantén pulsado para una nota";_note_help106.position=Vector2(24,29);_note_help106.add_theme_font_size_override("font_size",16);_note_help106.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_note_help106)
 		_set_zoom(zoom)
 
@@ -1288,7 +1285,17 @@ class DiscoveryMap extends Control:
 		if not _dragging:return
 		if not _long_pressed106 and point.distance_to(_drag_from)<12.:
 			if not expanded:world._toggle_map()
+			else:_select_site144(point)
 		_dragging=false;_ensure_terrain()
+	func _select_site144(point:Vector2)->void:
+		if world._travel144==null:return
+		var nearest:String="";var distance:float=24.
+		for site in world._travel144.available():
+			var mapped:Vector2=_to_map(site.pos,_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
+			var d:float=point.distance_to(mapped)
+			if d<distance:distance=d;nearest=site.id
+		if not nearest.is_empty():world._travel144.choose(nearest)
+
 	func _zoom_at108(z:float,from:Vector2,to:Vector2)->void:
 		var anchor:Vector2=_map_point106(from)
 		_set_zoom(z)
@@ -1439,6 +1446,12 @@ class DiscoveryMap extends Control:
 		# player marker (Ant 7-nov-2026: "ver claramente donde esta mi vaquero"):
 		# pulsing ring, high-contrast dot and facing arrow
 		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
+		if expanded and world._travel144!=null:
+			for site in world._travel144.available():
+				var point:Vector2=_to_map(site.pos,mins,cell,origin)
+				_markers108.draw_circle(point,8.,Color("efb950"))
+				_markers108.draw_arc(point,11.,0,TAU,24,Color("fff1d2"),2.)
+
 		for rows in SaveData.world_notes106.values():
 			for note in rows:
 				var point:Vector2=_to_map(note.pos,mins,cell,origin)
@@ -1837,6 +1850,7 @@ func _snapshot_roaming139()->void:
 		_roaming139.put(id,horse.get_meta("c"),int(horse.herd.member_index),horse.position)
 	SaveData.world_roaming139=_roaming139.state
 func _park_roaming139()->void:
+	if _travel144!=null and _travel144.active:return # Origin already saved; destination must commit only after landing validation.
 	if _roaming139==null:return
 	var retire:Array=[]
 	for key in _herd_horses.keys():
