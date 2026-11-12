@@ -17,19 +17,24 @@ func set_grazing(value: bool) -> void:
 	grazing = value
 	_update_anim()
 
-func set_walk_direction(dir: Vector2) -> void:
-	var ax: float = absf(dir.x)
-	var ay: float = absf(dir.y)
-	var d: String
-	if ax > ay * 1.6:
-		d = "side"
-	elif ax > ay * 0.45:
-		d = "diag_down" if dir.y > 0.0 else "diag_up"
-	else:
-		d = "down" if dir.y > 0.0 else "up"
-	if d == walk_dir: return
-	walk_dir = d
-	_update_anim()
+var _pending_view129:String=""
+var _pending_seconds129:float=0.
+func update_heading129(motion:Vector2,delta:float)->void:
+	if motion.length()<WildHeading129.MIN_MOTION:
+		_pending_view129="";_pending_seconds129=0.;return
+	var d:String=WildHeading129.view(motion,walk_dir)
+	var flip_:bool=WildHeading129.flip(motion,flip_h)
+	var candidate:String=d+str(flip_)
+	if d==walk_dir and flip_==flip_h:
+		_pending_view129="";_pending_seconds129=0.;return
+	if candidate!=_pending_view129:
+		_pending_view129=candidate;_pending_seconds129=0.
+	_pending_seconds129+=maxf(delta,0.)
+	if _pending_seconds129+0.000001<WildHeading129.VIEW_HOLD:return
+	walk_dir=d;flip_h=flip_;_pending_view129="";_pending_seconds129=0.;_update_anim()
+func set_walk_direction(dir:Vector2)->void:
+	# Static preview compatibility. Gameplay calls update_heading129 once after movement.
+	walk_dir=WildHeading129.view(dir,walk_dir);_update_anim()
 
 static func _build_frames(traits: Dictionary) -> SpriteFrames:
 	var frames := SpriteFrames.new()
@@ -46,10 +51,12 @@ func _ready() -> void:
 	_update_anim()
 
 func _update_anim() -> void:
-	if sprite_frames == null: return
-	if grazing or resting107:
-		play("idle")
-	elif walk_dir == "side":
-		play("walk")
-	else:
-		play("walk_" + walk_dir)
+	if sprite_frames==null:return
+	var next:String="idle" if grazing or resting107 else ("walk" if walk_dir=="side" else "walk_"+walk_dir)
+	if animation==next:return
+	var was_moving:bool=str(animation).begins_with("walk") and next.begins_with("walk")
+	var phase:float=(float(frame)+frame_progress)/maxi(1,sprite_frames.get_frame_count(animation)) if was_moving else 0.
+	play(next)
+	if was_moving:
+		var at:float=phase*sprite_frames.get_frame_count(next)
+		set_frame_and_progress(int(at),at-floorf(at))

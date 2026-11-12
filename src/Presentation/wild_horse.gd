@@ -48,6 +48,7 @@ var _touching_rider: bool = false
 var herd_guide:Node2D
 var _art: Node2D
 var _bob: float = 0.0
+var _steered129:Vector2=Vector2.ZERO
 var _graze_timer: float = 0.0
 var _wander_target: Vector2 = Vector2.ZERO
 var _wander_pause: float = 0.0
@@ -91,6 +92,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		_art.set_motion107(Vector2.ZERO)
 		_flee = Vector2.ZERO
+		_steered129=Vector2.ZERO
 		_art.grazing = false
 		_art.speed_scale=1.0
 		move_and_slide()
@@ -100,6 +102,7 @@ func _physics_process(delta: float) -> void:
 	var escaping95:bool=_escape_roads95 and _flee.length()>0.0
 	_escape_roads95=false
 	if _flee.length() > 0.0:
+		_flee=WildHeading129.steer(_steered129,_flee,delta)
 		var target: Vector2 = position + _flee * delta
 		if is_instance_valid(herd_guide) and herd_guide!=self and not herd_guide.roped:
 			var gap:Vector2=target-herd_guide.position
@@ -133,6 +136,8 @@ func _physics_process(delta: float) -> void:
 	velocity=(wanted94-before94)/maxf(delta,.001)
 	move_and_slide()
 	_art.set_motion107(velocity)
+	_steered129=velocity
+	_art.update_heading129(velocity,delta)
 	if not escaping95 and not (road_provider94.is_valid() and road_provider94.call(before94,WorldWildRoads94.FOOTPRINT)) and not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94
 	_art.position.y = sin(_bob * 1.6) * 1.5
 	queue_redraw()
@@ -205,8 +210,6 @@ func _wander_vel(delta: float) -> Vector2:
 		_wander_pause = randf_range(1.6, 3.6)
 		return Vector2.ZERO
 	var step: Vector2 = to.normalized() * wander_speed
-	_art.flip_h = step.x < 0.0
-	_art.set_walk_direction(step)
 	return step
 
 func _pick_wander_target() -> void:
@@ -224,17 +227,13 @@ func approach(point: Vector2, delta: float) -> void:
 		return
 	_escape_roads95=false
 	_flee = to.normalized() * 40.0  # reuses the leash-checked movement slot
-	_art.flip_h = to.x < 0.0
 	_art.grazing = false
-	_art.set_walk_direction(to)
 
 func flee_velocity(step:Vector2,panic:bool=false)->void:
 	_escape_roads95=true
 	_flee=step
 	_art.speed_scale=1.95 if panic else 1.55
-	_art.flip_h=step.x<0.0
 	_art.grazing=false
-	_art.set_walk_direction(step)
 
 func flee_from(from: Vector2, _delta: float) -> void:
 	var away: Vector2 = position - from
@@ -242,14 +241,15 @@ func flee_from(from: Vector2, _delta: float) -> void:
 		away = Vector2.RIGHT
 	_escape_roads95=true
 	_flee = away.normalized() * 230.0
-	_art.flip_h = away.x < 0.0
 	_art.grazing = false
 
 func alert_pose110(point:Vector2)->void:
 	_flee=Vector2.ZERO;_art.grazing=false;_art.set_motion107(Vector2.ZERO);face_towards(point)
 
 func face_towards(point: Vector2) -> void:
-	_art.flip_h = point.x < position.x
+	# Stationary looking has a world-space dead zone; moving pose is physical motion only.
+	if velocity.length()>=WildHeading129.MIN_MOTION:return
+	if absf(point.x-position.x)>24.:_art.flip_h=point.x<position.x
 
 ## Same capture rule as the corral bulls (Ant: mismo codigo): the LassoController
 ## resolves nearest-first and each prey accepts landings within body + tolerance.
