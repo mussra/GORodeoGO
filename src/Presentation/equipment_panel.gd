@@ -44,7 +44,10 @@ func _ready()->void:
    _horses=HorsePanel.new();add_child(_horses)
   else:_horses.open_menu())
  horse_button.size=Vector2(360,52)
- _label(tr("UI_054"),Vector2(40,580),20)
+ var note:=_label(tr("UI_054"),Vector2(40,555),18)
+ note.size=Vector2(735,135);note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ var finishes:=_button("Acabados · Vista previa",Vector2(800,625),func():add_child(FinishPreview145.new()))
+ finishes.size=Vector2(430,52)
  resized.connect(_layout);_layout();refresh()
 func _label(text:String,pos:Vector2,font:int)->Label:
  var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);_canvas.add_child(l);return l
