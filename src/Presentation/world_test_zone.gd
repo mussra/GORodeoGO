@@ -69,13 +69,11 @@ func _ready() -> void:
 
 func _add_decor(world: Node2D, kind: String, pos: Vector2) -> void:
 	var decor := DecorScript.new()
-	decor.kind = kind
-	decor.size_scale = 1.0
-	var boff: float = DecorScript.base_offset(kind, 1.0)
-	decor.draw_offset = Vector2(0, -boff)
-	decor.position = ZONE_POS + pos + Vector2(0, boff)
+	decor.configure121(kind,ZONE_POS+pos,1.,SaveData.world_seed)
 	world.add_child(decor)
-	var box: Rect2 = DecorScript.solid_box(kind, ZONE_POS + pos, 1.0)
+	var occ: Rect2 = DecorScript.occluder_box(kind,ZONE_POS+pos,decor.size_scale)
+	if occ.has_area():world.register_occluder("zone_tree121_"+str(pos),occ)
+	var box: Rect2 = DecorScript.solid_box(kind, ZONE_POS + pos, decor.size_scale)
 	if box.has_area():
 		Physics.add_box(world, box)
 

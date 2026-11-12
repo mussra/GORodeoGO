@@ -65,7 +65,9 @@ func _draw_roads():
  roads.draw_set_transform(Vector2.ZERO)
 func _decor():
  for data in [{"kind":"tree","pos":Vector2(150,355)},{"kind":"tree","pos":Vector2(430,180)},{"kind":"tree","pos":Vector2(850,560)},{"kind":"stump","pos":Vector2(110,550)}]:
-  var node=load("res://src/Presentation/world_decor.gd").new();node.kind=data.kind;node.size_scale=1.;var offset=WorldFloristShop.Decor.base_offset(data.kind,1.);node.draw_offset=Vector2(0,-offset);node.position=data.pos+Vector2(0,offset);add_child(node)
+  var node=load("res://src/Presentation/world_decor.gd").new();node.configure121(data.kind,data.pos,1.,0);add_child(node)
+  var box:Rect2=WorldFloristShop.Decor.solid_box(data.kind,data.pos,node.size_scale)
+  if box.has_area():WorldPhysics.add_box(self,box);collision_rects.append(box)
 func _hud():
  hud=CanvasLayer.new();add_child(hud)
  var bar=ColorRect.new();bar.color=Color(.04,.12,.09,.85);bar.size=Vector2(1598,44);bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.add_child(bar)

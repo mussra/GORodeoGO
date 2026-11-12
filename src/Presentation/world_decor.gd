@@ -38,8 +38,7 @@ const FLOWER_TEXS: Array[Texture2D] = [
 	preload("res://art/world/cartoon/f_tulip1.png"),
 	preload("res://art/world/cartoon/f_tulip2.png"),
 ]
-## Sprite heights in world px, matched to the old code-drawn bodies so the
-## solid/occluder boxes and the depth sorting keep working unchanged.
+## Base art sizes. Tree variation is presentation-only; generated worlds stay intact.
 const TREE_H := 76.0
 const PINE_H := 68.0
 const BUSH_H := 22.0
@@ -49,6 +48,41 @@ const FLOWER_H := 30.0
 var kind: String = "tree"
 var size_scale: float = 1.0
 var draw_offset: Vector2 = Vector2.ZERO
+
+## Stable spot hash, independent of RNG consumption and chunk activation order.
+## Square bias gives many modest trees and few giants, multiplier always 1..3.
+static func tree_multiplier121(p_kind: String, pos: Vector2, seed_: int) -> float:
+	if p_kind not in ["tree", "pine", "fruit_tree"]:return 1.
+	var h: int = hash(str(seed_)+":"+p_kind+":"+str(snappedf(pos.x,.01))+":"+str(snappedf(pos.y,.01)))
+	var u: float = float(h % 10001)/10000.
+	return 1.+2.*u*u
+
+static func effective_scale121(p_kind: String, pos: Vector2, original: float, seed_: int) -> float:
+	return original*tree_multiplier121(p_kind,pos,seed_)
+
+## Keep growth of generated trunk colliders off paths. Canopies may overhang.
+static func road_safe_scale121(p_kind: String, pos: Vector2, original: float, desired: float, surface) -> float:
+	if p_kind not in ["tree","pine","fruit_tree"] or surface==null:return desired
+	var low: float=original
+	var high: float=desired
+	for i in 10:
+		var candidate: float=high if i==0 else (low+high)*.5
+		var box: Rect2=solid_box(p_kind,pos,candidate)
+		var intersects: bool=false
+		for x in [box.position.x,box.get_center().x,box.end.x]:
+			for y in [box.position.y,box.get_center().y,box.end.y]:
+				if surface.contains(Vector2(x,y),8.):intersects=true
+		if intersects:high=candidate
+		elif i==0:return candidate
+		else:low=candidate
+	return low
+
+## Node sorts at the trunk's foot. Draw offset is LOCAL, not world-scaled twice.
+func configure121(p_kind: String, pos: Vector2, original: float, seed_: int, surface=null) -> void:
+	kind=p_kind
+	size_scale=road_safe_scale121(kind,pos,original,effective_scale121(kind,pos,original,seed_),surface)
+	position=pos+Vector2(0,base_offset(kind,size_scale))
+	draw_offset=Vector2(0,-base_offset(kind,1.))
 
 static func base_offset(p_kind: String, sc: float) -> float:
 	match p_kind:

@@ -205,17 +205,16 @@ func register_occluder(owner, rect: Rect2) -> void:
 
 func _tick_rider_marker() -> void:
 	var hidden: bool = false
+	var top: float = player.position.y-114.
 	for owner in _occluders:
 		for r in _occluders[owner]:
 			if (r as Rect2).has_point(player.position):
 				hidden = true
-				break
-		if hidden:
-			break
+				top=minf(top,(r as Rect2).position.y-18.)
 	_marker.visible = hidden
 	if hidden:
 		var bob: float = absf(sin(Time.get_ticks_msec() / 220.0)) * 8.0
-		_marker.position = player.position + Vector2(0, -114 - bob)
+		_marker.position = Vector2(player.position.x, top-bob)
 		_marker.queue_redraw()
 
 
@@ -440,16 +439,13 @@ func _advance_builder(b: Dictionary) -> void:
 				if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,d.pos,40.):return
 			elif not WorldFloristShop.keep_decor(d,SaveData.world_seed):return
 			var decor := DecorScript.new()
-			decor.kind = d["kind"]
-			decor.size_scale = d["scale"]
-			var boff: float = DecorScript.base_offset(d["kind"], d["scale"])
-			decor.draw_offset = Vector2(0, -boff)
-			decor.position = d["pos"] + Vector2(0, boff)
+			decor.configure121(d["kind"],d["pos"],d["scale"],SaveData.world_seed,_get_surface98() if WorldNominal98.enabled() and not d.get("edited",false) else null)
+			var decor_scale: float = decor.size_scale
 			(b["entities"] as Array).append(decor)
-			var occ: Rect2 = DecorScript.occluder_box(d["kind"], d["pos"], d["scale"])
+			var occ: Rect2 = DecorScript.occluder_box(d["kind"], d["pos"], decor_scale)
 			if occ.has_area():
 				(b["occluders"] as Array).append(occ)
-			var box: Rect2 = DecorScript.solid_box(d["kind"], d["pos"], d["scale"])
+			var box: Rect2 = DecorScript.solid_box(d["kind"], d["pos"], decor_scale)
 			if box.has_area():
 				(b["boxes"] as Array).append(box)
 			if todo.is_empty():
