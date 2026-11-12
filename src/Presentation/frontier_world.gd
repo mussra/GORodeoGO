@@ -894,9 +894,9 @@ static func arrow_to(from: Vector2, to: Vector2) -> String:
 func _build_hud() -> void:
 	_hud = CanvasLayer.new()
 	add_child(_hud)
-	var bar := ColorRect.new()
+	var bar := Panel.new()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bar.color = Color(0.06, 0.15, 0.17, 0.85)
+	var top_style:=StyleBoxFlat.new();top_style.bg_color=Color("453625ed");top_style.border_color=Color("d9ab58");top_style.border_width_bottom=3;top_style.set_corner_radius_all(10);bar.add_theme_stylebox_override("panel",top_style)
 	bar.size = Vector2(1280, 46)
 	_hud.add_child(bar)
 	_gait_label = Label.new()
@@ -927,7 +927,7 @@ func _build_hud() -> void:
 		g.visible=abilities[i][1]
 		_gauges[abilities[i][0]] = g
 		_hud.add_child(g)
-	var menu_button:=Button.new();menu_button.name="WorldNavigation";menu_button.text="Menú";menu_button.position=Vector2(1100,4);menu_button.size=Vector2(160,42);menu_button.pressed.connect(_open_navigation);_hud.add_child(menu_button)
+	var menu_button:=Button.new();menu_button.name="WorldNavigation";menu_button.text="Menú";QuestButtonStyle.apply(menu_button);menu_button.position=Vector2(1100,4);menu_button.size=Vector2(160,42);menu_button.pressed.connect(_open_navigation);_hud.add_child(menu_button)
 	_toasts=ToastStack.new()
 	_hud.add_child(_toasts)
 	_board_button = Button.new()
@@ -1081,6 +1081,12 @@ class DiscoveryMap extends Control:
 	var _cache_clock106:float=0.
 	var _draw_origin106:Vector2=Vector2.ZERO
 	var _touch_index106:int=-1
+	var _touches108:Dictionary={}
+	var _pinch_distance108:float=0.
+	var _pinch_mid108:Vector2
+	var _pinch_used108:bool=false
+	var _find108:Button
+	var _markers108:Control
 	var _press_time106:float=0.
 	var _long_pressed106:bool=false
 	var _last_point106:Vector2
@@ -1113,7 +1119,7 @@ class DiscoveryMap extends Control:
 		_terrain_signature = signature
 		_terrain_valid = true
 		var data = _cells()
-		var area = Rect2(Vector2(12, 12), (size - Vector2(24, 104 if expanded else 24)).max(Vector2(32,32)))
+		var area = Rect2(Vector2(12, 82 if expanded else 12), (size - Vector2(24, 174 if expanded else 24)).max(Vector2(32,32)))
 		var cols: int = data.maxs.x - data.mins.x + 1
 		var rows: int = data.maxs.y - data.mins.y + 1
 		var cell: float = maxf(.0001,minf(72.0, minf((area.size.x - 16.0) / cols, (area.size.y - 16.0) / rows))) * (zoom if expanded else 1.0)
@@ -1127,6 +1133,7 @@ class DiscoveryMap extends Control:
 		if _clip106==null:
 			_clip106=Control.new();_clip106.mouse_filter=Control.MOUSE_FILTER_IGNORE;_clip106.clip_contents=true;_clip106.show_behind_parent=true;add_child(_clip106)
 			_terrain.reparent(_clip106)
+			_markers108=Control.new();_markers108.mouse_filter=Control.MOUSE_FILTER_IGNORE;_markers108.draw.connect(_draw_markers108);_clip106.add_child(_markers108)
 		_clip106.position=area.position;_clip106.size=area.size
 		_draw_origin106=_map_geometry.origin;_terrain.position=Vector2.ZERO
 		terrain_rebuilds += 1
@@ -1135,8 +1142,10 @@ class DiscoveryMap extends Control:
 
 	func _layout() -> void:
 		var viewport: Vector2 = get_viewport_rect().size
-		size = Vector2(minf(700, viewport.x - 80), minf(410, viewport.y - 180)) if expanded else Vector2(180, 112)
+		size = Vector2(minf(700, viewport.x - 80), minf(470, viewport.y - 105)) if expanded else Vector2(180, 112)
 		position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x - size.x - 18, 84)
+		if _find108!=null:
+			_find108.visible=expanded;_find108.position=Vector2(size.x-346,16);_find108.size=Vector2(238,56)
 		if _zoom_btns.size()==2:
 			_zoom_btns[0].position=Vector2(24,size.y-76);_zoom_btns[1].position=Vector2(size.x-88,size.y-76)
 		if _zoom_slider106!=null:
@@ -1155,7 +1164,7 @@ class DiscoveryMap extends Control:
 			_cache_clock106+=delta
 			if not _terrain_valid or (not _dragging and _cache_clock106>.3):
 				_cache_clock106=0.;_ensure_terrain()
-			if _dragging and not _long_pressed106 and expanded and Time.get_ticks_msec()/1000.-_press_time106>.6 and _last_point106.distance_to(_drag_from)<12.:
+			if _dragging and not _pinch_used108 and not _long_pressed106 and expanded and Time.get_ticks_msec()/1000.-_press_time106>.6 and _last_point106.distance_to(_drag_from)<12.:
 				_long_pressed106=true
 				world._open_map_note106(_map_point106(_drag_from))
 			queue_redraw()
@@ -1172,11 +1181,12 @@ class DiscoveryMap extends Control:
 		close.offset_left = -90
 		close.offset_top = 16
 		close.offset_right = -16
-		close.offset_bottom = 88
-		close.add_theme_font_size_override("font_size", 40)
+		close.offset_bottom = 72
+		QuestButtonStyle.apply(close);close.add_theme_font_size_override("font_size", 32)
 		close.pressed.connect(world._toggle_map)
 		add_child(close)
 		_close_btn = close
+		_find108=Button.new();_find108.text="Encontrar mi caballo";QuestButtonStyle.apply(_find108);_find108.add_theme_font_size_override("font_size",19);_find108.pressed.connect(_find_player108);add_child(_find108)
 		var minus := Button.new()
 		minus.text = "-"
 		minus.position = Vector2(24, size.y - 84)
@@ -1202,7 +1212,7 @@ class DiscoveryMap extends Control:
 		var thumb:ImageTexture=ImageTexture.create_from_image(thumb_image);_zoom_slider106.add_theme_icon_override("grabber",thumb);_zoom_slider106.add_theme_icon_override("grabber_highlight",thumb)
 		_zoom_slider106.value_changed.connect(_set_zoom);add_child(_zoom_slider106)
 		_zoom_label106=Label.new();_zoom_label106.add_theme_font_size_override("font_size",20);add_child(_zoom_label106)
-		_note_help106=Label.new();_note_help106.text="Mantén pulsado para crear o editar una nota";_note_help106.position=Vector2(20,16);_note_help106.add_theme_font_size_override("font_size",17);_note_help106.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_note_help106)
+		_note_help106=Label.new();_note_help106.text="MAPA · Mantén pulsado para una nota";_note_help106.position=Vector2(24,29);_note_help106.add_theme_font_size_override("font_size",16);_note_help106.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_note_help106)
 		_set_zoom(zoom)
 
 	func _set_zoom(z: float) -> void:
@@ -1230,20 +1240,49 @@ class DiscoveryMap extends Control:
 		if not _long_pressed106 and point.distance_to(_drag_from)<12.:
 			if not expanded:world._toggle_map()
 		_dragging=false;_ensure_terrain()
+	func _zoom_at108(z:float,from:Vector2,to:Vector2)->void:
+		var anchor:Vector2=_map_point106(from)
+		_set_zoom(z)
+		var after:Vector2=_to_map(anchor,_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
+		pan+=to-after;_ensure_terrain();queue_redraw()
+	func _find_player108()->void:
+		_ensure_terrain()
+		var point:Vector2=_to_map(world.player.position,_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
+		pan+=_map_geometry.area.get_center()-point;_ensure_terrain();queue_redraw()
+	func _pinch_state108()->void:
+		var points:Array=_touches108.values()
+		_pinch_distance108=(points[0] as Vector2).distance_to(points[1])
+		_pinch_mid108=(points[0]+points[1])*.5
 	func _gui_input(event: InputEvent) -> void:
 		if event is InputEventScreenTouch:
-			if event.pressed and _touch_index106<0:_touch_index106=event.index;_begin_drag106(event.position)
-			elif not event.pressed and event.index==_touch_index106:_end_drag106(event.position);_touch_index106=-1
+			if event.pressed:
+				_touches108[event.index]=event.position
+				if _touches108.size()==1:
+					_touch_index106=event.index;_pinch_used108=false;_begin_drag106(event.position)
+				elif _touches108.size()>=2:
+					_pinch_used108=true;_dragging=false;_pinch_state108()
+			else:
+				_touches108.erase(event.index)
+				if not _pinch_used108:_end_drag106(event.position)
+				if _touches108.is_empty():_touch_index106=-1;_dragging=false;_pinch_used108=false
+				elif _touches108.size()==1:
+					_touch_index106=_touches108.keys()[0];_begin_drag106(_touches108.values()[0])
+				else:_pinch_state108()
 			accept_event()
-		elif event is InputEventScreenDrag and event.index==_touch_index106:
-			_drag106(event.position);accept_event()
+		elif event is InputEventScreenDrag and _touches108.has(event.index):
+			_touches108[event.index]=event.position
+			if _touches108.size()>=2 and expanded:
+				var before:Vector2=_pinch_mid108;var distance:float=_pinch_distance108;_pinch_state108()
+				if distance>1.:_zoom_at108(zoom*_pinch_distance108/distance,before,_pinch_mid108)
+			elif event.index==_touch_index106:_drag106(event.position)
+			accept_event()
 		elif event is InputEventMouse and _touch_index106<0 and event.device!=InputEvent.DEVICE_ID_EMULATION:
 			if event is InputEventMouseButton:
 				if event.button_index==MOUSE_BUTTON_LEFT:
 					if event.pressed:_begin_drag106(event.position)
 					else:_end_drag106(event.position)
-				elif event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_UP:_set_zoom(zoom*1.15)
-				elif event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:_set_zoom(zoom/1.15)
+				elif event.pressed and expanded and event.button_index==MOUSE_BUTTON_WHEEL_UP:_zoom_at108(zoom*1.15,event.position,event.position)
+				elif event.pressed and expanded and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:_zoom_at108(zoom/1.15,event.position,event.position)
 			elif event is InputEventMouseMotion and _dragging:_drag106(event.position)
 
 	func _cells() -> Dictionary:
@@ -1309,11 +1348,13 @@ class DiscoveryMap extends Control:
 				_terrain.draw_circle(pc, maxf(3.0, cell * 0.07), col)
 			_mission_mark(c, r, font, cell)
 	func _draw() -> void:
+		if _markers108!=null:_markers108.queue_redraw()
+	func _draw_markers108()->void:
 		if not _terrain_valid:_ensure_terrain()
 		if (_map_geometry.data.cells as Array).is_empty():return
 		var mins: Vector2i = _map_geometry.data.mins
 		var cell: float = _map_geometry.cell
-		var origin: Vector2 = _map_geometry.origin
+		var origin: Vector2 = _map_geometry.origin-_map_geometry.area.position
 		# player marker (Ant 7-nov-2026: "ver claramente donde esta mi vaquero"):
 		# pulsing ring, high-contrast dot and facing arrow
 		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
@@ -1321,12 +1362,12 @@ class DiscoveryMap extends Control:
 			for note in rows:
 				var point:Vector2=_to_map(note.pos,mins,cell,origin)
 				if Rect2(Vector2(12,12),(size-Vector2(24,100 if expanded else 24)).max(Vector2.ZERO)).has_point(point):
-					draw_circle(point,8.,Color("f2bc51"));draw_circle(point,3.,Color("413126"))
+					_markers108.draw_circle(point,8.,Color("f2bc51"));_markers108.draw_circle(point,3.,Color("413126"))
 		for flower in world._flower_nodes105.values():
 			var point:Vector2=_to_map(flower.position,mins,cell,origin)
 			if Rect2(Vector2.ZERO,size).has_point(point):
-				draw_circle(point,7.,Color(flower.color,.25));WorldFlowerTarget105.glyph(self,point,4.,flower.color)
-		MapPlayerMarker99.draw(self,ppos,world.player.velocity,_pulse)
+				_markers108.draw_circle(point,7.,Color(flower.color,.25));WorldFlowerTarget105.glyph(_markers108,point,4.,flower.color)
+		MapPlayerMarker99.draw(_markers108,ppos,world.player.velocity,_pulse)
 
 	func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		if WorldNominal98.enabled():

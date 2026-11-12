@@ -12,6 +12,9 @@ static func draw(node:CanvasItem,position:Vector2,velocity:Vector2,pulse:float):
  var scale:Vector2=node.get_viewport().get_stretch_transform().get_scale() * node.get_global_transform_with_canvas().get_scale().abs()
  node.draw_set_transform(position,0,Vector2(1./maxf(scale.x,.001),1./maxf(scale.y,.001)))
  position=Vector2.ZERO
+ var aura:float=(sin(pulse*3.)+1.)*.5
+ node.draw_circle(Vector2.ZERO,24.,Color(1.,.82,.24,.06+.19*aura))
+ node.draw_arc(Vector2.ZERO,24.,0,TAU,56,Color(1.,.89,.44,.10+.40*aura),2.,true)
  var color=Color("ffd23d");color.a=.8+.2*sin(pulse*4.)
  node.draw_arc(position,RING_RADIUS,0,TAU,40,color,RING_WIDTH,true)
  node.draw_circle(position,BODY_RADIUS,Color("201b1c"))
