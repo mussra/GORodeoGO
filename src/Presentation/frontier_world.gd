@@ -1003,6 +1003,8 @@ func _toggle_map() -> void:
 	# Toggles collapsed <-> expanded; the small map never disappears (Ant 22:49).
 	_map_overlay.visible = true
 	_map_overlay.expanded = not _map_overlay.expanded
+	if _map_overlay.expanded:
+		_map_overlay.zoom=1.0;_map_overlay.pan=Vector2.ZERO
 	_map_overlay.queue_redraw()
 
 func _open_board() -> void:

@@ -8,6 +8,12 @@ func run():
  while world._loading_world:await get_tree().process_frame
  await get_tree().create_timer(.8).timeout
  world.player.set_physics_process(false);world.set_process(false);world.set_physics_process(false);world.player.velocity=Vector2.ZERO
+ if OS.get_environment("MARKER99_LARGE")=="1":
+  SaveData.world_discovered.clear()
+  for x in range(30):
+   for y in range(-40,1):
+    if (x<18 and y>-8) or (x>13 and x<26 and y>-20 and y<-10) or (x>15 and x<22 and y<=-20):SaveData.world_discovered.append(WorldMap.chunk_key(x,y))
+  world.player.position=Vector2(19*1024,-37*1024)
  var map=world._map_overlay
  map.set_process(false);map._pulse=0
  for data in [{"name":"mini","expanded":false,"zoom":1.},{"name":"grande","expanded":true,"zoom":1.},{"name":"menos","expanded":true,"zoom":.5},{"name":"mas","expanded":true,"zoom":3.}]:
@@ -15,7 +21,7 @@ func run():
   for button in map._zoom_btns:button.visible=data.expanded
   map._ensure_terrain();map.queue_redraw()
   await get_tree().process_frame;await RenderingServer.frame_post_draw
-  get_viewport().get_texture().get_image().save_png("/downloads/marcador99-"+("telefono-" if small else "")+data.name+".png")
+  get_viewport().get_texture().get_image().save_png("/downloads/marcador99-"+("telefono-" if small else "")+("extenso-" if OS.get_environment("MARKER99_LARGE")=="1" else "")+data.name+".png")
   var pos:Vector2=map._to_map(world.player.position,map._map_geometry.data.mins,map._map_geometry.cell,map._map_geometry.origin)+map.position
   print("MARKER99 ",data.name," center=",pos," cell=",map._map_geometry.cell," screen-scale=",map.get_viewport().get_stretch_transform().get_scale())
  get_tree().quit()
