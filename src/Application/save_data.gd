@@ -38,6 +38,7 @@ var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
+var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
 var world_pigs: Array[String] = []  # captured pig-pen ids ("pig_cx_cy")
@@ -86,6 +87,7 @@ func save_progress() -> bool:
 	config.set_value("world", "tamed", world_tamed)
 	config.set_value("world", "position", world_position)
 	config.set_value("world", "quests", world_quests)
+	config.set_value("world","flora138",world_flora138)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
 	config.set_value("world","notes106",world_notes106)
@@ -126,6 +128,7 @@ func load_progress() -> void:
 	world_tamed.clear()
 	world_position = Vector2(0, 160)
 	world_quests.clear()
+	world_flora138.clear()
 	world_missions.clear()
 	world_pigs.clear()
 	world_notes106.clear();world_notes_revision106+=1
@@ -187,6 +190,7 @@ func load_progress() -> void:
 		for op in we:
 			if WorldEdits.valid_op(op):world_edits.append(op)
 	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
+	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
@@ -520,3 +524,15 @@ func delete_note106(id:String)->bool:
 	world_notes106=WorldNotes106.clean(world_notes106)
 	if save_progress():world_notes_revision106+=1;return true
 	world_notes106=before;return false
+
+func ensure_flora138()->bool:
+	if world_generator_version<3:return false
+	if not world_flora138.is_empty():return true
+	return commit_flora138(FloristJourney138.fresh(world_discovered),world_position)
+func commit_flora138(next:Dictionary,pos:Vector2)->bool:
+	var clean:Dictionary=FloristJourney138.clean(next)
+	if clean.is_empty():return false
+	var before:Dictionary=world_flora138.duplicate(true);var previous:Vector2=world_position
+	world_flora138=clean
+	if save_world_state(pos):return true
+	world_flora138=before;world_position=previous;return false

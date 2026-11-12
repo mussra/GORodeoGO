@@ -20,6 +20,7 @@ func _init(world_seed:int=0,is_modular:bool=false,is_dark:bool=false,is_nominal:
  else:
   for lane in WorldPaths.access_lanes(seed):lanes.append(ContinuousRoadArt.rounded(lane,32.))
 func contains(point:Vector2,margin:float=0.)->bool:
+ if nominal and version>=3 and not SaveData.world_flora138.is_empty() and FloristJourney138.on_lane(SaveData.world_flora138,point,margin):return true
  if not modular:return _legacy_contains(point,margin)
  if _contains(point):return true
  if margin>0:

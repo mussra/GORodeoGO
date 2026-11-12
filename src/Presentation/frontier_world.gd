@@ -22,6 +22,8 @@ const SAVE_EVERY := 4.0
 const ARROWS: Array[String] = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"]
 
 var _npc_block:Control
+var _flora_layer138:FlowerExpansion138
+var _flower_sample138:WorldFlowerTarget105
 var _npc_dialog:NpcDialog
 var _npc_button:Button
 var _quest_label:Label
@@ -137,6 +139,8 @@ func _ready() -> void:
 		test_zone.name = "test_zone"
 		add_child(test_zone)
 	_build_hud()
+	if SaveData.ensure_flora138():
+		_flora_layer138=FlowerExpansion138.new();_flora_layer138.name="FlowerExpansion138";_flora_layer138.z_index=-1;add_child(_flora_layer138)
 	_setup_goat_prototype()
 	_setup_npcs()
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
@@ -434,6 +438,8 @@ func _advance_builder(b: Dictionary) -> void:
 				b["phase"] = 2
 				return
 			var d: Dictionary = todo.pop_front()
+			if SaveData.world_generator_version>=3 and not d.get("edited",false):
+				if FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):return
 			if WorldNominal98.enabled():
 				if not WorldNominal98.keep_decor(d,_get_surface98()):return
 				if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,d.pos,40.):return
@@ -1150,7 +1156,7 @@ class DiscoveryMap extends Control:
 				_background106.draw_style_box(MapAppearance.frame(),Rect2(Vector2.ZERO,size))
 				_background106.draw_rect(Rect2(Vector2(12,12),(size-Vector2(24,24)).max(Vector2.ZERO)),MapAppearance.floor_color("10252d")))
 			add_child(_background106);move_child(_background106,0);move_child(_terrain,1)
-		var signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, size, expanded, zoom, pan])
+		var signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, SaveData.world_flora138, size, expanded, zoom, pan])
 		if _terrain_valid and signature == _terrain_signature:return
 		_terrain_signature = signature
 		_terrain_valid = true
@@ -1165,7 +1171,7 @@ class DiscoveryMap extends Control:
 		pan = pan.clamp(-limit, limit)
 		_map_geometry = {"data":data,"area":area,"cell":cell,"origin":area.position + (area.size - content) / 2.0 + (pan if expanded else Vector2.ZERO)}
 		# Store the normalized pan so clamping does not trigger a second rebuild.
-		_terrain_signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, size, expanded, zoom, pan])
+		_terrain_signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, SaveData.world_flora138, size, expanded, zoom, pan])
 		if _clip106==null:
 			_clip106=Control.new();_clip106.mouse_filter=Control.MOUSE_FILTER_IGNORE;_clip106.clip_contents=true;_clip106.show_behind_parent=true;add_child(_clip106)
 			_terrain.reparent(_clip106)
@@ -1367,11 +1373,13 @@ class DiscoveryMap extends Control:
 				if SaveData.world_generator_version>=3:
 					for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
 						var box:Rect2=ridge.box;_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),Vector2(maxf(1.,box.size.x/1024.*cell),maxf(1.,box.size.y/1024.*cell))),Color("777384"))
+				_draw_fields138(c,mins,cell,origin)
 				continue
 			# cartoon ground tile with a soft rim
 			_terrain.draw_rect(r.grow(1.0), Color.TRANSPARENT, true)
 			_terrain.draw_rect(r, MapAppearance.terrain_over_base("3f7a45"), true)
 			var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, c.x, c.y), SaveData.world_edits, c.x, c.y)
+			_draw_fields138(c,mins,cell,origin)
 			_draw_trails(c, mins, cell, origin, r)
 			_draw_decor(chunk, mins, cell, origin, r)
 			if WorldMap.is_ranch_chunk(c.x, c.y):
@@ -1383,6 +1391,26 @@ class DiscoveryMap extends Control:
 				var col: Color = Color("f2a7b8") if not SaveData.world_pigs.has(pid) else Color("f2a7b866")
 				_terrain.draw_circle(pc, maxf(3.0, cell * 0.07), col)
 			_mission_mark(c, r, font, cell)
+	func _draw_fields138(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
+		if SaveData.world_generator_version<3 or SaveData.world_flora138.is_empty():return
+		var box:=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.)
+		var clip:=PackedVector2Array([box.position,Vector2(box.end.x,box.position.y),box.end,Vector2(box.position.x,box.end.y)])
+		for field in FloristJourney138.descriptors(SaveData.world_flora138,SaveData.world_seed):
+			if not (field.rect as Rect2).grow(150).intersects(box):continue
+			for polygon in Geometry2D.intersect_polygons(FloristJourney138.boundary(field),clip):
+				var screen:=PackedVector2Array()
+				for p in polygon:screen.append(_to_map(p,mins,cell,origin))
+				if screen.size()>=3:_terrain.draw_colored_polygon(screen,Color("b37a72") if field.species=="red" else Color("7e7b93"))
+
+		for points in FloristJourney138.lanes(SaveData.world_flora138):
+			for segment in Geometry2D.intersect_polyline_with_polygon(points,clip):
+				for i in segment.size()-1:_terrain.draw_line(_to_map(segment[i],mins,cell,origin),_to_map(segment[i+1],mins,cell,origin),Color("bb9460"),maxf(1.,cell*.03))
+		var destination:Vector2=FloristJourney138.door(SaveData.world_flora138)
+		if box.has_point(destination):
+			var point:Vector2=_to_map(destination,mins,cell,origin)
+			_terrain.draw_rect(Rect2(point-Vector2(3,3),Vector2(6,6)),Color("f2d987"))
+			if expanded and cell>24.:_terrain.draw_string(get_theme_default_font(),point+Vector2(8,0),"Florista del Este",HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("fff2bc"))
+
 	func _draw() -> void:
 		if _markers108!=null:_markers108.queue_redraw()
 	func _draw_markers108()->void:
@@ -1444,6 +1472,8 @@ class DiscoveryMap extends Control:
 	func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		var dot: float = maxf(1.6, cell * 0.035)
 		for d in chunk.get("decor", []):
+			if SaveData.world_generator_version>=3 and not d.get("edited",false):
+				if FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):continue
 			if WorldNominal98.enabled() and not WorldNominal98.keep_decor(d,world._get_surface98()):continue
 			if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,d.pos,40.):continue
 			var p: Vector2 = _to_map(d["pos"], mins, cell, origin)
@@ -1555,7 +1585,12 @@ func _open_npc(data:Dictionary)->void:
 	_refresh_quest_hud()
 	player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
 	_npc_block=Control.new();_npc_block.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_npc_block.mouse_filter=Control.MOUSE_FILTER_STOP;_hud.add_child(_npc_block)
-	_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests);_hud.add_child(_npc_dialog)
+	var expanded138:bool=SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty() and (data.id=="florist_east138" or (data.id=="florist" and RegionalVillages123.all_done(SaveData.world_quests,data)))
+	if expanded138:
+		var dialog:=FloristDialog138.new();dialog.setup_journey(data.id=="florist_east138");dialog.journey_action.connect(_journey_action138);_npc_dialog=dialog
+	else:
+		_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests)
+	_hud.add_child(_npc_dialog)
 	_npc_dialog.closed.connect(_close_npc)
 	_npc_dialog.pigs_sold104.connect(func(count:int,price:int):
 		var sale:Dictionary=SaveData.sell_pigs104(count,price)
@@ -1579,7 +1614,9 @@ func _quest_event(kind:String,target:String,event_id:String)->void:
 		SaveData.save_world_state(player.position)
 	_refresh_missions();_refresh_quest_hud()
 func _refresh_quest_hud()->void:
-	if is_instance_valid(_quest_label):_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)
+	if is_instance_valid(_quest_label):
+		_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)
+		if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():_quest_label.text+="\n"+FloristJourney138.hud(SaveData.world_flora138)
 	if not is_instance_valid(_flower_strip105):return
 	var signature:int=hash(SaveData.world_quests)
 	if signature==_flower_hud_signature105:return
@@ -1594,6 +1631,7 @@ func _tick_npcs()->void:
 	_npc_button.visible=player.position.distance_to(nearest.position)<155.0
 	_npc_button.text="Hablar con "+str(nearest.name).to_lower()
 	_tick_flowers105()
+	_tick_flora138()
 	for id in NpcQuests.activate_triggers(SaveData.world_quests,player.position):
 		_toast(NpcQuests.QUESTS[id].text);SaveData.save_world_state(player.position)
 	_refresh_quest_hud()
@@ -1637,6 +1675,7 @@ func _npcs98()->Array:
 		data[0].position=WorldNominal98.home()+Vector2(100,10)
 		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)+Vector2(110,-20)
 	else:data[1].position=WorldFloristShop.FLORIST_FEET
+	if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista del Camino del Este","position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
 	return data
 
 func mountain_step103(a:Vector2,b:Vector2)->Vector2:
@@ -1721,3 +1760,43 @@ func save_photo_dir106()->String:return "user://map-photos/"+str(hash(SaveData.s
 func _close_note106()->void:
 	if is_instance_valid(_note_dialog106):_note_dialog106.queue_free()
 	_note_dialog106=null;player.set_physics_process(not _map_overlay.expanded)
+
+func _journey_action138(action_:String,species:String)->void:
+	if SaveData.world_generator_version<3 or SaveData.world_flora138.is_empty():return
+	var source:Vector2=FloristJourney138.home_door(SaveData.world_seed)+Vector2(110,-20)
+	var destination:Vector2=FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32)
+	if player.position.distance_to(source if action_ in ["begin","deliver"] else destination)>155.:return
+	if action_=="begin" and not RegionalVillages123.all_done(SaveData.world_quests,NpcQuests.NPCS[1]):return
+	var next:Dictionary=SaveData.world_flora138.duplicate(true);var changed:bool=false
+	match action_:
+		"begin":changed=FloristJourney138.begin(next,species)
+		"sample":changed=FloristJourney138.sample(next,species,"direct")
+		"deliver":changed=FloristJourney138.deliver(next,species)
+		"hint":
+			if FloristJourney138.stage(next,species)!="active":return
+			next.quests[species].route="field"
+			if SaveData.commit_flora138(next,player.position):
+				_toast("Busca el campo de "+FloristJourney138.title(species)+" al "+("norte" if species=="red" else "sur")+". Sigue el camino y recoge la muestra marcada.")
+			else:_toast("No se pudo guardar la pista. Puedes volver a preguntar.")
+			_refresh_quest_hud();_close_npc();return
+	if changed:
+		if SaveData.commit_flora138(next,player.position):
+			_toast("Entrega guardada. Tu nuevo cultivo está al sur de la tienda." if action_=="deliver" else "Muestra obtenida: vuelve a entregarla." if action_=="sample" else FloristJourney138.hud(next))
+			if is_instance_valid(_flora_layer138):_flora_layer138.refresh()
+		else:_toast("No se pudo guardar. No se ha consumido la muestra ni cambiado el encargo.")
+	_refresh_quest_hud();_close_npc()
+func _tick_flora138()->void:
+	if SaveData.world_generator_version<3 or SaveData.world_flora138.is_empty():return
+	var species:String=FloristJourney138.current(SaveData.world_flora138)
+	var active:bool=FloristJourney138.stage(SaveData.world_flora138,species)=="active"
+	if not active:
+		if is_instance_valid(_flower_sample138):_flower_sample138.queue_free();_flower_sample138=null
+		return
+	var p:Vector2=FloristJourney138.sample_point(SaveData.world_flora138,species)
+	if not is_instance_valid(_flower_sample138):
+		_flower_sample138=WorldFlowerTarget105.new();add_child(_flower_sample138)
+	_flower_sample138.position=p;_flower_sample138.color=Color("ed7770") if species=="red" else Color("b199df")
+	if player.position.distance_to(p)>28.:return
+	var next:Dictionary=SaveData.world_flora138.duplicate(true)
+	if FloristJourney138.sample(next,species,"field") and SaveData.commit_flora138(next,player.position):
+		_flower_sample138.queue_free();_flower_sample138=null;_toast("Muestra de "+FloristJourney138.title(species)+" recogida. Vuelve a la florista del rancho.")
