@@ -7,7 +7,7 @@ func test_escape_crosses_but_spawn_and_ordinary_behavior_stay_off_in_all_worlds(
  for mode in ["frontier","light","dark"]:
   var world:Node2D
   if mode=="frontier":
-   SaveData.save_path="user://cross95.dat";SaveData.trial_session_active=true;SaveData.world_seed=752026;SaveData.world_position=Vector2(100,180);SaveData.world_edits=[]
+   SaveData.save_path="user://cross95.dat";SaveData.trial_session_active=true;SaveData.world_generator_version=1;SaveData.world_seed=752026;SaveData.world_position=Vector2(100,180);SaveData.world_edits=[]
    world=load("res://src/Presentation/frontier_world.gd").new();add_child(world)
    while world._loading_world:await get_tree().process_frame
   else:

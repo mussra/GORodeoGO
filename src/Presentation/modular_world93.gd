@@ -35,7 +35,8 @@ func _ready():
   tiles[kind]=load("res://art/world/"+("alternative92/" if dark else "derived88/")+name+".png")
  ground=Node2D.new();ground.z_index=-10;ground.texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED;ground.draw.connect(_draw_ground);add_child(ground)
  roads=Node2D.new();roads.z_index=-8;roads.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;roads.draw.connect(_draw_roads);add_child(roads)
- _buildings();_decor();_landmarks96()
+ var buildings=WorldModularBuildings98.new();add_child(buildings);collision_rects=buildings.collision_rects
+ _decor();_landmarks96()
  # Invisible perimeter for this fixed-size test map, outside all access paths.
  for wall in [Rect2(-120,-45,1520,10),Rect2(-120,675,1520,10),Rect2(-120,-45,10,730),Rect2(1390,-45,10,730)]:WorldPhysics.add_box(self,wall)
  player=Player.new();add_child(player);player.position=Layout.world(Vector2i(9,5))+Vector2(20,-35)
@@ -63,26 +64,6 @@ func _draw_roads():
   var piece=Layout.piece(graph,cell);roads.draw_set_transform(Layout.world(cell),piece.rotation*PI/2)
   roads.draw_texture_rect(tiles[piece.kind],Rect2(-Vector2.ONE*Layout.CELL/2,Vector2.ONE*Layout.CELL),false)
  roads.draw_set_transform(Vector2.ZERO)
-func _sprite(texture:Texture2D,feet:Vector2,height:float,name_:String)->Sprite2D:
- var sprite=Sprite2D.new();sprite.texture=texture;sprite.position=feet;sprite.offset=Vector2(0,-texture.get_height()/2.);sprite.scale=Vector2.ONE*height/texture.get_height();sprite.name=name_;add_child(sprite);return sprite
-func _solid(rect:Rect2):collision_rects.append(rect);WorldPhysics.add_box(self,rect)
-func _buildings():
- for id in ["house_west","house_east"]:
-  var door=Layout.world(Layout.DOORS[id]);var width=140.;var height=116.
-  # Ant's house door at 37% of the art width, threshold at the base.
-  var feet=door+Vector2((.5-.37)*width,0)
-  _sprite(WorldTestZone.HOUSE_TEX,feet,height,id)
-  _solid(Rect2(feet+Vector2(-58,-50),Vector2(116,30)))
- var ranch=Layout.world(Layout.DOORS.ranch)
- _sprite(preload("res://src/Presentation/world_ranch.gd").BARN_TEX,ranch+Vector2(8,0),120,"RanchBarn")
- _solid(Rect2(ranch+Vector2(-48,-45),Vector2(96,25)))
- var door=Layout.world(Layout.DOORS.florist);var offset=door-WorldFloristShop.DOOR
- _sprite(WorldFloristShop.SHOP,WorldFloristShop.BASE+offset,200,"FloristShop")
- _solid(Rect2(WorldFloristShop.BODY.position+offset,WorldFloristShop.BODY.size))
- _sprite(WorldFloristShop.FLORIST,WorldFloristShop.FLORIST_FEET+offset,92,"Florist")
- for i in 16:
-  var side=-1 if i<8 else 1;var feet=door+Vector2(side*(65+(i%4)*16),18+(i%4)*10)
-  _sprite(WorldFloristShop.Decor.FLOWER_TEXS[i%WorldFloristShop.Decor.FLOWER_TEXS.size()],feet,18+i%3*3,"Flower%d"%i)
 func _decor():
  for data in [{"kind":"tree","pos":Vector2(150,355)},{"kind":"tree","pos":Vector2(430,180)},{"kind":"tree","pos":Vector2(850,560)},{"kind":"stump","pos":Vector2(110,550)}]:
   var node=load("res://src/Presentation/world_decor.gd").new();node.kind=data.kind;node.size_scale=1.;var offset=WorldFloristShop.Decor.base_offset(data.kind,1.);node.draw_offset=Vector2(0,-offset);node.position=data.pos+Vector2(0,offset);add_child(node)

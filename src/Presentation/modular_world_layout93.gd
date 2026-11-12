@@ -33,7 +33,7 @@ static func route(g:Dictionary,start:Vector2i,goal:Vector2i)->Array:
    while out[0]!=start:out.push_front(parents[out[0]])
    return out
   for next in g[cell]:
-   if not parents.has(next):parents[next]=cell;queue.append(next)
+   if g.has(next) and not parents.has(next):parents[next]=cell;queue.append(next)
  return []
 static func _path(g:Dictionary,corners:Array):
  for i in range(corners.size()-1):

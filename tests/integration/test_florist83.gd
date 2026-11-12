@@ -1,6 +1,6 @@
 extends GutTest
 func test_actual_world_shop_access_collision_and_no_quest_or_edit_mutation():
- SaveData.save_path="user://florist-integration-only.dat";SaveData.world_seed=752026;SaveData.world_position=Vector2(680,470);SaveData.world_edits=[];SaveData.world_quests={};SaveData.horse_collection.seed_trial()
+ SaveData.save_path="user://florist-integration-only.dat";SaveData.world_generator_version=1;SaveData.world_seed=752026;SaveData.world_position=Vector2(680,470);SaveData.world_edits=[];SaveData.world_quests={};SaveData.horse_collection.seed_trial()
  var before_edits=SaveData.world_edits.duplicate(true);var before_quests=SaveData.world_quests.duplicate(true)
  var world=load("res://src/Presentation/frontier_world.gd").new();add_child_autofree(world)
  var count=0

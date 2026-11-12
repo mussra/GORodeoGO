@@ -53,7 +53,7 @@ func test_modular_spawn_flee_charge_wander_and_stamina_both_art_sets():
   assert_almost_eq(float(world.stamina.value),46.,.001)
  assert_eq(SaveData.world_edits,edits);assert_eq(SaveData.world_position,saved)
 func test_real_frontier_spawn_and_ordinary_motion_avoids_roads():
- SaveData.save_path="user://road94-isolated-test.dat";SaveData.trial_session_active=true;SaveData.world_seed=752026;SaveData.world_edits=[];SaveData.world_position=Vector2(100,180);SaveData.horse_collection.seed_trial()
+ SaveData.save_path="user://road94-isolated-test.dat";SaveData.trial_session_active=true;SaveData.world_generator_version=1;SaveData.world_seed=752026;SaveData.world_edits=[];SaveData.world_position=Vector2(100,180);SaveData.horse_collection.seed_trial()
  var world=load("res://src/Presentation/frontier_world.gd").new();add_child_autofree(world)
  while world._loading_world:await get_tree().process_frame
  world.set_process(false);world.set_physics_process(false);world.player.set_physics_process(false)

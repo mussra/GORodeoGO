@@ -62,7 +62,7 @@ var _edit_mode: bool = false
 var _stamina: Dictionary = {}
 var _road_surface94:WorldRoadSurface94
 func road_surface_contains94(point:Vector2,margin:float=0.)->bool:
-	if _road_surface94==null:_road_surface94=WorldRoadSurface94.new(SaveData.world_seed)
+	if _road_surface94==null:_road_surface94=WorldRoadSurface94.new(SaveData.world_seed,WorldNominal98.enabled(),false,WorldNominal98.enabled())
 	return _road_surface94.contains(point,margin)
 
 var _gauges: Dictionary = {}
@@ -116,15 +116,19 @@ func _ready() -> void:
 	var camera := Camera2D.new()
 	player.add_child(camera)
 	camera.make_current()
-	var ranch := RanchScript.new()
-	add_child(ranch)
-	add_child(FloristShopScript.new())
-	register_occluder("ranch_house", Rect2(Vector2(-130, -262), Vector2(170, 142)))
-	# fixed showcase zone near the ranch (Ant, 7-nov-2026): additive overlay,
-	# no effect on chunk seeds, streaming or saves
-	var test_zone := TestZoneScript.new()
-	test_zone.name = "test_zone"
-	add_child(test_zone)
+	if WorldNominal98.enabled():
+		var buildings98=WorldModularBuildings98.new();buildings98.name="NominalBuildings98";add_child(buildings98)
+		var sign98=Sprite2D.new();sign98.texture=RanchScript.SIGNPOST_TEX;sign98.scale=Vector2.ONE*65./sign98.texture.get_height();sign98.position=WorldNominal98.board();sign98.offset=Vector2(0,-sign98.texture.get_height()/2.);add_child(sign98)
+	else:
+		var ranch := RanchScript.new()
+		add_child(ranch)
+		add_child(FloristShopScript.new())
+		register_occluder("ranch_house", Rect2(Vector2(-130, -262), Vector2(170, 142)))
+		# fixed showcase zone near the ranch (Ant, 7-nov-2026): additive overlay,
+		# no effect on chunk seeds, streaming or saves
+		var test_zone := TestZoneScript.new()
+		test_zone.name = "test_zone"
+		add_child(test_zone)
 	_build_hud()
 	_setup_goat_prototype()
 	_setup_npcs()
@@ -180,7 +184,7 @@ func _process(delta: float) -> void:
 		_last_gait = player.gait
 		_gait_label.text = tr(WorldGait.gait_names()[_last_gait])
 	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.0)
-	_board_button.visible = player.position.distance_to(BOARD_POS) < 150.0
+	_board_button.visible = player.position.distance_to(WorldNominal98.board() if WorldNominal98.enabled() else BOARD_POS) < 150.0
 	_save_timer += delta
 	if _save_timer >= SAVE_EVERY:
 		_save_timer = 0.0
@@ -421,7 +425,9 @@ func _advance_builder(b: Dictionary) -> void:
 				b["phase"] = 2
 				return
 			var d: Dictionary = todo.pop_front()
-			if not WorldFloristShop.keep_decor(d,SaveData.world_seed):return
+			if WorldNominal98.enabled():
+				if not WorldNominal98.keep_decor(d,_get_surface98()):return
+			elif not WorldFloristShop.keep_decor(d,SaveData.world_seed):return
 			var decor := DecorScript.new()
 			decor.kind = d["kind"]
 			decor.size_scale = d["scale"]
@@ -862,7 +868,7 @@ func _home() -> void:
 	_release_held_horse()
 	player.cancel_input();player.set_physics_process(false)
 	_loading_world=true;_returning_home=true;visible=false
-	player.position=HOME_POS
+	player.position=WorldNominal98.home() if WorldNominal98.enabled() else HOME_POS
 	_update_chunks()
 
 func _menu() -> void:
@@ -975,7 +981,7 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Mapa modular nuevo","hint":"Prueba aislada, sin cambiar tu partida"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
@@ -1236,6 +1242,14 @@ class DiscoveryMap extends Control:
 		draw_colored_polygon(PackedVector2Array([tip, ppos + face * cell * 0.12 + side, ppos + face * cell * 0.12 - side]), Color("ffd23d"))
 
 	func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
+		if WorldNominal98.enabled():
+			var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c)
+			for tile in graph:
+				var p=ModularWorldLayout93.world(tile)
+				if WorldMap.chunk_at(p)!=c:continue
+				for next in graph[tile]:
+					_terrain.draw_line(_to_map(p,mins,cell,origin),_to_map(p.lerp(ModularWorldLayout93.world(next),.5),mins,cell,origin),Color("a5825a"),maxf(1.,cell*.03),true)
+			return
 		# clip every dot to its own discovered tile: unseen world stays hidden
 		var seed: int = SaveData.world_seed
 		var worigin: Vector2 = Vector2(c) * WorldMap.CHUNK_SIZE
@@ -1262,6 +1276,7 @@ class DiscoveryMap extends Control:
 	func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		var dot: float = maxf(1.6, cell * 0.035)
 		for d in chunk.get("decor", []):
+			if WorldNominal98.enabled() and not WorldNominal98.keep_decor(d,world._get_surface98()):continue
 			var p: Vector2 = _to_map(d["pos"], mins, cell, origin)
 			if not r.grow(4.0).has_point(p):
 				continue
@@ -1280,6 +1295,9 @@ class DiscoveryMap extends Control:
 					_terrain.draw_circle(p, dot, Color("e86a8a"))
 
 	func _draw_ranch(r: Rect2) -> void:
+		if WorldNominal98.enabled():
+			var point=_to_map(WorldNominal98.home(),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
+			_terrain.draw_circle(point,maxf(3.,r.size.x*.06),Color("f2d987"));return
 		# little house: brown body + red roof, cartoon icon for home
 		var center: Vector2 = r.position + Vector2(r.size.x * 0.16, r.size.y * 0.2)
 		var s: float = maxf(4.0, r.size.x * 0.09)
@@ -1306,9 +1324,9 @@ func _exit_tree()->void:
 ## Additive, repeatable near-ranch prototype; does not alter chunk RNG or saves.
 func _setup_goat_prototype()->void:
 	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";add_child(_prototype_goats)
-	for pos in [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)]:
+	for pos in ([Vector2(200,600),Vector2(320,600),Vector2(400,600)] if WorldNominal98.enabled() else [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)]):
 		var goat=GoatScript.new();goat.setup({"pos":pos});goat.set_meta("origin",pos);_prototype_goats.add_child(goat)
-	var sign:=Label.new();sign.position=Vector2(-300,280);sign.text="Cabras · persigue con el lazo hasta agotar su energía";sign.add_theme_font_size_override("font_size",19);add_child(sign)
+	var sign:=Label.new();sign.position=Vector2(180,700) if WorldNominal98.enabled() else Vector2(-300,280);sign.text="Cabras · persigue con el lazo hasta agotar su energía";sign.add_theme_font_size_override("font_size",19);add_child(sign)
 func _tick_goats(delta:float)->void:
 	if not is_instance_valid(_prototype_goats):return
 	for goat in _prototype_goats.get_children():
@@ -1334,10 +1352,10 @@ func _tick_goats(delta:float)->void:
 
 
 func _setup_npcs()->void:
-	for data in NpcQuests.NPCS:
+	for data in _npcs98():
 		var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
 	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
-	_npc_button.pressed.connect(func():_open_npc(NpcQuests.NPCS[0]))
+	_npc_button.pressed.connect(func():_open_npc(_npcs98()[0]))
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(16,56);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
 	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(16,102);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
@@ -1374,7 +1392,7 @@ func _quest_event(kind:String,target:String,event_id:String)->void:
 func _refresh_quest_hud()->void:
 	if is_instance_valid(_quest_label):_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)
 func _tick_npcs()->void:
-	_npc_button.visible=player.position.distance_to(NpcQuests.NPCS[0].position)<155.0
+	_npc_button.visible=player.position.distance_to(_npcs98()[0].position)<155.0
 	for id in NpcQuests.activate_triggers(SaveData.world_quests,player.position):
 		_toast(NpcQuests.QUESTS[id].text);SaveData.save_world_state(player.position)
 	_refresh_quest_hud()
@@ -1405,3 +1423,12 @@ func _open_modular_preview93()->void:
 		if _hud!=null:_hud.visible=true
 		if touch!=null:touch.visible=not _edit_mode
 		if is_instance_valid(prior_camera):prior_camera.make_current())
+
+func _get_surface98()->WorldRoadSurface94:
+	if _road_surface94==null:road_surface_contains94(Vector2.ZERO)
+	return _road_surface94
+
+func _npcs98()->Array:
+	var data:Array=NpcQuests.NPCS.duplicate(true)
+	if WorldNominal98.enabled():data[0].position=WorldNominal98.home()+Vector2(100,10)
+	return data

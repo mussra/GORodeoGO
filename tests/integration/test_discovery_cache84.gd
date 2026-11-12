@@ -1,6 +1,6 @@
 extends GutTest
 func test_map_retains_terrain_and_invalidates_all_persisted_inputs():
- SaveData.world_seed=752026;SaveData.world_discovered=["0,0"];SaveData.world_edits=[];SaveData.world_pigs=[];SaveData.world_missions={};SaveData.world_tamed=[]
+ SaveData.world_generator_version=1;SaveData.world_seed=752026;SaveData.world_discovered=["0,0"];SaveData.world_edits=[];SaveData.world_pigs=[];SaveData.world_missions={};SaveData.world_tamed=[]
  var map=load("res://src/Presentation/frontier_world.gd").DiscoveryMap.new()
  map.world=Node2D.new();map.world.set_script(null)
  # No input path is used; only the cache and drawing data are under test.

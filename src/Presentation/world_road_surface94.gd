@@ -5,14 +5,15 @@ static var images:Dictionary={}
 var seed:int
 var modular:bool
 var dark:bool
+var nominal:bool=false
 var graph:Dictionary
 var pieces:Dictionary={}
 var lanes:Array=[]
 var axis_points:Dictionary={}
-func _init(world_seed:int=0,is_modular:bool=false,is_dark:bool=false):
- seed=world_seed;modular=is_modular;dark=is_dark
+func _init(world_seed:int=0,is_modular:bool=false,is_dark:bool=false,is_nominal:bool=false):
+ seed=world_seed;modular=is_modular;dark=is_dark;nominal=is_nominal
  if modular:
-  graph=ModularWorldLayout93.graph()
+  graph=ModularWorldLayout93.graph(world_seed if nominal else ModularWorldLayout93.DEFAULT_SEED)
   for cell in graph:pieces[cell]=ModularWorldLayout93.piece(graph,cell)
  else:
   for lane in WorldPaths.access_lanes(seed):lanes.append(ContinuousRoadArt.rounded(lane,32.))
@@ -26,7 +27,14 @@ func contains(point:Vector2,margin:float=0.)->bool:
 func _contains(point:Vector2)->bool:
  if modular:
   var cell:Vector2i=Vector2i(((point-ModularWorldLayout93.ORIGIN)/ModularWorldLayout93.CELL+Vector2.ONE*.5).floor())
-  if not pieces.has(cell):return false
+  if not pieces.has(cell):
+   if nominal and cell.y==4:pieces[cell]={"kind":"straight","rotation":0}
+   else:return false
+  if nominal and cell.y==4:
+   var edges:Array=graph.get(cell,[]).duplicate()
+   for next in [cell+Vector2i.LEFT,cell+Vector2i.RIGHT]:
+    if not edges.has(next):edges.append(next)
+   pieces[cell]=ModularWorldLayout93.piece({cell:edges},cell)
   var piece:Dictionary=pieces[cell]
   var local:Vector2=(point-ModularWorldLayout93.world(cell)).rotated(-piece.rotation*PI/2)
   var uv:Vector2=local/ModularWorldLayout93.CELL+Vector2.ONE*.5

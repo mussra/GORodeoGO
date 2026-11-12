@@ -4,6 +4,7 @@ extends Node2D
 ## Purely decorative - the rider can leave the path.
 const SAMPLE := 24.0
 
+var _nominal_tiles98:Dictionary={}
 var c: Vector2i = Vector2i.ZERO
 
 func _ready() -> void:
@@ -12,6 +13,8 @@ func _ready() -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	if WorldNominal98.enabled():
+		_draw_nominal98();return
 	var seed: int = SaveData.world_seed
 	var origin: Vector2 = Vector2(c) * WorldMap.CHUNK_SIZE
 	var junctions=WorldRoadJunctions.layout(seed)
@@ -41,3 +44,16 @@ func _stamp_axis(origin: Vector2, main: bool, seed: int,junctions:Array) -> void
 			continue
 		pts.append(center)
 	ContinuousRoadArt.ribbon(self,pts,45.0,junctions)
+
+func _draw_nominal98():
+	var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c)
+	for cell in graph:
+		var pos=ModularWorldLayout93.world(cell)
+		if WorldMap.chunk_at(pos)!=c:continue
+		var piece=ModularWorldLayout93.piece(graph,cell)
+		var name="tee" if piece.kind=="t" else piece.kind
+		if not _nominal_tiles98.has(name):_nominal_tiles98[name]=load("res://art/world/derived88/"+name+".png")
+		var texture=_nominal_tiles98[name]
+		draw_set_transform(pos,piece.rotation*PI/2)
+		draw_texture_rect(texture,Rect2(-Vector2.ONE*40,Vector2.ONE*80),false)
+	draw_set_transform(Vector2.ZERO)

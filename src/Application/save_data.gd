@@ -33,6 +33,7 @@ var dual_lasso_intro_shown: bool = false
 
 ## Frontera: bounded open-world test (Ant, 7-nov-2026). Seed 0 = world not created yet.
 ## Discovered chunks never change once seen; tamed herds never respawn.
+var world_generator_version:int=1 # missing field means legacy; only new worlds use v2
 var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
@@ -75,6 +76,7 @@ func save_progress() -> bool:
 	if horse_collection.horses.is_empty():horse_collection.seed_trial()
 	config.set_value("horses_trial", "state", horse_collection.export_state())
 	config.set_value("world", "seed", world_seed)
+	config.set_value("world", "generator_version", world_generator_version)
 	config.set_value("world", "discovered", world_discovered)
 	config.set_value("world", "tamed", world_tamed)
 	config.set_value("world", "position", world_position)
@@ -110,6 +112,7 @@ func load_progress() -> void:
 	equipment_equipped.clear()
 	points_legacy_credit_applied = false
 	world_seed = 0
+	world_generator_version=1
 	world_discovered.clear()
 	world_tamed.clear()
 	world_position = Vector2(0, 160)
@@ -151,6 +154,10 @@ func load_progress() -> void:
 	points_legacy_credit_applied=config.get_value("equipment","legacy_credit_applied",false)==true
 	var wseed:Variant=config.get_value("world","seed",0)
 	if typeof(wseed)==TYPE_INT and wseed>0:world_seed=wseed
+	var generator:Variant=config.get_value("world","generator_version",1)
+	if typeof(generator)!=TYPE_INT or generator not in [1,2]:
+		_load_valid=false;return
+	world_generator_version=generator
 	for pair in [["discovered",world_discovered],["tamed",world_tamed],["pigs",world_pigs]]:
 		var raw:Variant=config.get_value("world",pair[0],[])
 		if raw is Array or raw is PackedStringArray:
@@ -413,6 +420,8 @@ func set_horse_emblem(id:String,config:Dictionary)->bool:
 func ensure_world_seed() -> int:
 	if world_seed == 0:
 		world_seed = int(randi()) + 1
+		world_generator_version=2
+		world_position=WorldNominal98.home()
 		save_progress()
 	return world_seed
 
