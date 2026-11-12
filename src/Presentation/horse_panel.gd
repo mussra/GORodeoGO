@@ -19,6 +19,8 @@ var atlas_filters:Dictionary={}
 var scroll_to_newest:bool=false
 var expanded_appearance_groups118:Dictionary={}
 var collection_scroll118:int=0
+var pasture_tier141:int=-1
+var pasture_page141:int=0
 func _ready()->void:
  MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=80
@@ -39,15 +41,17 @@ func refresh()->void:
 func _refresh()->void:
  if not is_inside_tree():return
  if content!=null:canvas.remove_child(content);content.queue_free()
- content=Control.new();canvas.add_child(content);MenuNavigation.reveal(content)
+ content=Control.new();content.size=Vector2(1280,720);canvas.add_child(content);MenuNavigation.reveal(content)
  var titles={"hub":"CABALLERIZA","collection":"COLECCIÓN","breed":"CRUZAR","atlas":("ATLAS · RESULTADOS" if not atlas_filters.is_empty() else "ATLAS · FAMILIAS"),"atlas_variants":"ATLAS · VARIANTES","market":"MERCADO","detail":"FICHA"}
  MenuNavigation.header(content,str(titles.get(page,"CABALLERIZA")),go_back)
  if page=="hub":
   MenuNavigation.cards(content,[{"id":"collection","title":"Colección","hint":"Tus caballos"},{"id":"breed","title":"Cruzar","hint":"Elige padres y rasgos"},{"id":"atlas","title":"Atlas","hint":"Explora colores y patrones"},{"id":"market","title":"Mercado","hint":"Compra y venta"},{"id":"training","title":"Entrenamiento","hint":"Aprende habilidades"},{"id":"genealogy","title":"Mapa genealógico","hint":"Linajes y parentescos"}],open_section)
+  button("Mi rancho",Vector2(40,600),func():open_section("pasture141"),330)
   if SaveData.debug_mode or SaveData.trial_session_active:
    button("Caballos aleatorios de prueba",Vector2(430,600),add_random_pair,420)
   return
  match page:
+  "pasture141":pasture_view141()
   "collection":collection_view()
   "breed":breed_view()
   "family":family_view()
@@ -58,6 +62,14 @@ func open_section(value:String)->void:
  if value=="training":add_child(TrainingPanel.new());return
  if value=="genealogy":add_child(GenealogyPanel.new());return
  show_page(value)
+func pasture_view141()->void:
+ var ranch:=RanchPasturePanel141.new();ranch.tier=pasture_tier141;ranch.page_index=pasture_page141;content.add_child(ranch)
+ ranch.closed.connect(func():show_page("hub"))
+ ranch.horse_opened.connect(func(id:String):
+  pasture_tier141=ranch.tier;pasture_page141=ranch.page_index
+  detail_entries=RanchPastures141.horses(SaveData.horse_collection,ranch.tier).map(func(h):return {"horse":h,"owned":true})
+  focus_id=id;show_page("detail"))
+ ranch.list_requested.connect(func():show_page("collection"))
 func go_back()->void:
  if page=="hub":hide()
  elif page=="detail":show_page(detail_origin)
