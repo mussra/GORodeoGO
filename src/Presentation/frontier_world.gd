@@ -60,6 +60,9 @@ var _last_gait: int = -1
 var _pigs_label: Label
 var _edit_mode: bool = false
 var _stamina: Dictionary = {}
+var _flower_nodes105:Dictionary={}
+var _flower_strip105:HBoxContainer
+var _flower_hud_signature105:int=-1
 var _road_surface94:WorldRoadSurface94
 func road_surface_contains94(point:Vector2,margin:float=0.)->bool:
 	if _road_surface94==null:_road_surface94=WorldRoadSurface94.new(SaveData.world_seed,WorldNominal98.enabled(),false,WorldNominal98.enabled(),SaveData.world_generator_version)
@@ -183,7 +186,7 @@ func _process(delta: float) -> void:
 	if player.gait != _last_gait:
 		_last_gait = player.gait
 		_gait_label.text = tr(WorldGait.gait_names()[_last_gait])
-	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.0)
+	_toasts.set_top(_toast_top105())
 	_board_button.visible = player.position.distance_to(WorldNominal98.board() if WorldNominal98.enabled() else BOARD_POS) < 150.0
 	_save_timer += delta
 	if _save_timer >= SAVE_EVERY:
@@ -306,7 +309,7 @@ func _stallion_hint(horse: Node2D) -> void:
 	_stallion_hint_stage += 1
 
 func _toast(text: String) -> void:
-	_toasts.set_top(216.0 if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.0)
+	_toasts.set_top(_toast_top105())
 	_toasts.push(text)
 
 func _update_chunks() -> void:
@@ -1236,6 +1239,10 @@ class DiscoveryMap extends Control:
 		# player marker (Ant 7-nov-2026: "ver claramente donde esta mi vaquero"):
 		# pulsing ring, high-contrast dot and facing arrow
 		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
+		for flower in world._flower_nodes105.values():
+			var point:Vector2=_to_map(flower.position,mins,cell,origin)
+			if Rect2(Vector2.ZERO,size).has_point(point):
+				draw_circle(point,7.,Color(flower.color,.25));WorldFlowerTarget105.glyph(self,point,4.,flower.color)
 		MapPlayerMarker99.draw(self,ppos,world.player.velocity,_pulse)
 
 	func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
@@ -1358,13 +1365,15 @@ func _tick_goats(delta:float)->void:
 
 func _setup_npcs()->void:
 	for data in _npcs98():
-		var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
+		if data.id=="farmer":
+			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
 	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
-	_npc_button.pressed.connect(func():_open_npc(_npcs98()[0]))
+	_npc_button.pressed.connect(func():_open_npc(_nearest_npc105()))
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(16,56);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
 	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(16,102);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
-	_quest_label=Label.new();_quest_label.custom_minimum_size=Vector2(590,0);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);_quest_panel.add_child(_quest_label)
+	_quest_label=Label.new();_quest_label.custom_minimum_size=Vector2(590,0);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);var quest_content105=VBoxContainer.new();_quest_panel.add_child(quest_content105);quest_content105.add_child(_quest_label)
+	_flower_strip105=HBoxContainer.new();quest_content105.add_child(_flower_strip105)
 	_quest_toggle.pressed.connect(func():
 		_quests_expanded=not _quests_expanded;_quest_panel.visible=_quests_expanded;_quest_toggle.text="Encargos ▾" if _quests_expanded else "Encargos ▸")
 	_story_flower=Sprite2D.new();_story_flower.texture=DecorScript.FLOWER_TEXS[14];_story_flower.scale=Vector2.ONE*30.0/_story_flower.texture.get_height();_story_flower.visible=false;add_child(_story_flower)
@@ -1400,8 +1409,20 @@ func _quest_event(kind:String,target:String,event_id:String)->void:
 	_refresh_missions();_refresh_quest_hud()
 func _refresh_quest_hud()->void:
 	if is_instance_valid(_quest_label):_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)
+	if not is_instance_valid(_flower_strip105):return
+	var signature:int=hash(SaveData.world_quests)
+	if signature==_flower_hud_signature105:return
+	_flower_hud_signature105=signature
+	for child in _flower_strip105.get_children():_flower_strip105.remove_child(child);child.queue_free()
+	for id in WorldFlowers105.IDS:
+		var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
+		if state.status!="active":continue
+		var glyph=FlowerQuestGlyph105.new();glyph.color=WorldFlowers105.color_for(id);glyph.caption=("Azules" if id==WorldFlowers105.IDS[0] else "Doradas")+" · %d/3"%state.count;_flower_strip105.add_child(glyph)
 func _tick_npcs()->void:
-	_npc_button.visible=player.position.distance_to(_npcs98()[0].position)<155.0
+	var nearest:Dictionary=_nearest_npc105()
+	_npc_button.visible=player.position.distance_to(nearest.position)<155.0
+	_npc_button.text="Hablar con "+str(nearest.name).to_lower()
+	_tick_flowers105()
 	for id in NpcQuests.activate_triggers(SaveData.world_quests,player.position):
 		_toast(NpcQuests.QUESTS[id].text);SaveData.save_world_state(player.position)
 	_refresh_quest_hud()
@@ -1439,7 +1460,10 @@ func _get_surface98()->WorldRoadSurface94:
 
 func _npcs98()->Array:
 	var data:Array=NpcQuests.NPCS.duplicate(true)
-	if WorldNominal98.enabled():data[0].position=WorldNominal98.home()+Vector2(100,10)
+	if WorldNominal98.enabled():
+		data[0].position=WorldNominal98.home()+Vector2(100,10)
+		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)+Vector2(110,-20)
+	else:data[1].position=WorldFloristShop.FLORIST_FEET
 	return data
 
 func mountain_step103(a:Vector2,b:Vector2)->Vector2:
@@ -1449,3 +1473,34 @@ func mountain_spawn103(p:Vector2)->Vector2:
 
 func _refresh_livestock104()->void:
 	if is_instance_valid(_pigs_label):_pigs_label.text=tr("WORLD_PIG_INVENTORY104") % SaveData.pig_inventory104()
+
+func _nearest_npc105()->Dictionary:
+	var best:Dictionary=_npcs98()[0]
+	for data in _npcs98():
+		if player.position.distance_to(data.position)<player.position.distance_to(best.position):best=data
+	return best
+func _tick_flowers105()->void:
+	var florist_door:Vector2=ModularWorldLayout93.world(WorldNominal98.doors().florist) if WorldNominal98.enabled() else WorldFloristShop.DOOR
+	for id in WorldFlowers105.IDS:
+		var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
+		var positions:Array[Vector2]=WorldFlowers105.positions(SaveData.world_seed,SaveData.world_generator_version,florist_door,id)
+		for i in positions.size():
+			var event:String=WorldFlowers105.event_id(id,i)
+			var needed:bool=state.status=="active" and not state.events.has(event)
+			if not needed:
+				if _flower_nodes105.has(event):_flower_nodes105[event].queue_free();_flower_nodes105.erase(event)
+				continue
+			if not _flower_nodes105.has(event):
+				var target=WorldFlowerTarget105.new();target.color=WorldFlowers105.color_for(id);target.position=positions[i];add_child(target);_flower_nodes105[event]=target
+			if player.position.distance_to(positions[i])>28.:continue
+			var before:Dictionary=SaveData.world_quests.duplicate(true)
+			NpcQuests.record(SaveData.world_quests,"collect_flower",id,event)
+			if not SaveData.save_world_state(player.position):SaveData.world_quests=before;continue
+			state=NpcQuests.state(SaveData.world_quests,id)
+			_flower_nodes105[event].queue_free();_flower_nodes105.erase(event)
+			_toast("Flor recogida · %d/3"%state.count)
+
+func _toast_top105()->float:
+	var top:float=216. if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.
+	if is_instance_valid(_quest_panel) and _quest_panel.visible:top=maxf(top,_quest_panel.position.y+_quest_panel.size.y+12.)
+	return top
