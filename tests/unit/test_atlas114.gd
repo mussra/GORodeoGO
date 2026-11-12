@@ -30,3 +30,11 @@ func test_owned_legendary_keeps_identity_even_with_matching_regular_traits():
  panel.atlas_filters["owned"]=true;assert_eq(HorseFilters.apply(panel.atlas_entries(),panel.atlas_filters).size(),1)
  panel.page="atlas_variants";panel.atlas_filters={};panel.atlas_family=h.traits;var variants:Array=panel.atlas_entries();assert_true(variants.any(func(e):return e.owned and e.horse.id==h.id));assert_true(variants.any(func(e):return e.owned and e.horse.id=="original"))
  panel.free();SaveData.horse_collection=old
+func test_six_cards_visible_in_two_rows_without_scroll():
+ var panel=HorsePanel.new();add_child_autofree(panel);panel.page="atlas";panel._refresh()
+ var grid=panel.content.find_child("AtlasVisibleGrid117",true,false);assert_not_null(grid);assert_eq(grid.size,Vector2(1240,365));var count:int=0
+ for child in grid.get_children():
+  if str(child.name).begins_with("AtlasCard117_"):
+   count+=1;assert_true(Rect2(Vector2.ZERO,grid.size).encloses(Rect2(child.position,child.size)))
+  assert_false(child is ScrollContainer)
+ assert_eq(count,6)

@@ -246,35 +246,35 @@ func atlas_view()->void:
   order_btn.name="AtlasOrder114";order_btn.add_theme_font_size_override("font_size",19)
 
  _atlas_filter_bar()
- label(tr("MARKET_DESIGN_NOTE") if page=="market" else ("Desliza para ver todas las tarjetas · ojos y patas desde Filtros" if page=="atlas_variants" else ("Resultados: todos los colores de manchas · toca para abrir Ficha" if not atlas_filters.is_empty() else "1.440 familias · toca una para explorar manchas, ojos y patas")),Vector2(35,160),17)
+ label(tr("MARKET_DESIGN_NOTE") if page=="market" else "6 por página · toca una tarjeta para ver "+("variantes" if atlas_filters.is_empty() and page=="atlas" else "la ficha"),Vector2(35,160),21)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
  var all_entries:Array[Dictionary]=atlas_entries()
  var entries:Array[Dictionary]=HorseFilters.apply(all_entries,atlas_filters);var pages:int=maxi(1,ceili(entries.size()/6.0));atlas_page=clampi(atlas_page,0,pages-1)
  var outer:Control=content
- var scroll:=ScrollContainer.new();scroll.position=Vector2(0,200);scroll.size=Vector2(1280,365);content.add_child(scroll)
- var cards:=Control.new();cards.custom_minimum_size=Vector2(1250,1875);scroll.add_child(cards);content=cards
+ var cards:=Control.new();cards.name="AtlasVisibleGrid117";cards.position=Vector2(20,200);cards.size=Vector2(1240,365);content.add_child(cards);content=cards
  for j in range(6):
   var n:int=atlas_page*6+j
   if n>=entries.size():break
   var entry:Dictionary=entries[n];var h:Dictionary=entry.horse;var t:Dictionary=h.traits
-  var x:float=30+(j%2)*620;var y:float=0+int(j/2)*625
+  var x:float=(j%3)*416;var y:float=int(j/3)*183
   var mystery:bool=not entry.owned and (bool(entry.get("mystery115",false)) or (int(atlas_filters.get("rarity",-1))==4 and HorseMarket.tier(h)==4))
+  var tile:=Panel.new();tile.name="AtlasCard117_%d"%j;tile.position=Vector2(x,y);tile.size=Vector2(400,174);tile.add_theme_stylebox_override("panel",MapAppearance.frame());content.add_child(tile)
   if mystery:
-   var shadow=TextureRect.new();shadow.texture=UnicornAtlasPanel.BASE;shadow.position=Vector2(x,y);shadow.size=Vector2(175,175);shadow.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;shadow.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+   var shadow=TextureRect.new();shadow.texture=UnicornAtlasPanel.BASE;shadow.position=Vector2(x+8,y+12);shadow.size=Vector2(145,145);shadow.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;shadow.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
    var shader=Shader.new();shader.code="shader_type canvas_item;void fragment(){vec4 c=texture(TEXTURE,UV);COLOR=vec4(.16,.24,.28,c.a);}"
    var material=ShaderMaterial.new();material.shader=shader;shadow.material=material;content.add_child(shadow)
-  else:sprite(h,Vector2(x,y),175)
-  var title:=label(("Legendario sin descubrir" if mystery else h.name) if (mystery or h.get("species","")=="unicorn") else (h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
-  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,610);open.tooltip_text="Sin descubrir" if mystery else tr("UI_126");open.disabled=mystery;content.add_child(open);open.pressed.connect(func():
+  else:sprite(h,Vector2(x+8,y+12),145)
+  var title:String="Sin descubrir" if mystery else (str(h.name) if entry.owned or page=="market" else tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+"\nCrin: "+tr(HorseCollection.MANES[t.mane]))
+  var name_label:=label(title,Vector2(x+160,y+14),23);name_label.size=Vector2(232,58);name_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;name_label.clip_text=true
+  var rarity:int=4 if mystery or h.get("species","")=="unicorn" else HorseMarket.tier(h)
+  var rarity_label:=label(tr(HorseCollection.RARITIES[rarity]),Vector2(x+160,y+78),22);rarity_label.size.x=232
+  label("No conseguido" if mystery else ("✓ Conseguido" if entry.owned else "No conseguido"),Vector2(x+160,y+110),21)
+  if page=="market":label(tr("MARKET_PRICE")%HorseMarket.buy_price(h),Vector2(x+160,y+140),20)
+  elif not mystery:label("Ver variantes ›" if page=="atlas" and atlas_filters.is_empty() else "Ver ficha ›",Vector2(x+160,y+140),20)
+  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(400,174);open.tooltip_text="Sin descubrir" if mystery else tr("UI_126");open.disabled=mystery;content.add_child(open);open.pressed.connect(func():
    if page=="atlas" and atlas_filters.is_empty():
     atlas_family_page=atlas_page;atlas_family=h.traits.duplicate(true);atlas_page=0;show_page("atlas_variants")
    else:detail_entries=entries.filter(func(e):return e.owned or not (bool(e.get("mystery115",false)) or (int(atlas_filters.get("rarity",-1))==4 and HorseMarket.tier(e.horse)==4)));focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
-  var texts:Array=["Rareza: Legendario","No conseguido"] if mystery else HorseValues.visual(t)
-  if not mystery:texts.append("Rareza: "+HorseCollection.RARITIES[4 if h.get("species","")=="unicorn" else HorseMarket.tier(h)])
-  if page=="market":texts.append(tr("MARKET_PRICE")%HorseMarket.buy_price(h))
-  for i in texts.size():label(str(texts[i]),Vector2(x+180,y+48+i*27),17)
-  var stat_host:=VBoxContainer.new();stat_host.position=Vector2(x+180,y+48+texts.size()*27);stat_host.size.x=410;content.add_child(stat_host)
-  if not mystery:HorseStatBars.create(stat_host,h,entry.owned,true)
  content=outer
  ItemPager.create(content,Vector2(345,575),540,atlas_page,pages,func(i:int):atlas_page=i;refresh())
  if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(892,588),17)
