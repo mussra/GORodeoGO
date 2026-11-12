@@ -56,17 +56,10 @@ func choose(id:String)->void:
  var why:String=reason()
  if not why.is_empty():world._toast(why);return
  world.player.set_physics_process(false)
- panel=Control.new();panel.process_mode=Node.PROCESS_MODE_ALWAYS;panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=180;MenuInputGuard.install(panel);world._hud.add_child(panel)
- var bg:=ColorRect.new();bg.color=Color("10252ded");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.add_child(bg)
- var box:=VBoxContainer.new();box.position=Vector2(280,180);box.size=Vector2(720,300);panel.add_child(box)
- var title:=Label.new();title.text=target.name;title.add_theme_font_size_override("font_size",30);box.add_child(title)
- var note:=Label.new();note.text="Te echas una siesta mientras tu caballo va a este sitio ya visitado.\nSin coste ni consumo de energía. No completa encargos por el camino.";note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;note.custom_minimum_size=Vector2(680,100);box.add_child(note)
- var go:=Button.new();go.name="ConfirmSiesta144";go.text="Ir a este sitio";go.custom_minimum_size.y=56;box.add_child(go);go.pressed.connect(func():close_confirmation();start(str(target.id)))
- var cancel:=Button.new();cancel.text="Cancelar";cancel.custom_minimum_size.y=56;box.add_child(cancel);cancel.pressed.connect(close_confirmation)
- # Scale as the other menus, independent of landscape aspect ratio.
- var layout:Callable=func():
-  var k:float=minf(panel.size.x/1280.,panel.size.y/720.);box.scale=Vector2.ONE*k;box.position=(panel.size-Vector2(720,300)*k)/2.
- panel.resized.connect(layout);layout.call()
+ var confirmation:=SiestaConfirmation148.new();confirmation.destination=str(target.name);panel=confirmation
+ confirmation.confirmed.connect(func():close_confirmation();start(str(target.id)))
+ confirmation.cancelled.connect(close_confirmation);world._hud.add_child(confirmation)
+
 func start(id:String)->bool:
  var why:String=reason();last_error=""
  if not why.is_empty():last_error=why;world._toast(why);return false
@@ -115,16 +108,8 @@ func _load_area():
  while not world._build_queue.is_empty() and steps<20000 and Time.get_ticks_msec()-travel_started<45000:
   world._drain_chunk_builds();steps+=1;await get_tree().process_frame
 func _safe_landing(pos:Vector2)->Vector2:
- var shape:CollisionShape2D=world.player.get_node_or_null("CollisionShape2D")
- if shape==null:return Vector2(INF,INF)
- var query:=PhysicsShapeQueryParameters2D.new();query.shape=shape.shape;query.collision_mask=world.player.collision_mask;query.exclude=[world.player.get_rid()]
- for radius in [0.,24.,48.,72.,96.]:
-  for i in (1 if radius==0. else 8):
-   var candidate:Vector2=pos+Vector2.RIGHT.rotated(i*TAU/8.)*radius
-   if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,candidate,14.):continue
-   query.transform=world.player.global_transform;query.transform.origin=candidate
-   if world.player.get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return candidate
- return Vector2(INF,INF)
+ return TravelLanding148.find(world.player,pos,func(candidate:Vector2)->bool:return SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,candidate,14.))
+
 func _cover():
  curtain=SiestaCurtain147.new();curtain.destination=str(target.name);curtain.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);curtain.hat=SaveData.hat_color;add_child(curtain)
  zlabel=curtain.zlabel;message=curtain.message

@@ -12,6 +12,17 @@ var status:Label
 var visited_cells:Dictionary={}
 var river_clock:float=0.
 var hud_canvas:Control
+var touch_controls:CanvasLayer
+var modal:Control
+var travelling:bool=false
+var last_error:String=""
+var transaction:TravelTransaction147
+var prior_player_processing:bool=true
+var travel_target:Dictionary={}
+var travel_origin:Vector2
+var travel_ledger:Dictionary={}
+var curtain:SiestaCurtain147
+var map_button:Button
 const GRASS=preload("res://art/world/alternative92/grass-cache.png")
 const TREE=preload("res://art/world/cartoon/tree.png")
 func _ready():
@@ -35,16 +46,18 @@ func _ready():
  get_viewport().size_changed.connect(fit);fit.call()
  var bar:=ColorRect.new();bar.color=Color("10252ded");bar.size=Vector2(1280,100);hud_canvas.add_child(bar)
  var title:=Label.new();title.text="País nuevo · maqueta sin guardado ni ritual";title.position=Vector2(20,10);title.add_theme_font_size_override("font_size",24);bar.add_child(title)
- var back:=Button.new();back.text="Volver a Frontera";back.position=Vector2(1010,10);back.size=Vector2(250,60);QuestButtonStyle.apply(back);back.pressed.connect(func():return_requested.emit());bar.add_child(back)
+ var back:=Button.new();back.text="Salir a Frontera";back.position=Vector2(1040,10);back.size=Vector2(220,60);QuestButtonStyle.apply(back);back.pressed.connect(request_return);bar.add_child(back)
+ map_button=Button.new();map_button.text="Mapa local";map_button.position=Vector2(850,10);map_button.size=Vector2(180,60);QuestButtonStyle.apply(map_button);map_button.pressed.connect(show_map);bar.add_child(map_button)
  status=Label.new();status.position=Vector2(20,50);status.add_theme_font_size_override("font_size",21);bar.add_child(status)
- var touch:CanvasLayer=load("res://src/Presentation/touch_controls.tscn").instantiate();add_child(touch)
+ var touch:CanvasLayer=load("res://src/Presentation/touch_controls.tscn").instantiate();add_child(touch);touch_controls=touch
  var joy:VirtualJoystick=touch.get_node("MoveJoystick");var aim:VirtualJoystick=touch.get_node("AimJoystick");aim_joystick=aim;player.lasso.set_aim_joystick(aim);player.dodge.set_move_joystick(joy);JoystickAppearance.apply(self)
  set_process(true);queue_redraw()
 func _process(delta:float):
  river_clock+=delta
+ if travelling or is_instance_valid(modal):return
  var next:=CountryLedger146.record_position(ledger,player.position)
  if not next.is_empty():ledger=next
- var cell:=Vector2i(floori(player.position.x/512.),floori(player.position.y/512.));visited_cells[cell]=true
+ CountryExploration148.reveal(visited_cells,player.position)
  status.text="Sitios encontrados: %d/3 · sigue la orilla río arriba · arte provisional"%ledger.maps.water146.visited.size()
  queue_redraw()
 func _draw():
@@ -64,5 +77,72 @@ func _draw():
  for i in 6:draw_arc(data.entry+Vector2(0,-70),90.+i*9.,PI,TAU,32,Color.from_hsv(i/7.,.55,.95),7.,true)
  draw_circle(data.entry,12.,Color("fff0b3"))
 
+func request_return():
+ if not travelling and not is_instance_valid(modal):return_requested.emit()
+func _lock_player():
+ prior_player_processing=player.is_physics_processing();player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false);touch_controls.visible=false
+func _unlock_player():
+ player.set_physics_process(prior_player_processing);touch_controls.visible=true
+func close_modal(resume:bool=true):
+ if is_instance_valid(modal):modal.queue_free()
+ modal=null
+ if resume and not travelling:_unlock_player()
+func show_map():
+ if travelling or is_instance_valid(modal):return
+ _lock_player();var view:=CountryMap148.new();view.world=self;modal=view
+ view.closed.connect(close_modal);view.selected.connect(func(id:String):close_modal(false);choose_site.call_deferred(id,true))
+ view.sites_requested.connect(func():close_modal(false);show_sites.call_deferred(true));hud_canvas.add_child(view)
+func show_sites(already_locked:bool=false):
+ if travelling or is_instance_valid(modal):return
+ if not already_locked:_lock_player()
+ var sheet:=NavigationSheet.new();sheet.title="SITIOS DE ESTE PAÍS";modal=sheet
+ for site in CountryExploration148.available(ledger,data):sheet.entries.append({"id":site.id,"title":site.name,"hint":"Sitio visitado · siesta sin guardado"})
+ sheet.closed.connect(close_modal);sheet.selected.connect(func(id:String):modal=null;choose_site.call_deferred(id,true));hud_canvas.add_child(sheet)
+func travel_reason()->String:
+ if travelling:return "Espera a que termine el viaje."
+ if player.lasso.is_in_flight() or player.lasso.is_charging():return "Termina el lazo antes de viajar."
+ if player._stun_time_remaining>0. or player._jump_time>0.:return "Espera a terminar el movimiento antes de viajar."
+ return ""
+func choose_site(id:String,already_locked:bool=false):
+ if travelling or is_instance_valid(modal):return
+ var target:=CountryExploration148.destination(ledger,data,id)
+ var reason_:String=travel_reason()
+ if target.is_empty() or not reason_.is_empty():
+  last_error="Ese sitio no está visitado." if target.is_empty() else reason_
+  if already_locked:_unlock_player()
+  return
+ if not already_locked:_lock_player()
+ var confirmation:=SiestaConfirmation148.new();confirmation.destination=target.name;confirmation.preview=true;modal=confirmation
+ confirmation.cancelled.connect(close_modal);confirmation.confirmed.connect(func():close_modal(false);start_siesta(id,true));hud_canvas.add_child(confirmation)
+func start_siesta(id:String,already_locked:bool=false)->bool:
+ if is_instance_valid(modal):return false
+ last_error="";var reason_:String=travel_reason();var target:=CountryExploration148.destination(ledger,data,id)
+ if target.is_empty() or not reason_.is_empty():
+  last_error="Ese sitio no está visitado." if target.is_empty() else reason_
+  if already_locked and not travelling:_unlock_player()
+  return false
+ if not already_locked:_lock_player()
+ travelling=true;travel_target=target;travel_origin=player.position;travel_ledger=ledger.duplicate(true)
+ curtain=SiestaCurtain147.new();curtain.destination=target.name;curtain.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);curtain.hat=SaveData.hat_color;add_child(curtain)
+ await get_tree().create_timer(.65,true).timeout
+ transaction=TravelTransaction147.new();var result:=await transaction.run(_load_travel148,_validate_travel148,_commit_travel148,_restore_travel148)
+ if not result.ok:last_error="No hay llegada libre. Sigues en el origen."
+ curtain.message.text="Has llegado a "+str(target.name) if result.ok else last_error
+ await get_tree().create_timer(.35,true).timeout
+ curtain.queue_free();curtain=null;travelling=false;_unlock_player();return result.ok
+func _load_travel148()->bool:
+ await get_tree().process_frame;await get_tree().process_frame;return true
+func _validate_travel148()->Vector2:
+ return TravelLanding148.find(player,travel_target.pos,func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos))
+func _commit_travel148(pos:Vector2)->bool:
+ var next:=CountryLedger146.record_position(ledger,pos)
+ if next.is_empty():return false
+ player.position=pos;ledger=next;CountryExploration148.reveal(visited_cells,pos);camera.reset_smoothing();return true
+func _restore_travel148()->bool:
+ player.position=travel_origin;ledger=travel_ledger.duplicate(true);camera.reset_smoothing();return true
 func _unhandled_input(event:InputEvent):
- if event.is_action_pressed("ui_cancel"):return_requested.emit();get_viewport().set_input_as_handled()
+ if event.is_action_pressed("ui_cancel"):
+  if travelling:pass
+  elif is_instance_valid(modal):close_modal()
+  else:request_return()
+  get_viewport().set_input_as_handled()

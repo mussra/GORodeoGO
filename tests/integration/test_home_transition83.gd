@@ -1,12 +1,13 @@
 extends GutTest
 func _check_home(version:int):
- SaveData.world_generator_version=version;SaveData.trial_session_active=true;SaveData.horse_collection.seed_trial();SaveData.world_quests={};SaveData.world_seed=752026;SaveData.world_position=Vector2(14000,160);SaveData.world_discovered=[]
+ SaveData.save_path="user://home148-regression.dat";SaveData._load_valid=true;SaveData.world_places144={};SaveData.world_generator_version=version;SaveData.trial_session_active=false;SaveData.horse_collection.seed_trial();SaveData.world_quests={};SaveData.world_seed=752026;SaveData.world_position=Vector2(14000,160);SaveData.world_discovered=[]
  var world=load("res://src/Presentation/frontier_world.tscn").instantiate();add_child_autofree(world)
  while world._loading_world or get_tree().root.get_node_or_null("FrontierTransition")!=null:await wait_process_frames(1)
  var previous=SaveData.world_discovered.duplicate()
  world._home()
- assert_not_null(get_tree().root.get_node_or_null("FrontierTransition"))
- while world._returning_home or get_tree().root.get_node_or_null("FrontierTransition")!=null:await wait_process_frames(1)
+ # Since144 home is an explicit siesta confirmation, not an immediate teleport.
+ assert_not_null(world._travel144.panel);assert_eq(world.player.position,Vector2(14000,160));world._travel144.close_confirmation()
+ assert_true(await world._travel144.start("ranch"))
  assert_lt(world.player.position.distance_to(WorldNominal98.home() if version>=2 else world.HOME_POS),.01)
  assert_eq(world.player.velocity,Vector2.ZERO)
  assert_false(world._loading_world);assert_true(world.visible)
@@ -20,6 +21,7 @@ func _check_home(version:int):
     for dy in range(-1,2):allowed.append(WorldMap.chunk_key(c.x+dx,c.y+dy))
    assert_has(allowed,key,"No discovery of chunks on the route between endpoints")
  assert_lte(added,9)
+ DirAccess.remove_absolute(SaveData.save_path)
 
 func test_home_loads_legacy_destination_without_visible_travel():await _check_home(1)
 func test_home_loads_nominal_destination_without_visible_travel():await _check_home(3)
