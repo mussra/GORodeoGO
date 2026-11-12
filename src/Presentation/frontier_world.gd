@@ -23,6 +23,7 @@ const ARROWS: Array[String] = ["↑", "↗", "→", "↘", "↓", "↙", "←", 
 
 var _npc_block:Control
 var _flora_layer138:FlowerExpansion138
+var _roaming139:WorldHerdPositions139
 var _flower_sample138:WorldFlowerTarget105
 var _npc_dialog:NpcDialog
 var _npc_button:Button
@@ -148,6 +149,7 @@ func _ready() -> void:
 	_hoof_player.volume_db = -12.0
 	_hoof_player.bus = &"SFX" if AudioServer.get_bus_index("SFX") >= 0 else &"Master"
 	player.add_child(_hoof_player)
+	_roaming139=WorldHerdPositions139.new();_roaming139.setup(SaveData.world_roaming139,SaveData.world_seed);SaveData.world_roaming139=_roaming139.state
 	_update_chunks()
 	# Primera pintura completa: la 3x3 inicial se construye de una vez (es el
 	# momento de carga); el streaming en marcha ya va repartido por frames.
@@ -317,11 +319,12 @@ func _stallion_hint(horse: Node2D) -> void:
 	_toast(tr(WorldTaming.stallion_hint_key(_stallion_hint_stage)))
 	_stallion_hint_stage += 1
 
-func _toast(text: String) -> void:
+func _toast(text: String,replace_key:String="") -> void:
 	_toasts.set_top(_toast_top105())
-	_toasts.push(text)
+	_toasts.push(text,0.,replace_key)
 
 func _update_chunks() -> void:
+	_snapshot_roaming139()
 	var pc: Vector2i = WorldMap.chunk_at(player.position)
 	for dx in range(-1, 2):
 		for dy in range(-1, 2):
@@ -340,13 +343,13 @@ func _update_chunks() -> void:
 			_chunks[key].queue_free()
 			_chunks.erase(key)
 			for e in _chunk_entities.get(key, []):
-				if is_instance_valid(e):
+				if is_instance_valid(e) and e.get_script()!=WildHorseScript:
 					e.queue_free()
 			_chunk_entities.erase(key)
-			for horse_key in _herd_horses.keys():
-				if str(horse_key)==str(key) or str(horse_key).begins_with(str(key)+"#"):_herd_horses.erase(horse_key)
 			_cover_dirty110=true
 			_occluders.erase(key)  # Keep loaded cover until its chunk is evicted.
+	_park_roaming139()
+	_resume_roaming139()
 	_drop_far(pc, _chunk_pending)
 	_drop_far(pc, _chunk_built)
 	_build_queue.sort_custom(func(a, b):
@@ -558,18 +561,17 @@ func _activate_built(key: String) -> void:
 	if not herd.is_empty() and not SaveData.world_tamed.has(mission_id):
 		for member in WorldHerd.members(herd,SaveData.world_seed,cx,cy):
 			if SaveData.world_tamed.has(member.member_id):continue
-			var horse := WildHorseScript.new()
-			horse.name = "herd_"+str(member.member_index)
-			horse.setup(member)
-			horse.set_meta("c", Vector2i(cx, cy))
-			add_child(horse)
+			var live_key:String=WorldHerdPositions139.live_key(Vector2i(cx,cy),int(member.member_index))
+			if _roaming139!=null and _roaming139.state.horses.has(member.member_id):continue
+			if is_instance_valid(_herd_horses.get(live_key)):continue
+			var horse:=_spawn_horse139(member,Vector2i(cx,cy))
 			entities.append(horse)
-			_herd_horses[key+"#"+str(member.member_index)] = horse
 	if SaveData.world_generator_version>=3:
 		var mountains=WorldMountains103.new();mountains.seed=SaveData.world_seed;mountains.chunk=Vector2i(cx,cy);(b["node"] as Node).add_child(mountains)
 	add_child(b["node"])
 	_chunks[key] = b["node"]
 	_chunk_entities[key] = entities
+	_resume_roaming139()
 	if not SaveData.world_discovered.has(key):
 		SaveData.mark_world_discovered(key)
 		if not herd.is_empty() and not SaveData.world_tamed.has(mission_id) and not SaveData.world_missions.has(mission_id):
@@ -720,6 +722,7 @@ func _deliver_horse(c: Vector2i, horse: Node2D) -> void:
 	var mission_id: String = WorldMap.herd_mission_id(c.x, c.y)
 	var was_encargo: bool = SaveData.world_missions.get(mission_id, "") == "encargo"
 	var herd: Dictionary = horse.herd
+	if _roaming139!=null and herd.has("member_id"):_roaming139.erase(str(herd.member_id))
 	if herd.has("member_id"):
 		SaveData.mark_world_tamed(str(herd.member_id))
 		var base:Dictionary=WorldMap.generate(SaveData.world_seed,c.x,c.y).get("herd",{})
@@ -1601,7 +1604,7 @@ func _open_npc(data:Dictionary)->void:
 		_refresh_quest_hud())
 	_npc_dialog.accepted.connect(func(id:String):
 		if NpcQuests.accept(SaveData.world_quests,id):
-			SaveData.save_world_state(player.position);_toast(NpcQuests.QUESTS[id].active);_refresh_missions()
+			SaveData.save_world_state(player.position);_toast(NpcQuests.QUESTS[id].active,"quest:"+id);_refresh_missions()
 		_refresh_quest_hud();_close_npc())
 func _close_npc()->void:
 	if is_instance_valid(_npc_dialog):_npc_dialog.queue_free()
@@ -1610,7 +1613,7 @@ func _close_npc()->void:
 func _quest_event(kind:String,target:String,event_id:String)->void:
 	for id in NpcQuests.record(SaveData.world_quests,kind,target,event_id):
 		var q:Dictionary=NpcQuests.QUESTS[id];var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
-		_toast(q.done if state.status=="done" else q.active+" · %d/%d"%[state.count,q.goal])
+		_toast(q.done if state.status=="done" else q.active+" · %d/%d"%[state.count,q.goal],"quest:"+id)
 		SaveData.save_world_state(player.position)
 	_refresh_missions();_refresh_quest_hud()
 func _refresh_quest_hud()->void:
@@ -1710,7 +1713,7 @@ func _tick_flowers105()->void:
 			if not SaveData.save_world_state(player.position):SaveData.world_quests=before;continue
 			state=NpcQuests.state(SaveData.world_quests,id)
 			_flower_nodes105[event].queue_free();_flower_nodes105.erase(event)
-			_toast("Flor recogida · %d/3"%state.count)
+			_toast(("Flores azules" if id==WorldFlowers105.IDS[0] else "Flores doradas")+" · %d/3"%state.count,"quest:"+id)
 
 func _toast_top105()->float:
 	var top:float=216. if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.
@@ -1776,12 +1779,12 @@ func _journey_action138(action_:String,species:String)->void:
 			if FloristJourney138.stage(next,species)!="active":return
 			next.quests[species].route="field"
 			if SaveData.commit_flora138(next,player.position):
-				_toast("Busca el campo de "+FloristJourney138.title(species)+" al "+("norte" if species=="red" else "sur")+". Sigue el camino y recoge la muestra marcada.")
+				_toast("Busca el campo de "+FloristJourney138.title(species)+" al "+("norte" if species=="red" else "sur")+". Sigue el camino y recoge la muestra marcada.","journey138")
 			else:_toast("No se pudo guardar la pista. Puedes volver a preguntar.")
 			_refresh_quest_hud();_close_npc();return
 	if changed:
 		if SaveData.commit_flora138(next,player.position):
-			_toast("Entrega guardada. Tu nuevo cultivo está al sur de la tienda." if action_=="deliver" else "Muestra obtenida: vuelve a entregarla." if action_=="sample" else FloristJourney138.hud(next))
+			_toast("Entrega guardada. Tu nuevo cultivo está al sur de la tienda." if action_=="deliver" else "Muestra obtenida: vuelve a entregarla." if action_=="sample" else FloristJourney138.hud(next),"journey138")
 			if is_instance_valid(_flora_layer138):_flora_layer138.refresh()
 		else:_toast("No se pudo guardar. No se ha consumido la muestra ni cambiado el encargo.")
 	_refresh_quest_hud();_close_npc()
@@ -1799,4 +1802,56 @@ func _tick_flora138()->void:
 	if player.position.distance_to(p)>28.:return
 	var next:Dictionary=SaveData.world_flora138.duplicate(true)
 	if FloristJourney138.sample(next,species,"field") and SaveData.commit_flora138(next,player.position):
-		_flower_sample138.queue_free();_flower_sample138=null;_toast("Muestra de "+FloristJourney138.title(species)+" recogida. Vuelve a la florista del rancho.")
+		_flower_sample138.queue_free();_flower_sample138=null;_toast("Muestra de "+FloristJourney138.title(species)+" recogida. Vuelve a la florista del rancho.","journey138")
+
+func _spawn_horse139(member:Dictionary,origin:Vector2i)->Node2D:
+	var horse:=WildHorseScript.new();horse.name="herd_"+str(member.member_index)
+	horse.setup(member);horse.set_meta("c",origin);add_child(horse)
+	_herd_horses[WorldHerdPositions139.live_key(origin,int(member.member_index))]=horse
+	return horse
+func _snapshot_roaming139()->void:
+	if _roaming139==null:return
+	for horse in _herd_horses.values():
+		if not is_instance_valid(horse) or horse.is_queued_for_deletion() or not horse.herd.has("member_id"):continue
+		var id:String=horse.herd.member_id
+		if SaveData.world_tamed.has(id):_roaming139.erase(id);continue
+		if not _roaming139.state.horses.has(id) and horse.position.distance_to(horse.herd.pos)<32.:continue
+		_roaming139.put(id,horse.get_meta("c"),int(horse.herd.member_index),horse.position)
+	SaveData.world_roaming139=_roaming139.state
+func _park_roaming139()->void:
+	if _roaming139==null:return
+	var retire:Array=[]
+	for key in _herd_horses.keys():
+		var horse=_herd_horses[key]
+		if not is_instance_valid(horse) or horse.is_queued_for_deletion():_herd_horses.erase(key);continue
+		var origin:Vector2i=horse.get_meta("c")
+		if _chunks.has(WorldMap.chunk_key(origin.x,origin.y)):continue
+		if horse.roped or horse.position.distance_to(player.position)<=maxf(1200.,_exit_distance110()+384.):continue
+		# Even untouched individuals must be parked before their owner chunk goes away.
+		_roaming139.put(str(horse.herd.member_id),origin,int(horse.herd.member_index),horse.position)
+		retire.append(key)
+	if retire.is_empty():return
+	SaveData.world_roaming139=_roaming139.state
+	if not SaveData.save_world_state(player.position):
+		_toast(tr("WORLD_SAVE_FAILED104"));return # Keep live entities for retry, never lose their last positions.
+	for key in retire:
+		_herd_horses[key].queue_free();_herd_horses.erase(key)
+func _resume_roaming139()->void:
+	if _roaming139==null:return
+	var pc:=WorldMap.chunk_at(player.position)
+	for dx in range(-1,2):
+		for dy in range(-1,2):
+			var c:=pc+Vector2i(dx,dy)
+			if not _chunks.has(WorldMap.chunk_key(c.x,c.y)):continue
+			for id in _roaming139.in_chunk(c):
+				var row:Dictionary=_roaming139.state.horses[id];var origin:Vector2i=row.origin
+				if SaveData.world_tamed.has(id) or SaveData.world_tamed.has(WorldMap.herd_mission_id(origin.x,origin.y)):_roaming139.erase(id);continue
+				var key:=WorldHerdPositions139.live_key(origin,row.index)
+				if is_instance_valid(_herd_horses.get(key)) and not _herd_horses[key].is_queued_for_deletion():continue
+				var base:Dictionary=WorldMap.generate(SaveData.world_seed,origin.x,origin.y).get("herd",{})
+				var members:Array=WorldHerd.members(base,SaveData.world_seed,origin.x,origin.y)
+				if row.index>=members.size():continue
+				var member:Dictionary=members[row.index].duplicate(true);member.pos=row.pos
+				var horse:=_spawn_horse139(member,origin)
+				# setup/road safety can shift spawn. Persisted terrain location wins exactly.
+				horse.position=row.pos;horse.home=row.pos;horse.player_ref=player

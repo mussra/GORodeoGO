@@ -49,7 +49,7 @@ static func field_rect(state:Dictionary,species:String,planted:bool=false,seed_:
   return Rect2(home+Vector2(-720. if species=="red" else -370.,510.),Vector2(280,220))
  return Rect2(Vector2(int(state.get("region",1))*5120.,-1170. if species=="red" else 1150.),Vector2(2048,1024))
 static func sample_point(state:Dictionary,species:String)->Vector2:
- return Vector2(int(state.get("region",1))*5120.+465.,-210. if species=="red" else 1210.)
+ return Vector2(int(state.get("region",1))*5120.+465.,-850. if species=="red" else 1650.)
 static func descriptors(state:Dictionary,seed_:int)->Array:
  if state.is_empty():return []
  var out:Array=[]

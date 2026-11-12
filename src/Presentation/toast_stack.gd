@@ -1,6 +1,6 @@
 class_name ToastStack
 extends Control
-## Shared compact, nonblocking notices. One visible; the rest wait FIFO.
+## Shared compact, nonblocking notices. One visible; unrelated types wait FIFO, newer states replace their own type.
 const MAX_VISIBLE:int=1
 var active:Array[Dictionary]=[]
 var pending:Array[Dictionary]=[]
@@ -30,14 +30,24 @@ func _layout()->void:
 func set_top(value:float)->void:
  if is_equal_approx(top_offset,value):return
  top_offset=value;_layout()
-func push(text:String,minimum:float=0.0)->void:
+static func type_key(text:String)->String:
+ # Same wording with a new count/amount is a state update, not another notice.
+ var digits:=RegEx.new();digits.compile("[0-9]+([.,][0-9]+)?")
+ return digits.sub(text,"#",true)
+func push(text:String,minimum:float=0.0,replace_key:String="")->void:
  if text.strip_edges().is_empty():return
  var duration:float=reading_seconds(text,minimum)
+ var key:String=replace_key if not replace_key.is_empty() else type_key(text)
  for notice in active:
-  if notice.text==text:notice.left=maxf(notice.left,duration);notice.label.modulate.a=1.0;return
+  if notice.key==key:
+   notice.text=text;notice.label.text=text;notice.left=duration;notice.label.modulate.a=1.0
+   # Defensive cleanup if a previous caller queued this type before activation.
+   for i in range(pending.size()-1,-1,-1):
+    if pending[i].key==key:pending.remove_at(i)
+   return
  for notice in pending:
-  if notice.text==text:notice.duration=maxf(notice.duration,duration);return
- pending.append({"text":text,"duration":duration});_fill()
+  if notice.key==key:notice.text=text;notice.duration=duration;return
+ pending.append({"text":text,"duration":duration,"key":key});_fill()
 func _fill()->void:
  if column==null:return
  while active.size()<MAX_VISIBLE and not pending.is_empty():
@@ -48,7 +58,7 @@ func _fill()->void:
   label.add_theme_font_size_override("font_size",20);backdrop(label)
   label.custom_minimum_size.x=column.size.x
   column.add_child(label)
-  active.append({"text":next.text,"left":next.duration,"label":label})
+  active.append({"text":next.text,"left":next.duration,"label":label,"key":next.key})
 func _process(delta:float)->void:advance(delta)
 func advance(delta:float)->void:
  for i in range(active.size()-1,-1,-1):

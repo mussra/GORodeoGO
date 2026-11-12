@@ -38,6 +38,7 @@ var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
+var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
 var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
@@ -88,6 +89,7 @@ func save_progress() -> bool:
 	config.set_value("world", "position", world_position)
 	config.set_value("world", "quests", world_quests)
 	config.set_value("world","flora138",world_flora138)
+	config.set_value("world","roaming139",world_roaming139)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
 	config.set_value("world","notes106",world_notes106)
@@ -129,6 +131,7 @@ func load_progress() -> void:
 	world_position = Vector2(0, 160)
 	world_quests.clear()
 	world_flora138.clear()
+	world_roaming139.clear()
 	world_missions.clear()
 	world_pigs.clear()
 	world_notes106.clear();world_notes_revision106+=1
@@ -191,6 +194,7 @@ func load_progress() -> void:
 			if WorldEdits.valid_op(op):world_edits.append(op)
 	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
+	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
