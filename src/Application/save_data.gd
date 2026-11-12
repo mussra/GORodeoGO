@@ -39,6 +39,7 @@ var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
 var world_places144:Dictionary={}
+var country_ledger146:Dictionary={} # Separate future-country progress; no entry enabled yet.
 var world_cousins140:Dictionary={} # Four-town journal, separate additive V3 state.
 var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
 var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
@@ -94,6 +95,7 @@ func save_progress() -> bool:
 	config.set_value("world","roaming139",world_roaming139)
 	config.set_value("world","cousins140",world_cousins140)
 	config.set_value("world","places144",world_places144)
+	config.set_value("world","countries146",country_ledger146)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
 	config.set_value("world","notes106",world_notes106)
@@ -138,6 +140,7 @@ func load_progress() -> void:
 	world_roaming139.clear()
 	world_cousins140.clear()
 	world_places144.clear()
+	country_ledger146.clear()
 	world_missions.clear()
 	world_pigs.clear()
 	world_notes106.clear();world_notes_revision106+=1
@@ -203,6 +206,10 @@ func load_progress() -> void:
 	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
 	world_cousins140=VillageCousins140.clean(config.get_value("world","cousins140",{}),world_seed)
 	world_places144=WorldPlaces144.clean(config.get_value("world","places144",{}),world_seed,world_generator_version)
+	var countries:Variant=config.get_value("world","countries146",{})
+	if not countries is Dictionary or (not countries.is_empty() and not CountryLedger146.valid(countries,world_seed,world_generator_version)):
+		_load_valid=false;return # Preserve unknown/corrupt future-country data instead of replacing it.
+	country_ledger146=countries.duplicate(true)
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
@@ -332,7 +339,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
@@ -566,3 +573,11 @@ func commit_places144(state:Dictionary,pos:Vector2)->bool:
 	world_places144=WorldPlaces144.clean(state,world_seed,world_generator_version);world_position=pos
 	if save_progress():return true
 	world_places144=before;world_position=previous;return false
+
+func store_country_ledger146(state:Dictionary)->bool:
+	# Storage only. Scene routing/entry remain disabled until a complete transition exists.
+	if not CountryLedger146.valid(state,world_seed,world_generator_version):return false
+	var before:Dictionary=country_ledger146
+	country_ledger146=state.duplicate(true)
+	if save_progress():return true
+	country_ledger146=before;return false

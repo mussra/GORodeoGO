@@ -1035,7 +1035,7 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
@@ -1044,6 +1044,7 @@ func _navigation_selected(id:String)->void:
 	match id:
 		"map":_toggle_map()
 		"modular_preview":_open_modular_preview93()
+		"country146":_open_isolated_preview146(CountryPreview146.new())
 		"editor":_toggle_edit()
 		"home":_home()
 		"exit":_menu()
@@ -1679,7 +1680,9 @@ func _collect_story_flower()->void:
 
 func _open_modular_preview93()->void:
 	# Keep the live world and its data in memory, untouched, until returning.
-	var preview=load("res://src/Presentation/modular_world93.tscn").instantiate()
+	_open_isolated_preview146(load("res://src/Presentation/modular_world93.tscn").instantiate())
+
+func _open_isolated_preview146(preview:Node2D)->void:
 	var prior_mode=process_mode
 	var prior_camera=get_viewport().get_camera_2d()
 	visible=false;process_mode=Node.PROCESS_MODE_DISABLED
