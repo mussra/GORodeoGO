@@ -1228,18 +1228,7 @@ class DiscoveryMap extends Control:
 		# player marker (Ant 7-nov-2026: "ver claramente donde esta mi vaquero"):
 		# pulsing ring, high-contrast dot and facing arrow
 		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
-		var ring: float = cell * (0.20 + 0.06 * sin(_pulse * 4.0))
-		draw_arc(ppos, ring, 0, TAU, 40, Color("ffd23d"), 3.0, true)
-		draw_circle(ppos, cell * 0.16, Color("201b1c"))
-		draw_circle(ppos, cell * 0.12, Color("f8edce"))
-		draw_circle(ppos, cell * 0.05, Color("d94f3d"))
-		var face: Vector2 = world.player.velocity
-		if face.length() < 12.0:
-			face = Vector2.DOWN
-		face = face.normalized()
-		var tip: Vector2 = ppos + face * cell * 0.34
-		var side: Vector2 = Vector2(-face.y, face.x) * cell * 0.10
-		draw_colored_polygon(PackedVector2Array([tip, ppos + face * cell * 0.12 + side, ppos + face * cell * 0.12 - side]), Color("ffd23d"))
+		MapPlayerMarker99.draw(self,ppos,world.player.velocity,_pulse)
 
 	func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
 		if WorldNominal98.enabled():
