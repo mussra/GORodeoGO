@@ -43,3 +43,13 @@ Rendimiento: no crear un nodo/colisión por flor ni contar o dibujar todas las f
 Propuesta visual por distancia: flores individuales cerca, grupo más simple a media distancia y cobertura de color coherente en mapa. El mapa usa el polígono del descriptor, no consulta cada flor. Las flores decorativas no necesitan hitboxes. Solo objetivos activos tienen unos pocos puntos de recogida con ID estable y señal visual para distinguirlos del campo entero. Si se quiere recoger cualquier flor del campo, habrá que decidir inventario/reposición y diseñarlo por celdas, no guardar cada tallo.
 
 Riesgo principal: transparencia superpuesta/fill rate en móvil, no solo CPU o cantidad de nodos. Capar densidad dibujada por pantalla, recortar bajo HUD y medir en Android antes de aprobar. El diseño no puede garantizar todavía FPS ni memoria. Preview futura debe mostrar una pantalla dentro del campo y mapa alejado con dos chunks, seguida de perfil de dibujo/streaming. No se ha activado esta extensión ni cambiado los campos de la partida.
+
+## Consecuencias persistentes de las entregas
+
+Idea pedida: tras entregar amapolas a una florista, al volver a ese pueblo se encuentra un campo de amapolas creado gracias a la misión. Al preguntar reconoce: "Mira el campo de amapolas que he conseguido por fertilización gracias a tu ayuda." No sustituye el cierre de encargos: después sigue sin pedir más si su cadena terminó, pero su agradecimiento menciona el cambio visible.
+
+Propuesta de estado: evento único de entrega/completado por pueblo y quest_id, con un efecto versionado field_created, especie, campo_id, semilla y límites reservados. Guardar el cambio junto con la misión en una misma transacción, o revertir ambos si falla. Idempotente: volver a hablar o cargar no genera un campo adicional ni entrega premios otra vez. Mantener sin tocar world_quests heredado; usar una sección nueva por pueblo para efectos regionales. No inferir retroactivamente qué flor se entregó si el registro antiguo no lo prueba.
+
+El campo puede estar en una parcela ya reservada para crecimiento, no encima de rutas, casas o animales atrapados. El cambio aparece al volver o tras una transición breve; no ocultar una espera de días no acordada. Decidir si nace pequeño y crece o aparece extenso, y si cuenta como nuevo destino del mapa al descubrirlo. El mapa muestra el campo cambiado cuando se revisita, sin revelar el resto de la región. Recoger después sus flores, reposición y nuevas misiones siguen pendientes.
+
+Sin implementación ni nuevos estados escritos en partidas actuales. El efecto sería evidencia visible de haber ayudado, no solo texto genérico.

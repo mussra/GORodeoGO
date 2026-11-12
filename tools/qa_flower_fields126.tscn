@@ -1,0 +1,4 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://tools/qa_flower_fields126.gd" id="1"]
+[node name="Fields" type="Node2D"]
+script=ExtResource("1")
