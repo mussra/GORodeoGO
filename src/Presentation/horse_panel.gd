@@ -184,29 +184,37 @@ func detail_view()->void:
   if action[0] in ["Usar caballo","Emblema"]:b.disabled=not SaveData.horse_collection.is_adult(h.id)
  var sell:=Button.new();sell.text=tr("MARKET_SELL")%HorseMarket.sell_price(h);sell.custom_minimum_size.y=48;sell.disabled=not HorseMarket.can_sell(SaveData.horse_collection,h.id);box.add_child(sell);sell.pressed.connect(func():confirm_trade(h,true))
 func atlas_entries()->Array[Dictionary]:
- if page=="atlas_variants":return HorseAtlas.variants(atlas_family,atlas_filters,SaveData.horse_collection.horses)
- if page=="atlas" and not atlas_filters.is_empty():return HorseAtlas.filtered_entries(atlas_filters,SaveData.horse_collection.horses,atlas_owned_first)
+ if page=="atlas_variants":
+  var variants:Array[Dictionary]=HorseAtlas.variants(atlas_family,atlas_filters,SaveData.horse_collection.horses)
+  if not atlas_owned_first:variants.sort_custom(func(a,b):return HorseAtlas.signature(a.horse.traits)<HorseAtlas.signature(b.horse.traits))
+  return variants
+ if page=="atlas" and not atlas_filters.is_empty():
+  var found:Array[Dictionary]=HorseAtlas.filtered_entries(atlas_filters,SaveData.horse_collection.horses,atlas_owned_first)
+  if int(atlas_filters.get("rarity",-1))==4:
+   for item in UnicornAtlas.entries(SaveData.horse_collection.horses):
+    if item.owned:continue # owned records already included by exact filters
+    var hidden_horse:Dictionary={"traits":{"coat":3,"pattern":6,"mane":5,"eyes":20,"finish":"galaxy"},"name":"Legendario sin descubrir","stage":"adult"}
+    found.append({"horse":hidden_horse,"owned":false,"mystery115":true})
+   if atlas_owned_first:found=HorseAtlas.owned_first_order(found)
+  return found
  if page=="market" and not SaveData.debug_mode and not SaveData.trial_session_active:
   var limited:Array[Dictionary]=[]
   for h in HorseMarket.offers(SaveData.highest_level_completed):
    if not SaveData.horse_collection.bought_offers.has(h.offer_id):limited.append({"horse":h,"owned":false})
   return limited
- var result:Array[Dictionary]=[];var owned:Dictionary={}
- for h in SaveData.horse_collection.horses:
-  result.append({"horse":h,"owned":true})
-  owned["%d_%d_%d"%[h.traits.coat,h.traits.pattern,h.traits.mane]]=true
- if not atlas_owned_first or page=="market":
-  result.clear()
+ var result:Array[Dictionary]=[];var exact:Dictionary={};var included:Dictionary={}
+ for h in SaveData.horse_collection.horses:exact[HorseAtlas.signature(h.traits)]=h
  for n in range(HorseCollection.COATS.size()*HorseCollection.PATTERNS.size()*HorseCollection.MANES.size()):
   var t:Dictionary={"coat":int(n/(HorseCollection.PATTERNS.size()*6)),"pattern":int(n/6)%HorseCollection.PATTERNS.size(),"mane":n%6}
   if page!="market":t=HorseAtlas.traits(t,atlas_filters)
-  if page=="market" or not atlas_owned_first or not owned.has("%d_%d_%d"%[t.coat,t.pattern,t.mane]):result.append({"horse":{"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":false})
- if not atlas_owned_first and page!="market":
-  for entry in result:
-   var t:Dictionary=entry.horse.traits
-   for h in SaveData.horse_collection.horses:
-    if h.traits.coat==t.coat and h.traits.pattern==t.pattern and h.traits.mane==t.mane:
-     entry.horse=h;entry.owned=true;break
+  var key:String=HorseAtlas.signature(t)
+  if page!="market" and exact.has(key):result.append({"horse":exact[key],"owned":true});included[exact[key].id]=true
+  else:result.append({"horse":{"traits":t,"name":HorseCollection.COATS[t.coat],"stage":"adult"},"owned":false})
+ if page!="market":
+  for h in SaveData.horse_collection.horses:
+   if not included.has(h.id):result.append({"horse":h,"owned":true})
+  if atlas_owned_first:result=HorseAtlas.owned_first_order(result)
+
  return result
 ## Barra de filtros del atlas (Ant 8-nov 19:13): un desplegable por propiedad
 ## del registro HorseFilters (propiedades como datos); "Todos" quita ese
@@ -233,10 +241,10 @@ func _on_atlas_filter(idx:int,pid:String,values:Array)->void:
 
 func atlas_view()->void:
  label(tr("MARKET_BALANCE")%SaveData.equipment_points if page=="market" else tr("UI_121"),Vector2(35,105),25)
- if page=="atlas":
-  button("Unicornios",Vector2(760,100),func():add_child(UnicornAtlasPanel.new()),235)
-  var order_btn:=button(tr("UI_122") if atlas_owned_first else tr("UI_123"),Vector2(1015,575),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),230)
-  order_btn.add_theme_font_size_override("font_size",14)
+ if page in ["atlas","atlas_variants"]:
+  var order_btn:=button("Los míos primero"+(" ✓" if atlas_owned_first else ""),Vector2(690,100),func():atlas_owned_first=not atlas_owned_first;atlas_page=0;refresh(),300)
+  order_btn.name="AtlasOrder114";order_btn.add_theme_font_size_override("font_size",19)
+
  _atlas_filter_bar()
  label(tr("MARKET_DESIGN_NOTE") if page=="market" else ("Desliza para ver todas las tarjetas · ojos y patas desde Filtros" if page=="atlas_variants" else ("Resultados: todos los colores de manchas · toca para abrir Ficha" if not atlas_filters.is_empty() else "1.440 familias · toca una para explorar manchas, ojos y patas")),Vector2(35,160),17)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
@@ -250,17 +258,23 @@ func atlas_view()->void:
   if n>=entries.size():break
   var entry:Dictionary=entries[n];var h:Dictionary=entry.horse;var t:Dictionary=h.traits
   var x:float=30+(j%2)*620;var y:float=0+int(j/2)*625
-  sprite(h,Vector2(x,y),175)
-  var title:=label((h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
-  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,610);open.tooltip_text=tr("UI_126");content.add_child(open);open.pressed.connect(func():
+  var mystery:bool=not entry.owned and (bool(entry.get("mystery115",false)) or (int(atlas_filters.get("rarity",-1))==4 and HorseMarket.tier(h)==4))
+  if mystery:
+   var shadow=TextureRect.new();shadow.texture=UnicornAtlasPanel.BASE;shadow.position=Vector2(x,y);shadow.size=Vector2(175,175);shadow.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;shadow.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+   var shader=Shader.new();shader.code="shader_type canvas_item;void fragment(){vec4 c=texture(TEXTURE,UV);COLOR=vec4(.16,.24,.28,c.a);}"
+   var material=ShaderMaterial.new();material.shader=shader;shadow.material=material;content.add_child(shadow)
+  else:sprite(h,Vector2(x,y),175)
+  var title:=label(("Legendario sin descubrir" if mystery else ("Legendario conseguido" if h.get("species","")=="unicorn" else h.name)) if (mystery or h.get("species","")=="unicorn") else (h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
+  var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,610);open.tooltip_text="Sin descubrir" if mystery else tr("UI_126");open.disabled=mystery;content.add_child(open);open.pressed.connect(func():
    if page=="atlas" and atlas_filters.is_empty():
     atlas_family_page=atlas_page;atlas_family=h.traits.duplicate(true);atlas_page=0;show_page("atlas_variants")
    else:detail_entries=entries;focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
-  var texts:Array=HorseValues.visual(t)
-  texts.append("Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)])
+  var texts:Array=["Rareza: Legendario","No conseguido"] if mystery else HorseValues.visual(t)
+  if not mystery:texts.append("Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)])
   if page=="market":texts.append(tr("MARKET_PRICE")%HorseMarket.buy_price(h))
   for i in texts.size():label(str(texts[i]),Vector2(x+180,y+48+i*27),17)
-  var stat_host:=VBoxContainer.new();stat_host.position=Vector2(x+180,y+48+texts.size()*27);stat_host.size.x=410;content.add_child(stat_host);HorseStatBars.create(stat_host,h,entry.owned,true)
+  var stat_host:=VBoxContainer.new();stat_host.position=Vector2(x+180,y+48+texts.size()*27);stat_host.size.x=410;content.add_child(stat_host)
+  if not mystery:HorseStatBars.create(stat_host,h,entry.owned,true)
  content=outer
  ItemPager.create(content,Vector2(345,575),540,atlas_page,pages,func(i:int):atlas_page=i;refresh())
  if not atlas_filters.is_empty():label(tr("FILTER_COUNT")%[entries.size(),all_entries.size()],Vector2(892,588),17)
