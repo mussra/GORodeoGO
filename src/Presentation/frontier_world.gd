@@ -60,6 +60,11 @@ var _last_gait: int = -1
 var _pigs_label: Label
 var _edit_mode: bool = false
 var _stamina: Dictionary = {}
+var _road_surface94:WorldRoadSurface94
+func road_surface_contains94(point:Vector2,margin:float=0.)->bool:
+	if _road_surface94==null:_road_surface94=WorldRoadSurface94.new(SaveData.world_seed)
+	return _road_surface94.contains(point,margin)
+
 var _gauges: Dictionary = {}
 var _pant: AudioStream = load("res://art/audio/pant.wav")
 var _edit_tool: String = "tree"
@@ -831,7 +836,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _tick_stamina(delta: float) -> void:
 	var before: Dictionary = _stamina
-	_stamina = WorldStamina.tick(_stamina, player.gait, player.velocity.length() > 12.0, delta)
+	_stamina = WorldStamina.tick(_stamina, player.gait, player.velocity.length() > 12.0, delta, road_surface_contains94(player.global_position))
 	player.gait_cap = WorldStamina.cap_gait(_stamina, WorldGait.GALOPE)
 	if WorldStamina.just_tired(before, _stamina):
 		_toast(tr("WORLD_HORSE_TIRED"))

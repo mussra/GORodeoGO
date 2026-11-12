@@ -10,6 +10,8 @@ const MAX:float=100.0
 ## Ant (8-nov-2026): horses must last much longer for long trips. The worst
 ## horse now endures DOUBLE: every drain is divided by this one knob.
 const ENDURANCE_MULT:float=2.0
+## Reversible balance default: roads consume 35% less stamina, not zero.
+const ROAD_DRAIN_MULT:float=0.65
 const DRAIN_GALOPE:float=8.0    # ~12s of full gallop (x ENDURANCE_MULT)
 const DRAIN_TROTE:float=2.5     # trotting is cheap but not free
 const REGEN_PASO:float=9.0
@@ -25,11 +27,12 @@ static func new_state(power:float=0.65)->Dictionary:
  return {"value":max_for(power),"max":max_for(power),"forced_left":0.0}
 
 ## gait: current WorldGait; moving: the horse is actually covering ground.
-static func tick(state:Dictionary,gait:int,moving:bool,delta:float)->Dictionary:
+static func tick(state:Dictionary,gait:int,moving:bool,delta:float,on_road:bool=false)->Dictionary:
  var out:Dictionary=state.duplicate()
  var v:float=float(out.value)
- if moving and gait==WorldGait.GALOPE:v-=DRAIN_GALOPE/ENDURANCE_MULT*delta
- elif moving and gait==WorldGait.TROTE:v-=DRAIN_TROTE/ENDURANCE_MULT*delta
+ var drain_mult:float=ROAD_DRAIN_MULT if on_road else 1.0
+ if moving and gait==WorldGait.GALOPE:v-=DRAIN_GALOPE/ENDURANCE_MULT*delta*drain_mult
+ elif moving and gait==WorldGait.TROTE:v-=DRAIN_TROTE/ENDURANCE_MULT*delta*drain_mult
  elif moving:v+=REGEN_PASO*delta
  else:v+=REGEN_IDLE*delta
  out.value=clampf(v,0.0,float(out.max))

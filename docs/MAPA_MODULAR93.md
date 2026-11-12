@@ -65,3 +65,7 @@ Estos datos no certifican FPS Android. Tampoco son una comparación directa con 
 - Alternativa oscura de la nueva hoja, disponible para comparación sin sustituir el acabado actual.
 
 Recetas: `tools/qa_modular93.tscn`, `tools/qa_modular_return93.tscn`, `tools/profile_modular93.tscn`. La disposición nueva vive en `ModularWorldLayout93`, no en WorldMap ni WorldPaths.
+
+### Actualización posterior: reglas de caminos 94
+
+El mapa modular ahora sí simula resistencia con menos consumo sobre camino y limita los salvajes a hierba. El alcance anterior describe el estado de la entrega 93. Ver `REGLAS_CAMINOS94.md` y su release para los cambios y pruebas posteriores; sigue sin ser un mundo con progreso/encargos ni un APK nuevo.

@@ -21,6 +21,7 @@ var rider: Node2D = null
 var held: float = 0.0
 var touch_grace: float = 0.0
 var _touching_rider: bool = false
+var road_provider94:Callable
 var home: Vector2 = Vector2.ZERO
 var flip_h: bool = false
 var movement:Vector2=Vector2.RIGHT
@@ -33,6 +34,8 @@ func setup(p_pen: Dictionary) -> void:
 
 func _ready() -> void:
 	position = home
+	road_provider94=WorldWildRoads94.provider(self)
+	WorldWildRoads94.bind_spawn(self,road_provider94)
 	_art=WildPigArt.new()
 	_art.variant="pink"  # Brown pigs cancelled until further notice.
 	add_child(_art)
@@ -65,6 +68,7 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 	var target: Vector2 = position + away.normalized() * speed * delta
 	if not roped:target=WorldEscapeMotion.bounded_step(position,home,from,target-position,WorldPigs.FLEE_LEASH)
 	if WorldFence.crosses(self,target):target=position
+	if road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.safe_step(global_position,get_parent().to_global(target),road_provider94))
 	movement=(target-position).normalized()
 	position = target
 	flip_h = movement.x < 0.0

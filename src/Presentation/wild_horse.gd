@@ -19,6 +19,7 @@ const RELEASE_TOUCH_GRACE_SECONDS: float = 1.0
 
 var herd: Dictionary = {}
 var state: Dictionary = {}
+var road_provider94:Callable
 var home: Vector2 = Vector2.ZERO
 var wander: bool = false
 var wander_radius: float = 70.0
@@ -59,6 +60,8 @@ func setup(p_herd: Dictionary) -> void:
 func _ready() -> void:
 	collision_mask|=HorseJump.FENCE_LAYER
 	position = home
+	road_provider94=WorldWildRoads94.provider(self)
+	WorldWildRoads94.bind_spawn(self,road_provider94)
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()
 	fr.size = Vector2(24, 12)
@@ -119,7 +122,11 @@ func _physics_process(delta: float) -> void:
 		if _graze_timer <= 0.0:
 			_graze_timer = randf_range(2.0, 5.0)
 			_art.grazing = not _art.grazing
+	var before94:Vector2=global_position
+	var wanted94:Vector2=WorldWildRoads94.safe_step(before94,before94+velocity*delta,road_provider94)
+	velocity=(wanted94-before94)/maxf(delta,.001)
 	move_and_slide()
+	if not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94
 	_art.position.y = sin(_bob * 1.6) * 1.5
 	queue_redraw()
 

@@ -10,6 +10,8 @@ func setup(p_pen:Dictionary)->void:
  pen=p_pen;home=pen.get("pos",Vector2.ZERO);state=WorldGoats.new_state()
 func _ready()->void:
  position=home
+ road_provider94=WorldWildRoads94.provider(self)
+ WorldWildRoads94.bind_spawn(self,road_provider94)
  pixellab_views=PixelLabTrial.animal_views("goat")
  var key:String="nominal"
  if not frames_cache.has(key):
@@ -38,4 +40,5 @@ func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
  var target:Vector2=position+movement.normalized()*speed*delta
  if not charge:target=WorldEscapeMotion.bounded_step(position,home,point,target-position,550.0)
  if _fence_jump<=0 and WorldFence.crosses(self,target+movement.normalized()*20):_fence_jump=.48
+ if road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.safe_step(global_position,get_parent().to_global(target),road_provider94))
  movement=(target-position).normalized();position=target

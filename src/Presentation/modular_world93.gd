@@ -14,6 +14,18 @@ var ground:Node2D
 var player:Node2D
 var animals=[]
 var hud:CanvasLayer
+var stamina:Dictionary={}
+var road_surface:WorldRoadSurface94
+var stamina_label:Label
+func road_surface_contains94(point:Vector2,margin:float=0.)->bool:
+ if road_surface==null:road_surface=WorldRoadSurface94.new(0,true,dark)
+ road_surface.dark=dark
+ return road_surface.contains(point,margin)
+func _physics_process(delta:float):
+ if not is_instance_valid(player):return
+ stamina=WorldStamina.tick(stamina,player.gait,player.velocity.length()>12.,delta,road_surface_contains94(player.global_position))
+ player.gait_cap=WorldStamina.cap_gait(stamina,WorldGait.GALOPE)
+ if is_instance_valid(stamina_label):stamina_label.text="Energía: %d%%"%roundi(WorldStamina.ratio(stamina)*100)
 var collision_rects:Array[Rect2]=[]
 func _ready():
  dark=OS.get_environment("MODULAR93_ART")=="dark"
@@ -27,6 +39,7 @@ func _ready():
  # Invisible perimeter for this fixed-size test map, outside all access paths.
  for wall in [Rect2(-120,-45,1520,10),Rect2(-120,675,1520,10),Rect2(-120,-45,10,730),Rect2(1390,-45,10,730)]:WorldPhysics.add_box(self,wall)
  player=Player.new();add_child(player);player.position=Layout.world(Vector2i(9,5))+Vector2(20,-35)
+ stamina=WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power",.65))
  player.lasso.prey_provider=func()->Array:return animals
  player.lasso.prey_captured.connect(func(prey):prey.roped=true;prey.rider=player;prey.held=999)
  for data in [{"pos":Layout.world(Vector2i(0,2)),"traits":{"coat":10,"pattern":0,"mane":0,"eyes":0,"finish":"normal"}},{"pos":Layout.world(Vector2i(10,6))+Vector2(25,0),"traits":{"coat":1,"pattern":2,"mane":1,"eyes":1,"finish":"normal"}}]:
@@ -77,11 +90,15 @@ func _hud():
  hud=CanvasLayer.new();add_child(hud)
  var bar=ColorRect.new();bar.color=Color(.04,.12,.09,.85);bar.size=Vector2(1598,44);bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.add_child(bar)
  var label=Label.new();label.text="Mapa modular nuevo · "+("hoja oscura" if dark else "césped claro")+" · prueba aislada, no guarda partidas";label.position=Vector2(20,8);label.add_theme_font_size_override("font_size",20);hud.add_child(label)
+ stamina_label=Label.new();stamina_label.position=Vector2(1100,8);stamina_label.add_theme_font_size_override("font_size",18);hud.add_child(stamina_label)
  var toggle=Button.new();toggle.text="Cambiar césped";toggle.position=Vector2(1350,52);toggle.size=Vector2(220,42);QuestButtonStyle.apply(toggle);hud.add_child(toggle)
  toggle.pressed.connect(func():dark=not dark;_reload_art();ground.queue_redraw();roads.queue_redraw();label.text="Mapa modular nuevo · "+("hoja oscura" if dark else "césped claro")+" · prueba aislada, no guarda partidas")
  var back=Button.new();back.text="Volver al mundo anterior";back.position=Vector2(1280,4);back.size=Vector2(300,38);QuestButtonStyle.apply(back);hud.add_child(back);back.pressed.connect(func():return_requested.emit())
  var hint=Label.new();hint.text="WASD/flechas: mover · joystick táctil del jinete · lazo compartido · sin encargos ni progreso persistente";hint.position=Vector2(20,695);hint.add_theme_font_size_override("font_size",16);hud.add_child(hint)
 func _reload_art():
+ # A different painted shoulder can grow a few pixels: keep all wild hooves off it.
+ for animal in animals:
+  WorldWildRoads94.bind_spawn(animal,animal.road_provider94)
  for kind in tiles:
   var name="tee" if kind=="t" else kind
   tiles[kind]=load("res://art/world/"+("alternative92/" if dark else "derived88/")+name+".png")
