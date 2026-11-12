@@ -48,6 +48,8 @@ func _ready()->void:
  note.size=Vector2(735,135);note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  var finishes:=_button("Acabados · Vista previa",Vector2(800,625),func():add_child(FinishPreview145.new()))
  finishes.size=Vector2(430,52)
+ var adorns:=_button("Adornos · Vista previa",Vector2(800,561),func():add_child(AdornPreview153.new()))
+ adorns.size=Vector2(430,52)
  resized.connect(_layout);_layout();refresh()
 func _label(text:String,pos:Vector2,font:int)->Label:
  var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);_canvas.add_child(l);return l

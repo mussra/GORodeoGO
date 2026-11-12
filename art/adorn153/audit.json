@@ -1,0 +1,72 @@
+[
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_00.png",
+    "sha256": "ffdeb7ce39b6b08be201f9d72955d64f272e526eec6d77a0952a727066017b8f",
+    "mask": "art/adorn153/side_00.png",
+    "leg_pixels": 37,
+    "boot_pixels": 20
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_01.png",
+    "sha256": "70ecf4fd26135ac97e8d998ec8f834ea0aa34ad2d21f53a09b31cf2c7026a90a",
+    "mask": "art/adorn153/side_01.png",
+    "leg_pixels": 43,
+    "boot_pixels": 24
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_02.png",
+    "sha256": "331be3a7e21327fb6ea4e26b4f15be0799005e83a0f867fb312a4cde5c635782",
+    "mask": "art/adorn153/side_02.png",
+    "leg_pixels": 42,
+    "boot_pixels": 29
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_03.png",
+    "sha256": "c2c52ae81cb8ac332502f5bb2871a346c25cb7692caddda6b6ba4c2760e71533",
+    "mask": "art/adorn153/side_03.png",
+    "leg_pixels": 47,
+    "boot_pixels": 17
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_04.png",
+    "sha256": "c6a125d5e4565b8933bd8021c1e323b6e2ef599fb4447507cb198415d95735d0",
+    "mask": "art/adorn153/side_04.png",
+    "leg_pixels": 55,
+    "boot_pixels": 32
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_05.png",
+    "sha256": "da59479b228af3f8f70ccb45c1e1513d83eda3b112b5b6f9401335a67855c1da",
+    "mask": "art/adorn153/side_05.png",
+    "leg_pixels": 44,
+    "boot_pixels": 27
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_06.png",
+    "sha256": "f461da9e78cc09b5a9c76bd65fd214da83a2a29b4fec90394920be9aadb4f3b3",
+    "mask": "art/adorn153/side_06.png",
+    "leg_pixels": 40,
+    "boot_pixels": 26
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_07.png",
+    "sha256": "9fda9263b708f2d43b8f9af2e6fe901163ece515ca9f18215b86388c9d8002df",
+    "mask": "art/adorn153/side_07.png",
+    "leg_pixels": 50,
+    "boot_pixels": 17
+  },
+  {
+    "source": "art/experimental/pixellab/rider/side/frame_08.png",
+    "sha256": "cefc404a36dd20e5d7139c8ca1d3519362415c51f88d06352d789428c352b96a",
+    "mask": "art/adorn153/side_08.png",
+    "leg_pixels": 47,
+    "boot_pixels": 18
+  },
+  {
+    "source": "art/portraits/adult_hd.png",
+    "sha256": "f97f3fdd2deeec6625a970fbc95e6d296a0ad73b00f6b4147914d20f7701bb92",
+    "mask": "art/adorn153/portrait.png",
+    "leg_pixels": 6718,
+    "boot_pixels": 4302
+  }
+]
