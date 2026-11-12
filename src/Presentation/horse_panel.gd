@@ -102,6 +102,8 @@ func collection_view()->void:
   var info:=Label.new();info.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;info.custom_minimum_size.x=540;info.add_theme_font_size_override("font_size",23)
   var equipped:bool=horses.any(func(item):return item.id==SaveData.horse_collection.selected)
   info.text="%s · %s · crin %s\n×%d con esta apariencia%s"%[tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane]),horses.size()," · incluye equipado" if equipped else ""];row.add_child(info)
+  var pure_count:int=horses.filter(func(item):return GalaxyPure143.is_pure(item)).size()
+  if pure_count>0:info.text+="\n◆ GALAXY PURO ×%d"%pure_count
   var toggle:=Button.new();toggle.name="ToggleAppearance118";toggle.size_flags_vertical=Control.SIZE_SHRINK_CENTER;toggle.custom_minimum_size=Vector2(330,58);row.add_child(toggle)
   var members:=VBoxContainer.new();members.name="AppearanceMembers118";members.custom_minimum_size.x=1170;rows.add_child(members)
   var expanded:bool=expanded_appearance_groups118.has(group.key);members.visible=expanded;toggle.text=("Ocultar" if expanded else "Ver caballos")+" (×%d)"%horses.size()
@@ -120,7 +122,9 @@ func collection_view()->void:
 func _collection_horse_row118(rows:VBoxContainer,h:Dictionary)->void:
  var row:=HBoxContainer.new();row.custom_minimum_size.y=170;rows.add_child(row)
  var tex:=TextureRect.new();HorsePortrait.apply_horse(tex,h,SaveData.hat_color);tex.custom_minimum_size=Vector2(160,160);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
- var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;row.add_child(l)
+ var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;
+ if GalaxyPure143.is_pure(h):l.text+="\n"+GalaxyPure143.BADGE
+ row.add_child(l)
  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");row.add_child(dodge_badge)
  if HorseEmblem.valid(h.traits.get("emblem")):
@@ -155,6 +159,7 @@ func breed_view()->void:
  var t:Dictionary=SaveData.horse_collection.preview(parent_a,parent_b,choices)
  if not t.is_empty():
   var preview_title:=label("Vista de la cría",Vector2(525,225),19)
+  if not GalaxyPure143.birth(SaveData.horse_collection.find(parent_a),SaveData.horse_collection.find(parent_b)).is_empty():preview_title.text=GalaxyPure143.BADGE
   preview_title.size.x=230;preview_title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
   sprite({"traits":t,"stage":"foal"},Vector2(525,265),230)
   button(tr("UI_092"),Vector2(420,615),func():
@@ -190,6 +195,8 @@ func detail_view()->void:
  var scroll:=ScrollContainer.new();scroll.position=Vector2(470,130);scroll.size=Vector2(770,540);content.add_child(scroll)
  var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(735,0);box.add_theme_constant_override("separation",12);scroll.add_child(box)
  if owned:
+  if GalaxyPure143.is_pure(h):
+   var pure:=Label.new();pure.name="GalaxyPureBadge143";pure.text=GalaxyPure143.BADGE+"\nDos padres Galaxy al nacer · todavía no es un unicornio";pure.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;pure.add_theme_font_size_override("font_size",22);pure.modulate=RanchTheme.GOLD;box.add_child(pure)
   var completed:=Label.new();completed.text=HorseMastery.level_text(h);completed.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;completed.add_theme_font_size_override("font_size",20);box.add_child(completed)
   HorseStatBars.row(box,"Maestría general · %d%%"%roundi(HorseMastery.percent(h)),HorseMastery.percent(h))
   if h.traits.get("finish","")=="galaxy":

@@ -65,6 +65,8 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
  if t.is_empty():return {}
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
+ var proof:Dictionary=GalaxyPure143.birth(find(a),find(b))
+ if not proof.is_empty():child["galaxy_birth143"]=proof
  child["can_jump"]=false;child["can_dodge"]=false;child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
  return {"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
@@ -86,6 +88,7 @@ func restore(v:Variant)->bool:
    if h.id=="original" and not h.parents.is_empty():return false
    if h.parents.size()==2 and h.parents[0]==h.parents[1]:return false
    if h.get("stage","adult") not in ["foal","adult"]:return false
+   if h.has("galaxy_birth143") and not GalaxyPure143.valid_record(h.galaxy_birth143,h.parents):return false
    ids[h.id]=true;by_id[h.id]=h
    if group==known:clean_ancestors.append(h.duplicate(true))
    else:clean.append(h.duplicate(true))

@@ -54,6 +54,7 @@ func _actor(h:Dictionary,feet:Vector2,scale_:float=1.0):
 func _card(h:Dictionary,at:Vector2):
  _ground(Rect2(at,Vector2(295,132)))
  _actor(h,at+Vector2(66,104),.95)
+ if GalaxyPure143.is_pure(h):_label(GalaxyPure143.BADGE,at+Vector2(4,110),108,12).modulate=RanchTheme.GOLD
  _label(str(h.name),at+Vector2(115,8),170,21)
  _label(("Potrillo" if h.get("stage","adult")=="foal" else "Adulto")+(" · equipado" if h.id==SaveData.horse_collection.selected else ""),at+Vector2(115,38),170,18)
  var tap:=_button("",at+Vector2(2,4),108,func():horse_opened.emit(str(h.id)));tap.size.y=124;tap.tooltip_text="Ver ficha: "+str(h.name)
@@ -70,5 +71,5 @@ func _family():
   var h:Dictionary=members[i];var x:float=230.+i*360.
   _actor(h,Vector2(x,430),1.8 if h.get("stage","adult")=="adult" else 1.5)
   _label(str(h.name),Vector2(x-140,450),280,24)
-  _label(("Progenitor" if i<members.size()-1 else "Cría")+(" · vendido, registro familiar" if h.get("sold",false) else ""),Vector2(x-140,487),280,18)
+  _label(("Progenitor" if i<members.size()-1 else ("Cría · "+GalaxyPure143.BADGE if GalaxyPure143.is_pure(h) else "Cría"))+(" · vendido, registro familiar" if h.get("sold",false) else ""),Vector2(x-140,487),280,18)
  _label("Potrillos estáticos · esta vista no acelera el crecimiento ni cambia el adiestramiento.",Vector2(90,590),1130,21)
