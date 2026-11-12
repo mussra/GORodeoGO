@@ -100,6 +100,8 @@ var _lasso_horse: Node2D = null
 ## Occluder rects (owner -> Array[Rect2]): when the rider's feet are inside one,
 ## a tall body (house, tree, cactus) covers him, so a marker floats above him
 ## (Ant 7-nov-2026 16:50: "necesito ver claramente donde esta mi vaquero").
+var _country_resume_checked152:bool=false
+var _country_transition152:CountryTransition152
 var _occluders: Dictionary = {}
 var _cover_index110:Dictionary={}
 var _cover_dirty110:bool=true
@@ -185,6 +187,10 @@ func _process(delta: float) -> void:
 			_returning_home=false;_home_pending=false;SaveData.save_world_state(player.position)
 		FrontierTransition.obtain(get_tree()).reveal()
 		player.set_physics_process(true)
+	if not _country_resume_checked152:
+		_country_resume_checked152=true
+		if SaveData.country_ledger146.get("active", "frontier")==CountryRoute146.ID:
+			_start_country152(true);return
 	if _travel144!=null:_travel144.record_visits()
 	_tick_npcs()
 	_tick_lasso(delta)
@@ -1035,7 +1041,7 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"country_saved152","title":"País guardado","hint":"Progreso separado · sin ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
@@ -1045,6 +1051,7 @@ func _navigation_selected(id:String)->void:
 		"map":_toggle_map()
 		"modular_preview":_open_modular_preview93()
 		"country146":_open_isolated_preview146(CountryPreview146.new())
+		"country_saved152":_start_country152()
 		"editor":_toggle_edit()
 		"home":_home()
 		"exit":_menu()
@@ -1905,3 +1912,53 @@ func _show_journal140()->void:
 	var scroll:=ScrollContainer.new();scroll.position=Vector2(24,24);scroll.size=Vector2(732,430);_journal140.add_child(scroll)
 	var body:=Label.new();body.text=VillageCousins140.journal(SaveData.world_cousins140);body.custom_minimum_size.x=700;body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",21);scroll.add_child(body)
 	var back:=Button.new();back.text="Cerrar diario";back.position=Vector2(230,475);back.size=Vector2(320,52);_journal140.add_child(back);back.pressed.connect(func():_journal140.queue_free();_journal140=null;player.set_physics_process(not is_instance_valid(_npc_dialog)))
+
+func _start_country152(resume:bool=false)->bool:
+	if _country_transition152!=null and _country_transition152.busy:return false
+	if not resume:
+		var why:String=_travel144.reason()
+		if not why.is_empty():_toast(why);return false
+		_snapshot_roaming139()
+	var session:=CountrySession152.new();_country_transition152=CountryTransition152.new()
+	var cover:=SiestaCurtain147.new();cover.destination="País nuevo";cover.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);cover.hat=SaveData.hat_color;add_child(cover)
+	cover.message.text="Cargando país de prueba…"
+	var load_scene:Callable=func()->bool:
+		_open_isolated_preview146(session);await get_tree().process_frame;await get_tree().process_frame;return true
+	var validate:Callable=func()->Vector2:return TravelLanding148.find(session.player,session.ledger.maps.water146.position,func(pos:Vector2)->bool:return CountryRoute146.blocked(session.data,pos))
+	var restore:Callable=func()->bool:
+		if session.is_inside_tree():session.return_requested.emit()
+		return true
+	var result:Dictionary=await _country_transition152.enter152(session,player.position,load_scene,validate,restore)
+	if not result.ok:
+		if is_instance_valid(session) and not session.is_inside_tree():session.free()
+		if resume:
+			process_mode=Node.PROCESS_MODE_DISABLED;player.set_physics_process(false)
+			var controls:Node=get_node_or_null("TouchControls")
+			if controls!=null:controls.visible=false
+			cover.message.text="No se pudo reabrir el país. Su progreso sigue guardado."
+			var back:=Button.new();back.text="Menú principal";back.position=Vector2(20,20);back.size=Vector2(260,60);cover.add_child(back);back.pressed.connect(func():get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn"))
+		else:cover.queue_free();_toast("No se pudo abrir el país. El origen sigue guardado.")
+		return false
+	cover.queue_free()
+	session.exit_handler=func(current:CountrySession152)->bool:
+		var point_:Vector2=current.ledger.links.water146.position
+		var validate_source:Callable=func()->Vector2:return await _country_source_landing152(point_)
+		var exit_result:Dictionary=await _country_transition152.exit152(current,validate_source,func()->bool:return true)
+		if exit_result.ok:
+			player.position=SaveData.world_position;var source_camera:Camera2D=player.get_node_or_null("Camera2D")
+			if source_camera!=null:source_camera.reset_smoothing()
+		return exit_result.ok
+	return true
+
+func _country_source_landing152(point_:Vector2)->Vector2:
+	# Frozen source bodies are normally removed from physics by Godot. Reinsert only
+	# their shapes for the arrival query, without running any source gameplay.
+	var bodies:Array[CollisionObject2D]=[];var modes:Array[int]=[]
+	for node in find_children("*","CollisionObject2D",true,false):
+		bodies.append(node);modes.append(node.disable_mode);node.disable_mode=CollisionObject2D.DISABLE_MODE_KEEP_ACTIVE
+	await get_tree().physics_frame
+	await get_tree().process_frame
+	var result:=TravelLanding148.find(player,point_,func(pos:Vector2)->bool:return SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,pos,14.))
+	for i in bodies.size():
+		if is_instance_valid(bodies[i]):bodies[i].disable_mode=modes[i]
+	return result

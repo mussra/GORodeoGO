@@ -130,7 +130,7 @@ func start_siesta(id:String,already_locked:bool=false)->bool:
  curtain=SiestaCurtain147.new();curtain.destination=target.name;curtain.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);curtain.hat=SaveData.hat_color;add_child(curtain)
  await get_tree().create_timer(.65,true).timeout
  transaction=TravelTransaction147.new();var result:=await transaction.run(_load_travel148,_validate_travel148,_commit_travel148,_restore_travel148)
- if not result.ok:last_error="No hay llegada libre. Sigues en el origen."
+ if not result.ok:last_error="No se pudo guardar la llegada. Sigues en el origen." if result.reason=="save" else "No hay llegada libre. Sigues en el origen."
  curtain.message.text="Has llegado a "+str(target.name) if result.ok else last_error
  await get_tree().create_timer(.35,true).timeout
  curtain.queue_free();curtain=null;travelling=false;_unlock_player();return result.ok

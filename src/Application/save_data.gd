@@ -574,6 +574,13 @@ func commit_places144(state:Dictionary,pos:Vector2)->bool:
 	if save_progress():return true
 	world_places144=before;world_position=previous;return false
 
+func commit_country_exit152(state:Dictionary,pos:Vector2)->bool:
+	if not pos.is_finite() or not CountryLedger146.valid(state,world_seed,world_generator_version) or state.active!="frontier":return false
+	var previous_position:Vector2=world_position;var previous_ledger:Dictionary=country_ledger146
+	world_position=pos;country_ledger146=CountryLedger146.upgrade(state)
+	if save_progress():return true
+	world_position=previous_position;country_ledger146=previous_ledger;return false
+
 func store_country_ledger146(state:Dictionary)->bool:
 	# Storage only. Scene routing/entry remain disabled until a complete transition exists.
 	if not CountryLedger146.valid(state,world_seed,world_generator_version):return false
