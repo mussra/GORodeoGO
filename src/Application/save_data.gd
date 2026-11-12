@@ -209,7 +209,7 @@ func load_progress() -> void:
 	var countries:Variant=config.get_value("world","countries146",{})
 	if not countries is Dictionary or (not countries.is_empty() and not CountryLedger146.valid(countries,world_seed,world_generator_version)):
 		_load_valid=false;return # Preserve unknown/corrupt future-country data instead of replacing it.
-	country_ledger146=countries.duplicate(true)
+	country_ledger146={} if countries.is_empty() else CountryLedger146.upgrade(countries)
 	var wm:Variant=config.get_value("world","missions",{})
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
@@ -578,6 +578,6 @@ func store_country_ledger146(state:Dictionary)->bool:
 	# Storage only. Scene routing/entry remain disabled until a complete transition exists.
 	if not CountryLedger146.valid(state,world_seed,world_generator_version):return false
 	var before:Dictionary=country_ledger146
-	country_ledger146=state.duplicate(true)
+	country_ledger146=CountryLedger146.upgrade(state)
 	if save_progress():return true
 	country_ledger146=before;return false

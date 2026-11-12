@@ -26,7 +26,7 @@ var map_button:Button
 const GRASS=preload("res://art/world/alternative92/grass-cache.png")
 const TREE=preload("res://art/world/cartoon/tree.png")
 func _ready():
- data=CountryRoute146.plan(seed);ledger=CountryLedger146.enter(CountryLedger146.fresh(maxi(1,SaveData.world_seed),SaveData.world_generator_version),SaveData.world_position,seed)
+ ledger=initial_ledger149();seed=ledger.maps.water146.seed;data=CountryRoute146.plan(seed);visited_cells=ledger.maps.water146.explored.duplicate(true)
  texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
  var trunk:=Sprite2D.new();trunk.texture=TREE;trunk.centered=false;trunk.position=data.tree_art.position;trunk.scale=data.tree_art.size/Vector2(TREE.get_size());trunk.z_index=0;add_child(trunk)
  WorldPhysics.add_box(self,data.tree).collision_layer=128
@@ -37,7 +37,7 @@ func _ready():
  for point in river:
   var body:=StaticBody2D.new();body.collision_layer=128;body.position=point;var collision:=CollisionShape2D.new();var shape:=CircleShape2D.new();shape.radius=CountryRoute146.WATER_RADIUS;collision.shape=shape;body.add_child(collision);add_child(body)
  for box in [Rect2(-100,-100,12700,100),Rect2(-100,14000,12700,100),Rect2(-100,0,100,14000),Rect2(12500,0,100,14000)]:WorldPhysics.add_box(self,box).collision_layer=128
- player=load("res://src/Presentation/world_player.gd").new();player.position=data.entry;player.world_bounds=CountryRoute146.BOUNDS;add_child(player)
+ player=load("res://src/Presentation/world_player.gd").new();player.position=ledger.maps.water146.position;player.world_bounds=CountryRoute146.BOUNDS;add_child(player)
  camera=Camera2D.new();player.add_child(camera);camera.make_current()
  var layer:=CanvasLayer.new();add_child(layer)
  hud_canvas=Control.new();hud_canvas.size=Vector2(1280,720);layer.add_child(hud_canvas)
@@ -45,7 +45,7 @@ func _ready():
   var size_:Vector2=get_viewport().get_visible_rect().size;var k:float=minf(size_.x/1280.,size_.y/720.);hud_canvas.scale=Vector2.ONE*k;hud_canvas.position=(size_-Vector2(1280,720)*k)/2.
  get_viewport().size_changed.connect(fit);fit.call()
  var bar:=ColorRect.new();bar.color=Color("10252ded");bar.size=Vector2(1280,100);hud_canvas.add_child(bar)
- var title:=Label.new();title.text="País nuevo · maqueta sin guardado ni ritual";title.position=Vector2(20,10);title.add_theme_font_size_override("font_size",24);bar.add_child(title)
+ var title:=Label.new();title.text=session_title149();title.position=Vector2(20,10);title.add_theme_font_size_override("font_size",24);bar.add_child(title)
  var back:=Button.new();back.text="Salir a Frontera";back.position=Vector2(1040,10);back.size=Vector2(220,60);QuestButtonStyle.apply(back);back.pressed.connect(request_return);bar.add_child(back)
  map_button=Button.new();map_button.text="Mapa local";map_button.position=Vector2(850,10);map_button.size=Vector2(180,60);QuestButtonStyle.apply(map_button);map_button.pressed.connect(show_map);bar.add_child(map_button)
  status=Label.new();status.position=Vector2(20,50);status.add_theme_font_size_override("font_size",21);bar.add_child(status)
@@ -96,7 +96,7 @@ func show_sites(already_locked:bool=false):
  if travelling or is_instance_valid(modal):return
  if not already_locked:_lock_player()
  var sheet:=NavigationSheet.new();sheet.title="SITIOS DE ESTE PAÍS";modal=sheet
- for site in CountryExploration148.available(ledger,data):sheet.entries.append({"id":site.id,"title":site.name,"hint":"Sitio visitado · siesta sin guardado"})
+ for site in CountryExploration148.available(ledger,data):sheet.entries.append({"id":site.id,"title":site.name,"hint":"Sitio visitado · siesta" if persists149() else "Sitio visitado · siesta sin guardado"})
  sheet.closed.connect(close_modal);sheet.selected.connect(func(id:String):modal=null;choose_site.call_deferred(id,true));hud_canvas.add_child(sheet)
 func travel_reason()->String:
  if travelling:return "Espera a que termine el viaje."
@@ -112,7 +112,7 @@ func choose_site(id:String,already_locked:bool=false):
   if already_locked:_unlock_player()
   return
  if not already_locked:_lock_player()
- var confirmation:=SiestaConfirmation148.new();confirmation.destination=target.name;confirmation.preview=true;modal=confirmation
+ var confirmation:=SiestaConfirmation148.new();confirmation.destination=target.name;confirmation.preview=not persists149();modal=confirmation
  confirmation.cancelled.connect(close_modal);confirmation.confirmed.connect(func():close_modal(false);start_siesta(id,true));hud_canvas.add_child(confirmation)
 func start_siesta(id:String,already_locked:bool=false)->bool:
  if is_instance_valid(modal):return false
@@ -120,6 +120,10 @@ func start_siesta(id:String,already_locked:bool=false)->bool:
  if target.is_empty() or not reason_.is_empty():
   last_error="Ese sitio no está visitado." if target.is_empty() else reason_
   if already_locked and not travelling:_unlock_player()
+  return false
+ if not prepare_travel149():
+  last_error="No se pudo guardar el origen. No has viajado."
+  if already_locked:_unlock_player()
   return false
  if not already_locked:_lock_player()
  travelling=true;travel_target=target;travel_origin=player.position;travel_ledger=ledger.duplicate(true)
@@ -146,3 +150,9 @@ func _unhandled_input(event:InputEvent):
   elif is_instance_valid(modal):close_modal()
   else:request_return()
   get_viewport().set_input_as_handled()
+
+func initial_ledger149()->Dictionary:
+ return CountryLedger146.enter(CountryLedger146.fresh(maxi(1,SaveData.world_seed),SaveData.world_generator_version),SaveData.world_position,seed)
+func session_title149()->String:return "País nuevo · maqueta sin guardado ni ritual"
+func persists149()->bool:return false
+func prepare_travel149()->bool:return true

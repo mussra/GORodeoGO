@@ -14,11 +14,11 @@ func _ready():
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=170;MenuInputGuard.install(self)
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);canvas.draw.connect(draw_map)
- MenuNavigation.header(canvas,"MAPA LOCAL · maqueta",func():closed.emit())
+ MenuNavigation.header(canvas,"MAPA LOCAL · prueba guardada" if world.persists149() else "MAPA LOCAL · maqueta",func():closed.emit())
  var note:=Label.new();note.text="Solo lo explorado · toca un sitio visitado para viajar\nVolver a casa lleva a la entrada de este país, no al rancho.";note.position=Vector2(220,620);note.add_theme_font_size_override("font_size",21);canvas.add_child(note)
  var sites:=Button.new();sites.text="Sitios visitados";sites.position=Vector2(850,200);sites.size=Vector2(260,60);sites.pressed.connect(func():sites_requested.emit());canvas.add_child(sites)
  var home:=Button.new();home.text="Volver a casa";home.position=Vector2(850,290);home.size=Vector2(260,60);home.pressed.connect(func():selected.emit("entry"));canvas.add_child(home)
- var disclaimer:=Label.new();disclaimer.text="En esta maqueta\nno se guarda el progreso.";disclaimer.position=Vector2(850,390);disclaimer.add_theme_font_size_override("font_size",21);canvas.add_child(disclaimer)
+ var disclaimer:=Label.new();disclaimer.text="Prueba con guardado.\nSin puerta normal ni ritual." if world.persists149() else "En esta maqueta\nno se guarda el progreso.";disclaimer.position=Vector2(850,390);disclaimer.add_theme_font_size_override("font_size",21);canvas.add_child(disclaimer)
  resized.connect(layout);layout()
 func layout():
  var k:float=minf(size.x/1280.,size.y/720.);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2.;refresh_markers();canvas.queue_redraw()

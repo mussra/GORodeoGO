@@ -26,3 +26,7 @@ Siguiente: extraer búsqueda de llegada libre a un servicio común con callback 
 ##2.7.105: mapa y viaje local148
 
 Mapa explorado por celdas locales, selector solo de visitas, casa hacia entrada local. Maqueta todavía temporal. `TravelLanding148` comparte la comprobación de forma física con Frontera y recibe la validación de terreno por callback. Se corrige la transformación de la forma para respetar offset real de colisión. `SiestaConfirmation148` compartida.39integraciones/3.122aserciones y614unitarias pasan. Para persistencia: guardar explored148 como parte del ledger versionado, validar celdas y migrar versión1; no mezclar con world_discovered. Conectar escena activa en un flujo de prueba explícito sin activar aún puerta/ritual normales.
+
+## Checkpoint149: datos, aún no escena persistente
+
+LedgerV2 conserva exploración local y rechaza celdas fuera del país/datos malformados. V1 se migra solo en memoria conservando semilla, vínculos, notas, visitas y posición; no se inventa un camino explorado. Guardado desconocido sigue bloqueando reescrituras. Hooks de sesión preparados sin activar navegación, puerta ni guardado de la maqueta. Falta la escena/sesión con autosave/entrada/retorno y reanudación comprobadas antes de exponer modo persistente.
