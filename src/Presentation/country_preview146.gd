@@ -39,7 +39,7 @@ func _ready():
   var collision:=CollisionShape2D.new();var shape:=RectangleShape2D.new();shape.size=Vector2(river[i-1].distance_to(river[i]),CountryRoute146.WATER_RADIUS*2.);collision.shape=shape;body.add_child(collision);add_child(body)
  for point in river:
   var body:=StaticBody2D.new();body.collision_layer=128;body.position=point;var collision:=CollisionShape2D.new();var shape:=CircleShape2D.new();shape.radius=CountryRoute146.WATER_RADIUS;collision.shape=shape;body.add_child(collision);add_child(body)
- for box in [Rect2(-100,-100,12700,100),Rect2(-100,14000,12700,100),Rect2(-100,0,100,14000),Rect2(12500,0,100,14000)]:WorldPhysics.add_box(self,box).collision_layer=128
+ var coast_body:=StaticBody2D.new();coast_body.name="IslandShore156";coast_body.collision_layer=128;var coast_shape:=CollisionPolygon2D.new();coast_shape.build_mode=CollisionPolygon2D.BUILD_SEGMENTS;coast_shape.polygon=data.island;coast_body.add_child(coast_shape);add_child(coast_body)
  player=load("res://src/Presentation/world_player.gd").new();player.position=ledger.maps.water146.position;player.world_bounds=CountryRoute146.BOUNDS;add_child(player)
  camera=Camera2D.new();player.add_child(camera);camera.make_current()
  var layer:=CanvasLayer.new();layer.layer=20;add_child(layer)
@@ -71,7 +71,16 @@ func _process(delta:float):
  queue_redraw()
 func _draw():
  if data.is_empty():return
- draw_texture_rect(GRASS,CountryRoute146.BOUNDS,true)
+ draw_rect(CountryRoute146.BOUNDS.grow(100000.),Color("1e728b"))
+ var island:PackedVector2Array=data.island;var loop:PackedVector2Array=island.duplicate();loop.append(island[0])
+ draw_polyline(loop,Color("46a6b7"),480.,true);draw_polyline(loop,Color("78c9ca"),290.,true);draw_polyline(loop,Color("f2e3ac"),150.,true)
+ var uvs:=PackedVector2Array()
+ for point_ in island:uvs.append(point_/Vector2(GRASS.get_size()))
+ draw_colored_polygon(island,Color.WHITE,uvs,GRASS)
+ draw_polyline(loop,Color("e3cf91"),82.,true)
+ for i in range(island.size()):
+  var a:Vector2=island[i];var b:Vector2=island[(i+1)%island.size()];var inward:Vector2=(CountryRoute146.BOUNDS.get_center()-(a+b)/2.).normalized();var pulse:float=sin(river_clock*.9+i*.5)*10.
+  draw_line(a-inward*(120.+pulse),b-inward*(120.+pulse),Color("d6f6ee99"),8.,true)
  draw_polyline(data.approach,Color("6d522d"),112.,true);draw_polyline(data.approach,Color("bf8952"),90.,true)
  draw_polyline(data.bank,Color("6d522d"),112.,true);draw_polyline(data.bank,Color("bf8952"),90.,true)
  draw_polyline(data.river,Color("37666c"),205.,true);draw_polyline(data.river,Color("4e9caf"),180.,true);draw_polyline(data.river,Color("6bb9c5"),112.,true)
@@ -148,13 +157,18 @@ func _load_travel148()->bool:
 func landing155(requested:Vector2)->Vector2:
  var terrain:Callable=func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos)
  var result:=TravelLanding148.find(player,requested,terrain)
- if result.is_finite() or not MotherTree155.blocked(data.tree_solid,requested,18.):return result
+ if result.is_finite():return result
+ var outlines:Array[PackedVector2Array]=[]
+ if MotherTree155.blocked(data.tree_solid,requested,18.):outlines.append(data.tree_solid)
+ if CountryIsland156.blocked(data.island,requested,18.):outlines.append(data.island)
+ if outlines.is_empty():return result
  # A save from the previous, smaller footprint can lie inside a new root.
  # Reposition only after an actual physics-safe arrival has been found.
- var candidates:Array[Vector2]=[];var poly:PackedVector2Array=data.tree_solid
- for i in poly.size():
-  var near:=Geometry2D.get_closest_point_to_segment(requested,poly[i],poly[(i+1)%poly.size()])
-  for j in 8:candidates.append(near+Vector2.RIGHT.rotated(j*TAU/8.)*48.)
+ var candidates:Array[Vector2]=[]
+ for poly in outlines:
+  for i in poly.size():
+   var near:=Geometry2D.get_closest_point_to_segment(requested,poly[i],poly[(i+1)%poly.size()])
+   for j in 8:candidates.append(near+Vector2.RIGHT.rotated(j*TAU/8.)*48.)
  candidates.sort_custom(func(a:Vector2,b:Vector2):return requested.distance_squared_to(a)<requested.distance_squared_to(b))
  for candidate in candidates:
   result=TravelLanding148.find(player,candidate,terrain)

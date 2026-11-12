@@ -31,7 +31,12 @@ func draw_map():
  for cell in world.visited_cells:
   var rect:=Rect2(Vector2(cell)*CountryExploration148.CELL,Vector2.ONE*CountryExploration148.CELL).intersection(CountryRoute146.BOUNDS)
   var mapped:=Rect2(point(rect.position),rect.size/CountryRoute146.BOUNDS.size*map_area.size)
-  canvas.draw_rect(mapped,Color("4d7947"))
+  canvas.draw_rect(mapped,Color("227e9a"))
+  var cell_poly:=PackedVector2Array([rect.position,rect.position+Vector2(rect.size.x,0),rect.end,rect.position+Vector2(0,rect.size.y)])
+  for land in Geometry2D.intersect_polygons(world.data.island,cell_poly):
+   var mapped_land:=PackedVector2Array()
+   for vertex in land:mapped_land.append(point(vertex))
+   if mapped_land.size()>=3:canvas.draw_colored_polygon(mapped_land,Color("4d7947"))
   # Clip terrain to each explored cell. No unseen river or road leaks through fog.
   for entry in [[world.data.approach,Color("cb9d63"),3.],[world.data.bank,Color("cb9d63"),3.],[world.data.river,Color("6bb9c5"),6.]]:
    var path:PackedVector2Array=entry[0]
