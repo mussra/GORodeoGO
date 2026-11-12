@@ -35,14 +35,14 @@ func _ready():
   tiles[kind]=load("res://art/world/"+("alternative92/" if dark else "derived88/")+name+".png")
  ground=Node2D.new();ground.z_index=-10;ground.texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED;ground.draw.connect(_draw_ground);add_child(ground)
  roads=Node2D.new();roads.z_index=-8;roads.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;roads.draw.connect(_draw_roads);add_child(roads)
- _buildings();_decor()
+ _buildings();_decor();_landmarks96()
  # Invisible perimeter for this fixed-size test map, outside all access paths.
  for wall in [Rect2(-120,-45,1520,10),Rect2(-120,675,1520,10),Rect2(-120,-45,10,730),Rect2(1390,-45,10,730)]:WorldPhysics.add_box(self,wall)
  player=Player.new();add_child(player);player.position=Layout.world(Vector2i(9,5))+Vector2(20,-35)
  stamina=WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power",.65))
  player.lasso.prey_provider=func()->Array:return animals
  player.lasso.prey_captured.connect(func(prey):prey.roped=true;prey.rider=player;prey.held=999)
- for data in [{"pos":Layout.world(Vector2i(0,2)),"traits":{"coat":10,"pattern":0,"mane":0,"eyes":0,"finish":"normal"}},{"pos":Layout.world(Vector2i(10,6))+Vector2(25,0),"traits":{"coat":1,"pattern":2,"mane":1,"eyes":1,"finish":"normal"}}]:
+ for data in [{"pos":Layout.world(Vector2i(0,2)),"traits":{"coat":10,"pattern":0,"mane":0,"eyes":0,"finish":"normal"}},{"pos":Layout.world(Vector2i(11,5))+Vector2(25,0),"traits":{"coat":1,"pattern":2,"mane":1,"eyes":1,"finish":"normal"}}]:
   var horse=Horse.new();horse.setup(data);horse.wander=true;horse.wander_radius=40;add_child(horse);horse.player_ref=player;animals.append(horse)
  var camera=Camera2D.new();camera.position=Vector2(640,340);add_child(camera);camera.make_current()
  var touch=load("res://src/Presentation/touch_controls.tscn").instantiate();touch.name="TouchControls";touch.layer=0;add_child(touch)
@@ -102,3 +102,10 @@ func _reload_art():
  for kind in tiles:
   var name="tee" if kind=="t" else kind
   tiles[kind]=load("res://art/world/"+("alternative92/" if dark else "derived88/")+name+".png")
+
+func _landmarks96():
+ for item in [{"id":"west_pass","text":"Paso oeste"},{"id":"east_pass","text":"Paso este"},{"id":"lookout","text":"Mirador"}]:
+  var label=Label.new();label.name="Landmark_"+item.id;label.text=item.text
+  label.position=Layout.world(Layout.LANDMARKS[item.id])+Vector2(-35,25)
+  label.add_theme_font_size_override("font_size",18);label.add_theme_color_override("font_shadow_color",Color.BLACK);label.add_theme_constant_override("shadow_outline_size",3)
+  add_child(label)

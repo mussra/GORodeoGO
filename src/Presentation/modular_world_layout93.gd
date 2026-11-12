@@ -5,15 +5,36 @@ const CELL=80.0
 const ORIGIN=Vector2(80,150)
 const DOORS={"ranch":Vector2i(6,0),"house_west":Vector2i(3,2),"house_east":Vector2i(8,2),"florist":Vector2i(12,2)}
 const DIRS=[Vector2i.UP,Vector2i.RIGHT,Vector2i.DOWN,Vector2i.LEFT]
-static func graph()->Dictionary:
- var g={}
- _path(g,[Vector2i(0,4),Vector2i(14,4)])
- _path(g,[Vector2i(6,0),Vector2i(6,6)])
- _path(g,[Vector2i(5,4),Vector2i(5,3),Vector2i(3,3),Vector2i(3,2)])
- _path(g,[Vector2i(7,4),Vector2i(7,3),Vector2i(8,3),Vector2i(8,2)])
- _path(g,[Vector2i(11,4),Vector2i(11,3),Vector2i(12,3),Vector2i(12,2)])
- _path(g,[Vector2i(2,4),Vector2i(2,5),Vector2i(4,5),Vector2i(4,6),Vector2i(8,6),Vector2i(8,5),Vector2i(6,5)])
- return g
+const DEFAULT_SEED:int=752026
+const LANDMARKS={"west_pass":Vector2i(0,4),"east_pass":Vector2i(14,4),"lookout":Vector2i(13,6)}
+static func plan(seed:int=DEFAULT_SEED)->Dictionary:
+ var rng=RandomNumberGenerator.new();rng.seed=seed
+ var west:int=rng.randi_range(4,5)
+ var east:int=7 if rng.randi_range(0,1)==0 else 9
+ var florist:int=11 if rng.randi_range(0,1)==0 else 13
+ var trunk=[Vector2i(0,4),Vector2i(14,4)]
+ var branches={
+  "ranch":[Vector2i(6,4),DOORS.ranch],
+  "house_west":[Vector2i(west,4),Vector2i(west,3),Vector2i(3,3),DOORS.house_west],
+  "house_east":[Vector2i(east,4),Vector2i(east,3),Vector2i(8,3),DOORS.house_east],
+  "florist":[Vector2i(florist,4),Vector2i(florist,3),Vector2i(12,3),DOORS.florist],
+  "lookout":[Vector2i(6,4),Vector2i(6,6),LANDMARKS.lookout]}
+ var g={};_path(g,trunk)
+ for route in branches.values():_path(g,route)
+ return {"seed":seed,"graph":g,"trunk":trunk,"branches":branches,"landmarks":LANDMARKS.duplicate(),"doors":DOORS.duplicate()}
+static func graph(seed:int=DEFAULT_SEED)->Dictionary:return plan(seed).graph
+static func route(g:Dictionary,start:Vector2i,goal:Vector2i)->Array:
+ if not g.has(start) or not g.has(goal):return []
+ var queue=[start];var parents={start:start}
+ while not queue.is_empty():
+  var cell=queue.pop_front()
+  if cell==goal:
+   var out=[goal]
+   while out[0]!=start:out.push_front(parents[out[0]])
+   return out
+  for next in g[cell]:
+   if not parents.has(next):parents[next]=cell;queue.append(next)
+ return []
 static func _path(g:Dictionary,corners:Array):
  for i in range(corners.size()-1):
   var p:Vector2i=corners[i];var end:Vector2i=corners[i+1];var step=Vector2i(signi(end.x-p.x),signi(end.y-p.y))

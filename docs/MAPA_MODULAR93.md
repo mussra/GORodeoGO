@@ -69,3 +69,7 @@ Recetas: `tools/qa_modular93.tscn`, `tools/qa_modular_return93.tscn`, `tools/pro
 ### Actualización posterior: reglas de caminos 94
 
 El mapa modular ahora sí simula resistencia con menos consumo sobre camino y limita los salvajes a hierba. El alcance anterior describe el estado de la entrega 93. Ver `REGLAS_CAMINOS94.md` y su release para los cambios y pruebas posteriores; sigue sin ser un mundo con progreso/encargos ni un APK nuevo.
+
+### Actualización de diseño 96
+
+La red de prueba se ha regenerado como árbol sin circuitos, con ramales de edificios y destinos señalados. Ver `NORMAS_MUNDO96.md`: las capturas/topología y conteos 93 son históricos. Los asentamientos kilométricos y su mapa están planteados como siguiente fase, no implementados en esta escena acotada.
