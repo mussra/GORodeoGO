@@ -15,14 +15,15 @@ static func plan(seed_:int)->Dictionary:
  var approach:=PackedVector2Array([entry,Vector2(6160,12500)+shift,bank[-1]])
  var upstream:=PackedVector2Array()
  for i in range(bank.size()-1,-1,-1):upstream.append(bank[i])
+ var art:=Rect2(river[-1]-Vector2(2800,2394)*Vector2(.60,.95),Vector2(2800,2394))
  var tree:=Rect2(Vector2(4200,8800)+shift,Vector2(1700,2100))
- return {"id":ID,"version":1,"seed":seed_,"entry":entry,"tree":tree,"tree_art":Rect2(Vector2(1000,4300)+shift,Vector2(8000,6840)),"roots":river[-1],"source":river[0],"river":river,"bank":bank,"approach":approach,"upstream":upstream,"sites":{"entry":entry,"tree":bank[-1],"source":bank[0]}}
+ return {"id":ID,"version":1,"seed":seed_,"entry":entry,"tree":tree,"tree_art":art,"tree_solid":MotherTree155.footprint(art),"roots":river[-1],"source":river[0],"river":river,"bank":bank,"approach":approach,"upstream":upstream,"sites":{"entry":entry,"tree":bank[-1],"source":bank[0]}}
 static func distance_to_path(point:Vector2,path:PackedVector2Array)->float:
  var distance:float=INF
  for i in range(1,path.size()):distance=minf(distance,point.distance_to(Geometry2D.get_closest_point_to_segment(point,path[i-1],path[i])))
  return distance
 static func blocked(data:Dictionary,point:Vector2,radius:float=18.)->bool:
- return not BOUNDS.grow(-radius).has_point(point) or (data.tree as Rect2).grow(radius).has_point(point) or distance_to_path(point,data.river)<WATER_RADIUS+radius
+ return not BOUNDS.grow(-radius).has_point(point) or MotherTree155.blocked(data.tree_solid,point,radius) or distance_to_path(point,data.river)<WATER_RADIUS+radius
 static func path_clear(data:Dictionary,path:PackedVector2Array,radius:float=18.)->bool:
  if path.is_empty():return false
  for i in range(1,path.size()):

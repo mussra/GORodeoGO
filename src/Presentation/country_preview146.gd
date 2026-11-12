@@ -22,14 +22,17 @@ var travel_target:Dictionary={}
 var travel_origin:Vector2
 var travel_ledger:Dictionary={}
 var curtain:SiestaCurtain147
+var tree_sprite155:Sprite2D
+var gauges154:Dictionary={}
+var stamina154:Dictionary={}
 var map_button:Button
 const GRASS=preload("res://art/world/alternative92/grass-cache.png")
 const TREE=preload("res://art/world/supplied/tree_of_life150.png")
 func _ready():
  ledger=initial_ledger149();seed=ledger.maps.water146.seed;data=CountryRoute146.plan(seed);visited_cells=ledger.maps.water146.explored.duplicate(true)
  texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
- var trunk:=Sprite2D.new();trunk.texture=TREE;trunk.centered=false;trunk.position=data.tree_art.position;trunk.scale=data.tree_art.size/Vector2(TREE.get_size());trunk.z_index=0;add_child(trunk)
- WorldPhysics.add_box(self,data.tree).collision_layer=128
+ var trunk:=Sprite2D.new();trunk.texture=TREE;trunk.centered=false;trunk.position=data.tree_art.position;trunk.scale=data.tree_art.size/Vector2(TREE.get_size());trunk.z_index=24;tree_sprite155=trunk;trunk.material=ShaderMaterial.new();trunk.material.shader=preload("res://art/world/mother_tree155.gdshader");add_child(trunk)
+ var solid:=StaticBody2D.new();solid.name="MotherTreeGround155";solid.collision_layer=128;var polygon:=CollisionPolygon2D.new();polygon.polygon=data.tree_solid;solid.add_child(polygon);add_child(solid)
  var river:PackedVector2Array=data.river
  for i in range(1,river.size()):
   var body:=StaticBody2D.new();body.collision_layer=128;body.position=(river[i-1]+river[i])/2.;body.rotation=(river[i]-river[i-1]).angle()
@@ -39,22 +42,28 @@ func _ready():
  for box in [Rect2(-100,-100,12700,100),Rect2(-100,14000,12700,100),Rect2(-100,0,100,14000),Rect2(12500,0,100,14000)]:WorldPhysics.add_box(self,box).collision_layer=128
  player=load("res://src/Presentation/world_player.gd").new();player.position=ledger.maps.water146.position;player.world_bounds=CountryRoute146.BOUNDS;add_child(player)
  camera=Camera2D.new();player.add_child(camera);camera.make_current()
- var layer:=CanvasLayer.new();add_child(layer)
- hud_canvas=Control.new();hud_canvas.size=Vector2(1280,720);layer.add_child(hud_canvas)
+ var layer:=CanvasLayer.new();layer.layer=20;add_child(layer)
+ hud_canvas=Control.new();hud_canvas.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud_canvas.size=Vector2(1280,720);layer.add_child(hud_canvas)
  var fit:Callable=func():
   var size_:Vector2=get_viewport().get_visible_rect().size;var k:float=minf(size_.x/1280.,size_.y/720.);hud_canvas.scale=Vector2.ONE*k;hud_canvas.position=(size_-Vector2(1280,720)*k)/2.
  get_viewport().size_changed.connect(fit);fit.call()
- var bar:=ColorRect.new();bar.color=Color("10252ded");bar.size=Vector2(1280,100);hud_canvas.add_child(bar)
+ var bar:=ColorRect.new();bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;bar.color=Color("10252ded");bar.size=Vector2(1280,100);hud_canvas.add_child(bar)
  var title:=Label.new();title.text=session_title149();title.position=Vector2(20,10);title.add_theme_font_size_override("font_size",24);bar.add_child(title)
  var back:=Button.new();back.text="Salir a Frontera";back.position=Vector2(1040,10);back.size=Vector2(220,60);QuestButtonStyle.apply(back);back.pressed.connect(request_return);bar.add_child(back)
  map_button=Button.new();map_button.text="Mapa local";map_button.position=Vector2(850,10);map_button.size=Vector2(180,60);QuestButtonStyle.apply(map_button);map_button.pressed.connect(show_map);bar.add_child(map_button)
  status=Label.new();status.position=Vector2(20,50);status.add_theme_font_size_override("font_size",21);bar.add_child(status)
+ gauges154=MountedStatus154.create(hud_canvas)
+ var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
+ stamina154=WorldStamina.new_state(HorseStats.read(horse).get("power",.65));MountedStatus154.abilities(player,gauges154,horse)
  var touch:CanvasLayer=load("res://src/Presentation/touch_controls.tscn").instantiate();add_child(touch);touch_controls=touch
  var joy:VirtualJoystick=touch.get_node("MoveJoystick");var aim:VirtualJoystick=touch.get_node("AimJoystick");aim_joystick=aim;player.lasso.set_aim_joystick(aim);player.dodge.set_move_joystick(joy);JoystickAppearance.apply(self)
  set_process(true);queue_redraw()
 func _process(delta:float):
  river_clock+=delta
+ if tree_sprite155!=null:tree_sprite155.material.set_shader_parameter("rider_uv",(player.position+Vector2(0,-35)-data.tree_art.position)/data.tree_art.size)
  if travelling or is_instance_valid(modal):return
+ MountedStatus154.abilities(player,gauges154,SaveData.horse_collection.find(SaveData.horse_collection.selected))
+ stamina154=MountedStatus154.stamina(player,gauges154,stamina154,delta,on_road154(player.position))
  var next:=CountryLedger146.record_position(ledger,player.position)
  if not next.is_empty():ledger=next
  CountryExploration148.reveal(visited_cells,player.position)
@@ -136,6 +145,21 @@ func start_siesta(id:String,already_locked:bool=false)->bool:
  curtain.queue_free();curtain=null;travelling=false;_unlock_player();return result.ok
 func _load_travel148()->bool:
  await get_tree().process_frame;await get_tree().process_frame;return true
+func landing155(requested:Vector2)->Vector2:
+ var terrain:Callable=func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos)
+ var result:=TravelLanding148.find(player,requested,terrain)
+ if result.is_finite() or not MotherTree155.blocked(data.tree_solid,requested,18.):return result
+ # A save from the previous, smaller footprint can lie inside a new root.
+ # Reposition only after an actual physics-safe arrival has been found.
+ var candidates:Array[Vector2]=[];var poly:PackedVector2Array=data.tree_solid
+ for i in poly.size():
+  var near:=Geometry2D.get_closest_point_to_segment(requested,poly[i],poly[(i+1)%poly.size()])
+  for j in 8:candidates.append(near+Vector2.RIGHT.rotated(j*TAU/8.)*48.)
+ candidates.sort_custom(func(a:Vector2,b:Vector2):return requested.distance_squared_to(a)<requested.distance_squared_to(b))
+ for candidate in candidates:
+  result=TravelLanding148.find(player,candidate,terrain)
+  if result.is_finite():return result
+ return Vector2(INF,INF)
 func _validate_travel148()->Vector2:
  return TravelLanding148.find(player,travel_target.pos,func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos))
 func _commit_travel148(pos:Vector2)->bool:
@@ -156,3 +180,9 @@ func initial_ledger149()->Dictionary:
 func session_title149()->String:return "País nuevo · maqueta sin guardado ni ritual"
 func persists149()->bool:return false
 func prepare_travel149()->bool:return true
+
+func on_road154(point:Vector2)->bool:
+ for path in [data.approach,data.bank]:
+  for i in range(1,path.size()):
+   if Geometry2D.get_closest_point_to_segment(point,path[i-1],path[i]).distance_to(point)<=45.:return true
+ return false

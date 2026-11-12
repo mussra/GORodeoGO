@@ -195,17 +195,7 @@ func _process(delta: float) -> void:
 	_tick_npcs()
 	_tick_lasso(delta)
 	_tick_rider_marker()
-	if _gauges.has("dodge"):
-		# Same rule as the levels (Ant 7-nov-2026 21:33 "Igual"): the dodge needs
-		# a trained horse; recomputed so switching horses at the board updates it.
-		var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
-		player.dodge_available = HorseTraining.knows(horse, "dodge")
-		player.dodge_recharge_seconds = 2.5 * HorseTraining.recovery(horse, "dodge")
-		_gauges["dodge"].visible=player.dodge_available
-		player.can_jump=HorseJump.capable(horse);player.jump_recovery_multiplier=HorseTraining.recovery(horse,"jump")
-		_gauges["jump"].visible=player.can_jump
-		_gauges["jump"].set_state(player.can_jump,1.0-player._jump_cooldown/maxf(.01,1.2*player.jump_recovery_multiplier))
-		_gauges["dodge"].set_state(player.dodge_available, 1.0 - player.dodge_cooldown / maxf(0.01, player.dodge_recharge_seconds))
+	MountedStatus154.abilities(player,_gauges,SaveData.horse_collection.find(SaveData.horse_collection.selected))
 	_tick_hoofbeats(delta)
 	_tick_stamina(delta)
 	if player.gait != _last_gait:
@@ -913,14 +903,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _tick_stamina(delta: float) -> void:
 	var before: Dictionary = _stamina
-	_stamina = WorldStamina.tick(_stamina, player.gait, player.velocity.length() > 12.0, delta, road_surface_contains94(player.global_position))
-	player.gait_cap = WorldStamina.cap_gait(_stamina, WorldGait.GALOPE)
+	_stamina = MountedStatus154.stamina(player,_gauges,_stamina,delta,road_surface_contains94(player.global_position))
 	if WorldStamina.just_tired(before, _stamina):
 		_toast(tr("WORLD_HORSE_TIRED"))
 		_hoof_player.stream = _pant
 		_hoof_player.pitch_scale = 1.0
 		_hoof_player.play()
-	_gauges["stamina"].set_state(true, WorldStamina.ratio(_stamina))
 
 func _refresh_missions() -> void:
 	var counts: Dictionary = WorldMissions.counts()
@@ -943,6 +931,7 @@ static func arrow_to(from: Vector2, to: Vector2) -> String:
 
 func _build_hud() -> void:
 	_hud = CanvasLayer.new()
+	_hud.layer=20
 	add_child(_hud)
 	var bar := Panel.new()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -963,20 +952,7 @@ func _build_hud() -> void:
 	_pigs_label.add_theme_font_size_override("font_size", 18)
 	_refresh_livestock104()
 	_hud.add_child(_pigs_label)
-	# clock-fill gauges (Ant 11:39/11:40): stamina + ability reminders, bottom
-	# right so they never cover the touch joystick
-	var horse: Dictionary = SaveData.horse_collection.find(SaveData.horse_collection.selected)
-	var abilities: Array = [["stamina", true], ["dodge", HorseTraining.knows(horse, "dodge")], ["jump", HorseJump.capable(horse)]]
-	for i in abilities.size():
-		var g := RadialGauge.new()
-		g.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		g.skill = abilities[i][0]
-		g.position = Vector2(1046 + i * 84, 636)
-		g.size = Vector2(76, 76)
-		g.set_state(abilities[i][1], 1.0)
-		g.visible=abilities[i][1]
-		_gauges[abilities[i][0]] = g
-		_hud.add_child(g)
+	_gauges=MountedStatus154.create(_hud)
 	var menu_button:=Button.new();menu_button.name="WorldNavigation";menu_button.text="Menú";QuestButtonStyle.apply(menu_button);menu_button.position=Vector2(1100,4);menu_button.size=Vector2(160,42);menu_button.pressed.connect(_open_navigation);_hud.add_child(menu_button)
 	_toasts=ToastStack.new()
 	_hud.add_child(_toasts)
@@ -1924,7 +1900,7 @@ func _start_country152(resume:bool=false)->bool:
 	cover.message.text="Cargando país de prueba…"
 	var load_scene:Callable=func()->bool:
 		_open_isolated_preview146(session);await get_tree().process_frame;await get_tree().process_frame;return true
-	var validate:Callable=func()->Vector2:return TravelLanding148.find(session.player,session.ledger.maps.water146.position,func(pos:Vector2)->bool:return CountryRoute146.blocked(session.data,pos))
+	var validate:Callable=func()->Vector2:return session.landing155(session.ledger.maps.water146.position)
 	var restore:Callable=func()->bool:
 		if session.is_inside_tree():session.return_requested.emit()
 		return true

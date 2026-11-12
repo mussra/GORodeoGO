@@ -7,6 +7,7 @@ var world:CountryPreview146
 var canvas:Control
 var map_area:Rect2=Rect2(300,100,500,500)
 var marker_points:Dictionary={}
+var tree_visible155:bool=false
 var touches:Dictionary={}
 var first_touch:Vector2
 var moved:bool=false
@@ -39,16 +40,22 @@ func draw_map():
     for j in count_:
      var p:Vector2=a.lerp(b,float(j)/count_);var q:Vector2=a.lerp(b,float(j+1)/count_)
      if rect.has_point((p+q)/2.):canvas.draw_line(point(p),point(q),entry[1],entry[2],true)
+ tree_visible155=world.ledger.maps.water146.visited.get("tree",false)
+ if tree_visible155:
+  var art:Rect2=world.data.tree_art
+  canvas.draw_texture_rect(CountryPreview146.TREE,Rect2(point(art.position),art.size/CountryRoute146.BOUNDS.size*map_area.size),false)
  for site in CountryExploration148.available(world.ledger,world.data):
   var pos:Vector2=point(site.pos);canvas.draw_circle(pos,11.,Color("071b24"));canvas.draw_circle(pos,8.,Color("f7d984"));var label_width:float=ThemeDB.fallback_font.get_string_size(site.name,HORIZONTAL_ALIGNMENT_LEFT,-1,18).x
   var offset:=Vector2(-label_width-15,-12) if pos.x>map_area.get_center().x else Vector2(15,-12)
   canvas.draw_string(ThemeDB.fallback_font,pos+offset,site.name,HORIZONTAL_ALIGNMENT_LEFT,-1,18,Color("fff2c5"))
  var rider:Vector2=point(world.player.position);canvas.draw_circle(rider,6.,Color("071b24"));canvas.draw_circle(rider,4.,Color("f4fcff"))
 func refresh_markers():
+ tree_visible155=world.ledger.maps.water146.visited.get("tree",false)
  marker_points.clear()
  for site in CountryExploration148.available(world.ledger,world.data):marker_points[site.id]=point(site.pos)
 func select_at(screen:Vector2):
  var local:Vector2=canvas.get_global_transform_with_canvas().affine_inverse()*screen
+ if world.ledger.maps.water146.visited.get("tree",false) and local.distance_to(point(world.data.roots))<30.:selected.emit("tree");return
  for id in marker_points:
   if local.distance_to(marker_points[id])<24.:selected.emit(id);return
 func _input(event:InputEvent):
