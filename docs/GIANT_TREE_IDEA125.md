@@ -13,3 +13,7 @@ Propuesta técnica:
 - Ganchos futuros: tree_id estable, región, zona de interacción accesible, señal de descubrimiento y estado de misión por ID. No inventar objetivo, premio o NPC hasta elegirlos. Puede alojar una pista de un primo o reunión, sin convertirlo automáticamente en fuente o paso obligatorio para unicornio.
 
 Pendiente: frecuencia deseada por hora/mapa, tamaño, estética de copa, interacción, nombre y misión. Prioridad posterior a pueblos y diseño de progresión.
+
+## Continuación de la idea
+
+El recorrido especial posterior será rastro→mapa nuevo con otro césped/camino→árbol gigantesco→río que desaparece en raíces→seguir río arriba→fuente. El árbol central de este recorrido ya no debe ser una tirada rara que pueda no salir: su existencia y la conexión fluvial son parte del diseño del nuevo mapa. La rareza original puede mantenerse para gigantes decorativos/encuentros de otros mapas, separada de este hito. Fuente, río y raíces se planifican juntos; no llamar a este árbol "Árbol de la vida" como nombre final sin confirmación. No se ha implementado ninguna de estas ideas.

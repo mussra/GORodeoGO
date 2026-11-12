@@ -37,13 +37,23 @@ El rumbo de la cuarta frase es un ejemplo. No activarlo hasta fijar una fuente r
 
 Pendiente Atlas: el usuario dijo "Ultra raro". Hoy las cinco siluetas de unicornio se muestran como Legendario (tier4); Ultra raro es tier3 de caballos normales. Elegir categoría o término antes de activar el diálogo; no se ha cambiado el filtro.
 
-## Fuente, emplazamiento propuesto y estela
+## Recorrido de descubrimiento, actualizado con la continuación
 
-Propuesta: una fuente estable de mapa en una región al este del núcleo, después de un paso de montaña, no una fuente por chunk. Preferir una banda de4-8chunks del inicio como punto de partida de diseño, validando camino y espacio libre. Distancia definitiva depende de la distribución de pueblos y duración buscada. ID y coordenada se guardan al crear esa versión del mapa, no se vuelven a sortear al recargar. En mapas existentes no insertarla dentro de objetivos/edificios o zonas ya exploradas sin una decisión de compatibilidad.
+Rastro de un unicornio misterioso → acceso a una zona/país nuevo, en mapa separado → explorar y encontrar árbol gigantesco → río que entra misteriosamente en sus raíces → remontar el río → fuente mágica.
 
-La estela es de un unicornio misterioso que habría pasado por allí, NO requiere poseer antes un unicornio. Así evita la paradoja de necesitar unicornio para conseguir el primero. Propuesta de activación: conocer la pista correspondiente y montar un Galaxy PURO maestro en la región de entrada. Aparecen tramos del rastro, no toda la línea del mapa ni el marcador exacto de la fuente. Las pistas y el diario permiten reencontrarlo si se pierde; no exigir recordar una conversación de hace horas.
+Esto sustituye la propuesta anterior de estela directa a la fuente y de fuente4-8chunks al este del núcleo. No fijar coordenadas en el mapa actual: primero elegir el acceso y diseñar el mapa de destino. El lugar de entrada sí puede estar al este u otro rumbo real, según pueblo y ruta. Los primos orientan a la zona, no dan coordenadas exactas de la fuente. La cuarta pista puede ser: "Mi primo vio un rastro hacia el paso del este. Más allá, hasta la hierba parece de otro país. Lo de la fuente... eso ya tendrás que preguntárselo al agua." El rumbo queda condicionado al emplazamiento definitivo.
 
-Seguir el rastro revela la ruta y puede acelerar al jinete, como propone el usuario. Intensidad, duración y gasto de energía por decidir. Empezaría con bonificación moderada de velocidad solo sobre la senda, fuera de captura/combate, sin saltarse puertas, montañas o requisitos. No gastar energía/moneda automáticamente ni usar un boost como requisito de llegada. La ruta debe seguir geometría transitable y recuperarse tras una salida de senda. El efecto debería dibujarse con líneas/partículas y recursos existentes, sin arte raster nuevo ni miles de nodos. La fuente permanece destino, no se mueve al final de la estela.
+La nueva zona tiene césped y camino de otro color y una entrada marcada en el mapa. El paso es una transición explícita, no continuidad falsa entre coordenadas. Guardar world_id/zone_id, semilla/versiones, posición de entrada/salida y progreso de cada mapa por separado. Volver restaura el lugar anterior, no mezcla chunks ni borra notas, pueblos, caballos o encargos. Mantener el mapa de origen V1/V2/V3. Definir si se permiten varios accesos o solo uno antes de implementarlo.
+
+La estela pertenece a un unicornio misterioso que habría pasado por allí, NO exige poseer previamente unicornio para conseguir el primero. Revela o acelera el camino hasta la entrada de la zona, no toda la ruta hasta la fuente. Propuesta de activación: pista correspondiente y Galaxy PURO maestro cerca del acceso. El usuario aún debe elegir si la zona puede explorarse antes con otro caballo y si solo el ritual está bloqueado por pureza/maestría. No imponer esa puerta de acceso por inferencia.
+
+La estela puede dar una bonificación moderada de velocidad sobre camino transitable, sin saltarse paredes, agua o requisitos. Potencia, energía y duración por decidir; no convertirla en obligación de gasto. Reencontrar la senda con notas del diario si se pierde, sin revelar de golpe todo el mapa.
+
+El árbol gigantesco es un hito de investigación en la nueva zona, no otra escala aleatoria de los árboles normales. Puede haber otros gigantes raros en el futuro, pero el árbol conectado a la fuente necesita ID y ubicación de misión estables. Su nombre no está confirmado. El río lleva agua desde la fuente al árbol y desaparece en las raíces. Se puede recorrer la orilla río arriba para llegar al nacimiento; no exige nadar antes de conseguir el unicornio salvo decisión explícita y ruta alternativa.
+
+La topología fuente→río→raíces debe generarse/validarse como una sola estructura. El río no puede subir lógicamente desde el árbol hacia otra cuenca por un sorteo independiente. Reservar corredores accesibles, evitar misiones imposibles al otro lado y validar regreso. No copiar un río por chunk ni una fuente por árbol. El marcador de entrada se ve al descubrirla; árbol y fuente solo después de explorarlos. Los primos y pistas del agua sostienen el descubrimiento sin marcador exacto inicial.
+
+En la fuente se valida el Galaxy PURO adulto maestro y se confirma su transformación; identidad y ascendencia deberían mantenerse. Sigue siendo propuesta pendiente en sus detalles, no código activo.
 
 ## Pendiente antes de implementar
 
