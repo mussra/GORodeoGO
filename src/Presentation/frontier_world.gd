@@ -150,14 +150,14 @@ func _ready() -> void:
 	# Keep the construction hidden until the original safety ring is ready.
 
 func _physics_process(delta:float)->void:
-	if _loading_world or is_instance_valid(_npc_dialog):return
+	if _loading_world or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	# One escape decision per physics step; idle updates skipped movement at low FPS.
 	_tick_taming(delta)
 	_tick_pigs(delta)
 	_tick_goats(delta)
 
 func _process(delta: float) -> void:
-	if is_instance_valid(_npc_dialog):return
+	if is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	_update_chunks()
 	_drain_chunk_builds()
 	if _loading_world:
