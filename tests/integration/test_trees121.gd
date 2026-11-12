@@ -4,13 +4,17 @@ func test_trunk_blocks_but_canopy_does_not_and_road_growth_is_safe():
  SaveData.horse_collection.seed_trial()
  var w=Node2D.new();w.y_sort_enabled=true;add_child_autofree(w)
  var d=Decor.new();d.configure121("tree",Vector2.ZERO,1.4,752026);w.add_child(d)
- var box=Decor.solid_box("tree",Vector2.ZERO,d.size_scale);WorldPhysics.add_box(w,box)
+ var box=Decor.solid_box("tree",Vector2.ZERO,d.size_scale);var trunk=WorldPhysics.add_box(w,box);trunk.set_meta("tree121",true)
  var actor=load("res://src/Presentation/world_player.gd").new();w.add_child(actor);actor.set_physics_process(false)
  await wait_physics_frames(2)
  actor.position=Vector2(0,box.end.y+60)
  assert_true(actor.test_move(actor.global_transform,Vector2(0,-120)))
  actor.position=Vector2(100,-60)
  assert_false(actor.test_move(actor.global_transform,Vector2(-180,0)),"Canopy is not a solid wall")
+ actor.position=box.get_center()
+ assert_true(Decor.clear_spawn121(actor),"Old save inside an enlarged tree recovers locally")
+ assert_lte(actor.position.distance_to(box.get_center()),144.)
+ assert_false(actor.test_move(actor.global_transform,Vector2.ZERO))
  var surface=WorldRoadSurface94.new(752026,true)
  for x in range(-400,401,40):
   for y in range(-400,401,40):

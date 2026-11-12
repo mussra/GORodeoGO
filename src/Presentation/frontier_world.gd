@@ -165,6 +165,7 @@ func _process(delta: float) -> void:
 	if _loading_world:
 		if not _build_queue.is_empty():return
 		WorldFence.clear_spawn(player)
+		DecorScript.clear_spawn121(player)
 		_loading_world=false
 		visible=true
 		if _returning_home:
@@ -448,6 +449,9 @@ func _advance_builder(b: Dictionary) -> void:
 			var box: Rect2 = DecorScript.solid_box(d["kind"], d["pos"], decor_scale)
 			if box.has_area():
 				(b["boxes"] as Array).append(box)
+				if d["kind"] in ["tree","pine","fruit_tree"]:
+					if not b.has("tree_boxes121"):b["tree_boxes121"]=[]
+					b["tree_boxes121"].append(box)
 			if todo.is_empty():
 				b["phase"] = 2
 		2:
@@ -538,7 +542,9 @@ func _activate_built(key: String) -> void:
 		elif e.get_script()==GoatScript:_prototype_goats.add_child(e)
 		else:add_child(e)
 	for box in b["boxes"]:
-		entities.append(Physics.add_box(self, box))
+		var body=Physics.add_box(self, box)
+		if box in b.get("tree_boxes121",[]):body.set_meta("tree121",true)
+		entities.append(body)
 	for occ in b["occluders"]:
 		register_occluder(key, occ)
 	var data: Dictionary = b["data"]

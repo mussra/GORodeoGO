@@ -75,7 +75,8 @@ func _add_decor(world: Node2D, kind: String, pos: Vector2) -> void:
 	if occ.has_area():world.register_occluder("zone_tree121_"+str(pos),occ)
 	var box: Rect2 = DecorScript.solid_box(kind, ZONE_POS + pos, decor.size_scale)
 	if box.has_area():
-		Physics.add_box(world, box)
+		var body=Physics.add_box(world, box)
+		if kind in ["tree","pine","fruit_tree"]:body.set_meta("tree121",true)
 
 func _add_house(world: Node2D, h: Dictionary) -> void:
 	var base: Vector2 = ZONE_POS + h["pos"]

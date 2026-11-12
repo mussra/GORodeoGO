@@ -150,7 +150,7 @@ void fragment(){
  if(!original_horse){
   vec3 c=coat_color.rgb;
   vec2 p=UV*vec2(800.,840.)+vec2(240.,0.);
-  bool mark=(pattern==1 && (distance(p,vec2(465.,550.))<45. || distance(p,vec2(850.,570.))<42.)) || (pattern==2 && fract(p.x/65.)<.35 && fract(p.y/70.)<.35) || (pattern==3 && p.x<520. && p.y>410.);
+  bool mark=(pattern==1 && (distance(p,vec2(465.,550.))<45. || distance(p,vec2(850.,570.))<42.)) || (pattern==2 && fract(p.x/65.)<.35 && fract(p.y/70.)<.35) || (pattern==3 && p.x<535.+sin(p.y*.045)*16. && p.y>540.+sin(p.x*.06)*22.);
   if(pattern==2)c=mix(c,spot_color.rgb,natural_spots(p*.12));
   else if(pattern>=5)c=mix(c,spot_color.rgb,genetic_pattern(p*.12,pattern));
   else if(pattern==4)c=mix(c,vec3(.96,.93,.85),texture(light_legs_mask,UV).r);

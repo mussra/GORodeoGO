@@ -60,3 +60,16 @@ func test_controlled_100_throws_slow_fast_and_predicted():
     else:predicted+=1
  print("BALANCE110 slow=",slow,"/100 fast_unled_mixed_headings=",fast,"/100 fast_perfect_prediction=",predicted,"/100")
  assert_gte(slow,90);assert_gt(fast,0);assert_lt(fast,slow);assert_gte(predicted,90)
+
+func test_giant_tree_cover_uses_same_bounds_and_marker_clears_canopy():
+ var pos=world.player.position
+ var cover=world.DecorScript.occluder_box("tree",pos+Vector2(0,30),3.)
+ world.register_occluder("giant121",cover)
+ world._tick_rider_marker()
+ assert_true(world._marker.visible)
+ assert_lt(world._marker.position.y,cover.position.y)
+ var horse=plant(0,Vector2(150,0));world.player.velocity=Vector2.RIGHT*70
+ for i in 60:world._tick_taming(.016)
+ assert_false(horse.state.alert110)
+ world.player.position=cover.end+Vector2(80,80);world._tick_rider_marker()
+ assert_false(world._marker.visible)

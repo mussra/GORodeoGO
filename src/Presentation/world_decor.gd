@@ -118,6 +118,24 @@ static func occluder_box(p_kind: String, pos: Vector2, sc: float) -> Rect2:
 			return Rect2(pos + Vector2(-18, -32) * sc, Vector2(36, 52) * sc)
 	return Rect2()
 
+## A save can stand inside a trunk enlarged by this cosmetic update. Recover
+## only overlap with a tagged tree, searching nearby clear feet, never a road teleport.
+static func clear_spawn121(actor:CharacterBody2D)->bool:
+	var shape=actor.get_node_or_null("CollisionShape2D")
+	if shape==null:return true
+	var q=PhysicsShapeQueryParameters2D.new();q.shape=shape.shape;q.transform=actor.global_transform;q.collision_mask=actor.collision_mask;q.exclude=[actor.get_rid()]
+	var space=actor.get_world_2d().direct_space_state
+	var hits=space.intersect_shape(q,16)
+	var in_tree:bool=false
+	for hit in hits:
+		if hit.collider.has_meta("tree121"):in_tree=true
+	if not in_tree:return true
+	for distance in range(12,145,12):
+		for i in 16:
+			var offset=Vector2.RIGHT.rotated(i*TAU/16)*distance;q.transform=actor.global_transform;q.transform.origin+=offset
+			if space.intersect_shape(q,1).is_empty():actor.global_position+=offset;return true
+	return false
+
 func _ready() -> void:
 	scale = Vector2.ONE * size_scale
 	queue_redraw()

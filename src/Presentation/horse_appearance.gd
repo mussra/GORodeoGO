@@ -134,6 +134,23 @@ static func eye_color_at(index:int,p:Vector2)->Color:
  for star in [Vector2(.25,.25),Vector2(.65,.38),Vector2(.42,.72),Vector2(.78,.75)]:
   if p.distance_to(star)<.022:return Color("f4f7ff")
  return color
+## Anatomical hind-leg masks shared by mounted/wild/idle/jump/drink/foal.
+## B is selected once at texture bake time, not guessed from canvas x/y.
+static var rear_masks122:Dictionary={}
+static func rear_mask122(path:String)->Image:
+ if rear_masks122.has(path):return rear_masks122[path]
+ var target:String=""
+ if path.begins_with("res://art/experimental/pixellab/"):target=path.replace("res://art/experimental/pixellab/","res://art/rear_stockings122/pixellab/")
+ elif path.begins_with("res://art/player/"):target=path.replace("res://art/player/","res://art/rear_stockings122/player/")
+ elif path.begins_with("res://art/experimental/drink_preview83/pose_"):target=path.replace("res://art/experimental/drink_preview83/","res://art/rear_stockings122/drink/")
+ elif path=="res://art/foal/base.png":target="res://art/rear_stockings122/foal/base.png"
+ var mask:Image=null
+ if not target.is_empty() and ResourceLoader.exists(target):
+  mask=load(target).get_image()
+  if mask.is_compressed():mask.decompress()
+ rear_masks122[path]=mask
+ return mask
+
 static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_override:Image=null,uv_override:Image=null,look:Dictionary={},pose_view:String="")->Texture2D:
  if t.get("finish","")=="original" and not t.has("emblem") and HorseCollection.legs_index(t)<0:return source
  var key:String=source.resource_path+str(t)+str(look)+pose_view+(":pixellab-v5" if mask_override!=null else "")
@@ -146,6 +163,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
  if mask.is_compressed():mask.decompress()
  var bob:int=0 if mask_override!=null else body_offset(image,anim,frame)
  var uv:Image=uv_override if mask_override!=null else pose_uv(anim,frame)
+ var rear:Image=rear_mask122(source.resource_path) if int(t.get("pattern",0))==3 else null
  var hat:Dictionary=protected_hat(anim,frame) if mask_override==null and anim in ["walk_diag_down","walk_diag_up"] else {}
  for y in range(image.get_height()):
   for x in range(image.get_width()):
@@ -180,12 +198,13 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
       if anim=="walk_diag_down" and uv==null:mark=(Vector2(px,py)-Vector2(32,51)).length()<7 or (Vector2(px,py)-Vector2(58,61)).length()<6
       else:mark=(Vector2(px,py)-Vector2(30,60)).length()<8 or (Vector2(px,py)-Vector2(58,68)).length()<6
      2:mark=natural_spot(Vector2(px,py)) if uv==null else false
-     3:mark=px<40 and py>48 and py<78
+     3:mark=false # semantic coverage below, never fixed screen rectangle
      4:mark=py>77
      5,6,7,8,9,10,11:mark=genetic_mark(Vector2(px,py),int(t.pattern))
     if anim=="foal" and int(t.pattern)==1:
      var dist:float=minf((Vector2(px,py)-Vector2(30,60)).length()-8.0,(Vector2(px,py)-Vector2(58,68)).length()-6.0)
      color=color.lerp(Color("f4edd8"),1.0-smoothstep(-.9,.9,dist))
+    elif int(t.pattern)==3 and rear!=null:color=color.lerp(HorsePatternMap.color(t),rear.get_pixel(x,y).r)
     elif int(t.pattern)==2 and uv!=null:color=color.lerp(HorsePatternMap.color(t),natural_spot_coverage(Vector2(px,py)))
     elif int(t.pattern) in [9,10,11]:color=color.lerp(HorsePatternMap.color(t),HorsePatternMap.coverage(Vector2(px,py),int(t.pattern)))
     elif mark:color=HorsePatternMap.color(t)

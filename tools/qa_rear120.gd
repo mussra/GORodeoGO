@@ -5,7 +5,6 @@ func text(value:String,pos:Vector2,size_:int):
 func tex(texture:Texture2D,pos:Vector2,size_:Vector2):
  var r=TextureRect.new();r.texture=texture;r.position=pos;r.size=size_;r.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;r.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;r.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST;canvas.add_child(r);return r
 func movement(kind:String,option:int,traits:Dictionary)->Texture2D:
- if option==0:return PixelLabTrial.pose_texture(kind,"side",0,traits)
  var plain=traits.duplicate(true);plain.pattern=0
  var base=PixelLabTrial.pose_texture(kind,"side",0,plain).get_image();if base.is_compressed():base.decompress()
  var source:Image=load("res://art/experimental/pixellab/%s/side/frame_00.png"%kind).get_image();if source.is_compressed():source.decompress()
@@ -15,7 +14,8 @@ func movement(kind:String,option:int,traits:Dictionary)->Texture2D:
    var m=mask.get_pixel(x,y);if m.r<.5 or m.g>m.r:continue
    var px:float=x;var py:float=y
    var coverage:float=0.
-   if option==1:coverage=(1.-smoothstep(41.,43.,px))*smoothstep(67.+sin(px*.8)*1.3,69.+sin(px*.8)*1.3,py)
+   if option==0:coverage=1. if px<40 and py>48 and py<78 else 0.
+   elif option==1:coverage=(1.-smoothstep(41.,43.,px))*smoothstep(67.+sin(px*.8)*1.3,69.+sin(px*.8)*1.3,py)
    elif option==2:coverage=(1.-smoothstep(38.+sin(py*.4)*2.,40.+sin(py*.4)*2.,px))*smoothstep(57.+sin(px*.65)*3.,59.+sin(px*.65)*3.,py)
    else:
     var d=Vector2((px-28.)/16.,(py-55.)/13.).length();coverage=1.-smoothstep(.82+sin(px*.65+py*.4)*.06,1.08,d)
@@ -36,8 +36,7 @@ func run():
   text(titles[option],Vector2(30,30),30);text(notes[option],Vector2(30,80),23)
   text("Retrato",Vector2(30,130),24);text("Montado · lado",Vector2(520,130),24);text("Salvaje · lado",Vector2(900,130),24)
   var r=TextureRect.new();HorsePortrait.apply(r,t,"blue");r.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;r.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;r.position=Vector2(20,155);r.size=Vector2(460,460);canvas.add_child(r)
-  if option>0:
-   var shader=Shader.new();shader.code=FileAccess.get_file_as_string("res://art/portraits/portrait.gdshader").replace("p.x<520. && p.y>410.",expressions[option]);r.material.shader=shader
+  var shader=Shader.new();shader.code=FileAccess.get_file_as_string("res://art/portraits/portrait.gdshader").replace("p.x<535.+sin(p.y*.045)*16. && p.y>540.+sin(p.x*.06)*22.","p.x<520. && p.y>410.").replace("p.x<520. && p.y>410.",expressions[option]);r.material.shader=shader
   tex(movement("rider",option,t),Vector2(505,200),Vector2(310,310));tex(movement("horse",option,t),Vector2(880,200),Vector2(310,310))
   tex(movement("rider",option,t),Vector2(615,510),Vector2(96,96));tex(movement("horse",option,t),Vector2(990,510),Vector2(96,96))
   text("Ampliado y tamaño original",Vector2(545,620),22)

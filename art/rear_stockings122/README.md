@@ -1,0 +1,7 @@
+# Trasera blanca B
+
+Masks derived from supplied source art, not new sprites. Chosen B uses high hind stockings with an irregular upper edge. Reference regions differ by rig and view; source optical flow carries the region through the gait, with reviewed per-frame lower-limb envelopes where thin crossing legs defeat optical flow. Every result is clipped to the reviewed red coat channel and source alpha. Front-facing views show forelegs rather than hind legs, so the pattern contributes nothing there. Rear leg masks do not whiten the rider, mane or background. In portrait, the chosen B reference boundary is retained in its existing horse-only shader layer.
+
+140 grayscale masks: 90 nominal movement poses, 47 original mounted idle/jump/stunned poses, two drinking/rest poses and one foal. Runtime caches these at genotype texture bake time, with no optical flow or scanning per game frame. The actual sprite art, source silhouettes, body size, collisions, genotype, catalog keys and inherited statistics are unchanged. Existing custom lower-leg overrides in portrait/foal/original mounted rendering remain after the pattern layer. This does not add a new custom-lower-leg system to the nominal PixelLab art.
+
+Regenerate with tools/build_rear_stockings122.py using Pillow, NumPy and OpenCV. Images inspected at all 90 nominal movement poses plus portrait, extra mounted poses, drinking/rest and foal. This is derived 2D masking, not a 3D surface reconstruction; hidden parts remain hidden.
