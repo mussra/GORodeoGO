@@ -24,7 +24,7 @@ var travel_ledger:Dictionary={}
 var curtain:SiestaCurtain147
 var map_button:Button
 const GRASS=preload("res://art/world/alternative92/grass-cache.png")
-const TREE=preload("res://art/world/cartoon/tree.png")
+const TREE=preload("res://art/world/supplied/tree_of_life150.png")
 func _ready():
  ledger=initial_ledger149();seed=ledger.maps.water146.seed;data=CountryRoute146.plan(seed);visited_cells=ledger.maps.water146.explored.duplicate(true)
  texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED

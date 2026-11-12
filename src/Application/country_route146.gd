@@ -10,13 +10,13 @@ static func plan(seed_:int)->Dictionary:
  var shift:=Vector2(rng.randi_range(-180,180),rng.randi_range(-100,100))
  var river:=PackedVector2Array([Vector2(10600,2400),Vector2(10500,4000),Vector2(10200,5800),Vector2(9900,7600),Vector2(9500,9300),Vector2(5800,10800)])
  var bank:=PackedVector2Array()
- for i in river.size():river[i]+=shift;bank.append(river[i]+Vector2(360,0))
+ for i in river.size():river[i]+=shift;bank.append(river[i]+Vector2(1600 if i==river.size()-1 else 360,0))
  var entry:=Vector2(1500,12500)+shift
  var approach:=PackedVector2Array([entry,Vector2(6160,12500)+shift,bank[-1]])
  var upstream:=PackedVector2Array()
  for i in range(bank.size()-1,-1,-1):upstream.append(bank[i])
  var tree:=Rect2(Vector2(4200,8800)+shift,Vector2(1700,2100))
- return {"id":ID,"version":1,"seed":seed_,"entry":entry,"tree":tree,"tree_art":Rect2(Vector2(1000,2800)+shift,Vector2(8000,8352)),"roots":river[-1],"source":river[0],"river":river,"bank":bank,"approach":approach,"upstream":upstream,"sites":{"entry":entry,"tree":bank[-1],"source":bank[0]}}
+ return {"id":ID,"version":1,"seed":seed_,"entry":entry,"tree":tree,"tree_art":Rect2(Vector2(1000,4300)+shift,Vector2(8000,6840)),"roots":river[-1],"source":river[0],"river":river,"bank":bank,"approach":approach,"upstream":upstream,"sites":{"entry":entry,"tree":bank[-1],"source":bank[0]}}
 static func distance_to_path(point:Vector2,path:PackedVector2Array)->float:
  var distance:float=INF
  for i in range(1,path.size()):distance=minf(distance,point.distance_to(Geometry2D.get_closest_point_to_segment(point,path[i-1],path[i])))

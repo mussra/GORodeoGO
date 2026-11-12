@@ -30,3 +30,7 @@ Mapa explorado por celdas locales, selector solo de visitas, casa hacia entrada 
 ## Checkpoint149: datos, aún no escena persistente
 
 LedgerV2 conserva exploración local y rechaza celdas fuera del país/datos malformados. V1 se migra solo en memoria conservando semilla, vínculos, notas, visitas y posición; no se inventa un camino explorado. Guardado desconocido sigue bloqueando reescrituras. Hooks de sesión preparados sin activar navegación, puerta ni guardado de la maqueta. Falta la escena/sesión con autosave/entrada/retorno y reanudación comprobadas antes de exponer modo persistente.
+
+##2.7.106: árbol suministrado150
+
+Arte original de Ant conservado en supplied/tree_of_life_original150.png, derivado transparente y recortado tree_of_life150.png. Original excluido de export Android. Arte gigante8000×6840; camino final desplazado fuera de raíces opacas sin mover río ni fuente. Nuevo test cubre transparencia/ruta/río y prueba física existente repite recorrido. Persistencia de sesión NO activada. Vídeo151muestra acabados con jinete sin mutaciones.
