@@ -60,6 +60,8 @@ var _last_gait: int = -1
 var _pigs_label: Label
 var _edit_mode: bool = false
 var _stamina: Dictionary = {}
+var _note_dialog106:MapNoteDialog106
+var _note_photo106:Image
 var _flower_nodes105:Dictionary={}
 var _flower_strip105:HBoxContainer
 var _flower_hud_signature105:int=-1
@@ -1010,10 +1012,14 @@ func _close_navigation()->void:
 
 func _toggle_map() -> void:
 	# Toggles collapsed <-> expanded; the small map never disappears (Ant 22:49).
+	if not _map_overlay.expanded and DisplayServer.get_name()!="headless":_note_photo106=get_viewport().get_texture().get_image()
 	_map_overlay.visible = true
 	_map_overlay.expanded = not _map_overlay.expanded
 	if _map_overlay.expanded:
-		_map_overlay.zoom=1.0;_map_overlay.pan=Vector2.ZERO
+		_map_overlay.pan=Vector2.ZERO;_map_overlay._layout();_map_overlay._set_zoom(1.0)
+	player.velocity=Vector2.ZERO;player.set_physics_process(not _map_overlay.expanded)
+	var controls:Node=get_node_or_null("TouchControls")
+	if controls!=null:controls.visible=not _map_overlay.expanded and not _edit_mode
 	_map_overlay.queue_redraw()
 
 func _open_board() -> void:
@@ -1069,6 +1075,17 @@ class DiscoveryMap extends Control:
 	var _pulse: float = 0.0
 	var _close_btn: Button = null
 	var _zoom_btns: Array = []
+	var _zoom_slider106:HSlider
+	var _note_help106:Label
+	var _zoom_label106:Label
+	var _cache_clock106:float=0.
+	var _draw_origin106:Vector2=Vector2.ZERO
+	var _touch_index106:int=-1
+	var _press_time106:float=0.
+	var _long_pressed106:bool=false
+	var _last_point106:Vector2
+	var _clip106:Control
+	var _background106:Control
 	# Retain terrain draw commands. Only the rider marker animates each frame.
 	# Hash values, not array identity: edits can be appended or changed in place.
 	var _terrain: Control
@@ -1085,30 +1102,47 @@ class DiscoveryMap extends Control:
 			_terrain.draw.connect(_draw_terrain)
 			add_child(_terrain)
 			move_child(_terrain, 0) # Terrain must stay below X and both zoom buttons.
+		if _background106==null:
+			_background106=Control.new();_background106.mouse_filter=Control.MOUSE_FILTER_IGNORE;_background106.show_behind_parent=true
+			_background106.draw.connect(func():
+				_background106.draw_style_box(MapAppearance.frame(),Rect2(Vector2.ZERO,size))
+				_background106.draw_rect(Rect2(Vector2(12,12),(size-Vector2(24,24)).max(Vector2.ZERO)),MapAppearance.floor_color("10252d")))
+			add_child(_background106);move_child(_background106,0);move_child(_terrain,1)
 		var signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, size, expanded, zoom, pan])
 		if _terrain_valid and signature == _terrain_signature:return
 		_terrain_signature = signature
 		_terrain_valid = true
 		var data = _cells()
-		var area = Rect2(Vector2(12, 12), size - Vector2(24, 24))
+		var area = Rect2(Vector2(12, 12), (size - Vector2(24, 104 if expanded else 24)).max(Vector2(32,32)))
 		var cols: int = data.maxs.x - data.mins.x + 1
 		var rows: int = data.maxs.y - data.mins.y + 1
-		var cell: float = minf(72.0, minf((area.size.x - 16.0) / cols, (area.size.y - 16.0) / rows)) * (zoom if expanded else 1.0)
+		var cell: float = maxf(.0001,minf(72.0, minf((area.size.x - 16.0) / cols, (area.size.y - 16.0) / rows))) * (zoom if expanded else 1.0)
 		var content = Vector2(cols, rows) * cell
-		var limit = ((content - area.size) / 2.0) + Vector2(48, 48)
+		var limit = ((content - area.size) / 2.0) + Vector2(12,12)
 		limit.x = maxf(limit.x, 0.0);limit.y = maxf(limit.y, 0.0)
 		pan = pan.clamp(-limit, limit)
 		_map_geometry = {"data":data,"area":area,"cell":cell,"origin":area.position + (area.size - content) / 2.0 + (pan if expanded else Vector2.ZERO)}
 		# Store the normalized pan so clamping does not trigger a second rebuild.
 		_terrain_signature = hash([SaveData.world_seed, SaveData.world_discovered, SaveData.world_edits, SaveData.world_pigs, SaveData.world_missions, SaveData.world_tamed, size, expanded, zoom, pan])
+		if _clip106==null:
+			_clip106=Control.new();_clip106.mouse_filter=Control.MOUSE_FILTER_IGNORE;_clip106.clip_contents=true;_clip106.show_behind_parent=true;add_child(_clip106)
+			_terrain.reparent(_clip106)
+		_clip106.position=area.position;_clip106.size=area.size
+		_draw_origin106=_map_geometry.origin;_terrain.position=Vector2.ZERO
 		terrain_rebuilds += 1
 		_terrain.queue_redraw()
+		_background106.queue_redraw()
 
 	func _layout() -> void:
 		var viewport: Vector2 = get_viewport_rect().size
 		size = Vector2(minf(700, viewport.x - 80), minf(410, viewport.y - 180)) if expanded else Vector2(180, 112)
 		position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x - size.x - 18, 84)
-		for i in _zoom_btns.size():_zoom_btns[i].position=Vector2(24+i*72,size.y-76)
+		if _zoom_btns.size()==2:
+			_zoom_btns[0].position=Vector2(24,size.y-76);_zoom_btns[1].position=Vector2(size.x-88,size.y-76)
+		if _zoom_slider106!=null:
+			_zoom_slider106.position=Vector2(105,size.y-64);_zoom_slider106.size=Vector2(size.x-210,40)
+			_note_help106.visible=expanded
+			_zoom_slider106.visible=expanded;_zoom_label106.position=Vector2(size.x/2.-40,size.y-98);_zoom_label106.visible=expanded
 
 	func _process(delta: float) -> void:
 		if visible:
@@ -1118,7 +1152,12 @@ class DiscoveryMap extends Control:
 				_close_btn.visible = expanded
 			for b in _zoom_btns:
 				b.visible = expanded
-			_ensure_terrain()
+			_cache_clock106+=delta
+			if not _terrain_valid or (not _dragging and _cache_clock106>.3):
+				_cache_clock106=0.;_ensure_terrain()
+			if _dragging and not _long_pressed106 and expanded and Time.get_ticks_msec()/1000.-_press_time106>.6 and _last_point106.distance_to(_drag_from)<12.:
+				_long_pressed106=true
+				world._open_map_note106(_map_point106(_drag_from))
 			queue_redraw()
 
 	func _ready() -> void:
@@ -1141,42 +1180,71 @@ class DiscoveryMap extends Control:
 		var minus := Button.new()
 		minus.text = "-"
 		minus.position = Vector2(24, size.y - 84)
-		minus.size = Vector2(56, 56)
+		minus.size = Vector2(64, 56)
+		QuestButtonStyle.apply(minus);minus.add_theme_font_size_override("font_size",34)
 		minus.pressed.connect(func(): _set_zoom(zoom / 1.4))
 		add_child(minus)
 		_zoom_btns.append(minus)
 		var plus := Button.new()
 		plus.text = "+"
 		plus.position = Vector2(96, size.y - 84)
-		plus.size = Vector2(56, 56)
+		plus.size = Vector2(64, 56)
+		QuestButtonStyle.apply(plus);plus.add_theme_font_size_override("font_size",34)
 		plus.pressed.connect(func(): _set_zoom(zoom * 1.4))
 		add_child(plus)
 		_zoom_btns.append(plus)
+		_zoom_slider106=HSlider.new();_zoom_slider106.min_value=.5;_zoom_slider106.max_value=32.;_zoom_slider106.step=.05;_zoom_slider106.value=zoom;_zoom_slider106.scrollable=false
+		var track=StyleBoxFlat.new();track.bg_color=Color("876739");track.set_corner_radius_all(6);track.content_margin_top=6.;track.content_margin_bottom=6.;_zoom_slider106.add_theme_stylebox_override("slider",track)
+		var thumb_image:Image=Image.create(30,30,false,Image.FORMAT_RGBA8)
+		for x in 30:
+			for y in 30:
+				if Vector2(x-15,y-15).length()<14.:thumb_image.set_pixel(x,y,Color("ffdf8c"))
+		var thumb:ImageTexture=ImageTexture.create_from_image(thumb_image);_zoom_slider106.add_theme_icon_override("grabber",thumb);_zoom_slider106.add_theme_icon_override("grabber_highlight",thumb)
+		_zoom_slider106.value_changed.connect(_set_zoom);add_child(_zoom_slider106)
+		_zoom_label106=Label.new();_zoom_label106.add_theme_font_size_override("font_size",20);add_child(_zoom_label106)
+		_note_help106=Label.new();_note_help106.text="Mantén pulsado para crear o editar una nota";_note_help106.position=Vector2(20,16);_note_help106.add_theme_font_size_override("font_size",17);_note_help106.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_note_help106)
+		_set_zoom(zoom)
 
 	func _set_zoom(z: float) -> void:
-		zoom = clampf(z, 0.5, 3.0)
-		queue_redraw()
+		zoom = clampf(z, 0.5, 32.0)
+		if _zoom_slider106!=null:_zoom_slider106.set_value_no_signal(zoom);_zoom_label106.text="%.1fx"%zoom
+		_ensure_terrain();queue_redraw()
 
+	func _map_point106(point:Vector2)->Vector2:
+		_ensure_terrain()
+		return ((point-_map_geometry.origin)/_map_geometry.cell+Vector2(_map_geometry.data.mins))*WorldMap.CHUNK_SIZE
+	func _begin_drag106(point:Vector2)->void:
+		_dragging=true;_drag_from=point;_last_point106=point;_pan_from=pan;_press_time106=Time.get_ticks_msec()/1000.;_long_pressed106=false
+	func _drag106(point:Vector2)->void:
+		_last_point106=point
+		if not expanded or _long_pressed106:return
+		var data:Dictionary=_map_geometry.data;var content:Vector2=Vector2(data.maxs-data.mins+Vector2i.ONE)*_map_geometry.cell
+		var limit:Vector2=((content-_map_geometry.area.size)*.5+Vector2.ONE*12.).max(Vector2.ZERO)
+		pan=(_pan_from+point-_drag_from).clamp(-limit,limit)
+		_map_geometry.origin=_map_geometry.area.position+(_map_geometry.area.size-content)*.5+pan
+		_terrain.position=_map_geometry.origin-_draw_origin106
+		if _terrain.position.length()>250.:_ensure_terrain()
+		queue_redraw()
+	func _end_drag106(point:Vector2)->void:
+		if not _dragging:return
+		if not _long_pressed106 and point.distance_to(_drag_from)<12.:
+			if not expanded:world._toggle_map()
+		_dragging=false;_ensure_terrain()
 	func _gui_input(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
-				_dragging = true
-				_drag_from = event.position
-				_pan_from = pan
-			else:
-				if _dragging and (event.position - _drag_from).length() < 12.0:
-					if expanded:
-						world._toggle_map()
-					else:
-						expanded = true
-				_dragging = false
-		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
-			_set_zoom(zoom * 1.15)
-		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
-			_set_zoom(zoom / 1.15)
-		elif event is InputEventMouseMotion and _dragging and expanded:
-			pan = _pan_from + (event.position - _drag_from)
-			queue_redraw()
+		if event is InputEventScreenTouch:
+			if event.pressed and _touch_index106<0:_touch_index106=event.index;_begin_drag106(event.position)
+			elif not event.pressed and event.index==_touch_index106:_end_drag106(event.position);_touch_index106=-1
+			accept_event()
+		elif event is InputEventScreenDrag and event.index==_touch_index106:
+			_drag106(event.position);accept_event()
+		elif event is InputEventMouse and _touch_index106<0 and event.device!=InputEvent.DEVICE_ID_EMULATION:
+			if event is InputEventMouseButton:
+				if event.button_index==MOUSE_BUTTON_LEFT:
+					if event.pressed:_begin_drag106(event.position)
+					else:_end_drag106(event.position)
+				elif event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_UP:_set_zoom(zoom*1.15)
+				elif event.pressed and event.button_index==MOUSE_BUTTON_WHEEL_DOWN:_set_zoom(zoom/1.15)
+			elif event is InputEventMouseMotion and _dragging:_drag106(event.position)
 
 	func _cells() -> Dictionary:
 		var out: Dictionary = {"cells": [], "mins": Vector2i.ZERO, "maxs": Vector2i.ZERO}
@@ -1203,18 +1271,28 @@ class DiscoveryMap extends Control:
 		return origin + (pos / WorldMap.CHUNK_SIZE - Vector2(mins)) * cell
 
 	func _draw_terrain() -> void:
-		_terrain.draw_style_box(MapAppearance.frame(), Rect2(Vector2.ZERO, size))
+
 		var area: Rect2 = _map_geometry.area
+		_terrain.draw_set_transform(-area.position)
 		if area.size.x <= 0.0 or area.size.y <= 0.0:return
-		_terrain.draw_rect(area, MapAppearance.floor_color("10252d"), true)
+
 		var data: Dictionary = _map_geometry.data
 		if (data.cells as Array).is_empty():return
 		var mins: Vector2i = data.mins
 		var cell: float = _map_geometry.cell
 		var origin: Vector2 = _map_geometry.origin
 		var font: Font = get_theme_default_font()
+		var lod_buckets106:Dictionary={}
 		for c in data.cells:
 			var r: Rect2 = _chunk_rect(c, mins, cell, origin)
+			if not Rect2(Vector2.ZERO,size).grow(300.).intersects(r):continue
+			if cell<8.:
+				var bucket:Vector2i=Vector2i((r.position/3.).floor())
+				if not lod_buckets106.has(bucket):lod_buckets106[bucket]=true;_terrain.draw_rect(Rect2(Vector2(bucket)*3.,Vector2.ONE*maxf(3.,cell)),Color("3f7a45"))
+				if SaveData.world_generator_version>=3:
+					for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
+						var box:Rect2=ridge.box;_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),Vector2(maxf(1.,box.size.x/1024.*cell),maxf(1.,box.size.y/1024.*cell))),Color("777384"))
+				continue
 			# cartoon ground tile with a soft rim
 			_terrain.draw_rect(r.grow(1.0), Color.TRANSPARENT, true)
 			_terrain.draw_rect(r, MapAppearance.terrain_over_base("3f7a45"), true)
@@ -1231,7 +1309,7 @@ class DiscoveryMap extends Control:
 				_terrain.draw_circle(pc, maxf(3.0, cell * 0.07), col)
 			_mission_mark(c, r, font, cell)
 	func _draw() -> void:
-		_ensure_terrain()
+		if not _terrain_valid:_ensure_terrain()
 		if (_map_geometry.data.cells as Array).is_empty():return
 		var mins: Vector2i = _map_geometry.data.mins
 		var cell: float = _map_geometry.cell
@@ -1239,6 +1317,11 @@ class DiscoveryMap extends Control:
 		# player marker (Ant 7-nov-2026: "ver claramente donde esta mi vaquero"):
 		# pulsing ring, high-contrast dot and facing arrow
 		var ppos: Vector2 = _to_map(world.player.position, mins, cell, origin)
+		for rows in SaveData.world_notes106.values():
+			for note in rows:
+				var point:Vector2=_to_map(note.pos,mins,cell,origin)
+				if Rect2(Vector2(12,12),(size-Vector2(24,100 if expanded else 24)).max(Vector2.ZERO)).has_point(point):
+					draw_circle(point,8.,Color("f2bc51"));draw_circle(point,3.,Color("413126"))
 		for flower in world._flower_nodes105.values():
 			var point:Vector2=_to_map(flower.position,mins,cell,origin)
 			if Rect2(Vector2.ZERO,size).has_point(point):
@@ -1319,13 +1402,13 @@ class DiscoveryMap extends Control:
 		var pos: Vector2 = r.position + Vector2(r.size.x - cell * 0.34, r.size.y - cell * 0.1)
 		if SaveData.world_tamed.has(mission_id) or state == "done":
 			_terrain.draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("b3f6df"))
-			_terrain.draw_string(font, pos - Vector2(cell * 0.22, cell * 0.14), "✓", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+			_terrain.draw_string(font, pos - Vector2(cell * 0.22, cell * 0.14), "✓", HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(1,int(cell * 0.34)), Color("1d2a26"))
 		elif state == "encargo":
 			_terrain.draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("f2d987"))
-			_terrain.draw_string(font, pos - Vector2(cell * 0.17, cell * 0.14), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+			_terrain.draw_string(font, pos - Vector2(cell * 0.17, cell * 0.14), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(1,int(cell * 0.34)), Color("1d2a26"))
 		elif state == "offered":
 			_terrain.draw_circle(pos - Vector2(cell * 0.12, cell * 0.24), cell * 0.14, Color("ffffff"))
-			_terrain.draw_string(font, pos - Vector2(cell * 0.2, cell * 0.14), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, int(cell * 0.34), Color("1d2a26"))
+			_terrain.draw_string(font, pos - Vector2(cell * 0.2, cell * 0.14), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, maxi(1,int(cell * 0.34)), Color("1d2a26"))
 
 func _exit_tree()->void:
 	if is_instance_valid(_navigation):get_tree().paused=_navigation_was_paused
@@ -1504,3 +1587,47 @@ func _toast_top105()->float:
 	var top:float=216. if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.
 	if is_instance_valid(_quest_panel) and _quest_panel.visible:top=maxf(top,_quest_panel.position.y+_quest_panel.size.y+12.)
 	return top
+
+func _open_map_note106(pos:Vector2)->void:
+	if is_instance_valid(_note_dialog106):return
+	var nearest:Dictionary=WorldNotes106.nearest(SaveData.world_notes106,pos,20.*1024./maxf(.01,_map_overlay._map_geometry.cell))
+	var horse_id:String="";var horse_text:String="";var horse_pos:Vector2=pos
+	var near_distance:float=350.
+	for horse in _herd_horses.values():
+		if not is_instance_valid(horse) or horse.is_queued_for_deletion():continue
+		var d:float=horse.position.distance_to(pos)
+		if d<near_distance:
+			near_distance=d;horse_id=str(horse.herd.get("member_id",""));horse_pos=horse.position
+			var traits:Dictionary=horse.herd.get("traits",{})
+			horse_text="Caballo "+HorseCollection.COATS[int(traits.get("coat",0))].to_lower()+" · crin "+HorseCollection.MANES[int(traits.get("mane",0))].to_lower()
+	var note:Dictionary=nearest.duplicate(true)
+	if note.is_empty():note={"id":"note_%d_%d"%[Time.get_unix_time_from_system(),Time.get_ticks_usec()],"pos":horse_pos,"text":horse_text,"icon":"horse" if not horse_id.is_empty() else "pin","horse":horse_id,"photo":""}
+	_map_overlay._dragging=false
+	player.velocity=Vector2.ZERO;player.set_physics_process(false)
+	_note_dialog106=MapNoteDialog106.new();_note_dialog106.setup(nearest,horse_text);_hud.add_child(_note_dialog106)
+	_note_dialog106.closed.connect(_close_note106)
+	_note_dialog106.saved.connect(func(text:String,photo:bool):
+		note.text=text
+		var new_path:String=""
+		if photo and _note_photo106!=null:
+			var directory:String=save_photo_dir106()
+			DirAccess.make_dir_recursive_absolute(directory)
+			new_path=directory+"/"+note.id+"_"+str(Time.get_ticks_usec())+".png"
+			if _note_photo106.save_png(new_path)!=OK:_toast("No se pudo guardar la foto");return
+			note.photo=new_path
+		if not SaveData.store_note106(note):
+			if not new_path.is_empty():DirAccess.remove_absolute(new_path)
+			_toast(tr("WORLD_SAVE_FAILED104"));return
+		var previous_photo:String=str(nearest.get("photo",""))
+		if not new_path.is_empty() and previous_photo.begins_with(save_photo_dir106()+"/"):DirAccess.remove_absolute(previous_photo)
+		_toast("Nota guardada · mantén pulsado sobre ella para editar o eliminar")
+		_close_note106())
+	_note_dialog106.deleted.connect(func():
+		if not SaveData.delete_note106(str(note.id)):_toast(tr("WORLD_SAVE_FAILED104"));return
+		var photo:String=str(note.get("photo",""))
+		if photo.begins_with(save_photo_dir106()+"/"):DirAccess.remove_absolute(photo)
+		_close_note106())
+func save_photo_dir106()->String:return "user://map-photos/"+str(hash(SaveData.save_path))
+func _close_note106()->void:
+	if is_instance_valid(_note_dialog106):_note_dialog106.queue_free()
+	_note_dialog106=null;player.set_physics_process(not _map_overlay.expanded)

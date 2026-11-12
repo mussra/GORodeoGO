@@ -41,6 +41,8 @@ var world_position: Vector2 = Vector2(0, 160)
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
 var world_pigs: Array[String] = []  # captured pig-pen ids ("pig_cx_cy")
+var world_notes106:Dictionary={} # region -> compact annotation rows, photo bytes separate
+var world_notes_revision106:int=0
 var world_pig_captures:Array[String]=[] # individual IDs, new captures only
 var world_pigs_sold:int=0
 var world_goat_captures:Array[String]=[]
@@ -86,6 +88,7 @@ func save_progress() -> bool:
 	config.set_value("world", "quests", world_quests)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
+	config.set_value("world","notes106",world_notes106)
 	config.set_value("world","pig_captures",world_pig_captures)
 	config.set_value("world","pigs_sold",world_pigs_sold)
 	config.set_value("world","goat_captures",world_goat_captures)
@@ -125,6 +128,7 @@ func load_progress() -> void:
 	world_quests.clear()
 	world_missions.clear()
 	world_pigs.clear()
+	world_notes106.clear();world_notes_revision106+=1
 	world_pig_captures.clear();world_pigs_sold=0;world_goat_captures.clear()
 	world_edits.clear()
 	var config := ConfigFile.new()
@@ -170,6 +174,7 @@ func load_progress() -> void:
 		if raw is Array or raw is PackedStringArray:
 			for item in raw:
 				if typeof(item)==TYPE_STRING and not pair[1].has(item):pair[1].append(item)
+	world_notes106=WorldNotes106.clean(config.get_value("world","notes106",{}));world_notes_revision106+=1
 	world_pig_captures=WorldLivestock104.valid_ids(config.get_value("world","pig_captures",[]))
 	world_goat_captures=WorldLivestock104.valid_ids(config.get_value("world","goat_captures",[]))
 	var sold:Variant=config.get_value("world","pigs_sold",0)
@@ -493,3 +498,25 @@ func record_goat104(id:String)->bool:
 	world_goat_captures.append(id);NpcQuests.record(world_quests,"capture_animal","goat",id)
 	if save_progress():return true
 	world_goat_captures.erase(id);world_quests=before;return false
+
+func store_note106(note:Dictionary)->bool:
+	var before:Dictionary=world_notes106.duplicate(true)
+	for rows in world_notes106.values():
+		for i in range(rows.size()-1,-1,-1):
+			if rows[i].id==note.id:rows.remove_at(i)
+	var region:String=WorldNotes106.region_key(note.pos)
+	if not world_notes106.has(region):world_notes106[region]=[]
+	world_notes106[region].append(note)
+	world_notes106=WorldNotes106.clean(world_notes106)
+	if save_progress():world_notes_revision106+=1;return true
+	world_notes106=before;return false
+func delete_note106(id:String)->bool:
+	var before:Dictionary=world_notes106.duplicate(true)
+	var found:bool=false
+	for rows in world_notes106.values():
+		for i in range(rows.size()-1,-1,-1):
+			if rows[i].id==id:rows.remove_at(i);found=true
+	if not found:return false
+	world_notes106=WorldNotes106.clean(world_notes106)
+	if save_progress():world_notes_revision106+=1;return true
+	world_notes106=before;return false

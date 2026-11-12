@@ -5,6 +5,7 @@ const CELL:float=80.
 const ORIGIN:Vector2=Vector2(80,150)
 const REGION_CELLS:int=64
 const RIDGE_BAND:float=2560.
+static var ridge_cache106:Dictionary={}
 static func plan(seed:int)->Dictionary:
  var rng=RandomNumberGenerator.new();rng.seed=hash("terrain103-core-%d"%seed)
  var west:int=rng.randi_range(2,4);var east:int=rng.randi_range(8,10);var florist:int=rng.randi_range(13,15);var ranch:int=rng.randi_range(6,7)
@@ -41,13 +42,18 @@ static func graph_for_chunk(seed:int,c:Vector2i)->Dictionary:
   if bounds.has_point(ModularWorldLayout93.world(cell)):graph[cell]=all[cell]
  return graph
 static func ridge(seed:int,region:int,band:int=0)->Dictionary:
+ var key:String=str([seed,region,band])
+ if ridge_cache106.has(key):return ridge_cache106[key]
+ if ridge_cache106.size()>512:ridge_cache106.clear()
  var rng=RandomNumberGenerator.new();rng.seed=hash("terrain103-ridge-%d-%d-%d"%[seed,region,band])
  var column:int=region*REGION_CELLS+(20 if region==0 else rng.randi_range(36,52))
  var x:float=ORIGIN.x+column*CELL
  var width:float=rng.randi_range(100,150)
  var top:float=band*RIDGE_BAND-rng.randi_range(600,1200);var bottom:float=band*RIDGE_BAND+rng.randi_range(1150,1750)
  var gap_y:float=band*RIDGE_BAND+ORIGIN.y+4*CELL
- return {"id":"ridge_%d_%d"%[region,band],"x":x,"port":Vector2(x,gap_y),"clearance":160.,"boxes":[Rect2(x-width/2.,top,width,gap_y-80.-top),Rect2(x-width/2.,gap_y+80.,width,bottom-gap_y-80.)]}
+ var result:Dictionary={"id":"ridge_%d_%d"%[region,band],"x":x,"port":Vector2(x,gap_y),"clearance":160.,"boxes":[Rect2(x-width/2.,top,width,gap_y-80.-top),Rect2(x-width/2.,gap_y+80.,width,bottom-gap_y-80.)]}
+ ridge_cache106[key]=result
+ return result
 static func ridges_for_chunk(seed:int,c:Vector2i)->Array:
  var out:Array=[];var bounds:Rect2=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.)
  var region:int=floori((bounds.position.x-ORIGIN.x)/(REGION_CELLS*CELL))
