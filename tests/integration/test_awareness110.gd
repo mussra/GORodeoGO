@@ -17,7 +17,7 @@ func test_alert_pause_and_slow_capture_still_possible():
  for i in 60:world._tick_taming(.016);horse._physics_process(.016)
  assert_true(horse.state.alert110);assert_eq(horse.state.spook,0.);assert_lt(horse.position.distance_to(horse.home),1.)
  assert_eq(world.player.lasso.resolve_capture(horse.global_position),horse);assert_true(horse.roped)
-func test_group_flees_on_actual_throw_while_aimed_target_is_not_automatically_lost():
+func test_group_waits_for_landing_then_flees_except_caught_horse():
  var target=plant(0,Vector2(180,0));var friends:Array=[]
  for i in range(1,4):friends.append(plant(i,Vector2(180+i*50,70+i*25)))
  var ids:Array=[]
@@ -25,9 +25,10 @@ func test_group_flees_on_actual_throw_while_aimed_target_is_not_automatically_lo
  world.player.lasso.throw_guard=func():return true
  world.player.lasso._charge_distance=180.;world.player.lasso.aim_direction=Vector2.RIGHT;world.player.lasso._release_throw()
  await get_tree().process_frame;await get_tree().process_frame
- for horse in friends:assert_gt(float(horse.get_meta("panic_left",0.)),0.)
+ for horse in friends:assert_eq(float(horse.get_meta("panic_left",0.)),0.,"no panic in flight")
  assert_eq(float(target.get_meta("panic_left",0.)),0.,"aimed target excluded during flight")
  await get_tree().create_timer(.4).timeout;assert_true(target.roped,"slow accurate throw remains valid")
+ for horse in friends:assert_gt(float(horse.get_meta("panic_left",0.)),0.,"panic after impact")
  for tick in 260:
   world._tick_taming(.016)
   for horse in friends:horse._physics_process(.016)
@@ -73,3 +74,44 @@ func test_giant_tree_cover_uses_same_bounds_and_marker_clears_canopy():
  assert_false(horse.state.alert110)
  world.player.position=cover.end+Vector2(80,80);world._tick_rider_marker()
  assert_false(world._marker.visible)
+
+func test_missed_landing_uses_distance_not_chunk_and_includes_exact_radius():
+ var impact=world.player.position+Vector2(200,0)
+ var near=plant(0,Vector2(200,80));var edge=plant(1,Vector2(500,0));var far=plant(2,Vector2(500.01,0))
+ near.set_meta("c",Vector2i(98,98)) # Different chunk but near impact.
+ world.player.lasso.landing_resolved.emit(impact,null)
+ assert_eq(float(near.get_meta("panic_left",0.)),6.)
+ assert_eq(float(edge.get_meta("panic_left",0.)),6.)
+ assert_eq(float(far.get_meta("panic_left",0.)),0.,"same chunk outside radius remains calm")
+func test_far_miss_and_cancelled_flight_do_not_panic():
+ var horse=plant(0,Vector2(180,0))
+ world.player.lasso.landing_resolved.emit(world.player.position+Vector2(-600,0),null)
+ assert_eq(float(horse.get_meta("panic_left",0.)),0.)
+ world.player.lasso.throw_guard=func():return true
+ world.player.lasso._charge_distance=180.;world.player.lasso.aim_direction=Vector2.RIGHT;world.player.lasso._release_throw()
+ await get_tree().process_frame
+ world.player.lasso.cancel_all_actions()
+ await get_tree().create_timer(.4).timeout
+ assert_eq(float(horse.get_meta("panic_left",0.)),0.,"cancelled flight has no impact")
+func test_real_missed_throw_waits_then_panics_without_a_captured_target():
+ var horse=plant(0,Vector2(180,100)) # Outside capture58, inside panic300.
+ world.player.lasso.throw_guard=func():return true
+ world.player.lasso._charge_distance=180.;world.player.lasso.aim_direction=Vector2.RIGHT;world.player.lasso._release_throw()
+ await get_tree().create_timer(.15).timeout
+ assert_false(horse.roped);assert_eq(float(horse.get_meta("panic_left",0.)),0.)
+ await get_tree().create_timer(.25).timeout
+ assert_false(horse.roped);assert_eq(float(horse.get_meta("panic_left",0.)),6.)
+func test_affinity_leader_is_not_exempt_from_ground_impact():
+ var horse=plant(0,Vector2(180,0));var ridden=SaveData.horse_collection.find(SaveData.horse_collection.selected)
+ var traits=ridden.traits.duplicate()
+ SaveData.horse_collection.horses.append_array([
+  {"id":"ggp128","traits":traits,"parents":[]},
+  {"id":"gp128","traits":traits,"parents":["ggp128"]},
+  {"id":"p128a","traits":traits,"parents":["gp128"]},
+  {"id":"p128b","traits":traits,"parents":["gp128"]}])
+ ridden.parents=["p128a","p128b"];horse.herd.traits=traits
+ assert_true(world._affinity(horse).leader,"fixture is genuinely PackLeader")
+ world.player.lasso.landing_resolved.emit(horse.position,null)
+ assert_eq(float(horse.get_meta("panic_left",0.)),6.)
+ var before=horse.position;world._tick_taming(.016);horse._physics_process(.016)
+ assert_gt(horse.position.distance_to(before),0.,"impact panic overrides calm-affinity movement")

@@ -282,7 +282,6 @@ func _on_lasso_prey_captured(prey: Node2D) -> void:
 	if prey.get_script()==PigScript and not NpcQuests.can_capture(SaveData.world_quests,"pig"):return
 	if prey.get_script()==GoatScript and not NpcQuests.can_capture(SaveData.world_quests,"goat"):return
 	_lasso_horse = prey
-	if "herd" in prey or prey.get_script()==GoatScript:_panic_neighbors110(prey,prey.position)
 	prey.roped = true
 	prey.rider = player
 	if prey.get_script()==PigScript:prey.state=WorldPigs.begin_rope(prey.state)
@@ -586,24 +585,15 @@ func _exit_distance110()->float:
 	var camera:Camera2D=get_viewport().get_camera_2d()
 	var zoom_:Vector2=camera.zoom if camera!=null else Vector2.ONE
 	return (get_viewport_rect().size/zoom_).length()*.5+100.
-func _flight_panic110()->void:
-	var rope=player.lasso._flight_line
-	if not is_instance_valid(rope):return
-	var selected:Node2D=null;var nearest:float=58.
-	for horse in _wild_candidates112():
-		if not is_instance_valid(horse) or horse.roped:continue
-		var distance:float=horse.position.distance_to(rope.landing)
-		if distance<nearest:selected=horse;nearest=distance
-	if selected!=null:_panic_neighbors110(selected,rope.landing)
 func _wild_candidates112()->Array:
 	var out:Array=_herd_horses.values()
 	if is_instance_valid(_prototype_goats):out.append_array(_prototype_goats.get_children())
 	return out
-func _panic_neighbors110(selected:Node2D,point:Vector2)->void:
+## Only the resolved ground impact causes lasso panic. No prediction during flight.
+func _landing_panic128(point:Vector2,captured:Node2D)->void:
 	for horse in _wild_candidates112():
-		if not is_instance_valid(horse) or horse==selected or horse.roped:continue
-		if "herd" in horse and _affinity(horse).leader:continue
-		if horse.position.distance_to(point)>WorldAwareness110.NEIGHBOR_RANGE and horse.get_meta("c",Vector2i(-1,-1))!=selected.get_meta("c",Vector2i(-2,-2)):continue
+		if not is_instance_valid(horse) or horse.is_queued_for_deletion() or horse==captured or horse.roped:continue
+		if not WorldAwareness110.lasso_impact_near128(horse.global_position,point):continue
 		horse.set_meta("escape_left110",WorldAwareness110.PANIC_SECONDS)
 		horse.set_meta("panic_left",WorldAwareness110.PANIC_SECONDS)
 		horse.state.spook=WorldAwareness110.PANIC_SECONDS
@@ -612,7 +602,7 @@ func _panic_neighbors110(selected:Node2D,point:Vector2)->void:
 func _herd_guides()->Dictionary:
 	var groups:Dictionary={}
 	for horse in _herd_horses.values():
-		if not is_instance_valid(horse) or (not horse.roped and horse.position.distance_squared_to(player.position)>pow(maxf(700.,_exit_distance110()+200.),2)) or horse.is_queued_for_deletion() or horse.roped or WorldTaming.tamed(horse.state) or _affinity(horse).leader:continue
+		if not is_instance_valid(horse) or (not horse.roped and horse.position.distance_squared_to(player.position)>pow(maxf(700.,_exit_distance110()+200.),2)) or horse.is_queued_for_deletion() or horse.roped or WorldTaming.tamed(horse.state) or (_affinity(horse).leader and float(horse.get_meta("panic_left",0.))<=0.):continue
 		var c:Vector2i=horse.get_meta("c",Vector2i(-999,-999))
 		if not groups.has(c):groups[c]=[]
 		groups[c].append(horse)
@@ -699,7 +689,7 @@ func _tick_taming(delta: float) -> void:
 		# "Que suelte" (Ant, 7-nov-2026 19:58, the corral rule): contact with a
 		# bolting wild animal stuns the rider and drops the roped capture.
 		var touching: bool = dist <= horse.BODY_RADIUS + horse.RIDER_TOUCH_RADIUS
-		if aff.leader:
+		if aff.leader and float(horse.get_meta("panic_left",0.))<=0.:
 			# Lider de manada: no huye; curiosea y se acerca despacio.
 			if dist < WorldTaming.CALM_RANGE * 1.6 and dist > 60.0:
 				horse.approach(player.position, delta)
@@ -1026,7 +1016,7 @@ func _build_hud() -> void:
 		return out
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
-	player.lasso.lasso_released.connect(func():_flight_panic110.call_deferred())
+	player.lasso.landing_resolved.connect(_landing_panic128)
 	player.lasso.release_requested.connect(func(): _release_held_horse())
 
 func _open_navigation()->void:

@@ -70,7 +70,7 @@ func test_fleeing_group_stays_within_cohesion_radius()->void:
   w.player.position=guide.position+Vector2(-90,0);w.player.velocity=Vector2(200,0);w._tick_taming(1.0/60.0)
   for horse in horses:horse._physics_process(1.0/60.0)
  assert_lt(horses[-1].position.distance_to(guide.position),before,"straggler regroups without teleport")
-func test_lasso_flight_preserves_movement_and_miss_does_not_spook()->void:
+func test_lasso_flight_preserves_movement_and_near_miss_panics_at_landing()->void:
  var w:Node2D=world();await wait_process_frames(3)
  w.player.set_physics_process(false)
  w.player.lasso.throw_guard=func():return true
@@ -87,8 +87,8 @@ func test_lasso_flight_preserves_movement_and_miss_does_not_spook()->void:
  assert_eq(still.position,resting,"throw cannot move a resting horse")
  assert_eq(float(still.state.spook),0.0)
  await wait_seconds(.4)
- assert_eq(float(still.state.spook),0.0,"miss alone causes no panic")
- assert_eq(float(still.get_meta("panic_left",0.0)),0.0)
+ assert_eq(float(still.state.spook),6.0,"near miss panics at landing")
+ assert_eq(float(still.get_meta("panic_left",0.0)),6.0)
  # A new throw while the rider approaches fast must NOT shield the herd.
  w.player.lasso._release_throw(Vector2(-1,0))
  w.player.position=still.position+Vector2(-70,0);w.player.velocity=Vector2(260,0)

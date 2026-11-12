@@ -10,7 +10,10 @@ const FAST_ALERT_SECONDS:float=.45
 const CLOSE_ALERT_SECONDS:float=.2
 const COVER_MULTIPLIER:float=.3
 const PANIC_SECONDS:float=6.
-const NEIGHBOR_RANGE:float=500.
+const NEIGHBOR_RANGE:float=500. # Legacy perception tuning, not the lasso-impact radius.
+const LASSO_IMPACT_RADIUS128:float=300.
+static func lasso_impact_near128(animal:Vector2,impact:Vector2)->bool:
+ return animal.distance_squared_to(impact)<=LASSO_IMPACT_RADIUS128*LASSO_IMPACT_RADIUS128
 const COVER_CHECK_SECONDS:float=.2
 static func tick(state:Dictionary,dist:float,speed:float,covered:bool,delta:float)->Dictionary:
  var out:Dictionary=state.duplicate()
