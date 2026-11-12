@@ -16,3 +16,9 @@ La petición original del12nov13:03:51 define mapa separado, otro césped/camino
 6. Ritual separado, con confirmación y conservación de identidad/ascendencia; sigue pendiente la mecánica exacta.
 
 No dar por entregado el país final a partir de la maqueta. No cambiar adquisiciones Galaxy, crecimiento,20/40ni reglas de pureza para hacer encajar la entrada.
+
+## Protocolo compartido147, preparación posterior a2.7.104
+
+SiestaTravel144 usa ahora `TravelTransaction147`: carga → validación de llegada → commit, o una sola restauración. El origen sigue guardándose antes de pausar/cargar. La animación está en `SiestaCurtain147`, separada del adaptador de Frontera. Las12integraciones de siesta siguen pasando, incluida comprobación en disco del destino bloqueado, y tres pruebas nuevas cubren orden, cada fallo, restauración fallida y concurrencia. La revisión visual confirma la misma transición y llegada. Es un checkpoint de código, no un APK nuevo.
+
+Siguiente: extraer búsqueda de llegada libre a un servicio común con callback de terreno, y adaptar la maqueta del país al mismo protocolo/selector. No usar WorldTerrain103 para validar coordenadas del país nuevo. Después mapa local con sitios visitados y regreso a la entrada. Mantener la maqueta sin guardado hasta completar el flujo de reentrada/recarga y la elección de entrada normal.

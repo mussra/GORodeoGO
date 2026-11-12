@@ -3,8 +3,7 @@ extends Node
 var world:Node2D
 var active:bool=false
 var panel:Control
-var curtain:CanvasLayer
-var clock:float=0.
+var curtain:SiestaCurtain147
 var zlabel:Label
 var message:Label
 var target:Dictionary={}
@@ -79,21 +78,13 @@ func start(id:String)->bool:
  world.player.cancel_input();world.player.velocity=Vector2.ZERO;world.player.set_physics_process(false)
  if world._map_overlay.expanded:world._map_overlay.expanded=false;world._map_overlay._layout()
  _cover();await get_tree().create_timer(.65,true).timeout
- world.player.position=target.pos;await _load_area()
- # Two frames let new collision objects reach the physics server.
- await get_tree().process_frame;await get_tree().process_frame
- var landing:Vector2=_safe_landing(target.pos) if world._build_queue.is_empty() else Vector2(INF,INF)
- if not landing.is_finite():last_error="No hay una llegada libre. Vuelves al origen."
- else:
-  world.player.position=landing
-  if not SaveData.save_world_state(landing):last_error="No se pudo guardar la llegada. Vuelves al origen."
- if not last_error.is_empty():
-  rollback=true;SaveData.world_missions=missions_before;SaveData.world_discovered=discovered_before;SaveData.world_position=origin;world.player.position=origin;message.text=last_error;travel_started=Time.get_ticks_msec();await _load_area()
-  if not world._build_queue.is_empty():
-   message.text="La zona no pudo cargarse. El origen sigue guardado. Vuelve al menú para reabrirla."
-   var back:=Button.new();back.text="Menú principal";back.position=Vector2(490,640);back.size=Vector2(300,56);curtain.add_child(back);back.pressed.connect(func():get_tree().paused=prior_paused;get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn"))
-   return false
- else:message.text="Has llegado a "+str(target.name)
+ var transaction:=TravelTransaction147.new()
+ var result:Dictionary=await transaction.run(_load_destination147,_validate_destination147,_commit_destination147,_restore_origin147)
+ if not result.ok and not result.restored:
+  message.text="La zona no pudo cargarse. El origen sigue guardado. Vuelve al menú para reabrirla."
+  var back:=Button.new();back.text="Menú principal";back.position=Vector2(490,640);back.size=Vector2(300,56);curtain.add_child(back);back.pressed.connect(func():get_tree().paused=prior_paused;get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn"))
+  return false
+ if result.ok:message.text="Has llegado a "+str(target.name)
  await get_tree().create_timer(.35,true).timeout
  curtain.queue_free();curtain=null;zlabel=null;message=null;active=false;get_tree().paused=prior_paused
  world.player.set_physics_process(not world._map_overlay.expanded);world.visible=true
@@ -101,6 +92,23 @@ func start(id:String)->bool:
  if touch!=null:touch.visible=not world._edit_mode
  if not last_error.is_empty():world._toast(last_error)
  return last_error.is_empty()
+func _load_destination147()->bool:
+ world.player.position=target.pos;await _load_area()
+ # Two frames let new collision objects reach the physics server.
+ await get_tree().process_frame;await get_tree().process_frame
+ if not world._build_queue.is_empty():last_error="No hay una llegada libre. Vuelves al origen.";return false
+ return true
+func _validate_destination147()->Vector2:
+ var landing:Vector2=_safe_landing(target.pos)
+ if not landing.is_finite():last_error="No hay una llegada libre. Vuelves al origen."
+ return landing
+func _commit_destination147(landing:Vector2)->bool:
+ world.player.position=landing
+ if SaveData.save_world_state(landing):return true
+ last_error="No se pudo guardar la llegada. Vuelves al origen.";return false
+func _restore_origin147()->bool:
+ rollback=true;SaveData.world_missions=missions_before;SaveData.world_discovered=discovered_before;SaveData.world_position=origin;world.player.position=origin;message.text=last_error;travel_started=Time.get_ticks_msec();await _load_area()
+ return world._build_queue.is_empty()
 func _load_area():
  world._update_chunks()
  var steps:int=0
@@ -118,18 +126,8 @@ func _safe_landing(pos:Vector2)->Vector2:
    if world.player.get_world_2d().direct_space_state.intersect_shape(query,1).is_empty():return candidate
  return Vector2(INF,INF)
 func _cover():
- curtain=CanvasLayer.new();curtain.layer=220;curtain.process_mode=Node.PROCESS_MODE_ALWAYS;add_child(curtain)
- var cover:=ColorRect.new();cover.color=Color("10252d");cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);curtain.add_child(cover)
- var image:=TextureRect.new();HorsePortrait.apply_horse(image,SaveData.horse_collection.find(SaveData.horse_collection.selected),SaveData.hat_color);image.position=Vector2(480,200);image.size=Vector2(320,320);cover.add_child(image)
- zlabel=Label.new();zlabel.text="Z z z";zlabel.add_theme_font_size_override("font_size",42);zlabel.position=Vector2(780,190);cover.add_child(zlabel)
- message=Label.new();message.text="Una siesta rumbo a "+str(target.name);message.position=Vector2(120,550);message.size.x=1040;message.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;message.add_theme_font_size_override("font_size",28);cover.add_child(message)
- var fit:Callable=func():
-  var size_:Vector2=get_viewport().get_visible_rect().size;var k:float=minf(size_.x/1280.,size_.y/720.);image.scale=Vector2.ONE*k;image.position=(size_-Vector2(320,320)*k)/2.;zlabel.position=image.position+Vector2(300,-20)*k;message.position=Vector2(20,size_.y*.80);message.size.x=size_.x-40
- cover.resized.connect(fit);fit.call()
-func _process(delta:float):
- if not active:return
- clock+=delta
- if is_instance_valid(zlabel):zlabel.modulate.a=.55+.45*sin(clock*4.);zlabel.rotation=sin(clock*2.)*.08
+ curtain=SiestaCurtain147.new();curtain.destination=str(target.name);curtain.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);curtain.hat=SaveData.hat_color;add_child(curtain)
+ zlabel=curtain.zlabel;message=curtain.message
 func _unhandled_input(event:InputEvent)->void:
  if event.is_action_pressed("ui_cancel") and (active or is_instance_valid(panel)):
   if not active:close_confirmation()
