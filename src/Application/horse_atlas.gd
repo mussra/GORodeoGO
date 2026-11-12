@@ -29,6 +29,20 @@ static func variants(base:Dictionary,filters:Dictionary,horses:Array)->Array[Dic
   var t:=traits(base,filters);t.spots=color
   var found:=owned(t,horses)
   out.append({"horse":found if not found.is_empty() else {"traits":t,"name":HorseCollection.COATS[int(t.coat)],"stage":"adult"},"owned":not found.is_empty()})
+ # Keep all owned records in this family, including eye/leg/finish variants.
+ var present:Dictionary={}
+ for entry in out:
+  if entry.owned:present[entry.horse.id]=true
+ for h in horses:
+  if present.has(h.id):continue
+  if int(h.traits.coat)!=int(base.coat) or int(h.traits.pattern)!=int(base.pattern) or int(h.traits.mane)!=int(base.mane):continue
+  var matches:bool=true
+  for prop in ["spots","eyes","legs"]:
+   if filters.has(prop):
+    var value:int=HorseCollection.spots_index(h.traits) if prop=="spots" else (HorseCollection.eye_index(h.traits) if prop=="eyes" else HorseCollection.legs_index(h.traits))
+    if value!=int(filters[prop]):matches=false
+  if matches:out.append({"horse":h,"owned":true})
+ out=HorseFilters.apply(out,filters)
  out=owned_first_order(out)
  return out
 static func properties()->Array:
@@ -61,16 +75,17 @@ static func filtered_entries(filters:Dictionary,horses:Array,owned_first:bool=tr
  # Preserve owned variants outside the generated eye/leg/finish slice, but never
  # substitute a family match for exact ownership or add a duplicate signature.
  var seen:Dictionary={}
- for entry in out:seen[signature(entry.horse.traits)]=true
+ for entry in out:
+  if entry.owned:seen[str(entry.horse.id)]=true
  for h in horses:
   var key:String=signature(h.traits)
-  if seen.has(key):continue
+  if seen.has(str(h.id)):continue
   var matches:bool=true
   for prop in ["spots","eyes","legs"]:
    if filters.has(prop):
     var value:int=HorseCollection.spots_index(h.traits) if prop=="spots" else (HorseCollection.eye_index(h.traits) if prop=="eyes" else HorseCollection.legs_index(h.traits))
     if value!=int(filters[prop]):matches=false
-  if matches:out.append({"horse":h,"owned":true});seen[key]=true
+  if matches:out.append({"horse":h,"owned":true});seen[str(h.id)]=true
  out=HorseFilters.apply(out,filters)
  if owned_first:out=owned_first_order(out)
  return out

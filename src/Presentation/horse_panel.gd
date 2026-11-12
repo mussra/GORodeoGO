@@ -264,13 +264,13 @@ func atlas_view()->void:
    var shader=Shader.new();shader.code="shader_type canvas_item;void fragment(){vec4 c=texture(TEXTURE,UV);COLOR=vec4(.16,.24,.28,c.a);}"
    var material=ShaderMaterial.new();material.shader=shader;shadow.material=material;content.add_child(shadow)
   else:sprite(h,Vector2(x,y),175)
-  var title:=label(("Legendario sin descubrir" if mystery else ("Legendario conseguido" if h.get("species","")=="unicorn" else h.name)) if (mystery or h.get("species","")=="unicorn") else (h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
+  var title:=label(("Legendario sin descubrir" if mystery else h.name) if (mystery or h.get("species","")=="unicorn") else (h.name if page=="market" else ("✓ "+h.name if entry.owned else "? "+tr(HorseCollection.COATS[t.coat])+" · "+tr(HorseCollection.PATTERNS[t.pattern])+" · "+tr(HorseCollection.MANES[t.mane]))),Vector2(x+180,y),18);title.size=Vector2(410,35);title.clip_text=true
   var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(600,610);open.tooltip_text="Sin descubrir" if mystery else tr("UI_126");open.disabled=mystery;content.add_child(open);open.pressed.connect(func():
    if page=="atlas" and atlas_filters.is_empty():
     atlas_family_page=atlas_page;atlas_family=h.traits.duplicate(true);atlas_page=0;show_page("atlas_variants")
-   else:detail_entries=entries;focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
+   else:detail_entries=entries.filter(func(e):return e.owned or not (bool(e.get("mystery115",false)) or (int(atlas_filters.get("rarity",-1))==4 and HorseMarket.tier(e.horse)==4)));focus_id=str(h.get("id",""));focus_preview=h;show_page("detail"))
   var texts:Array=["Rareza: Legendario","No conseguido"] if mystery else HorseValues.visual(t)
-  if not mystery:texts.append("Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)])
+  if not mystery:texts.append("Rareza: "+HorseCollection.RARITIES[4 if h.get("species","")=="unicorn" else HorseMarket.tier(h)])
   if page=="market":texts.append(tr("MARKET_PRICE")%HorseMarket.buy_price(h))
   for i in texts.size():label(str(texts[i]),Vector2(x+180,y+48+i*27),17)
   var stat_host:=VBoxContainer.new();stat_host.position=Vector2(x+180,y+48+texts.size()*27);stat_host.size.x=410;content.add_child(stat_host)

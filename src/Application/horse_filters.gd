@@ -24,7 +24,7 @@ static func properties() -> Array:
 		{"id": "coat", "label": "FILTER_COAT", "values": _trait_values(HorseCollection.COATS), "matches": _trait("coat")},
 		{"id": "pattern", "label": "FILTER_PATTERN", "values": _trait_values(HorseCollection.PATTERNS), "matches": _trait("pattern")},
 		{"id": "mane", "label": "FILTER_MANE", "values": _trait_values(HorseCollection.MANES), "matches": _trait("mane")},
-		{"id": "rarity", "label": "FILTER_RARITY", "values": _trait_values(HorseCollection.RARITIES), "matches": func(entry: Dictionary, v) -> bool: return HorseMarket.tier(entry.horse) == int(v)},
+		{"id": "rarity", "label": "FILTER_RARITY", "values": _trait_values(HorseCollection.RARITIES), "matches": func(entry: Dictionary, v) -> bool: return (4 if entry.horse.get("species", "")=="unicorn" else HorseMarket.tier(entry.horse)) == int(v)},
 		{"id": "owned", "label": "FILTER_OWNED", "values": [{"value": true, "label": "FILTER_OWNED_YES"}, {"value": false, "label": "FILTER_OWNED_NO"}], "matches": func(entry: Dictionary, v) -> bool: return bool(entry.owned) == bool(v)},
 	]
 
