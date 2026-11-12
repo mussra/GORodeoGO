@@ -160,7 +160,6 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
    var color:Color=Color(COLORS[int(t.coat)])
    if m.g>m.r:
     if int(t.mane)==5:
-     var palette:Array[Color]=[Color("ec606c"),Color("efb85d"),Color("e8d874"),Color("77c888"),Color("6aa9da"),Color("9980c8"),Color("ec606c")]
      var tpos:float
      if anim=="foal":tpos=(float(y)-165.0)/105.0 if x<110 else float(y)/180.0
      elif anim=="walk_up":tpos=(float(y)-48.0)/30.0
@@ -169,8 +168,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
       elif anim=="walk_diag_up":tpos=(float(y)-46.0)/33.0
       else:tpos=(float(y)-40.0)/36.0
      else:tpos=(float(y)-25.0)/28.0
-     var u:float=clampf(tpos,0.0,.999)*6.0
-     color=palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.0,1.0,u-floorf(u)))
+     color=rainbow_color113(tpos)
     else:color=Color("33302e") if anim=="foal" and int(t.mane)==0 else Color(MANES[int(t.mane)])
    elif int(t.pattern)>0:
     var mark:bool=false
@@ -239,3 +237,8 @@ static func apply(frames:SpriteFrames,t:Dictionary,horse:Dictionary={})->void:
  for anim in frames.get_animation_names():
   for i in range(frames.get_frame_count(anim)):
    frames.set_frame(anim,i,texture(frames.get_frame_texture(anim,i),anim,i,t,null,null,HorseGalaxyLook.state(horse)))
+
+static func rainbow_color113(t:float)->Color:
+ var palette:Array[Color]=[Color("ec606c"),Color("efb85d"),Color("e8d874"),Color("77c888"),Color("6aa9da"),Color("9980c8"),Color("ec606c")]
+ var u:float=clampf(t,0.,.999)*6.
+ return palette[int(u)].lerp(palette[mini(int(u)+1,6)],smoothstep(0.,1.,u-floorf(u)))

@@ -265,7 +265,7 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 
 ## Cosmetic selection is independent of points and functional equipment.
 func select_hat(value:String)->bool:
-	if not HatAppearance.OPTIONS.has(value):return false
+	if HatAppearance.sanitize(value)!=value:return false
 	var before:String=hat_color
 	hat_color=value
 	if save_progress():return true
