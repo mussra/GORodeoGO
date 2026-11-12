@@ -58,3 +58,17 @@ En la fuente se valida el Galaxy PURO adulto maestro y se confirma su transforma
 ## Pendiente antes de implementar
 
 Llaves20/40; herenciaGalaxy×normal; significado preciso de pureza más allá de dos padres; crecimiento de cría; detalles de transformación/variante; maestría por bloque; nombres y red de pueblos; Ultra raro/Legendario; lugar de fuente y ruta; activación y potencia de estela; compatibilidad con propietarios anteriores. Ningún punto pendiente se toma como regla ya aprobada.
+
+## Volver a casa por capas y viaje rápido, continuación
+
+Regla pedida para el nuevo país: "Volver a casa" lleva al rastro arcoíris que dio entrada a ESE mapa, no directamente al rancho del país anterior. Cruzar ese rastro devuelve al país anterior, en su acceso enlazado. Una vez allí, "Volver a casa" lleva al inicio donde empezó la partida. Cada mapa guarda su punto de retorno e ID del acceso de procedencia, de modo que entrar por otro portal no pierda la salida. No implementar todavía.
+
+Viaje rápido pedido: desde el mapa se selecciona un SITIO ya visitado y se pulsa "Ir a este sitio". El jinete se echa una siesta, el caballo viaja en piloto automático y aparece en destino tras una animación. No una caminata real obligatoria de veinte minutos ni simulación acelerada que dispare encuentros/capturas fuera de cámara.
+
+Propuesta de UX: lugares descubiertos, no cualquier píxel de terreno que se haya visto. Rancho, entrada arcoíris, pueblos, árbol y fuente una vez encontrados pueden tener destino accesible guardado. Al tocar el icono aparece nombre y "Ir a este sitio". Lugares sin descubrir no se muestran ni se usan como coordenada de teletransporte. Una animación breve de dormir/despertar oculta la carga y muestra el nombre del destino; el jugador conserva un botón de cancelar antes de comenzar. No costes de puntos, energía o castigos por inferencia.
+
+Cómo encaja: "Volver a casa" es un atajo a la entrada arcoíris del mapa nuevo con la misma transición de siesta, sin tener que caminar a ella. Cruzarla vuelve al país anterior. Allí se puede viajar rápido a pueblos visitados o volver al inicio con el mismo mecanismo. Propuesta inicial de no saltar directamente entre países desde el selector: pasar por acceso enlazado preserva la regla por capas. Si se desea selector global entre países, debe decidirse explícitamente, no contradecir silenciosamente la regla anterior.
+
+Seguridad de juego: fijar un punto de llegada libre y transitable por lugar, validar que su mapa existe, hacer snapshot de montura y posición antes de la transición y guardar el nuevo destino solo cuando la carga finaliza. Un fallo devuelve al origen, no a un país equivocado ni a una posición dentro de tronco/agua. No completar encargos, domesticar ni descubrir pueblos atravesados por el viaje. Decidir cómo tratar un animal atado, persecución o diálogo activo: recomiendo terminar/cancelar viaje antes de iniciarlo, sin soltar capturas ni inventario sin avisar. Evitar más de una transición concurrente. Verificar ambas direcciones y carga de partida en cada país.
+
+Pendiente de elegir: lista de destinos, longitud de animación, si el tiempo del mundo avanza durante la siesta, condiciones durante persecución/captura, regreso entre países por selector o solo por rastro. La intención de evitar largas caminatas de regreso queda fijada; estos detalles no están activos.
