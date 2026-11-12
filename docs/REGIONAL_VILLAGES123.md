@@ -53,3 +53,21 @@ Propuesta de estado: evento único de entrega/completado por pueblo y quest_id, 
 El campo puede estar en una parcela ya reservada para crecimiento, no encima de rutas, casas o animales atrapados. El cambio aparece al volver o tras una transición breve; no ocultar una espera de días no acordada. Decidir si nace pequeño y crece o aparece extenso, y si cuenta como nuevo destino del mapa al descubrirlo. El mapa muestra el campo cambiado cuando se revisita, sin revelar el resto de la región. Recoger después sus flores, reposición y nuevas misiones siguen pendientes.
 
 Sin implementación ni nuevos estados escritos en partidas actuales. El efecto sería evidencia visible de haber ayudado, no solo texto genérico.
+
+## Revisión visual: silvestres, no cultivos
+
+Los campos grandes del mundo son SILVESTRES. Conservan la densidad que gustó al cabalgar, con variación de posición/tamaño y límite irregular estable por semilla. Los chunks interiores se llenan, pero el perímetro atraviesa celdas y forma lóbulos redondeados, sin acabar justo en líneas rectas de recuadro. Mapa y flores usan el mismo contorno, no dos formas distintas.
+
+El mapa reduce saturación/contraste y cantidad de puntos, sin reducir la abundancia a escala de jinete. Debe seguir diferenciando rojo y morado, pero no parecer dos paneles de color plano intenso. La escala de mapa es una representación simplificada, no un recuento de tallos.
+
+Solo el campo creado por la florista tras su misión puede verse cultivado/ordenado. No aplicar cuadrículas, hileras ni formas rectangulares a los campos silvestres por reutilizar el mismo renderer. Mantener un atributo de origen del campo, silvestre o creado_por_florista, y su perfil de forma/distribución. Esta diferencia sigue como diseño, no hay campos insertados en partidas.
+
+## Encargos entre floristas y árboles dispersos
+
+Las floristas pueden pedir una especie que NO existe en su poblado/región y enviar al jugador a otro pueblo. Dos vías válidas: pedir una flor directamente a la florista del destino, o que esta indique el campo donde recogerla. Se reconoce la especie y el origen de la muestra; volver a entregar al NPC inicial completa el encargo, no solo hablar con el segundo.
+
+Diseño de estado: quest_id, pueblo_origen, pueblo_destino, especie requerida, muestra_obtenida y muestra_entregada. La muestra de misión tiene ID único y no se duplica al volver a preguntar; no se vende/consume como flor decorativa por accidente. Guardar entrega y efecto de campo en una misma transacción. La disponibilidad de destino debe verificarse en el registro de pueblos antes de ofrecer la misión, sin escoger una florista que no existe o que quedó tras una barrera imposible. El diario guarda nombre y rumbo del pueblo, y si ya se conoce permite el viaje rápido de siesta. Si el jugador consiguió la muestra por la otra vía, la misión reconoce igualmente el mismo objetivo y no obliga a repetir la conversación.
+
+Ejemplo: "Aquí no crecen amapolas. Mi compañera del pueblo del este sí las conoce. Pregúntale si puede darte una, o dónde encontrarlas." Respuesta de destino: "Tengo una muestra para ella" o "Buscamos las del campo que queda al sur del camino". Nombres, direcciones reales, cantidades y si siempre se permiten ambas vías por decidir. La misión puede crear el campo de amapolas al regreso como consecuencia visible, sin alterar los campos silvestres ni reiniciar cadenas terminadas.
+
+Los campos silvestres también incluyen pocos árboles sueltos, sin convertirse en bosque. La preview revisada muestra seis árboles por campo de dos chunks, como muestra visual y no densidad final aprobada. Respetar pies/troncos, cobertura y carretera con el mismo sistema de árboles; claros y flores dominan el paisaje. El concepto de bosque queda anotado para futuro, sin generación ni reglas nuevas ahora.
