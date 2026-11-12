@@ -1641,6 +1641,8 @@ func _get_surface98()->WorldRoadSurface94:
 
 func _npcs98()->Array:
 	var data:Array=NpcQuests.NPCS.duplicate(true)
+	if SaveData.world_generator_version>=3:
+		for npc in data:npc["regional_close123"]=true
 	if WorldNominal98.enabled():
 		data[0].position=WorldNominal98.home()+Vector2(100,10)
 		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)+Vector2(110,-20)
