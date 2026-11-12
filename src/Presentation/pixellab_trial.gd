@@ -33,6 +33,7 @@ static func apply(frames:SpriteFrames,kind:String,animation:String,traits:Dictio
  # Rest remains deliberate, not an arbitrary running frame.
  if frames.has_animation("idle"):frames.remove_animation("idle")
  frames.add_animation("idle");frames.add_frame("idle",pose_texture(kind,"side",0,traits,horse))
+ if kind=="rider":HorseRest107.apply(frames,traits,horse)
 
 static func animal_views(kind:String)->Array:
  var views:Array=[]

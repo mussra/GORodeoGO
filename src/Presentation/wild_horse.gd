@@ -82,13 +82,14 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if is_instance_valid(player_ref) and not roped and position.distance_squared_to(player_ref.position)>700.0*700.0:
-		_art.speed_scale=0.0;return
+		_art.set_motion107(Vector2.ZERO);_art.speed_scale=0.0;return
 	_bob += delta
 	touch_grace = maxf(0.0, touch_grace - delta)
 	if roped:
 		# Roped: stays in place while the hold timer runs (no tow, Ant 21:47).
 		held = maxf(0.0, held - delta)
 		velocity = Vector2.ZERO
+		_art.set_motion107(Vector2.ZERO)
 		_flee = Vector2.ZERO
 		_art.grazing = false
 		_art.speed_scale=1.0
@@ -129,6 +130,7 @@ func _physics_process(delta: float) -> void:
 	wanted94=WorldWildRoads94.terrain_step(self,before94,wanted94)
 	velocity=(wanted94-before94)/maxf(delta,.001)
 	move_and_slide()
+	_art.set_motion107(velocity)
 	if not escaping95 and not (road_provider94.is_valid() and road_provider94.call(before94,WorldWildRoads94.FOOTPRINT)) and not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94
 	_art.position.y = sin(_bob * 1.6) * 1.5
 	queue_redraw()

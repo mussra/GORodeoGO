@@ -10,7 +10,8 @@ static func from_speed(speed:float,top_speed:float)->int:
 static func apply(swap:SpriteSwap,velocity:Vector2,top_speed:float,gait:int,delta:float)->String:
  if not swap.has_sprite():return ""
  if velocity.length()<12.0:
-  swap.stop_on_idle();swap.set_gait_pose(Vector2.ZERO,delta,false);return "idle"
+  swap.rest_pose107(delta);swap.set_gait_pose(Vector2.ZERO,delta,false);return "idle"
+ swap.rest107.reset();swap.restore_movement107()
  var facing:Array=SpriteSwap.direction_suffix(velocity)
  var anim:String="walk_"+facing[0]
  var dedicated:bool=gait==WorldGait.GALOPE and swap.has_animation("gallop_"+facing[0])

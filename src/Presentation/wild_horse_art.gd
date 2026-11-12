@@ -6,6 +6,11 @@ static var frame_cache: Dictionary = {}
 var traits: Dictionary = {}
 var grazing: bool = false : set = set_grazing
 var walk_dir: String = "side"
+var resting107:bool=false
+func set_motion107(motion:Vector2)->void:
+	var rest:bool=motion.length()<12.
+	if rest==resting107:return
+	resting107=rest;_update_anim()
 
 func set_grazing(value: bool) -> void:
 	if grazing == value: return
@@ -42,7 +47,7 @@ func _ready() -> void:
 
 func _update_anim() -> void:
 	if sprite_frames == null: return
-	if grazing:
+	if grazing or resting107:
 		play("idle")
 	elif walk_dir == "side":
 		play("walk")

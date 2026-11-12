@@ -122,6 +122,7 @@ static func direction_suffix(dir: Vector2) -> Array:
 ## (caller should NOT apply its own color-coding in that case), false if this animation
 ## isn't available (caller should fall back to its own placeholder feedback).
 func play(anim_name: String) -> bool:
+	if anim_name not in ["idle","rest_gesture107"]:restore_movement107()
 	if _sprite != null and _frames.has_animation(anim_name):
 		if _sprite.animation != anim_name or not _sprite.is_playing():
 			# A turn changes the view, not the gait phase. Restarting frame0 on every
@@ -160,6 +161,17 @@ static func _is_gait(animation: String) -> bool:
 ## Gait body language on top of the shared walk art: lean and bob per gait.
 ## pose = Vector2(lean_radians, bob_amplitude_px); call every frame while riding.
 var _gait_bob: float = 0.0
+var rest107:HorseRest107=HorseRest107.new()
+var _rest_offset107:bool=false
+func restore_movement107()->void:
+	if _rest_offset107:
+		_sprite.offset.x+=8.;_rest_offset107=false
+func rest_pose107(delta:float)->void:
+	var pose:int=rest107.step(delta,false)
+	var animation:String="rest_gesture107" if pose==1 and has_animation("rest_gesture107") else "idle"
+	if has_animation("rest_gesture107") and not _rest_offset107:_sprite.offset.x-=8.;_rest_offset107=true
+	play(animation);_sprite.speed_scale=1.0
+
 func set_gait_pose(pose: Vector2, delta: float, moving: bool) -> void:
 	if _sprite == null:
 		return
