@@ -41,6 +41,9 @@ var world_position: Vector2 = Vector2(0, 160)
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
 var world_pigs: Array[String] = []  # captured pig-pen ids ("pig_cx_cy")
+var world_pig_captures:Array[String]=[] # individual IDs, new captures only
+var world_pigs_sold:int=0
+var world_goat_captures:Array[String]=[]
 var world_edits: Array = []  # world-editor ops (see WorldEdits), layered over the seed
 # Overridden only by isolated persistence tests; production retains its original path.
 var save_path: String = NORMAL_SAVE_PATH
@@ -83,6 +86,9 @@ func save_progress() -> bool:
 	config.set_value("world", "quests", world_quests)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
+	config.set_value("world","pig_captures",world_pig_captures)
+	config.set_value("world","pigs_sold",world_pigs_sold)
+	config.set_value("world","goat_captures",world_goat_captures)
 	config.set_value("world", "edits", world_edits)
 	config.set_value("equipment", "points", equipment_points)
 	config.set_value("equipment", "owned", equipment_owned)
@@ -119,6 +125,7 @@ func load_progress() -> void:
 	world_quests.clear()
 	world_missions.clear()
 	world_pigs.clear()
+	world_pig_captures.clear();world_pigs_sold=0;world_goat_captures.clear()
 	world_edits.clear()
 	var config := ConfigFile.new()
 	var source_path:String=load_source_path(save_path,LEGACY_2_SAVE_PATH) if save_path==SAVE_PATH else save_path
@@ -163,6 +170,10 @@ func load_progress() -> void:
 		if raw is Array or raw is PackedStringArray:
 			for item in raw:
 				if typeof(item)==TYPE_STRING and not pair[1].has(item):pair[1].append(item)
+	world_pig_captures=WorldLivestock104.valid_ids(config.get_value("world","pig_captures",[]))
+	world_goat_captures=WorldLivestock104.valid_ids(config.get_value("world","goat_captures",[]))
+	var sold:Variant=config.get_value("world","pigs_sold",0)
+	world_pigs_sold=clampi(sold,0,world_pig_captures.size()) if sold is int else 0
 	var wpos:Variant=config.get_value("world","position",world_position)
 	if typeof(wpos)==TYPE_VECTOR2 and wpos.is_finite():world_position=wpos
 	var we:Variant=config.get_value("world","edits",[])
@@ -459,3 +470,26 @@ func adopt_wild_horse(herd: Dictionary) -> Dictionary:
 		return horse
 	horse_collection.restore(before)
 	return {}
+
+func pig_inventory104()->int:return WorldLivestock104.available(world_pig_captures,world_pigs_sold)
+func record_pig104(id:String)->bool:
+	if id.is_empty() or world_pig_captures.has(id):return false
+	var before_points:int=equipment_points;var before_quests:Dictionary=world_quests.duplicate(true)
+	world_pig_captures.append(id)
+	if WorldPigs.CHASE_MODE:equipment_points+=WorldPigs.CHASE_REWARD_POINTS
+	NpcQuests.record(world_quests,"capture_animal","pig",id)
+	if save_progress():return true
+	world_pig_captures.erase(id);equipment_points=before_points;world_quests=before_quests;return false
+func sell_pigs104(count:int,expected_unit_price:int)->Dictionary:
+	if expected_unit_price!=WorldLivestock104.PIG_SALE_PRICE or count<=0 or count>pig_inventory104():return {}
+	var quote:Dictionary=WorldLivestock104.quote(count)
+	var before_points:int=equipment_points;var before_sold:int=world_pigs_sold
+	world_pigs_sold+=count;equipment_points+=int(quote.total)
+	if save_progress():return quote
+	world_pigs_sold=before_sold;equipment_points=before_points;return {}
+func record_goat104(id:String)->bool:
+	if id.is_empty() or world_goat_captures.has(id):return false
+	var before:Dictionary=world_quests.duplicate(true)
+	world_goat_captures.append(id);NpcQuests.record(world_quests,"capture_animal","goat",id)
+	if save_progress():return true
+	world_goat_captures.erase(id);world_quests=before;return false

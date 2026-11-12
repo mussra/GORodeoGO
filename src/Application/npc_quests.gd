@@ -4,7 +4,7 @@ extends RefCounted
 const NPCS=[{"id":"farmer","name":"Granjero","position":Vector2(310,190),"placeholder":false,"quests":["farmer_pigs","farmer_goats"]}]
 const QUESTS={
  "east_flower":{"npc":"story","title":"Una flor al este","kind":"find_object","target":"east_flower","goal":1,"requires":"","trigger":{"axis":"east","chunks":15,"comparison":"gt"},"text":"Has cruzado más de 15 bloques hacia el este. Hay una flor silvestre especial cerca: búscala.","active":"Más de 15 bloques al este: encuentra la flor azul","done":"Has encontrado la flor del este."},
- "farmer_pigs":{"npc":"farmer","title":"Un favor para el granjero","kind":"capture_animal","target":"pig","goal":3,"requires":"","text":"¿Me harías un favor? Necesito tres cerdos salvajes para mi negocio. Persíguelos con el lazo hasta capturarlos.","active":"Captura 3 cerdos salvajes","done":"¡Gracias! Ya tengo los tres cerdos. Me has ayudado mucho."},
+ "farmer_pigs":{"npc":"farmer","title":"Un favor para el granjero","kind":"capture_animal","target":"pig","goal":3,"requires":"","text":"¿Me harías un favor? Necesito tres cerdos salvajes para mi negocio. Persíguelos con el lazo hasta capturarlos.","active":"Captura 3 cerdos salvajes","done":"¡Has capturado los tres cerdos! Puedes guardarlos o vendérmelos al precio indicado."},
  "farmer_goats":{"npc":"farmer","title":"Ahora, las cabras","kind":"capture_animal","target":"goat","goal":3,"requires":"farmer_pigs","text":"Gracias por los cerdos. Ahora necesito tres cabras salvajes. ¿Me ayudas con ellas?","active":"Captura 3 cabras salvajes","done":"¡Las tres cabras están a salvo! Gracias por ayudarme."}
 }
 static func state(states:Dictionary,id:String)->Dictionary:return states.get(id,{"status":"locked","count":0,"events":[]})

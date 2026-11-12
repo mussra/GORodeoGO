@@ -434,3 +434,9 @@ Lazo: esquiva 5 s sin alejarte","Goats · prototype
 Rope: evade for 5 s, stay close"
 WORLD_GOAT_ESCAPED,La cabra se ha liberado,The goat broke free
 WORLD_GOAT_CAPTURED,Cabra capturada · prueba completada,Goat captured · test complete
+WORLD_SAVE_FAILED104,No se ha podido guardar. No se ha aplicado el cambio.,Could not save. No change was applied.
+WORLD_PIG_CAPTURE104,"¡Cerdo capturado! Total: %d · llevas %d · +%d puntos","Pig captured! Total: %d · carrying %d · +%d points"
+WORLD_PIG_INVENTORY104,Cerdos: %d,Pigs: %d
+WORLD_PIG_PRICE104,"Precio propuesto: %d puntos/cerdo · llevas %d. Puedes guardarlos.","Proposed price: %d points/pig · carrying %d. You can keep them."
+WORLD_PIG_SELL104,Vender %d cerdos · +%d puntos,Sell %d pigs · +%d points
+WORLD_PIG_SOLD104,"Vendidos %d cerdos · +%d puntos","Sold %d pigs · +%d points"

@@ -1256,3 +1256,21 @@ msgstr "The goat broke free"
 
 msgid "WORLD_GOAT_CAPTURED"
 msgstr "Goat captured · test complete"
+
+msgid "WORLD_SAVE_FAILED104"
+msgstr "Could not save. No change was applied."
+
+msgid "WORLD_PIG_CAPTURE104"
+msgstr "Pig captured! Total: %d · carrying %d · +%d points"
+
+msgid "WORLD_PIG_INVENTORY104"
+msgstr "Pigs: %d"
+
+msgid "WORLD_PIG_PRICE104"
+msgstr "Proposed price: %d points/pig · carrying %d. You can keep them."
+
+msgid "WORLD_PIG_SELL104"
+msgstr "Sell %d pigs · +%d points"
+
+msgid "WORLD_PIG_SOLD104"
+msgstr "Sold %d pigs · +%d points"

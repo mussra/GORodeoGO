@@ -1256,3 +1256,21 @@ msgstr "La cabra se ha liberado"
 
 msgid "WORLD_GOAT_CAPTURED"
 msgstr "Cabra capturada · prueba completada"
+
+msgid "WORLD_SAVE_FAILED104"
+msgstr "No se ha podido guardar. No se ha aplicado el cambio."
+
+msgid "WORLD_PIG_CAPTURE104"
+msgstr "¡Cerdo capturado! Total: %d · llevas %d · +%d puntos"
+
+msgid "WORLD_PIG_INVENTORY104"
+msgstr "Cerdos: %d"
+
+msgid "WORLD_PIG_PRICE104"
+msgstr "Precio propuesto: %d puntos/cerdo · llevas %d. Puedes guardarlos."
+
+msgid "WORLD_PIG_SELL104"
+msgstr "Vender %d cerdos · +%d puntos"
+
+msgid "WORLD_PIG_SOLD104"
+msgstr "Vendidos %d cerdos · +%d puntos"

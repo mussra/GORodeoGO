@@ -463,6 +463,8 @@ func _advance_builder(b: Dictionary) -> void:
 				var pig := PigScript.new()
 				pig.name = "pig%d" % int(b["pig_idx"])
 				b["pig_idx"] = int(b["pig_idx"]) + 1
+				if SaveData.world_pig_captures.has(pig_id+":"+str(pig.name)):
+					pig.free();return
 				pig.setup({"pos": pos})
 				(b["entities"] as Array).append(pig)
 				if not todo.is_empty():
@@ -730,10 +732,11 @@ func _tick_pigs(delta: float) -> void:
 				if pig == _lasso_horse:
 					_end_lasso()
 				_audio.play("return")
-				if WorldPigs.CHASE_MODE:
-					SaveData.equipment_points += WorldPigs.CHASE_REWARD_POINTS
-					_toast(tr("WORLD_PIG_REWARD") % WorldPigs.CHASE_REWARD_POINTS)
-				_quest_event("capture_animal","pig",_pen_id_for(Vector2i(node.get_meta("c")))+":"+str(pig.name))
+				var id:String=_pen_id_for(Vector2i(node.get_meta("c")))+":"+str(pig.name)
+				if not SaveData.record_pig104(id):
+					_toast(tr("WORLD_SAVE_FAILED104"));continue
+				_refresh_livestock104();_refresh_quest_hud();_refresh_missions()
+				_toast(tr("WORLD_PIG_CAPTURE104") % [SaveData.world_pig_captures.size(),SaveData.pig_inventory104(),WorldPigs.CHASE_REWARD_POINTS])
 				pig.queue_free()  # captured: counts right away (roped or walk-up)
 			else:
 				all_captured = false
@@ -759,8 +762,8 @@ func _on_pigs_captured(c: Vector2i, pen: Node2D) -> void:
 	SaveData.world_pigs.append(_pen_id_for(c))
 	pen.queue_free()
 	SaveData.save_world_state(player.position)
-	_pigs_label.text = tr("WORLD_PIGS") % SaveData.world_pigs.size()
-	_toast(tr("WORLD_PIG_CAPTURED") % SaveData.world_pigs.size())
+	_refresh_livestock104()
+	
 
 func _pen_id_for(c: Vector2i) -> String:
 	var chunk: Dictionary = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, c.x, c.y), SaveData.world_edits, c.x, c.y)
@@ -903,7 +906,7 @@ func _build_hud() -> void:
 	_pigs_label = Label.new()
 	_pigs_label.position = Vector2(430, 12)
 	_pigs_label.add_theme_font_size_override("font_size", 18)
-	_pigs_label.text = tr("WORLD_PIGS") % SaveData.world_pigs.size()
+	_refresh_livestock104()
 	_hud.add_child(_pigs_label)
 	# clock-fill gauges (Ant 11:39/11:40): stamina + ability reminders, bottom
 	# right so they never cover the touch joystick
@@ -1324,6 +1327,7 @@ func _exit_tree()->void:
 func _setup_goat_prototype()->void:
 	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";add_child(_prototype_goats)
 	for pos in ([Vector2(200,600),Vector2(320,600),Vector2(400,600)] if WorldNominal98.enabled() else [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)]):
+		if SaveData.world_goat_captures.has("goat:"+str(pos)):continue
 		var goat=GoatScript.new();goat.setup({"pos":pos});goat.set_meta("origin",pos);_prototype_goats.add_child(goat)
 	var sign:=Label.new();sign.position=Vector2(180,700) if WorldNominal98.enabled() else Vector2(-300,280);sign.text="Cabras · persigue con el lazo hasta agotar su energía";sign.add_theme_font_size_override("font_size",19);add_child(sign)
 func _tick_goats(delta:float)->void:
@@ -1343,7 +1347,9 @@ func _tick_goats(delta:float)->void:
 			_toast(tr("WORLD_GOAT_ESCAPED"))
 		elif float(st.progress)>=1.0 and NpcQuests.can_capture(SaveData.world_quests,"goat"):
 			if goat==_lasso_horse:_end_lasso()
-			_quest_event("capture_animal","goat","goat:"+str(goat.get_meta("origin",goat.position)))
+			if not SaveData.record_goat104("goat:"+str(goat.get_meta("origin",goat.position))):
+				_toast(tr("WORLD_SAVE_FAILED104"));continue
+			_refresh_quest_hud()
 			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED"))
 			continue
 		if not bool(st.get("tired",false)) and (goat.roped or dist<260):goat.move_from_or_towards(player.position,delta,goat.roped)
@@ -1371,6 +1377,10 @@ func _open_npc(data:Dictionary)->void:
 	_npc_block=Control.new();_npc_block.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_npc_block.mouse_filter=Control.MOUSE_FILTER_STOP;_hud.add_child(_npc_block)
 	_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests);_hud.add_child(_npc_dialog)
 	_npc_dialog.closed.connect(_close_npc)
+	_npc_dialog.pigs_sold104.connect(func(count:int,price:int):
+		var sale:Dictionary=SaveData.sell_pigs104(count,price)
+		_toast(tr("WORLD_PIG_SOLD104") % [sale.count,sale.total] if not sale.is_empty() else tr("WORLD_SAVE_FAILED104"))
+		_refresh_livestock104();_close_npc())
 	_npc_dialog.acknowledged.connect(func(id:String):
 		if NpcQuests.acknowledge(SaveData.world_quests,id):SaveData.save_world_state(player.position)
 		_refresh_quest_hud())
@@ -1436,3 +1446,6 @@ func mountain_step103(a:Vector2,b:Vector2)->Vector2:
 	return WorldTerrain103.safe_step(SaveData.world_seed,a,b) if SaveData.world_generator_version>=3 else b
 func mountain_spawn103(p:Vector2)->Vector2:
 	return WorldTerrain103.clear_spawn(SaveData.world_seed,p) if SaveData.world_generator_version>=3 else p
+
+func _refresh_livestock104()->void:
+	if is_instance_valid(_pigs_label):_pigs_label.text=tr("WORLD_PIG_INVENTORY104") % SaveData.pig_inventory104()
