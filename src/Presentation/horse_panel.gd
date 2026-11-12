@@ -17,6 +17,8 @@ var atlas_page:int=0
 var atlas_owned_first:bool=true
 var atlas_filters:Dictionary={}
 var scroll_to_newest:bool=false
+var expanded_appearance_groups118:Dictionary={}
+var collection_scroll118:int=0
 func _ready()->void:
  MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=80
@@ -73,23 +75,47 @@ func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
  HorsePortrait.apply_horse(tex,h,SaveData.hat_color)
  tex.position=pos;tex.size=Vector2.ONE*size_px;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;content.add_child(tex)
 func collection_view()->void:
- label(TranslationServer.translate_plural("UI_081","UI_081_PLURAL",SaveData.horse_collection.horses.size())%SaveData.horse_collection.horses.size(),Vector2(30,100),18)
- var scroll:=ScrollContainer.new();scroll.position=Vector2(30,140);scroll.size=Vector2(1210,500);content.add_child(scroll)
- var rows:=VBoxContainer.new();rows.custom_minimum_size.x=1170;scroll.add_child(rows)
- for h in SaveData.horse_collection.horses:
-  var row:=HBoxContainer.new();row.custom_minimum_size.y=170;rows.add_child(row)
-  var tex:=TextureRect.new();HorsePortrait.apply_horse(tex,h,SaveData.hat_color);tex.custom_minimum_size=Vector2(160,160);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
-  var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;row.add_child(l)
-  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
-  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");row.add_child(dodge_badge)
-  if HorseEmblem.valid(h.traits.get("emblem")):
-   var emblem:=TextureRect.new();emblem.texture=HorseEmblem.mask(h.traits.emblem);emblem.modulate=Color(HorseEmblem.COLORS[h.traits.emblem.color]);emblem.custom_minimum_size=Vector2(45,45);emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(emblem)
-  var eq:=Button.new();eq.size_flags_vertical=Control.SIZE_SHRINK_CENTER;eq.custom_minimum_size=Vector2(124,56);eq.text=tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_059");eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
-   message=(tr("UI_084") if SaveData.trial_session_active else tr("UI_085")) if SaveData.select_horse(h.id) else tr("UI_086");refresh())
-  var fam:=Button.new();fam.size_flags_vertical=Control.SIZE_SHRINK_CENTER;fam.custom_minimum_size=Vector2(100,56);fam.text=tr("FICHA");row.add_child(fam);fam.pressed.connect(func():detail_entries=SaveData.horse_collection.horses.map(func(item):return {"horse":item,"owned":true});focus_id=h.id;show_page("detail"))
+ var restore_scroll:int=collection_scroll118
+ var groups:Array[Dictionary]=HorseAppearanceGroups118.groups(SaveData.horse_collection.horses)
+ label(str(SaveData.horse_collection.horses.size())+" caballos · "+str(groups.size())+" apariencias · despliega para elegir cada caballo",Vector2(30,100),21)
+ var scroll:=ScrollContainer.new();scroll.name="CollectionScroll118";scroll.position=Vector2(30,140);scroll.size=Vector2(1210,500);content.add_child(scroll)
+ scroll.scroll_vertical=collection_scroll118
+ scroll.get_v_scroll_bar().value_changed.connect(func(value:float):collection_scroll118=int(value))
+ var rows:=VBoxContainer.new();rows.name="AppearanceGroups118";rows.custom_minimum_size.x=1170;scroll.add_child(rows)
+ for group in groups:
+  var horses:Array=group.horses
+  if horses.size()==1:_collection_horse_row118(rows,horses[0]);continue
+  var h:Dictionary=horses[0];var row:=HBoxContainer.new();row.name="AppearanceGroup118";row.custom_minimum_size.y=150;rows.add_child(row)
+  var tex:=TextureRect.new();HorsePortrait.apply_horse(tex,h,SaveData.hat_color);tex.custom_minimum_size=Vector2(150,150);row.add_child(tex)
+  var info:=Label.new();info.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;info.custom_minimum_size.x=540;info.add_theme_font_size_override("font_size",23)
+  var equipped:bool=horses.any(func(item):return item.id==SaveData.horse_collection.selected)
+  info.text="%s · %s · crin %s\n×%d con esta apariencia%s"%[tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane]),horses.size()," · incluye equipado" if equipped else ""];row.add_child(info)
+  var toggle:=Button.new();toggle.name="ToggleAppearance118";toggle.size_flags_vertical=Control.SIZE_SHRINK_CENTER;toggle.custom_minimum_size=Vector2(330,58);row.add_child(toggle)
+  var members:=VBoxContainer.new();members.name="AppearanceMembers118";members.custom_minimum_size.x=1170;rows.add_child(members)
+  var expanded:bool=expanded_appearance_groups118.has(group.key);members.visible=expanded;toggle.text=("Ocultar" if expanded else "Ver caballos")+" (×%d)"%horses.size()
+  if expanded:
+   for member in horses:_collection_horse_row118(members,member)
+  toggle.pressed.connect(func():
+   if members.get_child_count()==0:
+    for member in horses:_collection_horse_row118(members,member)
+   members.visible=not members.visible
+   if members.visible:expanded_appearance_groups118[group.key]=true
+   else:expanded_appearance_groups118.erase(group.key)
+   toggle.text=("Ocultar" if members.visible else "Ver caballos")+" (×%d)"%horses.size())
  if scroll_to_newest:
-  scroll_to_newest=false
-  scroll.set_deferred("scroll_vertical",2147483647)
+  scroll_to_newest=false;scroll.set_deferred("scroll_vertical",2147483647)
+ else:scroll.set_deferred("scroll_vertical",restore_scroll)
+func _collection_horse_row118(rows:VBoxContainer,h:Dictionary)->void:
+ var row:=HBoxContainer.new();row.custom_minimum_size.y=170;rows.add_child(row)
+ var tex:=TextureRect.new();HorsePortrait.apply_horse(tex,h,SaveData.hat_color);tex.custom_minimum_size=Vector2(160,160);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
+ var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;row.add_child(l)
+ var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
+ var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");row.add_child(dodge_badge)
+ if HorseEmblem.valid(h.traits.get("emblem")):
+  var emblem:=TextureRect.new();emblem.texture=HorseEmblem.mask(h.traits.emblem);emblem.modulate=Color(HorseEmblem.COLORS[h.traits.emblem.color]);emblem.custom_minimum_size=Vector2(45,45);emblem.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;emblem.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(emblem)
+ var eq:=Button.new();eq.name="Equip118_"+str(h.id);eq.size_flags_vertical=Control.SIZE_SHRINK_CENTER;eq.custom_minimum_size=Vector2(124,56);eq.text=tr("UI_060") if SaveData.horse_collection.selected==h.id else tr("UI_059");eq.disabled=SaveData.horse_collection.selected==h.id or not SaveData.horse_collection.is_adult(h.id);row.add_child(eq);eq.pressed.connect(func():
+  message=(tr("UI_084") if SaveData.trial_session_active else tr("UI_085")) if SaveData.select_horse(h.id) else tr("UI_086");refresh())
+ var fam:=Button.new();fam.name="Ficha118_"+str(h.id);fam.size_flags_vertical=Control.SIZE_SHRINK_CENTER;fam.custom_minimum_size=Vector2(100,56);fam.text=tr("FICHA");row.add_child(fam);fam.pressed.connect(func():detail_entries=SaveData.horse_collection.horses.map(func(item):return {"horse":item,"owned":true});focus_id=h.id;show_page("detail"))
 func thumbnail(h:Dictionary)->Texture2D:return HorsePicker.thumbnail(h)
 func parent_picker(id:String,pos:Vector2,is_a:bool)->void:
  var horses:Array=SaveData.horse_collection.horses.filter(func(h):return SaveData.horse_collection.is_adult(h.id))
@@ -126,7 +152,10 @@ func breed_view()->void:
    refresh(),440)
  else:label(tr("UI_095"),Vector2(490,350),22)
 func family_view()->void:
- var graph:=GenealogyPanel.new();add_child(graph);graph.select(focus_id);page="collection"
+ # Rebuild the real list behind the overlay before it can close.
+ page=detail_origin if detail_origin in ["collection","atlas","atlas_variants","market"] else "collection"
+ refresh()
+ var graph:=GenealogyPanel.new();graph.name="HorseGenealogyOverlay118";add_child(graph);graph.select(focus_id)
 
 func detail_view()->void:
  var h:Dictionary=SaveData.horse_collection.find(focus_id)
