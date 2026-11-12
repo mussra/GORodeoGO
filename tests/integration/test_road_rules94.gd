@@ -17,10 +17,10 @@ func _check_motion(world:Node2D,animal:Node2D,threat:Vector2):
  for i in 40:
   var before:Vector2=animal.global_position
   if animal.get_script()==Horse:
-   animal._flee=(threat-animal.position).normalized()*350.
+   animal.approach(threat,.1)
    animal._physics_process(.1)
   elif animal.get_script()==Goat:animal.move_from_or_towards(threat,.1,true)
-  else:animal.flee_from(animal.position-(threat-animal.position),.1,350.)
+  else:animal._settle_offroad95(.1)
   assert_false(world.road_surface_contains94(animal.global_position,WorldWildRoads94.FOOTPRINT),"animal footprint stays off road")
   assert_true(WorldWildRoads94.segment_clear(before,animal.global_position,animal.road_provider94),"no jumping across road")
 func test_modular_spawn_flee_charge_wander_and_stamina_both_art_sets():
@@ -52,7 +52,7 @@ func test_modular_spawn_flee_charge_wander_and_stamina_both_art_sets():
   world.player.position=Vector2(1000,100);world.stamina={"value":50.,"max":100.,"forced_left":0.};world._physics_process(1.)
   assert_almost_eq(float(world.stamina.value),46.,.001)
  assert_eq(SaveData.world_edits,edits);assert_eq(SaveData.world_position,saved)
-func test_real_frontier_spawn_and_all_wild_classes_cannot_enter_roads():
+func test_real_frontier_spawn_and_ordinary_motion_avoids_roads():
  SaveData.save_path="user://road94-isolated-test.dat";SaveData.trial_session_active=true;SaveData.world_seed=752026;SaveData.world_edits=[];SaveData.world_position=Vector2(100,180);SaveData.horse_collection.seed_trial()
  var world=load("res://src/Presentation/frontier_world.gd").new();add_child_autofree(world)
  while world._loading_world:await get_tree().process_frame

@@ -96,6 +96,8 @@ func _physics_process(delta: float) -> void:
 		_art.position.y = sin(_bob * 1.6) * 1.5
 		queue_redraw()
 		return
+	var escaping95:bool=_escape_roads95 and _flee.length()>0.0
+	_escape_roads95=false
 	if _flee.length() > 0.0:
 		var target: Vector2 = position + _flee * delta
 		if is_instance_valid(herd_guide) and herd_guide!=self and not herd_guide.roped:
@@ -123,10 +125,10 @@ func _physics_process(delta: float) -> void:
 			_graze_timer = randf_range(2.0, 5.0)
 			_art.grazing = not _art.grazing
 	var before94:Vector2=global_position
-	var wanted94:Vector2=WorldWildRoads94.safe_step(before94,before94+velocity*delta,road_provider94)
+	var wanted94:Vector2=before94+velocity*delta if escaping95 else WorldWildRoads94.safe_step(before94,before94+velocity*delta,road_provider94)
 	velocity=(wanted94-before94)/maxf(delta,.001)
 	move_and_slide()
-	if not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94
+	if not escaping95 and not (road_provider94.is_valid() and road_provider94.call(before94,WorldWildRoads94.FOOTPRINT)) and not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94
 	_art.position.y = sin(_bob * 1.6) * 1.5
 	queue_redraw()
 
@@ -206,18 +208,21 @@ func _pick_wander_target() -> void:
 	_wander_target = home + Vector2(cos(a), sin(a)) * r
 
 var _flee: Vector2 = Vector2.ZERO
+var _escape_roads95:bool=false
 
 ## Lider de manada: en vez de huir, el salvaje se acerca despacio al jinete.
 func approach(point: Vector2, delta: float) -> void:
 	var to: Vector2 = point - position
 	if to.length() < 1.0:
 		return
+	_escape_roads95=false
 	_flee = to.normalized() * 40.0  # reuses the leash-checked movement slot
 	_art.flip_h = to.x < 0.0
 	_art.grazing = false
 	_art.set_walk_direction(to)
 
 func flee_velocity(step:Vector2,panic:bool=false)->void:
+	_escape_roads95=true
 	_flee=step
 	_art.speed_scale=1.95 if panic else 1.55
 	_art.flip_h=step.x<0.0
@@ -228,6 +233,7 @@ func flee_from(from: Vector2, _delta: float) -> void:
 	var away: Vector2 = position - from
 	if away.length() < 1.0:
 		away = Vector2.RIGHT
+	_escape_roads95=true
 	_flee = away.normalized() * 230.0
 	_art.flip_h = away.x < 0.0
 	_art.grazing = false

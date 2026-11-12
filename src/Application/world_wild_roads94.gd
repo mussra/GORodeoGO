@@ -24,6 +24,11 @@ static func segment_clear(a:Vector2,b:Vector2,road:Callable)->bool:
  return true
 static func safe_step(a:Vector2,b:Vector2,road:Callable)->Vector2:
  if not road.is_valid():return b
+ # After a fleeing crossing, return to the nearest verge before resuming
+ # ordinary wandering/following. No new crossing is allowed in this state.
+ if road.call(a,FOOTPRINT):
+  var safe:Vector2=clear_spawn(a,road)
+  return a.move_toward(safe,a.distance_to(b)) if safe.is_finite() else a
  if segment_clear(a,b,road):return b
  # Slide along the verge, never teleport across a road even on a long frame.
  var step:Vector2=b-a

@@ -22,6 +22,13 @@ var held: float = 0.0
 var touch_grace: float = 0.0
 var _touching_rider: bool = false
 var road_provider94:Callable
+var _escape_left95:float=0.
+func _settle_offroad95(delta:float)->void:
+	_escape_left95=maxf(0.,_escape_left95-delta)
+	if _escape_left95<=0. and not roped and road_provider94.is_valid() and road_provider94.call(global_position,WorldWildRoads94.FOOTPRINT):
+		var safe:Vector2=WorldWildRoads94.clear_spawn(global_position,road_provider94)
+		if safe.is_finite():global_position=global_position.move_toward(safe,100.*delta)
+
 var home: Vector2 = Vector2.ZERO
 var flip_h: bool = false
 var movement:Vector2=Vector2.RIGHT
@@ -41,6 +48,7 @@ func _ready() -> void:
 	add_child(_art)
 
 func _process(delta: float) -> void:
+	_settle_offroad95(delta)
 	if is_instance_valid(_art):_art.update_state(bool(state.get("flee",false)),bool(state.get("tired",false)),flip_h,movement)
 	touch_grace = maxf(0.0, touch_grace - delta)
 	if roped:
@@ -68,7 +76,7 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 	var target: Vector2 = position + away.normalized() * speed * delta
 	if not roped:target=WorldEscapeMotion.bounded_step(position,home,from,target-position,WorldPigs.FLEE_LEASH)
 	if WorldFence.crosses(self,target):target=position
-	if road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.safe_step(global_position,get_parent().to_global(target),road_provider94))
+	_escape_left95=.2 # Genuine flee motion may cross the road.
 	movement=(target-position).normalized()
 	position = target
 	flip_h = movement.x < 0.0

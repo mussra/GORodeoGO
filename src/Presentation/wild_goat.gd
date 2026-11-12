@@ -22,6 +22,7 @@ func _ready()->void:
  goat_art.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
  add_child(goat_art);goat_art.play("run")
 func _process(delta:float)->void:
+ _settle_offroad95(delta)
  _fence_jump=maxf(0,_fence_jump-delta)
  z_index=30 if _fence_jump>0 else 0
  goat_art.position.y=-sin(PI*(1-_fence_jump/.48))*28 if _fence_jump>0 else 0
@@ -40,5 +41,6 @@ func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
  var target:Vector2=position+movement.normalized()*speed*delta
  if not charge:target=WorldEscapeMotion.bounded_step(position,home,point,target-position,550.0)
  if _fence_jump<=0 and WorldFence.crosses(self,target+movement.normalized()*20):_fence_jump=.48
- if road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.safe_step(global_position,get_parent().to_global(target),road_provider94))
+ if not charge:_escape_left95=.2
+ if charge and road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.safe_step(global_position,get_parent().to_global(target),road_provider94))
  movement=(target-position).normalized();position=target
