@@ -66,14 +66,14 @@ func test_eye_bounds_and_galaxy_effect()->void:
     if maxf(mask.get_pixel(x,y).r,mask.get_pixel(x,y).g)>.001:inside+=1
     else:outside+=1
  assert_gt(inside,0);assert_eq(outside,0)
-func test_galaxy_parent_finish_inherits_explicitly()->void:
+func test_single_galaxy_finish_does_not_propagate()->void:
  var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents();c.find("trial_b").traits.finish="galaxy"
- assert_eq(c.preview("trial_a","trial_b",{"finish":1}).finish,"galaxy")
+ assert_eq(c.preview("trial_a","trial_b",{"finish":1}).finish,"normal")
  assert_eq(c.preview("trial_a","trial_b",{"finish":0}).finish,"normal")
  assert_eq(c.preview("original","trial_b",{"finish":0}).finish,"normal")
  var h:Dictionary=c.breed("trial_a","trial_b",{"finish":1})
- assert_eq(h.traits.finish,"galaxy")
- var restored:=HorseCollection.new();assert_true(restored.restore(c.export_state()));assert_eq(restored.find(h.id).traits.finish,"galaxy")
+ assert_eq(h.traits.finish,"normal")
+ var restored:=HorseCollection.new();assert_true(restored.restore(c.export_state()));assert_eq(restored.find(h.id).traits.finish,"normal")
 func test_special_trial_selection_restores_real_collection()->void:
  var before:Dictionary=SaveData.horse_collection.export_state()
  SaveData.begin_trial_session()

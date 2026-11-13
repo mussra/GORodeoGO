@@ -17,7 +17,7 @@ func test_sold_unicorn_remains_discovered_when_records_passed():
  assert_false(entries[4].silhouette)
 
 func test_normal_galaxy_remains_obtainable_but_is_not_unicorn():
- var c=HorseCollection.new();c.seed_trial();c.add_trial_parents();c.find("trial_b").traits.finish="galaxy"
+ var c=HorseCollection.new();c.seed_trial();c.add_trial_parents();c.find("trial_a").traits.finish="galaxy";c.find("trial_b").traits.finish="galaxy"
  var child=c.breed("trial_a","trial_b",{"finish":1});assert_eq(child.traits.finish,"galaxy")
  assert_false(child.has("species"))
  var entries=UnicornAtlas.entries(c.horses)

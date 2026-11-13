@@ -1,6 +1,14 @@
 # Galaxy puro, fuente y red de primos
 
-Diseño en curso, sin activar reglas, niveles, fuente ni personajes nuevos. Recoge la cadena pedida y separa propuestas pendientes. Sustituye la idea anterior de que el cruce producía directamente un unicornio.
+## Estado actual, 13 noviembre, versión2.7.124
+
+El usuario aceptó los diseños el13nov. Ya están implementados niveles21-40, llaves20/40, bloqueo de nuevos cruces Galaxy×normal y maestría separada por campaña, sin quitar caballos anteriores. Véase RELEASE_2_7_124.md para reglas y migración exactas. Siguen pendientes crecimiento normal y ritual de transformación. El texto inferior conserva la evolución del diseño; sus antiguas etiquetas de pendiente no revocan esa aceptación.
+
+Corrección posterior del13nov: se eliminó el botón Volver a casa. La siesta avanza en línea recta hacia el destino, se detiene antes del primer río/obstáculo o terreno desconocido y despierta allí. No rodea obstáculos ni garantiza llegar. Notas, fotos y sitios ya visitados sirven como destinos, sin saltar entre países. Esto sustituye las propuestas históricas de regreso automático y llegada directa que aparecen abajo.
+
+## Historial del diseño
+
+La cadena sustituye la idea anterior de que el cruce producía directamente un unicornio.
 
 ## Cadena
 

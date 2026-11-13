@@ -10,7 +10,7 @@ func test_distinct_levels_exact_threshold_and_no_skill_or_calm_shortcut():
  h.stage="foal";assert_false(HorseMastery.galaxy_master(h));h.stage="adult";h.traits.finish="normal";assert_false(HorseMastery.galaxy_master(h))
 func test_legacy_empty_validation_and_restore():
  var c=HorseCollection.new();c.seed_trial();var h=c.find("original");assert_eq(HorseMastery.levels(h),[])
- h["completed_levels"]=[3,1,3,-1,21,"4"]
+ h["completed_levels"]=[3,1,3,-1,41,"4"]
  assert_eq(HorseMastery.levels(h),[1,3]);assert_false(HorseMastery.record(c,"missing",2));assert_false(HorseMastery.record(c,h.id,0))
  var loaded=HorseCollection.new();assert_true(loaded.restore(c.export_state()));assert_eq(HorseMastery.levels(loaded.find(h.id)),[1,3])
 func test_victory_credits_mounted_snapshot_and_rolls_back_with_save():
@@ -22,7 +22,7 @@ func test_victory_credits_mounted_snapshot_and_rolls_back_with_save():
  sut.trial_session_active=true;assert_eq(sut.record_victory(2,{},"trial_a"),0);assert_eq(sut.horse_collection.export_state(),before);sut.free();DirAccess.remove_absolute("user://mastery83-qa.dat")
 func test_level20_one_galaxy_offer_other_five_unchanged():
  var offers=HorseMarket.offers(20);assert_eq(offers.size(),6);assert_eq(offers.filter(func(h):return h.traits.finish=="galaxy").size(),1)
- assert_eq(offers[5].offer_id,"offer_20_5");assert_eq(offers,HorseMarket.offers(20));assert_true(HorseMarket.available(HorseCollection.new(),offers[5],20));assert_false(HorseMarket.available(HorseCollection.new(),offers[5],19))
+ assert_eq(offers[5].offer_id,"galaxy_key_20");assert_eq(offers,HorseMarket.offers(20));assert_true(HorseMarket.available(HorseCollection.new(),offers[5],20));assert_false(HorseMarket.available(HorseCollection.new(),offers[5],19))
 func test_portrait_glow_is_master_only_and_intensity_is_configurable():
  var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy"
  var view=TextureRect.new();HorsePortrait.apply_horse(view,h)

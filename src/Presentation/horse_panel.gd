@@ -198,14 +198,16 @@ func detail_view()->void:
   if GalaxyPure143.is_pure(h):
    var pure:=Label.new();pure.name="GalaxyPureBadge143";pure.text=GalaxyPure143.BADGE+"\nDos padres Galaxy al nacer · todavía no es un unicornio";pure.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;pure.add_theme_font_size_override("font_size",22);pure.modulate=RanchTheme.GOLD;box.add_child(pure)
   var completed:=Label.new();completed.text=HorseMastery.level_text(h);completed.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;completed.add_theme_font_size_override("font_size",20);box.add_child(completed)
-  HorseStatBars.row(box,"Maestría general · %d%%"%roundi(HorseMastery.percent(h)),HorseMastery.percent(h))
+  HorseStatBars.row(box,"Maestría de campaña · %d%%"%roundi(HorseMastery.percent(h)),HorseMastery.percent(h))
   if h.traits.get("finish","")=="galaxy":
-   var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: necesita %d%% de maestría general"%roundi(HorseMastery.GALAXY_MASTER_THRESHOLD);galaxy.add_theme_font_size_override("font_size",20);box.add_child(galaxy)
+   var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: necesita %d%% de maestría de campaña"%roundi(HorseMastery.GALAXY_MASTER_THRESHOLD);galaxy.add_theme_font_size_override("font_size",20);box.add_child(galaxy)
  for text in HorseValues.visual(t)+(HorseValues.hidden_genes(t) if owned else [])+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
   var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);box.add_child(line)
  HorseStatBars.create(box,h,owned)
  if not owned:
-  var note:=Label.new();note.text="Vista de posibilidad · no cambia tu colección";box.add_child(note)
+  var note:=Label.new();note.text="Vista de posibilidad · no cambia tu colección"
+  if h.get("galaxy_key173",0)>0:note.text="Galaxy: requiere la llave del nivel %d y los puntos. Una adquisición por llave."%int(h.galaxy_key173)
+  box.add_child(note)
   if detail_origin not in ["atlas","atlas_variants"]:
    var buy:=Button.new();buy.text=tr("MARKET_BUY")%(0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h));box.add_child(buy);buy.pressed.connect(func():confirm_trade(h,false));buy.disabled=not SaveData.debug_mode and not SaveData.trial_session_active and (SaveData.equipment_points<HorseMarket.buy_price(h) or not HorseMarket.available(SaveData.horse_collection,h,SaveData.highest_level_completed))
   return
@@ -294,7 +296,7 @@ func atlas_view()->void:
   order_btn.name="AtlasOrder114";order_btn.add_theme_font_size_override("font_size",19)
 
  _atlas_filter_bar()
- label(tr("MARKET_DESIGN_NOTE") if page=="market" else "6 por página · toca una tarjeta para ver "+("variantes" if atlas_filters.is_empty() and page=="atlas" else "la ficha"),Vector2(35,160),21)
+ label("Galaxy: una llave del 20 y otra del 40. Cada llave adquiere uno; el dinero no sustituye la llave." if page=="market" else "6 por página · toca una tarjeta para ver "+("variantes" if atlas_filters.is_empty() and page=="atlas" else "la ficha"),Vector2(35,160),21)
  if page=="market" and entries_empty():label(tr("MARKET_EMPTY"),Vector2(40,300),22)
  var all_entries:Array[Dictionary]=atlas_entries()
  var entries:Array[Dictionary]=HorseFilters.apply(all_entries,atlas_filters);var pages:int=maxi(1,ceili(entries.size()/6.0));atlas_page=clampi(atlas_page,0,pages-1)
@@ -317,7 +319,7 @@ func atlas_view()->void:
   var rarity:int=4 if mystery or h.get("species","")=="unicorn" else HorseMarket.tier(h)
   var rarity_label:=label(tr(HorseCollection.RARITIES[rarity]),Vector2(x+160,y+78),22);rarity_label.size.x=232
   label("No conseguido" if mystery else ("✓ Conseguido" if entry.owned else "No conseguido"),Vector2(x+160,y+110),21)
-  if page=="market":label(tr("MARKET_PRICE")%HorseMarket.buy_price(h),Vector2(x+160,y+140),20)
+  if page=="market":label(("Galaxy · llave %d + %d puntos"%[int(h.galaxy_key173),HorseMarket.buy_price(h)]) if h.get("galaxy_key173",0)>0 else tr("MARKET_PRICE")%HorseMarket.buy_price(h),Vector2(x+160,y+140),16 if h.get("galaxy_key173",0)>0 else 20)
   elif not mystery:label("Ver variantes ›" if page=="atlas" and atlas_filters.is_empty() else "Ver ficha ›",Vector2(x+160,y+140),20)
   var open:=Button.new();open.flat=true;open.position=Vector2(x,y);open.size=Vector2(400,174);open.tooltip_text="Sin descubrir" if mystery else tr("UI_126");open.disabled=mystery;content.add_child(open);open.pressed.connect(func():
    if page=="atlas" and atlas_filters.is_empty():
@@ -331,6 +333,7 @@ func confirm_trade(h:Dictionary,selling:bool)->void:
  var dialog:=ConfirmationDialog.new();dialog.title=tr("MARKET_TITLE")
  var amount:int=HorseMarket.sell_price(h) if selling else (0 if SaveData.debug_mode or SaveData.trial_session_active else HorseMarket.buy_price(h))
  dialog.dialog_text=(tr("MARKET_CONFIRM_SELL") if selling else tr("MARKET_CONFIRM_BUY"))%[h.name,amount,SaveData.equipment_points]
+ if not selling and h.get("galaxy_key173",0)>0:dialog.dialog_text+="\nSe consume la llave del nivel %d. No se recupera al vender el caballo."%int(h.galaxy_key173)
  dialog.get_cancel_button().text=tr("MARKET_CANCEL");dialog.min_size=Vector2i(600,180);dialog.dialog_autowrap=true;add_child(dialog);RanchTheme.style_dialog(dialog,true)
  dialog.confirmed.connect(func():
   var ok:bool=SaveData.sell_market_horse(str(h.id)) if selling else SaveData.buy_market_horse(h)

@@ -18,7 +18,7 @@ extends RefCounted
 ## running scene. If a bull ever spawns stuck inside a wall, that's why — report it and
 ## it's a one-line position fix here, not a deeper bug.
 
-const MAX_LEVEL: int = 20  ## single source of truth for the number of playable levels (menu, progression, save validation)
+const MAX_LEVEL: int = 40  ## single source of truth for the number of playable levels (menu, progression, save validation)
 const DEFAULT_DOOR_HOLD_SECONDS: float = 1.2  ## seconds standing still to open any pen door (Nivel 11+); override per-pen below if ever needed
 
 static func get_level(level_number: int) -> LevelData:
@@ -33,6 +33,8 @@ static func get_level(level_number: int) -> LevelData:
 	# specific case below if a level ever needs to diverge from the ramp.
 	data.chase_probability = clampf(level_number * 0.05, 0.05, 0.5)
 
+	if level_number>=21 and level_number<=40:
+		Campaign173.apply(data);return data
 	match level_number:
 		1:
 			data.time_limit_seconds = 80.0

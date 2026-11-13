@@ -5,10 +5,10 @@ func test_two_galaxy_parents_record_birth_but_do_not_transform_or_change_stats()
  var c:=collection();var a:Dictionary=c.find("trial_a").duplicate(true);var b:Dictionary=c.find("trial_b").duplicate(true)
  var child:=c.breed(a.id,b.id,{})
  assert_true(GalaxyPure143.is_pure(child));assert_eq(child.stage,"foal");assert_eq(child.traits.finish,"galaxy");assert_false(child.has("species"));assert_false(c.is_adult(child.id));assert_false(HorseMastery.galaxy_master(child));assert_eq(child.stats,HorseStats.inherit(a,b));assert_eq(c.find(a.id),a);assert_eq(c.find(b.id),b)
-func test_single_galaxy_can_inherit_finish_but_is_not_pure():
+func test_single_galaxy_does_not_pass_finish_or_purity():
  var c:=collection();c.find("trial_b").traits.finish="normal"
  var child:=c.breed("trial_a","trial_b",{})
- assert_eq(child.traits.finish,"galaxy");assert_false(child.has("galaxy_birth143"));assert_false(GalaxyPure143.is_pure(child));assert_eq(GalaxyPure143.birth(c.find("trial_a"),c.find("trial_a")),{})
+ assert_eq(child.traits.finish,"normal");assert_false(child.has("galaxy_birth143"));assert_false(GalaxyPure143.is_pure(child));assert_eq(GalaxyPure143.birth(c.find("trial_a"),c.find("trial_a")),{})
 func test_birth_snapshot_is_independent_of_parent_edits_and_sale():
  var c:=collection();var child:=c.breed("trial_a","trial_b",{});var proof:Dictionary=child.galaxy_birth143.duplicate(true)
  c.find("trial_a").traits.finish="normal";assert_true(HorseMarket.sell(c,"trial_b"))

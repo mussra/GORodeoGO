@@ -1,6 +1,7 @@
 extends Control
 
 @onready var level_grid: GridContainer = $LevelGrid
+var level_scroll173:ScrollContainer
 @onready var quit_button: Button = $QuitButton
 var _settings_button:Button
 var _hero: Control
@@ -105,7 +106,7 @@ func _build_menu() -> void:
 	_missions.add_theme_font_size_override("font_size",16)
 	_missions.pressed.connect(_show_levels)
 	_hero.add_child(_missions)
-	_caption = _label("%02d / 20 COMPLETADOS     ·     RODEO + CORRALES" % SaveData.highest_level_completed,14,Color("85a9ad"))
+	_caption = _label("%02d / %02d COMPLETADOS     ·     RODEO + CORRALES" % [SaveData.highest_level_completed,LevelCatalog.MAX_LEVEL],14,Color("85a9ad"))
 	_hero.add_child(_caption)
 	_equipment_button=Button.new()
 	_equipment_button.text=tr("UI_004")
@@ -167,11 +168,12 @@ func _build_menu() -> void:
 	close.size = Vector2(140,44)
 	close.pressed.connect(_hide_levels)
 	_drawer.add_child(close)
-	level_grid.reparent(_drawer)
+	level_scroll173=ScrollContainer.new();level_scroll173.name="CampaignScroll173";level_scroll173.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;_drawer.add_child(level_scroll173)
+	level_grid.reparent(level_scroll173);level_grid.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	level_grid.columns = 5
 	level_grid.add_theme_constant_override("h_separation",10)
 	level_grid.add_theme_constant_override("v_separation",10)
-	for number in range(1,21):
+	for number in range(1,LevelCatalog.MAX_LEVEL+1):
 		var button := Button.new()
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -210,8 +212,8 @@ func _layout() -> void:
 	quit_button.size = Vector2(90,44)
 	_drawer.position = Vector2(32,22)
 	_drawer.size = size-Vector2(64,68)
-	level_grid.position = Vector2(24,120)
-	level_grid.size = _drawer.size-Vector2(48,144)
+	level_scroll173.position = Vector2(24,120)
+	level_scroll173.size = _drawer.size-Vector2(48,144)
 
 func _animate_intro() -> void:
 	# Ant 22:50 ("que aparezca todo homogéneo"): ONE shared entrance for the whole
@@ -235,7 +237,10 @@ func _show_levels() -> void:
 	_drawer.show()
 	_drawer.modulate.a = 0
 	create_tween().tween_property(_drawer,"modulate:a",1.0,.22)
-	level_grid.get_child(0).grab_focus()
+	var target:int=clampi(_next_level-1,0,level_grid.get_child_count()-1)
+	var next:Control=level_grid.get_child(target)
+	level_scroll173.ensure_control_visible.call_deferred(next)
+	if next.focus_mode!=Control.FOCUS_NONE and not next.disabled:next.grab_focus()
 func _hide_levels() -> void:
 	_drawer.hide()
 	_missions.grab_focus()
@@ -258,7 +263,7 @@ func _refresh_points_caption()->void:
 		var id:String=SaveData.equipment_equipped.get("whip","")
 		_equipment_caption.text=tr("UI_013")+(str(EquipmentCatalog.ITEMS[id].name) if EquipmentCatalog.ITEMS.has(id) else tr("UI_014"))
 	if is_instance_valid(_hd_rider):HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color);HorseGalaxyLook.configure_portrait(_hd_rider.material,SaveData.horse_collection.find(SaveData.horse_collection.selected))
-	_caption.text=tr("UI_015") % [SaveData.highest_level_completed,SaveData.equipment_points]
+	_caption.text="%02d / %02d COMPLETADOS · %d PUNTOS"%[SaveData.highest_level_completed,LevelCatalog.MAX_LEVEL,SaveData.equipment_points]
 
 func _show_equipment()->void:
 	_equipment_panel.refresh()

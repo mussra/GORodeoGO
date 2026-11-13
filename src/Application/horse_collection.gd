@@ -17,6 +17,8 @@ var training_pair:Dictionary={}
 var affinities:Dictionary={}
 var birth_credits:int=0
 var bought_offers:Array[String]=[]
+var galaxy_keys173:Array[int]=[]
+var galaxy_rule173:int=1
 func seed_trial()->void:
  if not horses.is_empty():return
  horses=[{"id":"original","name":"Original","parents":[],"traits":{"coat":10,"pattern":0,"mane":1,"finish":"original"}}]
@@ -37,7 +39,7 @@ func grant_achievement(level:int)->Dictionary:
  if not known_record(id).is_empty():return {}
  var rng:=RandomNumberGenerator.new();rng.randomize()
  var h:Dictionary={"id":id,"name":"Hallazgo de nivel %d"%level,"parents":[],"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,PATTERNS.size()-1),"mane":rng.randi_range(0,5),"eyes":rng.randi_range(0,EYES.size()-1),"finish":"normal"},"stats":{"speed":rng.randf_range(260,285),"handling":rng.randf_range(900,1300),"power":rng.randf_range(0.6,0.8),"dodge":rng.randf_range(0.85,1.0)}}
- var offer:Dictionary=HorseMarket.offers(level)[rng.randi_range(0,5)]
+ var offer:Dictionary=HorseMarket.offers(level)[rng.randi_range(0,3 if level>=40 else (4 if level>=20 else 5))]
  h.traits=offer.traits.duplicate(true);h["can_jump"]=level>=3;h.name=suggest_name(h.traits);horses.append(h);return h
 func find(id:String)->Dictionary:
  for h in horses:
@@ -54,8 +56,7 @@ func valid_traits(v:Variant)->bool:
  return v.coat>=0 and v.coat<20 and v.pattern>=0 and v.pattern<PATTERNS.size() and v.mane>=0 and v.mane<6 and v.get("finish","normal") in ["normal","original","galaxy"]
 func preview(a:String,b:String,choices:Dictionary)->Dictionary:
  if a==b or find(a).is_empty() or find(b).is_empty() or not is_adult(a) or not is_adult(b):return {}
- var inherited_finish:String=str(find(b if choices.get("finish",0)==1 else a).traits.get("finish","normal"))
- var t:Dictionary={"finish":"galaxy" if inherited_finish=="galaxy" else "normal"}
+ var t:Dictionary={"finish":"galaxy" if find(a).traits.get("finish","")=="galaxy" and find(b).traits.get("finish","")=="galaxy" else "normal"}
  for k in ["coat","pattern","mane","eyes","legs","spots"]:
   var source:String=b if choices.get(k,0)==1 else a
   if k in ["legs","spots"] and not find(source).traits.has(k):continue
@@ -69,7 +70,7 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  if not proof.is_empty():child["galaxy_birth143"]=proof
  child["can_jump"]=false;child["can_dodge"]=false;child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
- return {"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
+ return {"galaxy_keys173":galaxy_keys173.duplicate(),"galaxy_rule173":galaxy_rule173,"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
  if not v is Dictionary or not v.get("horses") is Array:return false
  if not v.get("training_pair",{}) is Dictionary or not v.get("affinities",{}) is Dictionary:return false
@@ -77,6 +78,10 @@ func restore(v:Variant)->bool:
  if not offers_state is Array:return false
  for offer in offers_state:
   if not offer is String:return false
+ var raw_keys:Variant=v.get("galaxy_keys173",[])
+ if not raw_keys is Array or typeof(v.get("galaxy_rule173",0))!=TYPE_INT or int(v.get("galaxy_rule173",0)) not in [0,1]:return false
+ for key in raw_keys:
+  if typeof(key)!=TYPE_INT or key not in [20,40]:return false
  var clean:Array[Dictionary]=[];var ids:Dictionary={};var by_id:Dictionary={}
  var known:Variant=v.get("ancestors",[])
  if not known is Array:return false
@@ -113,6 +118,7 @@ func restore(v:Variant)->bool:
  for h in clean:
   if h.get("stage","adult")=="adult":adult_id=h.id;break
  if adult_id.is_empty():return false
+ galaxy_keys173.assign(raw_keys);galaxy_rule173=clampi(int(v.get("galaxy_rule173",0)),0,1)
  horses=clean;ancestors=clean_ancestors;selected=str(v.get("selected",adult_id))
  if not is_adult(selected):selected=adult_id
  var offers:Variant=v.get("bought_offers",[])

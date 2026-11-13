@@ -72,7 +72,7 @@ func _ready() -> void:
 	world_bounds=ArenaLayout.bounds_for_level(_level_number)
 	if _arena_scale>1.0:_expand_arena()
 	_time_remaining = level_data.time_limit_seconds
-	_obstacle_rects = level_data.obstacle_rects if level_data.pens.is_empty() else []
+	_obstacle_rects = level_data.obstacle_rects if level_data.pens.is_empty() or _level_number>=21 else []
 	_win_requires_all_bulls = level_data.win_requires_all_bulls
 	_spawn_obstacles(_obstacle_rects)
 	_setup_art()

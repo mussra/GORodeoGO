@@ -169,6 +169,7 @@ func load_progress() -> void:
 	highest_level_completed = LevelProgression.sanitize_highest_completed(
 		config.get_value("progress", "highest_level_completed", 0)
 	)
+	GalaxyKeys173.migrate(horse_collection,highest_level_completed)
 	dual_lasso_intro_shown = config.get_value("progress", "dual_lasso_intro_shown", false)
 
 	var points:Variant=config.get_value("equipment","points",0)
@@ -283,7 +284,8 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 	var before_horses:Dictionary=horse_collection.export_state()
 	var before_highest:int=highest_level_completed
 	var before_points:int=equipment_points
-	if level_number>highest_level_completed:horse_collection.grant_achievement(level_number)
+	GalaxyKeys173.migrate(horse_collection,highest_level_completed)
+	if level_number>highest_level_completed and level_number not in [20,40]:horse_collection.grant_achievement(level_number)
 	highest_level_completed=maxi(highest_level_completed,level_number)
 	equipment_points+=reward
 	horse_collection.birth_credits+=1
@@ -406,7 +408,10 @@ func buy_market_horse(offer:Dictionary)->bool:
 	var price:int=0 if debug_mode or trial_session_active else HorseMarket.buy_price(offer)
 	if equipment_points<price:return false
 	var before:Dictionary=horse_collection.export_state();var points:int=equipment_points
-	if HorseMarket.buy(horse_collection,offer).is_empty():return false
+	if offer.get("traits",{}).get("finish","")=="galaxy" and not debug_mode and not trial_session_active:
+		if not GalaxyKeys173.consume(horse_collection,highest_level_completed,int(offer.get("galaxy_key173",0))):return false
+	if HorseMarket.buy(horse_collection,offer).is_empty():
+		horse_collection.restore(before);return false
 	equipment_points-=price
 	if not debug_mode and not trial_session_active:horse_collection.bought_offers.append(str(offer.offer_id))
 	if save_progress():return true

@@ -35,20 +35,29 @@ static func sell(c:HorseCollection,id:String)->bool:
  c.ancestors.append(record);return true
 
 ## Six one-off offers per reached level. Stable across reloads; no wall clock rerolls.
-static func offers(progress:int)->Array[Dictionary]:
+static func _normal_offers173(progress:int)->Array[Dictionary]:
  var result:Array[Dictionary]=[];var rng:=RandomNumberGenerator.new();rng.seed=91073+progress*197
  var cap:int=mini(4,int(progress/4));var attempts:int=0
  while result.size()<6 and attempts<100000:
   attempts+=1
-  var h:Dictionary={"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,9),"mane":rng.randi_range(0,5),"eyes":rng.randi_range(0,21),"finish":"galaxy" if cap==4 and rng.randf()<.1 else "normal"},"can_jump":progress>=3 and rng.randf()<.3}
+  var h:Dictionary={"traits":{"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,9),"mane":rng.randi_range(0,5),"eyes":rng.randi_range(0,21),"finish":"normal"},"can_jump":progress>=3 and rng.randf()<.3}
   # Higher tiers only enter as progress permits. Within unlocked pool, high tiers remain less offered.
   var rank:int=tier(h)
   if rank>cap or rng.randf()>pow(.45,rank):continue
   h["offer_id"]="offer_%d_%d"%[progress,result.size()];h["name"]=HorseCollection.COATS[h.traits.coat];result.append(h)
- if progress==20 and not result.any(func(h):return h.traits.get("finish","")=="galaxy"):
-  result[5].traits["finish"]="galaxy"  # keep other five offers and all other traits/IDs untouched
+ return result
+static func offers(progress:int)->Array[Dictionary]:
+ var result:=_normal_offers173(progress)
+ if progress>=20:
+  result[5]=_normal_offers173(20)[5]
+  result[5].traits["finish"]="galaxy"
+  result[5]["galaxy_key173"]=20;result[5].offer_id="galaxy_key_20"
+ if progress>=40:
+  result[4]=_normal_offers173(40)[4]
+  result[4].traits["finish"]="galaxy";result[4]["galaxy_key173"]=40;result[4].offer_id="galaxy_key_40"
  return result
 static func available(c:HorseCollection,offer:Dictionary,progress:int)->bool:
+ if offer.get("traits",{}).get("finish","")=="galaxy" and not GalaxyKeys173.available(c,progress).has(int(offer.get("galaxy_key173",0))):return false
  for candidate in offers(progress):
-  if candidate.offer_id==offer.get("offer_id","") and not c.bought_offers.has(candidate.offer_id) and candidate.traits==offer.get("traits",{}) and candidate.can_jump==offer.get("can_jump",false):return true
+  if candidate.get("galaxy_key173",0)==offer.get("galaxy_key173",0) and candidate.offer_id==offer.get("offer_id","") and not c.bought_offers.has(candidate.offer_id) and candidate.traits==offer.get("traits",{}) and candidate.can_jump==offer.get("can_jump",false):return true
  return false

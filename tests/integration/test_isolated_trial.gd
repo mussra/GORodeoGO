@@ -13,7 +13,7 @@ func test_bytes_and_all_state_preserved_across_scratch_routes()->void:
  var progress:int=SaveData.highest_level_completed;var points:int=SaveData.equipment_points
  var contracts:Dictionary=SaveData.repeat_contract165.duplicate(true);var rest:float=SaveData.siesta_rest166
  assert_true(SaveData.begin_trial_session());assert_false(SaveData.begin_trial_session())
- assert_eq(SaveData.effective_progress(),20);assert_true(SaveData.equip_item("whip_long"));assert_eq(SaveData.equipped_whip_reach(),420.0)
+ assert_eq(SaveData.effective_progress(),LevelCatalog.MAX_LEVEL);assert_true(SaveData.equip_item("whip_long"));assert_eq(SaveData.equipped_whip_reach(),420.0)
  assert_true(SaveData.preview_trial_traits(19,4,5));assert_eq(HorseStats.read(SaveData.horse_collection.find("preview_temporary")),HorseStats.BASE)
  assert_true(SaveData.select_hat("blue" if HatAppearance.OPTIONS.has("blue") else "original"))
  var child:Dictionary=SaveData.breed_horses("original","trial_a",{});assert_false(child.is_empty());assert_false(SaveData.select_horse(child.id));assert_true(SaveData.mature_horse_trial(child.id));assert_true(SaveData.select_horse(child.id))

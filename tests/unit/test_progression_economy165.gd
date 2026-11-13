@@ -4,7 +4,7 @@ func test_first_wins_keep_earned_policy_repeats_cannot_farm_8500():
   assert_eq(ProgressionEconomy165.victory_points(level,level-1),EquipmentCatalog.REWARDS[level])
   assert_between(ProgressionEconomy165.victory_points(level,20),10,400)
  assert_eq(ProgressionEconomy165.victory_points(20,20),400)
- assert_eq(ProgressionEconomy165.victory_points(40,20),0)
+ assert_eq(ProgressionEconomy165.victory_points(41,40),0)
 func test_currency_alone_never_unlocks_cosmetics_and_progress_is_not_consumed():
  var id:String="finish_ice";var missing:=ProgressionEconomy165.missing(id,1000000,0,0,0)
  assert_eq(missing,{"pigs":280,"goats":220,"contracts":56})
