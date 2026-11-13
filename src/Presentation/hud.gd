@@ -142,6 +142,8 @@ func _build_pause_panel() -> void:
 
 	var sound_button := CheckButton.new()
 	sound_button.text = tr("UI_024")
+	sound_button.add_theme_icon_override("unchecked",AntIcons187.sized(61,Vector2i(32,16)))
+	sound_button.add_theme_icon_override("checked",AntIcons187.sized(62,Vector2i(32,16)))
 	sound_button.button_pressed = GameState.sound_enabled
 	sound_button.position = Vector2(185, 65)
 	sound_button.toggled.connect(func(value: bool): sound_toggled.emit(value))

@@ -7,8 +7,8 @@ var total:int=0
 var previous:Button
 var next:Button
 var counter:Label
-var _left:Label
-var _right:Label
+var _left:Control
+var _right:Control
 var _elapsed:float=0
 static func create(host:Control,pos:Vector2,width:float,current:int,count:int,selected:Callable)->ItemPager:
  var pager:=ItemPager.new();pager.name="ItemPager";pager.position=pos;pager.size=Vector2(width,56);pager.index=current;pager.total=count;host.add_child(pager);pager.changed.connect(selected);return pager
@@ -19,8 +19,9 @@ func _ready()->void:
  _left=_glyph(previous,"←");_right=_glyph(next,"→")
  counter=Label.new();counter.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;counter.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;counter.mouse_filter=Control.MOUSE_FILTER_IGNORE;counter.add_theme_font_size_override("font_size",19);add_child(counter)
  previous.pressed.connect(func():_step(-1));next.pressed.connect(func():_step(1));resized.connect(_layout);_layout();set_state(index,total)
-func _glyph(host:Button,text:String)->Label:
- var label:=Label.new();label.text=text;label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.vertical_alignment=VERTICAL_ALIGNMENT_CENTER;label.size=Vector2(56,56);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;label.add_theme_font_size_override("font_size",32);host.add_child(label);return label
+func _glyph(host:Button,text:String)->Control:
+ var holder:=Control.new();holder.mouse_filter=Control.MOUSE_FILTER_IGNORE;holder.size=Vector2(56,56);host.add_child(holder)
+ var icon:=TextureRect.new();icon.texture=AntIcons187.texture(13 if text=="←" else 14);icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;icon.position=Vector2(8,8);icon.size=Vector2(40,40);icon.mouse_filter=Control.MOUSE_FILTER_IGNORE;holder.add_child(icon);return holder
 func _layout()->void:
  if next==null:return
  next.position=Vector2(size.x-56,0);counter.position=Vector2(56,0);counter.size=Vector2(maxf(0,size.x-112),56)

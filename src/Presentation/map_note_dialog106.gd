@@ -46,10 +46,7 @@ func refresh_photo160()->void:
  photo_status.text=("Esta captura se adjuntará cuando pulses Guardar." if captured_photo!=null else "No hay captura disponible. Cierra el mapa y vuelve a abrirlo.") if photo_box.button_pressed else ("Foto guardada. Tócala para verla a pantalla completa. Se conserva si no activas otra captura." if stored_photo!=null else "Toca el recuadro amarillo de arriba para añadir la vista del mundo anterior al mapa. Después pulsa Guardar.")
  if not photo_allowed:photo_status.text="Estás lejos del marcador.\nCierra el mapa, acércate y ábrelo de nuevo.\nLa foto anterior se conserva."
 func photo_icon160(checked:bool,disabled:bool=false)->Texture2D:
- var image:=Image.create(36,36,false,Image.FORMAT_RGBA8)
- for x in 36:
-  for y in 36:
-   var border:bool=x<4 or y<4 or x>=32 or y>=32
-   var tick:bool=checked and (Vector2(x,y).distance_to(Geometry2D.get_closest_point_to_segment(Vector2(x,y),Vector2(8,18),Vector2(15,25)))<2.4 or Vector2(x,y).distance_to(Geometry2D.get_closest_point_to_segment(Vector2(x,y),Vector2(15,25),Vector2(28,10)))<2.4)
-   image.set_pixel(x,y,(Color("b8c1c5") if disabled else Color("342313")) if tick else (Color("738088") if disabled else Color("efb950")) if border or checked else (Color("34434a") if disabled else Color("10252d")))
+ var image:=AntIcons187.texture((60 if checked else 59) if disabled else (58 if checked else 57)).get_image()
+ if image.is_compressed():image.decompress()
+ image.resize(36,36,Image.INTERPOLATE_LANCZOS)
  return ImageTexture.create_from_image(image)

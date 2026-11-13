@@ -88,10 +88,11 @@ func test_remote_capture_disabled_style_is_gray_and_close_capture_is_gold_and_sa
  assert_true(dialog.photo_status.text.contains("Cierra el mapa, acércate"))
  var disabled_style:StyleBoxFlat=dialog.photo_box.get_theme_stylebox("disabled")
  assert_eq(disabled_style.bg_color,Color("34434a"))
- assert_eq(dialog.photo_box.get_theme_icon("unchecked_disabled").get_image().get_pixel(0,0),Color("738088"))
+ assert_eq(dialog.photo_box.get_theme_icon("unchecked_disabled").get_size(),Vector2(36,36))
+ assert_true(dialog.photo_box.get_theme_icon("unchecked_disabled").get_image().detect_alpha()!=Image.ALPHA_NONE)
  dialog.photo_allowed=true;dialog.refresh_photo160()
  assert_false(dialog.photo_box.disabled)
- assert_eq(dialog.photo_box.get_theme_icon("unchecked").get_image().get_pixel(0,0),Color("efb950"))
+ assert_ne(dialog.photo_box.get_theme_icon("unchecked").get_image().get_data(),dialog.photo_box.get_theme_icon("unchecked_disabled").get_image().get_data())
  dialog.photo_box.button_pressed=true
  assert_true(dialog.photo_preview.visible)
  assert_true(dialog.photo_status.text.contains("Guardar"))

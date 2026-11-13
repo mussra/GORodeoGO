@@ -44,6 +44,9 @@ static func create() -> Theme:
 	dialog_panel.content_margin_top = 20.0
 	dialog_panel.content_margin_bottom = 18.0
 	theme.set_stylebox("panel", "AcceptDialog", dialog_panel)
+	theme.set_icon("arrow","OptionButton",AntIcons187.sized(63,Vector2i(12,12)))
+	# Keep the old12px dropdown footprint despite the larger supplied crop.
+	theme.set_constant("arrow_margin","OptionButton",4)
 	return theme
 
 ## Applies the menus' palette to a popup dialog (Salir, confirmaciones, avisos).

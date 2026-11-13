@@ -126,7 +126,8 @@ func _ready() -> void:
  # clear close affordances (Ant 7-nov-2026: "no lo puedo cerrar"):
  # X button, tap without drag, or Android back (ui_cancel in the world)
  var close := Button.new()
- close.text = "X"
+ close.text = ""
+ AntIcons187.button(close,21,30)
  close.set_anchors_preset(Control.PRESET_TOP_RIGHT)
  close.offset_left = -90
  close.offset_top = 16
@@ -138,7 +139,8 @@ func _ready() -> void:
  _close_btn = close
  _find108=Button.new();_find108.text="Encontrar mi caballo";QuestButtonStyle.apply(_find108);_find108.add_theme_font_size_override("font_size",19);_find108.pressed.connect(_find_player108);add_child(_find108)
  var minus := Button.new()
- minus.text = "-"
+ minus.text = ""
+ AntIcons187.button(minus,23,30)
  minus.position = Vector2(24, size.y - 84)
  minus.size = Vector2(64, 56)
  QuestButtonStyle.apply(minus);minus.add_theme_font_size_override("font_size",34)
@@ -146,7 +148,8 @@ func _ready() -> void:
  add_child(minus)
  _zoom_btns.append(minus)
  var plus := Button.new()
- plus.text = "+"
+ plus.text = ""
+ AntIcons187.button(plus,22,30)
  plus.position = Vector2(96, size.y - 84)
  plus.size = Vector2(64, 56)
  QuestButtonStyle.apply(plus);plus.add_theme_font_size_override("font_size",34)
@@ -155,11 +158,7 @@ func _ready() -> void:
  _zoom_btns.append(plus)
  _zoom_slider106=HSlider.new();_zoom_slider106.min_value=.5;_zoom_slider106.max_value=32.;_zoom_slider106.step=.05;_zoom_slider106.value=zoom;_zoom_slider106.scrollable=false
  var track=StyleBoxFlat.new();track.bg_color=Color("876739");track.set_corner_radius_all(6);track.content_margin_top=6.;track.content_margin_bottom=6.;_zoom_slider106.add_theme_stylebox_override("slider",track)
- var thumb_image:Image=Image.create(30,30,false,Image.FORMAT_RGBA8)
- for x in 30:
-  for y in 30:
-   if Vector2(x-15,y-15).length()<14.:thumb_image.set_pixel(x,y,Color("ffdf8c"))
- var thumb:ImageTexture=ImageTexture.create_from_image(thumb_image);_zoom_slider106.add_theme_icon_override("grabber",thumb);_zoom_slider106.add_theme_icon_override("grabber_highlight",thumb)
+ var thumb:Texture2D=AntIcons187.sized(48,Vector2i(30,30));_zoom_slider106.add_theme_icon_override("grabber",thumb);_zoom_slider106.add_theme_icon_override("grabber_highlight",thumb)
  _zoom_slider106.value_changed.connect(_set_zoom);add_child(_zoom_slider106)
  _zoom_label106=Label.new();_zoom_label106.add_theme_font_size_override("font_size",20);add_child(_zoom_label106)
  _sites144=Button.new();_sites144.text="Sitios visitados";_sites144.tooltip_text="Toca un círculo dorado para viajar. Mantén pulsado el terreno para añadir una nota.";_sites144.position=Vector2(20,16);_sites144.size=Vector2(230,56);QuestButtonStyle.apply(_sites144);_sites144.pressed.connect(func():show_sites159());add_child(_sites144)
