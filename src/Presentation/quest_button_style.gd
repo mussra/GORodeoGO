@@ -1,6 +1,7 @@
 class_name QuestButtonStyle
 extends RefCounted
 static func apply(button:Button):
+ TextFit181.button(button)
  # Same footprint, opaque gold face, warm border and dark readable lettering.
  for state in ["normal","hover","pressed"]:
   var box=RanchTheme.box(Color("efb950") if state=="normal" else Color("ffe09a") if state=="hover" else Color("d99b35"),Color("704122"),10)

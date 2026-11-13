@@ -36,7 +36,7 @@ func _remove(slot:String):
  status.text="Adorno retirado." if SaveData.equip_adorn169(SaveData.horse_collection.selected,slot,"") else "No se pudo quitar."
  refresh()
 func _label(text_:String,pos:Vector2,font:int)->Label:
- var l:=Label.new();l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;l.size=Vector2(900,80);l.text=text_;l.position=pos;l.add_theme_font_size_override("font_size",font);canvas.add_child(l);return l
+ var l:=Label.new();l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;l.size=Vector2(900,80);l.text=text_;l.position=pos;l.add_theme_font_size_override("font_size",font);canvas.add_child(l);TextFit181.fixed(l,l.size,font,18,3);return l
 func _button(text_:String,pos:Vector2,size_:Vector2,callback:Callable)->Button:
  var b:=Button.new();b.text=text_;b.position=pos;b.size=size_;b.pressed.connect(callback);canvas.add_child(b);return b
 func _layout():

@@ -26,8 +26,8 @@ func _ready()->void:
    HorsePortrait.apply_horse(view,e.horse,SaveData.hat_color)
   if e.silhouette:
    var horn=Polygon2D.new();horn.color=SHADE;horn.polygon=PackedVector2Array([Vector2(20+68*200.0/96,12+37*200.0/96),Vector2(20+71*200.0/96,12+21*200.0/96),Vector2(20+75*200.0/96,12+37*200.0/96)]);panel.add_child(horn)
-  var title=Label.new();title.position=Vector2(222,58);title.text=e.name;title.add_theme_font_size_override("font_size",20);panel.add_child(title)
-  var state=Label.new();state.position=Vector2(222,105);state.text="No conseguido" if e.silhouette else "Conseguido";state.add_theme_font_size_override("font_size",16);panel.add_child(state)
+  var title=Label.new();title.position=Vector2(222,58);title.text=e.name;title.add_theme_font_size_override("font_size",20);panel.add_child(title);TextFit181.fixed(title,Vector2(166,44),20,18,2)
+  var state=Label.new();state.position=Vector2(222,105);state.text="No conseguido" if e.silhouette else "Conseguido";state.add_theme_font_size_override("font_size",16);panel.add_child(state);TextFit181.fixed(state,Vector2(166,30),16,16)
  var caveat=Label.new();caveat.position=Vector2(36,688);caveat.text="Preview: contorno reutilizado. Diseño/color final de unicornio aún por aprobar.";caveat.add_theme_font_size_override("font_size",18);canvas.add_child(caveat)
 func _layout()->void:
  if canvas==null:return

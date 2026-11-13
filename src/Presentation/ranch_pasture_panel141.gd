@@ -3,7 +3,7 @@ extends Control
 signal horse_opened(id:String)
 signal list_requested
 signal closed
-const AdultArt=preload("res://src/Presentation/wild_horse_art.gd")
+const AdultArt=preload("res://src/Presentation/mounted_preview181.gd")
 var canvas:Control
 var content:Control
 var tier:int=-1
@@ -18,9 +18,9 @@ func _layout():
  if canvas==null:return
  var k:float=minf(size.x/1280.,size.y/720.);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2.
 func _label(text:String,at:Vector2,width:float=280,font:int=20)->Label:
- var l:=Label.new();l.text=text;l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.position=at;l.size.x=width;l.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;l.tooltip_text=text;l.add_theme_font_size_override("font_size",font);content.add_child(l);return l
+ var l:=Label.new();l.text=text;l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.position=at;l.size.x=width;l.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;l.tooltip_text=text;l.add_theme_font_size_override("font_size",font);content.add_child(l);TextFit181.fixed(l,Vector2(width,30),font,mini(font,18));return l
 func _button(text:String,at:Vector2,width:float,action:Callable)->Button:
- var b:=Button.new();b.text=text;b.position=at;b.size=Vector2(width,48);content.add_child(b);b.pressed.connect(action);return b
+ var b:=Button.new();b.text=text;b.position=at;b.size=Vector2(width,48);content.add_child(b);TextFit181.button(b,Vector2(width,48));b.pressed.connect(action);return b
 func refresh():
  if content!=null:canvas.remove_child(content);content.queue_free()
  animated.clear();content=Control.new();canvas.add_child(content)

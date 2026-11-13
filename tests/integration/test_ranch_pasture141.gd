@@ -22,6 +22,7 @@ func test_real_menu_open_detail_back_filter_and_list():
  button.pressed.emit();await settle();assert_eq(panel.page,"detail");assert_eq(panel.focus_id,"trial_a");assert_eq(panel.detail_origin,"pasture141")
  panel.go_back();await settle();assert_eq(panel.page,"pasture141");assert_eq(ranch().tier,0)
  ranch().list_requested.emit();await settle();assert_eq(panel.page,"collection")
+ panel.content.get_node("CollectionToRanch181").pressed.emit();await settle();assert_eq(panel.page,"pasture141")
  panel.open_section("pasture141");await settle();ranch().closed.emit();await settle();assert_eq(panel.page,"hub")
 func test_shared_animated_adults_static_foal_and_family():
  panel.open_section("pasture141");await settle();var p:=ranch();assert_eq(p.animated.size(),3)
@@ -49,3 +50,12 @@ func test_preview_bounded_and_distinct_galaxy_mastery():
  var b=Art.new();b.configure_preview141(mastered);panel.add_child(b)
  assert_ne(a.sprite_frames,b.sprite_frames);assert_true(HorseGalaxyLook.state(mastered).master)
  var c=Art.new();c.configure_preview141(h);panel.add_child(c);assert_eq(a.sprite_frames,c.sprite_frames)
+
+func test_paddock_uses_exact_mounted_side_texture_hat_and_cosmetics():
+ SaveData.hat_color="blue"
+ panel.open_section("pasture141");await settle()
+ var p:=ranch()
+ for i in p.animated.size():
+  var a:AnimatedSprite2D=p.animated[i];var h:Dictionary=SaveData.horse_collection.horses[i]
+  for frame in 9:assert_eq(a.sprite_frames.get_frame_texture("walk",frame),PixelLabTrial.pose_texture("rider","side",frame,h.traits,h))
+ SaveData.hat_color="original"

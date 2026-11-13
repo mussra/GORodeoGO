@@ -15,11 +15,12 @@ func setup(npc:Dictionary,states:Dictionary):
  var definitions:Dictionary=RegionalVillages123.definitions(npc.town_id123,npc.profile123) if npc.has("town_id123") else NpcQuests.QUESTS
  var finished123:bool=npc.get("regional_close123",false) and RegionalVillages123.all_done(states,npc)
  var id:String=NpcQuests.next_for(states,npc);var q:Dictionary=definitions[id];var s:Dictionary=NpcQuests.state(states,id)
- var title=Label.new();title.text=npc.name+" · "+("Aquí hemos terminado" if finished123 else q.title);title.position=Vector2(24,20);title.add_theme_font_size_override("font_size",25);add_child(title)
+ var title=Label.new();title.text=npc.name+" · "+("Aquí hemos terminado" if finished123 else q.title);title.position=Vector2(24,20);title.add_theme_font_size_override("font_size",25);add_child(title);TextFit181.fixed(title,Vector2(size.x-48,44),24,20,2)
  var portrait=Sprite2D.new();portrait.name="FarmerPortrait";portrait.texture=WorldFloristShop.FLORIST if npc.id=="florist" else WorldNpc.PORTRAIT;portrait.position=Vector2(83,162);portrait.scale=Vector2.ONE*(195.0/portrait.texture.get_height());add_child(portrait)
  var body=Label.new();body.position=Vector2(170,85);body.size=Vector2(480,175);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",22)
  DetailCard179.style_panel(self)
  DetailCard179.reading_surface(body)
+ TextFit181.fixed(body,body.size,21,18,9)
  body.name="QuestBody"
  body.text=RegionalVillages123.THANKS if finished123 else q.text if s.status=="locked" else (q.done if s.status=="done" else q.active+" · %d/%d"%[s.count,q.goal]);add_child(body)
  var yes=Button.new();yes.position=Vector2(24,275);yes.size=Vector2(280,52);yes.text="Aceptar encargo";yes.visible=s.status=="locked";QuestButtonStyle.apply(yes);add_child(yes);yes.pressed.connect(func():accepted.emit(id))
@@ -35,7 +36,7 @@ func setup(npc:Dictionary,states:Dictionary):
 
 func add_sale104()->void:
  var count:int=SaveData.pig_inventory104();var quote:Dictionary=WorldLivestock104.quote(count)
- var price=Label.new();price.name="PigPrice104";price.text=tr("WORLD_PIG_PRICE104") % [quote.unit_price,count];price.position=Vector2(24,340);price.add_theme_font_size_override("font_size",20);add_child(price)
+ var price=Label.new();price.name="PigPrice104";price.text=tr("WORLD_PIG_PRICE104") % [quote.unit_price,count];price.position=Vector2(24,340);price.add_theme_font_size_override("font_size",20);add_child(price);TextFit181.fixed(price,Vector2(620,40),20,18,2)
  var sell=Button.new();sell.name="SellPigs104";sell.position=Vector2(24,385);sell.size=Vector2(620,52);sell.text=tr("WORLD_PIG_SELL104") % [count,quote.total];sell.disabled=count<=0;QuestButtonStyle.apply(sell);add_child(sell)
  sell.pressed.connect(func():pigs_sold104.emit(count,quote.unit_price))
 

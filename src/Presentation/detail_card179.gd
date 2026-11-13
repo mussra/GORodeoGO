@@ -36,4 +36,4 @@ func setup(title:String,text:String,status:String="",count:int=-1,goal:int=0,don
   var number:=_label("%d / %d"%[count,goal],20);row.add_child(number)
  footer=_label(status,18);footer.add_theme_color_override("font_color",Color("a9d8ca") if done else Color("bed0d0"));footer.visible=not status.is_empty();column.add_child(footer)
 func _label(text:String,font:int)->Label:
- var label:=Label.new();label.text=text;label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.size_flags_horizontal=Control.SIZE_EXPAND_FILL;label.mouse_filter=Control.MOUSE_FILTER_IGNORE;style_body(label,font);return label
+ var label:=Label.new();label.text=text;label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.size_flags_horizontal=Control.SIZE_EXPAND_FILL;label.mouse_filter=Control.MOUSE_FILTER_IGNORE;style_body(label,font);TextFit181.flow(label);return label

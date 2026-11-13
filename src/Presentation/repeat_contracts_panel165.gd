@@ -32,7 +32,7 @@ func _ready():
  message=_label("",Vector2(60,590),23);message.size=Vector2(1120,70);message.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  resized.connect(_layout);_layout();refresh()
 func _label(text_:String,pos:Vector2,font:int)->Label:
- var l:=Label.new();l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;l.size=Vector2(1120,100);l.text=text_;l.position=pos;l.add_theme_font_size_override("font_size",font);canvas.add_child(l);return l
+ var l:=Label.new();l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;l.size=Vector2(1120,100);l.text=text_;l.position=pos;l.add_theme_font_size_override("font_size",font);canvas.add_child(l);TextFit181.fixed(l,l.size,font,18,3);return l
 func _layout():
  if canvas==null:return
  var k:float=minf(size.x/1280.,size.y/720.);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2.

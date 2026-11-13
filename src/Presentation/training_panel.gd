@@ -17,7 +17,7 @@ func _ready()->void:
 func layout()->void:
  var k:float=minf(size.x/1280,size.y/720);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2
 func label(text:String,pos:Vector2,font:int=22)->void:
- var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);content.add_child(l)
+ var l:=Label.new();l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);content.add_child(l);TextFit181.fixed(l,Vector2(1200-pos.x,54 if pos.y==525 else 70 if pos.y==570 else 35),font,18,2 if pos.y in [525,570] else 1)
 func button(text:String,pos:Vector2,cb:Callable)->void:
  var b:=Button.new();b.text=text;b.position=pos;b.size=Vector2(360,48);b.pressed.connect(cb);content.add_child(b)
 func refresh()->void:call_deferred("build")
