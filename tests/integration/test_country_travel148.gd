@@ -20,10 +20,10 @@ func test_local_roundtrip_never_changes_frontier_disk_horses_or_unexplored_route
  var expected:=SiestaRoute163.country(world.player.position,world.data.sites.source,world.data,world.visited_cells);assert_false(expected.is_empty())
  assert_true(await world.start_siesta("source"));assert_lt(world.player.position.distance_to(expected.pos),100.);world.preview_rest166=0.;var back:=SiestaRoute163.country(world.player.position,world.data.entry,world.data,world.visited_cells);assert_true(await world.start_siesta("entry"));assert_lt(world.player.position.distance_to(back.pos),100.)
  assert_eq(world.visited_cells,cells);assert_eq(world.ledger.maps.water146.visited.keys().size(),2);assert_false(world.ledger.maps.water146.visited.has("tree"));assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_eq(SaveData.world_position,origin);assert_eq(SaveData.country_ledger146,{});assert_eq(SaveData.horse_collection.export_state(),horses);assert_false(world.travelling);assert_true(world.touch_controls.visible)
-func test_blocked_arrival_restores_country_origin_ledger_exploration_and_disk():
+func test_physical_obstacle_stops_on_near_side_and_saves_wakeup():
  visit_source();var origin:Vector2=world.player.position;var ledger:=world.ledger.duplicate(true);var cells:=world.visited_cells.duplicate(true);var disk:=FileAccess.get_file_as_bytes(SaveData.save_path)
  var blocker:=StaticBody2D.new();blocker.collision_layer=128;blocker.position=SiestaRoute163.country(origin,world.data.sites.source,world.data,world.visited_cells).pos;var shape:=CollisionShape2D.new();var rect:=RectangleShape2D.new();rect.size=Vector2(500,500);shape.shape=rect;blocker.add_child(shape);world.add_child(blocker);await get_tree().physics_frame
- assert_false(await world.start_siesta("source"));assert_eq(world.player.position,origin);assert_eq(world.ledger,ledger);assert_eq(world.visited_cells,cells);assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_eq(world.transaction.phase,"failed")
+ assert_true(await world.start_siesta("source"));assert_gt(world.player.position.distance_to(origin),1.);assert_lt(world.player.position.distance_to(origin),origin.distance_to(blocker.position)-250.);assert_true(world.partial_route163.stopped172);assert_eq(world.visited_cells,cells);assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_eq(world.transaction.phase,"done")
 func test_map_uses_shared_gestures_known_sites_and_back_cancel():
  world.show_map();var map:CountryMap148=world.modal;map._layout();map._ensure_terrain();assert_eq(map.available159().map(func(site):return site.id),["entry"]);assert_false(world.touch_controls.visible)
  var point_:Vector2=map._to_map(world.data.entry,map._map_geometry.data.mins,map._map_geometry.cell,map._map_geometry.origin)
@@ -52,14 +52,14 @@ func test_eye_walks_without_manual_control_then_opens_only_after_commit():
  run.call_deferred();await get_tree().create_timer(.3,true).timeout
  assert_true(world.travelling);assert_false(world.player.is_physics_processing());assert_eq(world.curtain.phase,"closing");assert_gt(world.player.position.distance_to(origin),1.);assert_gt(world.curtain.eye.aperture,0.);assert_lt(world.curtain.eye.aperture,1.)
  Input.action_press("move_left");Input.action_press("move_down");var at:Vector2=world.player.position
- await get_tree().create_timer(.3,true).timeout;Input.action_release("move_left");Input.action_release("move_down");assert_gt(world.player.position.x,at.x);assert_lt(absf(world.player.position.y-origin.y),1.)
+ await get_tree().create_timer(.3,true).timeout;Input.action_release("move_left");Input.action_release("move_down");assert_gt(world.player.position.x,at.x);assert_lt(absf((world.player.position-origin).cross(expected.pos-origin)),2.)
  while not state.done:await get_tree().process_frame
  assert_true(state.ok);assert_lt(world.player.position.distance_to(expected.pos),100.);assert_false(world.travelling);assert_null(world.curtain);assert_true(world.touch_controls.visible)
-func test_blocked_initial_walk_restores_saved_origin_instead_of_pushing_through():
+func test_blocked_initial_walk_wakes_at_its_stop_instead_of_pushing_through():
  visit_source();var origin:Vector2=world.player.position;var blocker:=StaticBody2D.new();blocker.collision_layer=128;blocker.position=origin+Vector2(40,0);var collision:=CollisionShape2D.new();var rect:=RectangleShape2D.new();rect.size=Vector2(20,120);collision.shape=rect;blocker.add_child(collision);world.add_child(blocker);await get_tree().physics_frame
- assert_false(await world.start_siesta("source"));assert_eq(world.player.position,origin);assert_false(world.travelling);assert_true(world.last_error.contains("bloqueado"));assert_null(world.curtain)
+ assert_true(await world.start_siesta("source"));assert_lt(world.player.position.x,blocker.position.x);assert_false(world.travelling);assert_true(world.partial_route163.stopped172);assert_null(world.curtain)
 func test_unseen_connection_and_last_short_stretch_are_left_to_manual_exploration():
- var before:Vector2=world.player.position;world.ledger.maps.water146.visited.source=true;assert_false(await world.start_siesta("source"));assert_eq(world.player.position,before)
+ var before:Vector2=world.player.position;world.ledger.maps.water146.visited.source=true;assert_true(await world.start_siesta("source"));assert_gt(world.player.position.distance_to(before),1.);assert_true(world.partial_route163.stopped172);world.preview_rest166=0.
  world.player.position=world.data.entry+Vector2(100,0);world._process(0.);assert_false(await world.start_siesta("entry"));assert_eq(world.player.position,world.data.entry+Vector2(100,0))
 
 var refusal_done166:bool=false
@@ -73,3 +73,15 @@ func test_preview_repeat_refusal_is_isolated_and_does_not_move_or_touch_real_sav
  world.request_return();assert_false(await world.start_siesta("entry"))
  while not refusal_done166:await get_tree().process_frame
  assert_eq(world.player.position,origin);assert_eq(world.ledger,ledger);assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_eq(SaveData.siesta_rest166,123.);assert_eq(world.preview_rest166,300.);assert_false(world.travelling)
+
+func test_actual_siesta_toward_saved_note_stops_on_near_river_bank():
+ var center:Vector2=world.data.source+Vector2(0,500);var origin:Vector2=center+Vector2(-600,0);var goal:Vector2=center+Vector2(1800,0)
+ world.player.position=origin
+ for x in range(floori((center.x-1500)/512.),ceili((center.x+2500)/512.)):
+  for y in range(floori((center.y-1500)/512.),ceili((center.y+1500)/512.)):world.visited_cells[Vector2i(x,y)]=true
+ var note:Dictionary={"id":"river172","pos":goal,"text":"Otra orilla","photo":""}
+ world.ledger.maps.water146.notes={WorldNotes106.region_key(goal):[note]}
+ var cells:=world.visited_cells.duplicate(true);assert_true(await world.start_siesta("note170:river172"))
+ assert_true(world.partial_route163.stopped172);assert_lt(world.player.position.x,center.x);assert_almost_eq(world.player.position.y,origin.y,1.)
+ assert_gt(world.player.position.distance_to(origin),1.);assert_true(world.last_error.contains("detenido"));assert_eq(world.visited_cells,cells)
+ for i in 100:assert_false(CountryRoute146.blocked(world.data,origin.lerp(world.player.position,float(i)/99.)))

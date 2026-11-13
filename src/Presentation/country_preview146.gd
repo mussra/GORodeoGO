@@ -5,6 +5,7 @@ signal return_requested
 var seed:int=752026
 var data:Dictionary
 var ledger:Dictionary
+var notice170:ToastStack
 var player:CharacterBody2D
 var camera:Camera2D
 var aim_joystick:VirtualJoystick
@@ -151,7 +152,7 @@ func show_sites(already_locked:bool=false):
  if travelling or is_instance_valid(modal):return
  if not already_locked:_lock_player()
  var sheet:=NavigationSheet.new();sheet.title="SITIOS DE ESTE PAÍS";modal=sheet
- for site in CountryExploration148.available(ledger,data):sheet.entries.append({"id":site.id,"title":site.name,"hint":"Sitio visitado · siesta" if persists149() else "Sitio visitado · siesta sin guardado"})
+ for site in available_sites170():sheet.entries.append({"id":site.id,"title":site.name,"hint":"Sitio visitado · siesta" if persists149() else "Sitio visitado · siesta sin guardado"})
  sheet.closed.connect(close_modal);sheet.selected.connect(func(id:String):modal=null;choose_site.call_deferred(id,true));hud_canvas.add_child(sheet)
 func travel_reason()->String:
  if travelling:return "Espera a que termine el viaje."
@@ -160,7 +161,7 @@ func travel_reason()->String:
  return ""
 func choose_site(id:String,already_locked:bool=false):
  if travelling or is_instance_valid(modal):return
- var target:=CountryExploration148.destination(ledger,data,id)
+ var target:=destination170(id)
  var reason_:String=travel_reason()
  if target.is_empty() or not reason_.is_empty():
   last_error="Ese sitio no está visitado." if target.is_empty() else reason_
@@ -171,7 +172,7 @@ func choose_site(id:String,already_locked:bool=false):
  confirmation.cancelled.connect(close_modal);confirmation.confirmed.connect(func():close_modal(false);start_siesta(id,true));hud_canvas.add_child(confirmation)
 func start_siesta(id:String,already_locked:bool=false)->bool:
  if is_instance_valid(modal):return false
- last_error="";var reason_:String=travel_reason();var target:=CountryExploration148.destination(ledger,data,id)
+ last_error="";var reason_:String=travel_reason();var target:=destination170(id)
  if target.is_empty() or not reason_.is_empty():
   last_error="Ese sitio no está visitado." if target.is_empty() else reason_
   if already_locked and not travelling:_unlock_player()
@@ -187,22 +188,26 @@ func start_siesta(id:String,already_locked:bool=false)->bool:
  if not already_locked:_lock_player()
  partial_route163=SiestaRoute163.country(player.position,target.pos,data,visited_cells)
  if partial_route163.is_empty():
-  last_error="No hay una ruta conocida y segura, o queda muy poco camino. Continúa explorando a caballo.";_unlock_player();return false
+  last_error="Ya estamos cerca. Este último tramo lo hacemos a caballo." if player.position.distance_to(target.pos)<SiestaRoute163.FINAL_MANUAL*2. else "No encuentro paso por el terreno que conocemos. Habrá que explorar cómo rodearlo.";map_notice170(last_error);_unlock_player();return false
  target=target.duplicate(true);target.pos=partial_route163.pos
  travelling=true;travel_target=target;travel_origin=player.position;travel_ledger=ledger.duplicate(true)
  curtain=SiestaCurtain147.new();curtain.destination=target.name;curtain.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);curtain.hat=SaveData.hat_color;add_child(curtain)
  player.cancel_input()
  var walking_ok:bool=await curtain.close_eye(player,partial_route163.path)
  if not walking_ok:
-  player.position=travel_origin;camera.reset_smoothing();last_error="El paso está bloqueado. Sigues en el origen."
-  await curtain.open_eye();curtain.queue_free();curtain=null;travelling=false;_unlock_player();return false
+  TravelStraight172.stop(partial_route163,player.position);travel_target.pos=player.position
  transaction=TravelTransaction147.new();var result:=await transaction.run(_load_travel148,_validate_travel148,_commit_travel148,_restore_travel148)
  if not result.ok:last_error="No se pudo guardar la llegada. Sigues en el origen." if result.reason=="save" else "No hay llegada libre. Sigues en el origen."
- curtain.message.text="Has avanzado media ruta hacia "+str(target.name) if result.ok else last_error
+ curtain.message.text=(str(partial_route163.wake172) if partial_route163.get("stopped172",false) else "Has avanzado en línea recta hacia "+str(target.name)) if result.ok else last_error
  await curtain.open_eye()
- curtain.queue_free();curtain=null;travelling=false;_unlock_player();return result.ok
+ curtain.queue_free();curtain=null;travelling=false;_unlock_player()
+ if result.ok and partial_route163.get("stopped172",false):map_notice170(str(partial_route163.wake172))
+ return result.ok
 func _load_travel148()->bool:
- await get_tree().process_frame;await get_tree().process_frame;return true
+ await get_tree().physics_frame
+ var swept:=TravelStraight172.segment(player,travel_origin,travel_target.pos)
+ if swept.stopped:TravelStraight172.stop(partial_route163,swept.pos);travel_target.pos=swept.pos
+ return true
 func landing155(requested:Vector2)->Vector2:
  var terrain:Callable=func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos)
  # Keep a legal saved coastal position exactly. Reuse the shared actual-shape
@@ -228,7 +233,7 @@ func landing155(requested:Vector2)->Vector2:
   if result.is_finite():return result
  return Vector2(INF,INF)
 func _validate_travel148()->Vector2:
- return TravelLanding148.find(player,travel_target.pos,func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos) or (not partial_route163.is_empty() and not partial_route163.allowed.call(pos)))
+ return TravelLanding148.find(player,travel_target.pos,func(pos:Vector2)->bool:return pos!=travel_target.pos or CountryRoute146.blocked(data,pos) or (not partial_route163.is_empty() and not partial_route163.allowed.call(pos)))
 func _commit_travel148(pos:Vector2)->bool:
  var next:=CountryLedger146.record_position(ledger,pos)
  if next.is_empty():return false
@@ -255,3 +260,18 @@ func on_road154(point:Vector2)->bool:
   for i in range(1,path.size()):
    if Geometry2D.get_closest_point_to_segment(point,path[i-1],path[i]).distance_to(point)<=45.:return true
  return false
+
+func available_sites170()->Array[Dictionary]:
+ var out:=CountryExploration148.available(ledger,data)
+ out.append_array(SiestaDestinations170.notes(ledger.maps.water146.notes,func(pos:Vector2)->bool:return visited_cells.has(Vector2i((pos/CountryExploration148.CELL).floor()))))
+ return out
+func destination170(id:String)->Dictionary:
+ for site in available_sites170():
+  if site.id==id:return site
+ return {}
+
+func map_notice170(text:String)->void:
+ last_error=text
+ if notice170==null:
+  notice170=ToastStack.new();notice170.z_index=100;hud_canvas.add_child(notice170)
+ notice170.wide170=true;notice170._layout();notice170.set_top(110.);notice170.clear();notice170.push(text)

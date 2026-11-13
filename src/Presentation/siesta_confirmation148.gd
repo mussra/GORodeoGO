@@ -9,10 +9,10 @@ func _ready():
  var bg:=ColorRect.new();bg.color=Color("10252ded");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  var box:=VBoxContainer.new();box.size=Vector2(720,320);add_child(box)
  var title:=Label.new();title.text=destination;title.add_theme_font_size_override("font_size",30);box.add_child(title)
- var note:=Label.new();note.text="El caballo arranca solo y avanzas la mitad de una ruta conocida hacia este sitio.\nEl último tramo se recorre jugando. No revela terreno ni completa encargos."
+ var note:=Label.new();note.text="El caballo arranca solo y avanzas en línea recta hacia este sitio.\nSi hay un obstáculo, el caballo se para y te despiertas allí. No lo rodea."
  if preview:note.text+="\nMaqueta: este viaje no se guarda."
  note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;note.custom_minimum_size=Vector2(680,130);box.add_child(note)
- var go:=Button.new();go.name="ConfirmSiesta144";go.text="Avanzar media ruta";go.custom_minimum_size.y=56;box.add_child(go);go.pressed.connect(func():confirmed.emit())
+ var go:=Button.new();go.name="ConfirmSiesta144";go.text="Echar la siesta";go.custom_minimum_size.y=56;box.add_child(go);go.pressed.connect(func():confirmed.emit())
  var cancel:=Button.new();cancel.text="Cancelar";cancel.custom_minimum_size.y=56;box.add_child(cancel);cancel.pressed.connect(func():cancelled.emit())
  var layout:Callable=func():
   var k:float=minf(size.x/1280.,size.y/720.);box.scale=Vector2.ONE*k;box.position=(size-Vector2(720,320)*k)/2.

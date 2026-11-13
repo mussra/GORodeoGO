@@ -6,7 +6,7 @@ var tree_visible155:bool=false
 func cell_size159()->float:return CountryExploration148.CELL
 func content_signature159()->int:return hash([world.seed,world.visited_cells,world.ledger.maps.water146.visited])
 func available159()->Array[Dictionary]:
- var sites:=CountryExploration148.available(world.ledger,world.data)
+ var sites:Array[Dictionary]=world.available_sites170()
  for site in sites:
   if site.id=="tree":site.pos=world.data.roots
  return sites

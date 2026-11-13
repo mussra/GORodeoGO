@@ -6,6 +6,7 @@ var active:Array[Dictionary]=[]
 var pending:Array[Dictionary]=[]
 var column:VBoxContainer
 var top_offset:float=60.0
+var wide170:bool=false
 static func reading_seconds(text:String,minimum:float=0.0)->float:
  return maxf(minimum,clampf(2.5+float(text.length())/24.0,3.0,7.0))
 static func backdrop(label:Label)->void:
@@ -23,9 +24,10 @@ func _ready()->void:
 func _layout()->void:
  if column==null:return
  var viewport_size:Vector2=get_viewport_rect().size
- var width:float=minf(640.0,viewport_size.x*.44)
+ var width:float=minf(1100.,viewport_size.x-32.) if wide170 else minf(640.0,viewport_size.x*.44)
  column.position=Vector2(16,top_offset)
- column.size.x=width
+ column.size.x=width;column.custom_minimum_size.x=width
+ column.size.y=0.
  for notice in active:notice.label.custom_minimum_size.x=width
 func set_top(value:float)->void:
  if is_equal_approx(top_offset,value):return
@@ -56,7 +58,7 @@ func _fill()->void:
   label.text=next.text;label.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT
   label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
   label.add_theme_font_size_override("font_size",20);backdrop(label)
-  label.custom_minimum_size.x=column.size.x
+  label.custom_minimum_size.x=column.size.x;label.size.x=column.size.x
   column.add_child(label)
   active.append({"text":next.text,"left":next.duration,"label":label,"key":next.key})
 func _process(delta:float)->void:advance(delta)

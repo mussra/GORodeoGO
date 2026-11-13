@@ -73,6 +73,7 @@ func show_list162()->void:
  notes_list162=MapNotesList162.new();notes_list162.notes=world._map_overlay.notes159();world.map_note_host159().add_child(notes_list162)
  notes_list162.closed.connect(close_list162)
  notes_list162.selected.connect(func(note:Dictionary):close_list162();world._map_overlay.center_note162(note))
+ notes_list162.travel170.connect(func(note:Dictionary):close_list162();world._map_overlay.choose159("note170:"+str(note.id)))
 func close_list162()->void:
  if is_instance_valid(notes_list162):notes_list162.queue_free()
  notes_list162=null

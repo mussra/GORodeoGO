@@ -7,9 +7,12 @@ func _check_home(version:int):
  world._home()
  # Since144 home is an explicit siesta confirmation, not an immediate teleport.
  assert_not_null(world._travel144.panel);assert_eq(world.player.position,Vector2(14000,160));world._travel144.close_confirmation()
- # An old distant save has no known connecting route. Siesta may not explore it.
- assert_false(await world._travel144.start("ranch"))
- assert_eq(world.player.position,Vector2(14000,160))
+ # An old distant save may advance straight only to the known boundary, never explore.
+ SaveData.siesta_rest166=0.
+ var moved:bool=await world._travel144.start("ranch")
+ if moved:
+  assert_true(world._travel144.partial163.stopped172);assert_gt(world.player.position.x,12000.);assert_lt(world.player.position.x,14000.)
+ else:assert_eq(world.player.position,Vector2(14000,160))
  assert_eq(world.player.velocity,Vector2.ZERO)
  assert_false(world._loading_world);assert_true(world.visible)
  var added=0

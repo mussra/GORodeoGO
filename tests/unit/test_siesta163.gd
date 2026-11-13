@@ -10,7 +10,7 @@ func test_unknown_or_blocked_sections_cannot_be_crossed_even_when_endpoints_are_
  assert_true(SiestaRoute163.plan(Vector2.ZERO,Vector2(2000,0),roads,func(p):return p.x<800 or p.x>1200).is_empty())
 func test_country_half_avoids_river_and_sea_and_needs_connected_exploration():
  var data:=CountryRoute146.plan(123);var cells:Dictionary={};CountryExploration148.reveal(cells,data.entry);CountryExploration148.reveal(cells,data.sites.source)
- assert_true(SiestaRoute163.country(data.entry,data.sites.source,data,cells).is_empty())
+ var stopped:=SiestaRoute163.country(data.entry,data.sites.source,data,cells);assert_false(stopped.is_empty());assert_true(stopped.stopped172)
  for path in [data.approach,data.upstream]:
   for i in range(1,path.size()):
    for j in ceili(path[i-1].distance_to(path[i])/100.)+1:CountryExploration148.reveal(cells,path[i-1].move_toward(path[i],j*100.))

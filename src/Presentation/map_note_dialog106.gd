@@ -21,8 +21,11 @@ func setup(existing:Dictionary,horse_text:String,capture:Image=null,allow_photo:
  var info=Label.new();info.text="La nota no congela al caballo ni cambia su posición.\nMáximo 240 caracteres por nota.";info.position=Vector2(24,235);info.add_theme_font_size_override("font_size",18);add_child(info)
  var photo_path:String=str(existing.get("photo",""))
  if photo_path.begins_with("user://map-photos/") and FileAccess.file_exists(photo_path):stored_photo=Image.load_from_file(photo_path)
- photo_preview=TextureRect.new();photo_preview.position=Vector2(24,290);photo_preview.size=Vector2(250,130);photo_preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;photo_preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;photo_preview.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(photo_preview)
+ photo_preview=TextureRect.new();photo_preview.position=Vector2(24,290);photo_preview.size=Vector2(250,130);photo_preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;photo_preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;photo_preview.mouse_filter=Control.MOUSE_FILTER_STOP;add_child(photo_preview)
  photo_status=Label.new();photo_status.position=Vector2(294,290);photo_status.size=Vector2(396,130);photo_status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;photo_status.add_theme_font_size_override("font_size",18);add_child(photo_status)
+ photo_preview.gui_input.connect(func(event:InputEvent):
+  if (event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed):
+   MapPhotoViewer171.open(self,captured_photo if photo_box.button_pressed else stored_photo);accept_event())
  photo_box.toggled.connect(func(_on:bool):refresh_photo160());refresh_photo160()
  var actions=HBoxContainer.new();actions.position=Vector2(24,430);actions.size=Vector2(690,62);add_child(actions)
  for label in ["Guardar","Eliminar","Cerrar"]:
@@ -40,7 +43,7 @@ func refresh_photo160()->void:
  photo_preview.visible=image!=null
  if image!=null:
   var small:Image=image.duplicate();small.resize(250,113,Image.INTERPOLATE_LANCZOS);photo_preview.texture=ImageTexture.create_from_image(small)
- photo_status.text=("Esta captura se adjuntará cuando pulses Guardar." if captured_photo!=null else "No hay captura disponible. Cierra el mapa y vuelve a abrirlo.") if photo_box.button_pressed else ("Foto ya guardada. Se conserva si no activas otra captura." if stored_photo!=null else "Toca el recuadro amarillo de arriba para añadir la vista del mundo anterior al mapa. Después pulsa Guardar.")
+ photo_status.text=("Esta captura se adjuntará cuando pulses Guardar." if captured_photo!=null else "No hay captura disponible. Cierra el mapa y vuelve a abrirlo.") if photo_box.button_pressed else ("Foto guardada. Tócala para verla a pantalla completa. Se conserva si no activas otra captura." if stored_photo!=null else "Toca el recuadro amarillo de arriba para añadir la vista del mundo anterior al mapa. Después pulsa Guardar.")
  if not photo_allowed:photo_status.text="Estás lejos del marcador. Acércate y vuelve a abrir el mapa para guardar su captura. La foto anterior se conserva."
 func photo_icon160(checked:bool)->Texture2D:
  var image:=Image.create(36,36,false,Image.FORMAT_RGBA8)

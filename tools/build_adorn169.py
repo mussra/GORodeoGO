@@ -14,7 +14,7 @@ def bands(eligible):
  for k in range(1,n):
   if stats[k,cv2.CC_STAT_AREA]<3:continue
   comp=labels==k
-  for x in np.where(comp.any(0))[0]:out[np.where(comp[:,x])[0][:2],x]=255
+  for x in np.where(comp.any(0))[0]:out[np.where(comp[:,x])[0][:5],x]=255
  return out
 # Per source-coordinate rig, not world-space positions.
 BOOT={

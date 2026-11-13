@@ -73,7 +73,8 @@ static func chase_tick(state:Dictionary,dist:float,_speed:float,roped:bool,delta
   out=AnimalFatigue.tick(out,dist<CHASE_TRIGGER_RANGE,false,delta)
   out.break_rope=true;out.progress=0.0
   return out
- out=AnimalFatigue.tick(out,roped or dist<CHASE_TRIGGER_RANGE,roped,delta)
+ out.lasso_panic170=maxf(0.,float(out.get("lasso_panic170",0.))-delta)
+ out=AnimalFatigue.tick(out,roped or dist<CHASE_TRIGGER_RANGE or out.lasso_panic170>0.,roped,delta)
  out["rope_run"]=float(out.get("rope_run",0.0))+(delta if roped and not out.tired else 0.0)
  out.still=0.0
  return out

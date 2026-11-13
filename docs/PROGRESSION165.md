@@ -54,3 +54,7 @@ Activo: compra única de acabado oro/cristal/hielo, equipamiento por caballo adu
 ## Bloque169 /2.7.122
 
 Adornos de plata y oro activados:6.000/12.000puntos,20/40cerdos,15/30cabras,4/8encargos cobrados. Los requisitos del modelo no se han rebajado. Una compra desbloquea cada metal para patas y botas; se equipa por caballo adulto y se puede combinar plata en botas con oro en patas, o al revés. Quitar no cobra puntos. No se hereda ni cambia estadísticas o genes; compatible con los tres acabados. Guardado atómico con reversión del cobro o equipado si falla. Las capturas/encargos no se gastan. Sigue pendiente el bloque de niveles21-40/llaves y la continuación Galaxy/cría/ritual.
+
+## Correcciones 170-172 / 2.7.123
+
+Siesta recta que despierta antes del primer obstáculo o límite conocido, incluida comprobación física por las zonas intermedias; no busca rodeos. Notas/fotos como destinos, visor completo, aviso sobre mapa, botón antiguo de casa retirado. Sustos del lazo incluidos para cerdos. Metal integrado con sombreado por pata, sin rayas; carga con hierba/cielo/nubes. Sin cambios en costes, logros ni cadena de progresión. Niveles21-40 y Galaxy/ritual todavía pendientes.

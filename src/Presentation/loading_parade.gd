@@ -1,6 +1,7 @@
 class_name LoadingParade
 extends Node2D
 ## Shared loading-only visuals. Local cosmetic RNG, no world seed or save writes.
+const GRASS170=preload("res://art/world/modular87/grass-1.png")
 var age:float=0.0
 var rng=RandomNumberGenerator.new()
 var rider:AnimatedSprite2D
@@ -60,12 +61,18 @@ func finish():
 static func drift_x(t:float)->float:
  return 920.0-620.0*exp(-t/8.4)
 func _draw():
- draw_rect(Rect2(0,0,1280,720),Color("10252d"))
- draw_rect(Rect2(0,394,1280,326),Color("142c33"))
- draw_line(Vector2(0,394),Vector2(1280,394),Color("385052"),2)
- for i in 24:
-  var x=fposmod(i*61.0-age*160.0,1280.0)
-  draw_line(Vector2(x,512+i%3*23),Vector2(x+13,512+i%3*23),Color("294146"),2)
+ draw_rect(Rect2(0,0,1280,720),Color("9ddcff"))
+ # White clouds are vector shapes, not replacement character/source art.
+ for i in 5:
+  var x:float=fposmod(i*295.+140.-age*7.,1530.)-125.;var y:float=90.+(i%3)*65.
+  draw_circle(Vector2(x,y),31.,Color.WHITE);draw_circle(Vector2(x+34,y-17),41.,Color.WHITE);draw_circle(Vector2(x+73,y),30.,Color.WHITE)
+  draw_rect(Rect2(x,y-4,74,31),Color.WHITE)
+ draw_rect(Rect2(0,394,1280,326),Color("6d9e3d"))
+ for x in range(-1,11):
+  for y in range(4):
+   var offset:float=fposmod(age*40.,128.)
+   draw_texture_rect(GRASS170,Rect2(x*128.-offset,394.+y*128.,128.,128.),false)
+ draw_line(Vector2(0,394),Vector2(1280,394),Color("96bb58"),3)
 func _process(delta:float):
  if not prepared:return
  rider.visible=true

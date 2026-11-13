@@ -325,6 +325,9 @@ func _stallion_hint(horse: Node2D) -> void:
 	_stallion_hint_stage += 1
 
 func _toast(text: String,replace_key:String="") -> void:
+	if is_instance_valid(_map_overlay) and _map_overlay.expanded:_toasts.clear()
+	_toasts.wide170=is_instance_valid(_map_overlay) and _map_overlay.expanded
+	_toasts._layout()
 	_toasts.set_top(_toast_top105())
 	_toasts.push(text,0.,replace_key)
 
@@ -604,12 +607,14 @@ func _wild_candidates112()->Array:
 	return out
 ## Only the resolved ground impact causes lasso panic. No prediction during flight.
 func _landing_panic128(point:Vector2,captured:Node2D)->void:
-	for horse in _wild_candidates112():
+	var animals170:Array=_wild_candidates112();animals170.append_array(_lasso_pigs())
+	for horse in animals170:
 		if not is_instance_valid(horse) or horse.is_queued_for_deletion() or horse==captured or horse.roped:continue
 		if not WorldAwareness110.lasso_impact_near128(horse.global_position,point):continue
 		horse.set_meta("escape_left110",WorldAwareness110.PANIC_SECONDS)
 		horse.set_meta("panic_left",WorldAwareness110.PANIC_SECONDS)
 		horse.state.spook=WorldAwareness110.PANIC_SECONDS
+		horse.state.lasso_panic170=WorldAwareness110.PANIC_SECONDS
 
 ## A guide is a movement role, distinct from the ridden horse's PackLeader skill.
 func _herd_guides()->Dictionary:
@@ -955,7 +960,7 @@ func _build_hud() -> void:
 	_hud.add_child(_pigs_label)
 	_gauges=MountedStatus154.create(_hud)
 	var menu_button:=Button.new();menu_button.name="WorldNavigation";menu_button.text="Menú";QuestButtonStyle.apply(menu_button);menu_button.position=Vector2(1100,4);menu_button.size=Vector2(160,42);menu_button.pressed.connect(_open_navigation);_hud.add_child(menu_button)
-	_toasts=ToastStack.new()
+	_toasts=ToastStack.new();_toasts.z_index=100
 	_hud.add_child(_toasts)
 	_board_button = Button.new()
 	_board_button.text = tr("WORLD_BOARD")
@@ -1019,7 +1024,7 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"country_saved152","title":"País guardado","hint":"Progreso separado · sin ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"home","title":"Volver a casa","hint":"Regresa al rancho"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"country_saved152","title":"País guardado","hint":"Progreso separado · sin ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
@@ -1031,7 +1036,6 @@ func _navigation_selected(id:String)->void:
 		"country146":_open_isolated_preview146(CountryPreview146.new())
 		"country_saved152":_start_country152()
 		"editor":_toggle_edit()
-		"home":_home()
 		"exit":_menu()
 func _close_navigation()->void:
 	get_tree().paused=_navigation_was_paused
@@ -1296,6 +1300,7 @@ func _tick_flowers105()->void:
 			_toast(("Flores azules" if id==WorldFlowers105.IDS[0] else "Flores doradas")+" · %d/3"%state.count,"quest:"+id)
 
 func _toast_top105()->float:
+	if is_instance_valid(_map_overlay) and _map_overlay.expanded:return 60.
 	var top:float=216. if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.
 	if is_instance_valid(_quest_panel) and _quest_panel.visible:top=maxf(top,_quest_panel.position.y+_quest_panel.size.y+12.)
 	return top

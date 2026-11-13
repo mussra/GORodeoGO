@@ -29,7 +29,15 @@ func record_visits()->void:
  if WorldPlaces144.visit(state,world.player.position,candidates(),SaveData.world_cousins140.get("known",{})) or changed:
   if not SaveData.commit_places144(state,world.player.position):
    visit_clock=Time.get_ticks_msec()+5000.;world._toast("No se pudo guardar este sitio visitado. Se reintentará.")
-func available()->Array[Dictionary]:return WorldPlaces144.available(SaveData.world_places144,candidates())
+func available()->Array[Dictionary]:
+ var out:=WorldPlaces144.available(SaveData.world_places144,candidates())
+ out.append_array(SiestaDestinations170.notes(SaveData.world_notes106,func(pos:Vector2)->bool:
+  var cell:=WorldMap.chunk_at(pos);return SaveData.world_discovered.has(WorldMap.chunk_key(cell.x,cell.y))))
+ return out
+func destination170(id:String)->Dictionary:
+ for site in available():
+  if site.id==id:return site
+ return {}
 func reason()->String:
  if active or world._loading_world or world._home_pending:return "Espera a que termine el viaje o la carga."
  if world._lasso_state!="" or world.player.lasso.is_in_flight() or world.player.lasso.is_charging():return "Termina la captura antes de viajar. No se soltará ningún animal."
@@ -52,7 +60,7 @@ func close_confirmation()->void:
  panel=null;world.player.set_physics_process(not world._map_overlay.expanded)
 func choose(id:String)->void:
  if is_instance_valid(panel) or active:return
- record_visits();target=WorldPlaces144.destination(SaveData.world_places144,candidates(),id)
+ record_visits();target=destination170(id)
  if target.is_empty():return
  var why:String=reason()
  if not why.is_empty():world._toast(why);return
@@ -64,7 +72,7 @@ func choose(id:String)->void:
 func start(id:String)->bool:
  var why:String=reason();last_error=""
  if not why.is_empty():last_error=why;world._toast(why);return false
- target=WorldPlaces144.destination(SaveData.world_places144,candidates(),id)
+ target=destination170(id)
  if target.is_empty():last_error="Ese sitio todavía no está visitado.";return false
  if SaveData.siesta_rest166>0.:
   active=true;prior_paused=get_tree().paused;get_tree().paused=true
@@ -77,7 +85,9 @@ func start(id:String)->bool:
   if controls!=null:controls.visible=was_visible
   last_error=SiestaRest166.REFUSAL;return false
  partial163=SiestaRoute163.frontier(world.player.position,target.pos)
- if partial163.is_empty():last_error="No hay una ruta conocida y segura, o queda muy poco camino. Continúa explorando a caballo.";world._toast(last_error);return false
+ if partial163.is_empty():
+  last_error="Ya estamos cerca. Este último tramo lo hacemos a caballo." if world.player.position.distance_to(target.pos)<SiestaRoute163.FINAL_MANUAL*2. else "No encuentro paso por el terreno que conocemos. Habrá que explorar cómo rodearlo."
+  world._toast(last_error);return false
  target=target.duplicate(true);target.pos=partial163.pos
  origin=world.player.position;missions_before=SaveData.world_missions.duplicate(true);discovered_before=SaveData.world_discovered.duplicate();world._snapshot_roaming139()
  if not SaveData.save_world_state(origin):last_error="No se pudo guardar el origen. No has viajado.";world._toast(last_error);return false
@@ -89,17 +99,14 @@ func start(id:String)->bool:
  _cover()
  var walking_ok:bool=await curtain.close_eye(world.player,partial163.path)
  if not walking_ok:
-  last_error="El paso está bloqueado. Sigues en el origen.";world.player.position=origin;rollback=true
-  await curtain.open_eye();curtain.queue_free();curtain=null;active=false;get_tree().paused=prior_paused;world.player.set_physics_process(true)
-  if touch_controls!=null:touch_controls.visible=not world._edit_mode
-  world._toast(last_error);return false
+  TravelStraight172.stop(partial163,world.player.position);target.pos=world.player.position
  var transaction:=TravelTransaction147.new()
  var result:Dictionary=await transaction.run(_load_destination147,_validate_destination147,_commit_destination147,_restore_origin147)
  if not result.ok and not result.restored:
   message.text="La zona no pudo cargarse. El origen sigue guardado. Vuelve al menú para reabrirla."
   var back:=Button.new();back.text="Menú principal";back.position=Vector2(490,640);back.size=Vector2(300,56);curtain.add_child(back);back.pressed.connect(func():get_tree().paused=prior_paused;get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn"))
   return false
- if result.ok:message.text="Has avanzado media ruta hacia "+str(target.name)
+ if result.ok:message.text=partial163.get("wake172","") if partial163.get("stopped172",false) else "Has avanzado en línea recta hacia "+str(target.name)
  var camera:Camera2D=get_viewport().get_camera_2d()
  if camera!=null:camera.reset_smoothing()
  await curtain.open_eye()
@@ -107,9 +114,19 @@ func start(id:String)->bool:
  world.player.set_physics_process(not world._map_overlay.expanded);world.visible=true
  var touch:Node=world.get_node_or_null("TouchControls")
  if touch!=null:touch.visible=not world._edit_mode
+ if result.ok and partial163.get("stopped172",false):world._toast(str(partial163.wake172))
  if not last_error.is_empty():world._toast(last_error)
  return last_error.is_empty()
 func _load_destination147()->bool:
+ var last:Vector2=origin;var desired:Vector2=target.pos;var steps:int=maxi(1,ceili(origin.distance_to(desired)/256.))
+ for i in range(1,steps+1):
+  var next:Vector2=origin.lerp(desired,float(i)/steps)
+  world.player.position=next;await _load_area()
+  if not world._build_queue.is_empty():last_error="La zona no pudo cargarse. Vuelves al origen.";return false
+  await get_tree().physics_frame
+  var swept:=TravelStraight172.segment(world.player,last,next)
+  last=swept.pos
+  if swept.stopped:TravelStraight172.stop(partial163,last);target.pos=last;break
  world.player.position=target.pos;await _load_area()
  # Two frames let new collision objects reach the physics server.
  await get_tree().process_frame;await get_tree().process_frame
@@ -136,7 +153,7 @@ func _load_area():
  while not world._build_queue.is_empty() and steps<20000 and Time.get_ticks_msec()-travel_started<45000:
   world._drain_chunk_builds();steps+=1;await get_tree().process_frame
 func _safe_landing(pos:Vector2)->Vector2:
- return TravelLanding148.find(world.player,pos,func(candidate:Vector2)->bool:return (not partial163.is_empty() and not partial163.allowed.call(candidate)) or (SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,candidate,14.)))
+ return TravelLanding148.find(world.player,pos,func(candidate:Vector2)->bool:return candidate!=pos or (not partial163.is_empty() and not partial163.allowed.call(candidate)) or not SiestaRoute163.clear(pos,candidate,partial163.allowed) or (SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,candidate,14.)))
 
 func _cover():
  curtain=SiestaCurtain147.new();curtain.destination=str(target.name);curtain.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);curtain.hat=SaveData.hat_color;add_child(curtain)
