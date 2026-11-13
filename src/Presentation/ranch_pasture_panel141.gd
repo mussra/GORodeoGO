@@ -67,7 +67,7 @@ func _card(h:Dictionary,at:Vector2):
  _label(str(h.name),at+Vector2(115,8),170,21)
  _label(("Potrillo" if h.get("stage","adult")=="foal" else "Adulto")+(" · equipado" if h.id==SaveData.horse_collection.selected else ""),at+Vector2(115,38),170,18)
  var tap:=_button("",at+Vector2(2,4),108,func():horse_opened.emit(str(h.id)));tap.size.y=124;tap.tooltip_text="Ver ficha: "+str(h.name)
- for state in ["normal","hover","pressed","focus"]:tap.add_theme_stylebox_override(state,StyleBoxEmpty.new())
+ for state in ["normal","hover","pressed","focus","disabled"]:tap.add_theme_stylebox_override(state,StyleBoxEmpty.new())
  for skill in HorseTraining.SKILLS:
   var badge:=JumpBadge.new();badge.skill=skill;badge.capable=HorseTraining.knows(h,skill);badge.position=at+Vector2(116+(0 if skill=="jump" else 40),70);badge.scale=Vector2.ONE*.52;content.add_child(badge)
  var summary:=HorseSummaryBar185.create(content,h,170);summary.position=at+Vector2(115,112)

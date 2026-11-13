@@ -111,3 +111,26 @@ func test_summary_and_skills_in_both_views_without_changing_horse():
  assert_eq(badges.size(),8)
  assert_eq(badges[2].capable,HorseTraining.knows(h,"jump"))
  assert_eq(badges[3].capable,HorseTraining.knows(h,"dodge"))
+
+func test_summary_popup_keeps_horse_hit_areas_transparent_and_restores_input():
+ panel.open_section("collection");await settle()
+ panel.content.get_node("CollectionRanch182").pressed.emit();await settle()
+ var summary=ranch().content.find_child("HorseSummary185_original",true,false)
+ var grid=summary.get_parent()
+ var taps:Array=[]
+ for c in grid.get_children():
+  if c is Button and c.tooltip_text.begins_with("Ver ficha:"):taps.append(c)
+ assert_eq(taps.size(),4)
+ var art:AnimatedSprite2D=ranch().animated[0]
+ var frames:SpriteFrames=art.sprite_frames
+ summary.get_child(0).pressed.emit();await settle()
+ var dialog:AcceptDialog=summary.get_children().filter(func(c):return c is AcceptDialog)[0]
+ assert_true(dialog.visible)
+ for tap in taps:
+  assert_true(tap.disabled,"modal still blocks background input")
+  assert_true(tap.get_theme_stylebox("disabled") is StyleBoxEmpty,"blocked invisible hit area cannot cover horse")
+ assert_true(summary.get_child(0).get_theme_stylebox("disabled") is StyleBoxEmpty)
+ assert_true(art.is_visible_in_tree());assert_eq(art.sprite_frames,frames);assert_true(art.is_playing())
+ dialog.queue_free();await settle()
+ for tap in taps:assert_false(tap.disabled,"closing popup restores horse input")
+ assert_true(art.is_visible_in_tree())
