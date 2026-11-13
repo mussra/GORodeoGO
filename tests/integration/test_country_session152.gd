@@ -47,3 +47,19 @@ func test_trial_invalid_origin_and_busy_transition_do_not_load_or_write():
  var before:=FileAccess.get_file_as_bytes(SaveData.save_path);var result:Dictionary
  SaveData.trial_session_active=true;result=await enter();assert_false(result.ok);assert_false(session.is_inside_tree());SaveData.trial_session_active=false
  result=await transition.enter152(session,Vector2(INF,0),load_session,validate,restore);assert_false(result.ok);assert_false(session.is_inside_tree());transition.busy=true;result=await enter();assert_eq(result.reason,"busy");assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),before)
+func test_real_shore_contact_saves_retries_and_cold_reloads_exactly_without_progress_loss():
+ assert_true((await enter()).ok);session.player.set_physics_process(false)
+ for site in [session.data.sites.tree,session.data.sites.source]:session.player.position=site;session._process(0.)
+ var poly:PackedVector2Array=session.data.island;var edge:Vector2=(poly[96]+poly[97])/2.;var inward:Vector2=(CountryRoute146.BOUNDS.get_center()-edge).normalized()
+ session.player.position=edge+inward*100.;assert_not_null(session.player.move_and_collide(-inward*300.));var shore:=session.player.position
+ assert_true(CountryRoute146.blocked(session.data,shore));assert_false(CountryRoute146.blocked(session.data,shore,0.))
+ session._process(5.1);assert_eq(session.save_error,"");assert_eq(SaveData.country_ledger146.maps.water146.position,shore)
+ var state:=SaveData.country_ledger146.duplicate(true);var disk:=FileAccess.get_file_as_bytes(SaveData.save_path);var horses:=SaveData.horse_collection.export_state()
+ SaveData._load_valid=false;session._process(5.1);assert_false(session.save_error.is_empty());assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk)
+ SaveData._load_valid=true;session._process(5.1);assert_eq(session.save_error,"");assert_false(session.status.text.contains("No se pudo guardar"));assert_eq(SaveData.country_ledger146,state)
+ session.free();await get_tree().process_frame;SaveData.load_progress();session=CountrySession152.new();transition=CountryTransition152.new()
+ var result:=await transition.enter152(session,SaveData.world_position,load_session,func():return session.landing155(session.ledger.maps.water146.position),restore)
+ assert_true(result.ok);session.player.set_physics_process(false);assert_eq(session.player.position,shore);assert_eq(session.ledger,state);assert_eq(SaveData.horse_collection.export_state(),horses);assert_eq(SaveData.world_position,Vector2(999,470));assert_eq(SaveData.world_missions,{"original":"done"})
+func test_solid_sea_center_is_still_rejected_without_touching_disk():
+ assert_true((await enter()).ok);session.player.set_physics_process(false);var disk:=FileAccess.get_file_as_bytes(SaveData.save_path)
+ session.player.position=Vector2(-10,-10);assert_false(session.save_now152());assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk)

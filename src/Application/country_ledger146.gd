@@ -5,6 +5,9 @@ extends RefCounted
 const VERSION:int=2
 static func fresh(seed_:int,generator:int)->Dictionary:
  return {"version":VERSION,"origin_seed":seed_,"origin_generator":generator,"active":"frontier","maps":{},"links":{}}
+# Stored positions are rider centers, not teleport destinations. Actual feet can
+# legally stand closer than the conservative 18px travel margin. Reload still
+# validates the real shared player shape against physics before activation.
 static func valid(raw:Variant,seed_:int,generator:int)->bool:
  if seed_<=0 or generator not in [1,2,3]:return false
  if not raw is Dictionary or raw.get("version",0) not in [1,VERSION] or raw.get("origin_seed",0)!=seed_ or raw.get("origin_generator",0)!=generator:return false
@@ -20,7 +23,7 @@ static func valid(raw:Variant,seed_:int,generator:int)->bool:
     if typeof(cell)!=TYPE_VECTOR2I or typeof(map_.explored[cell])!=TYPE_BOOL or not map_.explored[cell]:return false
     if cell.x<0 or cell.y<0 or cell.x>24 or cell.y>27:return false
   var data:=CountryRoute146.plan(map_.seed)
-  if CountryRoute146.blocked(data,map_.position):return false
+  if CountryRoute146.blocked(data,map_.position,0.):return false
   for place in map_.visited:
    if place not in ["entry","tree","source"] or typeof(map_.visited[place])!=TYPE_BOOL:return false
   if not raw.links.has(id):return false
@@ -42,7 +45,7 @@ static func record_position(state:Dictionary,position_:Vector2)->Dictionary:
  if not valid(state,int(state.get("origin_seed",0)),int(state.get("origin_generator",0))):return {}
  if state.get("active","")=="frontier" or not state.get("maps",{}).has(state.active):return {}
  var next:=upgrade(state);var map_:Dictionary=next.maps[next.active];var data:=CountryRoute146.plan(map_.seed)
- if not position_.is_finite() or CountryRoute146.blocked(data,position_):return {}
+ if not position_.is_finite() or CountryRoute146.blocked(data,position_,0.):return {}
  map_.position=position_;CountryExploration148.reveal(map_.explored,position_)
  for site in data.sites:
   if position_.distance_to(data.sites[site])<180.:map_.visited[site]=true

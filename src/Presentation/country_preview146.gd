@@ -78,9 +78,11 @@ func _draw():
  for point_ in island:uvs.append(point_/Vector2(GRASS.get_size()))
  draw_colored_polygon(island,Color.WHITE,uvs,GRASS)
  draw_polyline(loop,Color("e3cf91"),82.,true)
- for i in range(island.size()):
-  var a:Vector2=island[i];var b:Vector2=island[(i+1)%island.size()];var inward:Vector2=(CountryRoute146.BOUNDS.get_center()-(a+b)/2.).normalized();var pulse:float=sin(river_clock*.9+i*.5)*10.
-  draw_line(a-inward*(120.+pulse),b-inward*(120.+pulse),Color("d6f6ee99"),8.,true)
+ var foam:=PackedVector2Array()
+ for i in island.size():
+  var inward:Vector2=(CountryRoute146.BOUNDS.get_center()-island[i]).normalized();var pulse:float=sin(river_clock*.9+i*TAU/float(island.size())*3.)*10.
+  foam.append(island[i]-inward*(120.+pulse))
+ foam.append(foam[0]);draw_polyline(foam,Color("d6f6ee99"),8.,true)
  draw_polyline(data.approach,Color("6d522d"),112.,true);draw_polyline(data.approach,Color("bf8952"),90.,true)
  draw_polyline(data.bank,Color("6d522d"),112.,true);draw_polyline(data.bank,Color("bf8952"),90.,true)
  draw_polyline(data.river,Color("37666c"),205.,true);draw_polyline(data.river,Color("4e9caf"),180.,true);draw_polyline(data.river,Color("6bb9c5"),112.,true)
@@ -156,7 +158,11 @@ func _load_travel148()->bool:
  await get_tree().process_frame;await get_tree().process_frame;return true
 func landing155(requested:Vector2)->Vector2:
  var terrain:Callable=func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos)
- var result:=TravelLanding148.find(player,requested,terrain)
+ # Keep a legal saved coastal position exactly. Reuse the shared actual-shape
+ # query, rather than treating its center as an 18px teleport safety circle.
+ var result:=TravelLanding148.find(player,requested,func(pos:Vector2)->bool:return pos!=requested or CountryRoute146.blocked(data,pos,0.))
+ if result.is_finite():return result
+ result=TravelLanding148.find(player,requested,terrain)
  if result.is_finite():return result
  var outlines:Array[PackedVector2Array]=[]
  if MotherTree155.blocked(data.tree_solid,requested,18.):outlines.append(data.tree_solid)

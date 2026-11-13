@@ -18,11 +18,11 @@ func activate152()->bool:
 func _process(delta:float):
  super._process(delta)
  if not activated:return
- if not save_error.is_empty():status.text+=" · "+save_error
  if travelling:return
  save_clock+=delta
  if save_clock>=5.:
   save_clock=0.;save_now152()
+ if not save_error.is_empty():status.text+=" · "+save_error
 func snapshot152()->Dictionary:return CountryLedger146.record_exploration(ledger,player.position,visited_cells)
 func save_now152()->bool:
  if not activated or travelling:return false
