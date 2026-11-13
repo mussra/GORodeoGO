@@ -4,6 +4,7 @@ signal horse_opened(id:String)
 signal list_requested
 signal closed
 const AdultArt=preload("res://src/Presentation/mounted_preview181.gd")
+var embedded182:bool=false
 var canvas:Control
 var content:Control
 var tier:int=-1
@@ -11,9 +12,11 @@ var page_index:int=0
 var family_id:String=""
 var animated:Array=[]
 func _ready():
- set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=100;MenuInputGuard.install(self)
- var bg:=ColorRect.new();bg.color=RanchTheme.INK;bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
- canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(_layout);_layout();refresh()
+ set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=100;mouse_filter=Control.MOUSE_FILTER_IGNORE
+ if not embedded182:MenuInputGuard.install(self)
+ if not embedded182:
+  var bg:=ColorRect.new();bg.color=RanchTheme.INK;bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
+ canvas=Control.new();canvas.mouse_filter=Control.MOUSE_FILTER_IGNORE;canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(_layout);_layout();refresh()
 func _layout():
  if canvas==null:return
  var k:float=minf(size.x/1280.,size.y/720.);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2.
@@ -23,23 +26,25 @@ func _button(text:String,at:Vector2,width:float,action:Callable)->Button:
  var b:=Button.new();b.text=text;b.position=at;b.size=Vector2(width,48);content.add_child(b);TextFit181.button(b,Vector2(width,48));b.pressed.connect(action);return b
 func refresh():
  if content!=null:canvas.remove_child(content);content.queue_free()
- animated.clear();content=Control.new();canvas.add_child(content)
- MenuNavigation.header(content,"MI RANCHO" if family_id.is_empty() else "FAMILIA EN EL RANCHO",func():
-  if not family_id.is_empty():family_id="";refresh()
-  else:closed.emit())
- if not family_id.is_empty():_family();return
- _button("Ver lista de colección",Vector2(760,23),265,func():list_requested.emit())
+ animated.clear();content=Control.new();content.mouse_filter=Control.MOUSE_FILTER_IGNORE;canvas.add_child(content)
+ if not embedded182:MenuNavigation.header(content,"MI RANCHO" if family_id.is_empty() else "FAMILIA EN EL RANCHO",func():
+   if not family_id.is_empty():family_id="";refresh()
+   else:closed.emit())
+ if not family_id.is_empty():
+  if embedded182:_button("Volver al rancho",Vector2(900,158),300,func():family_id="";refresh())
+  _family();return
+ if not embedded182:_button("Ver lista de colección",Vector2(760,23),265,func():list_requested.emit())
  var tabs:Array=["Todos"]+HorseCollection.RARITIES
  for i in tabs.size():
   var t:int=i-1;var amount:int=RanchPastures141.horses(SaveData.horse_collection,t).size()
-  var b:=_button(str(tabs[i])+" · %d"%amount,Vector2(30+i*206,92),194,func():tier=t;page_index=0;refresh())
+  var b:=_button(str(tabs[i])+" · %d"%amount,Vector2(30+i*206,158 if embedded182 else 92),194,func():tier=t;page_index=0;refresh())
   b.disabled=tier==t
  var all_:Array=RanchPastures141.horses(SaveData.horse_collection,tier)
  var pages:int=maxi(1,ceili(float(all_.size())/RanchPastures141.PAGE_SIZE));page_index=clampi(page_index,0,pages-1)
- _label("Adultos en movimiento · potrillos quietos · toca un caballo para ver su ficha",Vector2(30,150),1210,20)
+ _label("Adultos en movimiento · potrillos quietos · toca un caballo para ver su ficha",Vector2(30,213 if embedded182 else 150),1210,20)
  var entries:Array=RanchPastures141.page(SaveData.horse_collection,tier,page_index)
  if entries.is_empty():_label("Todavía no tienes caballos en este corral.",Vector2(300,350),700,28)
- for i in entries.size():_card(entries[i],Vector2(30+(i%4)*310,190+int(i/4)*145))
+ for i in entries.size():_card(entries[i],Vector2(30+(i%4)*310,(250 if embedded182 else 190)+int(i/4)*145))
  var prev:=_button("Anterior",Vector2(330,650),190,func():page_index-=1;refresh());prev.disabled=page_index==0
  _label("%d / %d · %d caballos"%[page_index+1,pages,all_.size()],Vector2(535,662),250,21)
  var next:=_button("Siguiente",Vector2(790,650),190,func():page_index+=1;refresh());next.disabled=page_index==pages-1
@@ -65,8 +70,8 @@ func _card(h:Dictionary,at:Vector2):
   var fam:=_button("Familia",at+Vector2(200,74),83,func():family_id=h.id;refresh());fam.add_theme_font_size_override("font_size",16)
 func _family():
  var members:Array=RanchPastures141.family(SaveData.horse_collection,family_id)
- _label("Padres y cría · solo vista, no cambia crecimiento ni habilidades",Vector2(30,105),1200,22)
- _ground(Rect2(70,190,1140,350))
+ _label("Padres y cría · solo vista, no cambia crecimiento ni habilidades",Vector2(30,210 if embedded182 else 105),1200,22)
+ _ground(Rect2(70,250 if embedded182 else 190,1140,290 if embedded182 else 350))
  for i in members.size():
   var h:Dictionary=members[i];var x:float=230.+i*360.
   _actor(h,Vector2(x,430),1.8 if h.get("stage","adult")=="adult" else 1.5)

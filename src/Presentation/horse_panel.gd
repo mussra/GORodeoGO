@@ -19,6 +19,7 @@ var atlas_filters:Dictionary={}
 var scroll_to_newest:bool=false
 var expanded_appearance_groups118:Dictionary={}
 var collection_scroll118:int=0
+var collection_mode182:String="list"
 var pasture_tier141:int=-1
 var pasture_page141:int=0
 func _ready()->void:
@@ -52,7 +53,10 @@ func _refresh()->void:
   return
  match page:
   "pasture141":pasture_view141()
-  "collection":collection_view()
+  "collection":
+   collection_selector182()
+   if collection_mode182=="ranch":pasture_view141(true)
+   else:collection_view()
   "breed":breed_view()
   "family":family_view()
   "atlas","atlas_variants","market":atlas_view()
@@ -62,8 +66,8 @@ func open_section(value:String)->void:
  if value=="training":add_child(TrainingPanel.new());return
  if value=="genealogy":add_child(GenealogyPanel.new());return
  show_page(value)
-func pasture_view141()->void:
- var ranch:=RanchPasturePanel141.new();ranch.tier=pasture_tier141;ranch.page_index=pasture_page141;content.add_child(ranch)
+func pasture_view141(embedded:bool=false)->void:
+ var ranch:=RanchPasturePanel141.new();ranch.embedded182=embedded;ranch.tier=pasture_tier141;ranch.page_index=pasture_page141;content.add_child(ranch)
  ranch.closed.connect(func():show_page("hub"))
  ranch.horse_opened.connect(func(id:String):
   pasture_tier141=ranch.tier;pasture_page141=ranch.page_index
@@ -86,12 +90,22 @@ func sprite(h:Dictionary,pos:Vector2,size_px:float=130)->void:
  var tex:=TextureRect.new();tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
  HorsePortrait.apply_horse(tex,h,SaveData.hat_color)
  tex.position=pos;tex.size=Vector2.ONE*size_px;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;tex.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;content.add_child(tex)
+func set_collection_mode182(mode:String)->void:
+ for child in content.get_children():
+  if child is RanchPasturePanel141:pasture_tier141=child.tier;pasture_page141=child.page_index
+ collection_mode182=mode;refresh()
+func collection_selector182()->void:
+ var list_button:=button("Lista de gestión",Vector2(30,92),func():set_collection_mode182("list"),330)
+ list_button.name="CollectionList182";list_button.disabled=collection_mode182=="list"
+ var ranch_button:=button("Vista del rancho",Vector2(375,92),func():set_collection_mode182("ranch"),330)
+ ranch_button.name="CollectionRanch182";ranch_button.disabled=collection_mode182=="ranch"
+ var legacy:=button("Mi rancho · vista anterior",Vector2(930,92),func():show_page("pasture141"),310);legacy.name="CollectionToRanch181"
+ TextFit181.fixed(label("Prototipo · dos vistas de la misma colección",Vector2(30,62),18),Vector2(900,32),18,18)
 func collection_view()->void:
  var restore_scroll:int=collection_scroll118
  var groups:Array[Dictionary]=HorseAppearanceGroups118.groups(SaveData.horse_collection.horses)
- TextFit181.fixed(label(str(SaveData.horse_collection.horses.size())+" caballos · "+str(groups.size())+" apariencias · despliega para elegir cada caballo",Vector2(30,100),21),Vector2(900,32),21,18)
- var ranch_link:=button("Mi rancho",Vector2(1010,92),func():show_page("pasture141"),230);ranch_link.name="CollectionToRanch181"
- var scroll:=ScrollContainer.new();scroll.name="CollectionScroll118";scroll.position=Vector2(30,140);scroll.size=Vector2(1210,500);content.add_child(scroll)
+ TextFit181.fixed(label(str(SaveData.horse_collection.horses.size())+" caballos · "+str(groups.size())+" apariencias · despliega para elegir cada caballo",Vector2(30,152),21),Vector2(1190,32),21,18)
+ var scroll:=ScrollContainer.new();scroll.name="CollectionScroll118";scroll.position=Vector2(30,195);scroll.size=Vector2(1210,445);content.add_child(scroll)
  scroll.scroll_vertical=collection_scroll118
  scroll.get_v_scroll_bar().value_changed.connect(func(value:float):collection_scroll118=int(value))
  var rows:=VBoxContainer.new();rows.name="AppearanceGroups118";rows.custom_minimum_size.x=1170;scroll.add_child(rows)

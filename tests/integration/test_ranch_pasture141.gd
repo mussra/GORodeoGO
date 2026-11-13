@@ -59,3 +59,29 @@ func test_paddock_uses_exact_mounted_side_texture_hat_and_cosmetics():
   var a:AnimatedSprite2D=p.animated[i];var h:Dictionary=SaveData.horse_collection.horses[i]
   for frame in 9:assert_eq(a.sprite_frames.get_frame_texture("walk",frame),PixelLabTrial.pose_texture("rider","side",frame,h.traits,h))
  SaveData.hat_color="original"
+
+func test_collection_view_selector_preserves_data_filter_and_detail_origin():
+ panel.open_section("collection");await settle()
+ assert_not_null(panel.content.find_child("CollectionScroll118",true,false))
+ panel.content.get_node("CollectionRanch182").pressed.emit();await settle()
+ assert_eq(panel.page,"collection");assert_eq(panel.collection_mode182,"ranch");assert_true(ranch().embedded182)
+ assert_false(panel.content.get_node("CollectionList182").disabled,"Nested view must not block the common selector")
+ ranch().tier=0;ranch().refresh()
+ ranch().content.find_child("PastureHorse_trial_a",true,false).pressed.emit();await settle()
+ assert_eq(panel.page,"detail");assert_eq(panel.detail_origin,"collection")
+ panel.go_back();await settle();assert_eq(panel.page,"collection");assert_eq(panel.collection_mode182,"ranch");assert_eq(ranch().tier,0)
+ panel.content.get_node("CollectionList182").pressed.emit();await settle()
+ assert_eq(panel.collection_mode182,"list");assert_null(ranch());assert_not_null(panel.content.find_child("CollectionScroll118",true,false))
+ panel.content.get_node("CollectionRanch182").pressed.emit();await settle();assert_eq(ranch().tier,0)
+ panel.content.get_node("CollectionToRanch181").pressed.emit();await settle();assert_eq(panel.page,"pasture141");assert_false(ranch().embedded182)
+
+func click182(button:Button):
+ var pos:Vector2=button.get_global_rect().get_center()
+ var motion:=InputEventMouseMotion.new();motion.position=pos;Input.parse_input_event(motion);await settle()
+ for pressed in [true,false]:
+  var e:=InputEventMouseButton.new();e.button_index=MOUSE_BUTTON_LEFT;e.pressed=pressed;e.position=pos;Input.parse_input_event(e);await settle()
+func test_real_pointer_changes_modes_in_both_directions():
+ panel.open_section("collection");await settle();await click182(panel.content.get_node("CollectionRanch182"))
+ assert_eq(panel.collection_mode182,"ranch");assert_not_null(ranch())
+ await click182(panel.content.get_node("CollectionList182"))
+ assert_eq(panel.collection_mode182,"list");assert_null(ranch())
