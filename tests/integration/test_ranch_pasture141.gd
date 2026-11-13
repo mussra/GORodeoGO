@@ -22,7 +22,6 @@ func test_real_menu_open_detail_back_filter_and_list():
  button.pressed.emit();await settle();assert_eq(panel.page,"detail");assert_eq(panel.focus_id,"trial_a");assert_eq(panel.detail_origin,"pasture141")
  panel.go_back();await settle();assert_eq(panel.page,"pasture141");assert_eq(ranch().tier,0)
  ranch().list_requested.emit();await settle();assert_eq(panel.page,"collection")
- panel.content.get_node("CollectionToRanch181").pressed.emit();await settle();assert_eq(panel.page,"pasture141")
  panel.open_section("pasture141");await settle();ranch().closed.emit();await settle();assert_eq(panel.page,"hub")
 func test_shared_animated_adults_static_foal_and_family():
  panel.open_section("pasture141");await settle();var p:=ranch();assert_eq(p.animated.size(),3)
@@ -73,7 +72,7 @@ func test_collection_view_selector_preserves_data_filter_and_detail_origin():
  panel.content.get_node("CollectionList182").pressed.emit();await settle()
  assert_eq(panel.collection_mode182,"list");assert_null(ranch());assert_not_null(panel.content.find_child("CollectionScroll118",true,false))
  panel.content.get_node("CollectionRanch182").pressed.emit();await settle();assert_eq(ranch().tier,0)
- panel.content.get_node("CollectionToRanch181").pressed.emit();await settle();assert_eq(panel.page,"pasture141");assert_false(ranch().embedded182)
+ assert_null(panel.content.find_child("CollectionToRanch181",true,false))
 
 func click182(button:Button):
  var pos:Vector2=button.get_global_rect().get_center()
@@ -85,3 +84,15 @@ func test_real_pointer_changes_modes_in_both_directions():
  assert_eq(panel.collection_mode182,"ranch");assert_not_null(ranch())
  await click182(panel.content.get_node("CollectionList182"))
  assert_eq(panel.collection_mode182,"list");assert_null(ranch())
+
+func test_one_collection_menu_entry_and_two_named_views():
+ panel.open_section("hub");await settle()
+ assert_not_null(panel.content.get_node("Navigate_collection"))
+ var duplicates:int=0
+ for child in panel.content.get_children():
+  if child is Button and child.text=="Mi rancho":duplicates+=1
+ assert_eq(duplicates,0)
+ panel.content.get_node("Navigate_collection").pressed.emit();await settle()
+ assert_eq(panel.content.get_node("CollectionList182").text,"Vista de colección")
+ assert_eq(panel.content.get_node("CollectionRanch182").text,"Vista de rancho")
+ assert_null(panel.content.find_child("CollectionToRanch181",true,false))

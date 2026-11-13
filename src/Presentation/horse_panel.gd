@@ -47,7 +47,6 @@ func _refresh()->void:
  MenuNavigation.header(content,str(titles.get(page,"CABALLERIZA")),go_back)
  if page=="hub":
   MenuNavigation.cards(content,[{"id":"collection","title":"Colección","hint":"Tus caballos"},{"id":"breed","title":"Cruzar","hint":"Elige padres y rasgos"},{"id":"atlas","title":"Atlas","hint":"Explora colores y patrones"},{"id":"market","title":"Mercado","hint":"Compra y venta"},{"id":"training","title":"Entrenamiento","hint":"Aprende habilidades"},{"id":"genealogy","title":"Mapa genealógico","hint":"Linajes y parentescos"}],open_section)
-  button("Mi rancho",Vector2(40,600),func():open_section("pasture141"),330)
   if SaveData.debug_mode or SaveData.trial_session_active:
    button("Caballos aleatorios de prueba",Vector2(430,600),add_random_pair,420)
   return
@@ -95,12 +94,11 @@ func set_collection_mode182(mode:String)->void:
   if child is RanchPasturePanel141:pasture_tier141=child.tier;pasture_page141=child.page_index
  collection_mode182=mode;refresh()
 func collection_selector182()->void:
- var list_button:=button("Lista de gestión",Vector2(30,92),func():set_collection_mode182("list"),330)
+ var list_button:=button("Vista de colección",Vector2(30,92),func():set_collection_mode182("list"),330)
  list_button.name="CollectionList182";list_button.disabled=collection_mode182=="list"
- var ranch_button:=button("Vista del rancho",Vector2(375,92),func():set_collection_mode182("ranch"),330)
+ var ranch_button:=button("Vista de rancho",Vector2(375,92),func():set_collection_mode182("ranch"),330)
  ranch_button.name="CollectionRanch182";ranch_button.disabled=collection_mode182=="ranch"
- var legacy:=button("Mi rancho · vista anterior",Vector2(930,92),func():show_page("pasture141"),310);legacy.name="CollectionToRanch181"
- TextFit181.fixed(label("Prototipo · dos vistas de la misma colección",Vector2(30,62),18),Vector2(900,32),18,18)
+ TextFit181.fixed(label("Una colección · dos vistas",Vector2(30,62),18),Vector2(900,32),18,18)
 func collection_view()->void:
  var restore_scroll:int=collection_scroll118
  var groups:Array[Dictionary]=HorseAppearanceGroups118.groups(SaveData.horse_collection.horses)
