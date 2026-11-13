@@ -32,7 +32,12 @@ func run():
   Input.action_press("move_left");Input.action_press("move_down")
   await get_tree().create_timer(.5,true).timeout;await shot(country_id+"-casi-cerrado")
   Input.action_release("move_left");Input.action_release("move_down")
-  while not completed:await get_tree().process_frame
+  var covered_shot:bool=false
+  while not completed:
+   var curtain:SiestaCurtain147=world.curtain if country else world._travel144.curtain
+   if is_instance_valid(curtain) and curtain.phase=="covered" and not covered_shot:
+    covered_shot=true;assert(curtain.message.visible);await shot(country_id+"-cargando")
+   await get_tree().process_frame
   assert(ok);assert(SaveData.world_quests==before);await get_tree().create_timer(1.,true).timeout;await shot(country_id+"-despues");print("SIESTA163_QA_OK ",country_id," from=",origin," to=",world.player.position)
   world.queue_free();await get_tree().process_frame
  get_tree().quit()

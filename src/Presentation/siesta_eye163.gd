@@ -1,11 +1,12 @@
 class_name SiestaEye163
 extends Control
-var aperture:float=0.
+## One feathered eye mask for all shared siesta transitions.
+var aperture:float=0.:
+ set(value):
+  aperture=value
+  if material!=null:material.set_shader_parameter("aperture",value)
+  queue_redraw()
+func _ready():
+ var mask:=ShaderMaterial.new();mask.shader=preload("res://art/siesta_eye164.gdshader");mask.set_shader_parameter("aperture",aperture);material=mask
 func _draw():
- if size.x<=0. or size.y<=0. or aperture>=.99999:return
- var top:=PackedVector2Array([Vector2.ZERO,Vector2(size.x,0)])
- var bottom:=PackedVector2Array([Vector2(0,size.y),size])
- for i in range(64,-1,-1):
-  var x:float=size.x*i/64.;var opening:float=size.y*.499*aperture*sin(PI*i/64.)
-  top.append(Vector2(x,maxf(0.,size.y*.5-opening)));bottom.append(Vector2(x,minf(size.y,size.y*.5+opening)))
- draw_colored_polygon(top,Color("080d12"));draw_colored_polygon(bottom,Color("080d12"))
+ if size.x>0. and size.y>0.:draw_rect(Rect2(Vector2.ZERO,size),Color.WHITE)
