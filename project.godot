@@ -110,7 +110,7 @@ pointing/emulate_mouse_from_touch=true
 
 environment/defaults/default_clear_color=Color(0.0353, 0.1059, 0.1529, 1)
 
-renderer/rendering_method="mobile"
+renderer/rendering_method="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
 
 [rancho]

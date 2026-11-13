@@ -1,0 +1,25 @@
+RANCHO PRUEBA 2.7.125 - WINDOWS 64 BITS
+
+1. Descarga el ZIP completo y pulsa Extraer todo.
+2. Deja Rancho-Prueba.exe y Rancho-Prueba.pck en la misma carpeta.
+3. Abre Rancho-Prueba.exe. No lo ejecutes dentro del ZIP.
+4. En Settings/Ajustes puedes cambiar el idioma a Espanol.
+
+Version de prueba portable, sin instalador. Ejecutable no firmado: Windows
+puede mostrar un aviso de editor desconocido. No desactives tu antivirus.
+Si bloquea el archivo, envia captura del aviso antes de cambiar nada.
+
+Controles: flechas del teclado para mover. Los controles dibujados tambien
+se pueden usar con el raton. Espacio lanza el lazo; R suelta la captura.
+Los menus se usan con el raton. Esc abre pausa o vuelve segun pantalla.
+
+Contenido igual a la APK 2.7.125:40niveles, llavesGalaxy20/40 y crecimiento
+normal de crias. Sin cuerno nuevo ni ritual activado.
+
+El progreso queda guardado en este PC, separado de Android. No hay
+sincronizacion automatica con el movil. No se incluye ninguna partida
+personal en este ZIP. Las actualizaciones conservan el guardado local.
+
+Comprobacion realizada: exportacionWindowsx64, paquete de recursos abierto
+con el motor de escritorio enLinux, menu, nivel1 y movimiento por teclado.
+No probado enWindowsnativo. Rendimiento y avisos deWindows por confirmar.
