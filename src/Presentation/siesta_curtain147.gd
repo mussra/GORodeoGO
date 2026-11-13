@@ -35,7 +35,7 @@ func open_eye()->void:
 func _aperture(value:float)->void:eye.aperture=value;eye.queue_redraw()
 func _physics_process(delta:float):
  clock+=delta
- if phase in ["idle","covered"] and is_instance_valid(message):message.text="Cargando el camino"+".".repeat(1+int(clock*2.)%3)+"\nEspera un momento"
+ if phase=="covered" and is_instance_valid(message) and message.text.begins_with("Cargando el camino"):message.text="Cargando el camino"+".".repeat(1+int(clock*2.)%3)+"\nEspera un momento"
  if not walking or not is_instance_valid(actor):return
  while route_index<route.size() and actor.position.distance_to(route[route_index])<3.:route_index+=1
  if route_index>=route.size():walking=false;return

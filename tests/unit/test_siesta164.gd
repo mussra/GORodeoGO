@@ -6,9 +6,10 @@ func test_shared_eye_uses_feathered_shader_and_has_no_overlay_when_fully_open():
  assert_true(eye.material.shader.code.contains("smoothstep"));assert_true(eye.material.shader.code.contains("if(aperture>=0.99999)"))
 func test_closed_loading_has_clear_message_and_message_hides_before_open():
  var curtain:=SiestaCurtain147.new();add_child_autofree(curtain)
- curtain._physics_process(.1)
+ curtain.phase="covered";curtain.message.text="Cargando el camino...\nEspera un momento";curtain._physics_process(.1)
  assert_true(curtain.message.visible);assert_true(curtain.message.text.contains("Cargando el camino"));assert_true(curtain.message.text.contains("Espera un momento"))
  curtain.phase="covered";curtain._physics_process(.8);assert_true(curtain.message.visible)
+ curtain.message.text="No se pudo reabrir el país. Su progreso sigue guardado.";curtain._physics_process(.1);assert_eq(curtain.message.text,"No se pudo reabrir el país. Su progreso sigue guardado.")
  curtain.open_eye();assert_false(curtain.message.visible)
  await get_tree().create_timer(1.1).timeout
  assert_eq(curtain.phase,"done");assert_eq(curtain.eye.aperture,1.)
