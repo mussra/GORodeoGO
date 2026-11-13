@@ -34,16 +34,31 @@ func test_collapsing_and_resizing_invalidates_terrain_immediately_and_back_close
  var back:=InputEventAction.new();back.action="ui_cancel";back.pressed=true;world._unhandled_input(back);assert_null(world._note_dialog106);assert_true(map.expanded);assert_false(world.player.is_physics_processing());world._unhandled_input(back);assert_false(map.expanded)
 
 func test_failed_photo_then_retry_without_photo_never_persists_deleted_file():
- world.show_map();world._map_overlay._ensure_terrain();world._open_map_note106(world.player.position);world._map_notes159.photo=Image.create(16,16,false,Image.FORMAT_RGBA8)
+ world.show_map();world._map_overlay._ensure_terrain();world._open_map_note106(world.player.position);world._map_notes159.photo_position=world.player.position;world._map_notes159.photo=Image.create(16,16,false,Image.FORMAT_RGBA8)
  SaveData._load_valid=false;world._note_dialog106.saved.emit("Foto fallida",true);assert_not_null(world._note_dialog106);assert_true(world._map_overlay.notes159().is_empty())
  SaveData._load_valid=true;world._note_dialog106.saved.emit("Sin foto",false);await get_tree().process_frame
  var note:Dictionary=WorldNotes106.nearest(world._map_overlay.notes159(),world.player.position,500.);assert_eq(note.photo,"");assert_eq(note.text,"Sin foto")
 
 func test_requested_photo_without_available_capture_does_not_silently_save_text_only():
- world.show_map();world._map_overlay._ensure_terrain();world._open_map_note106(world.player.position);world._map_notes159.photo=null
+ world.show_map();world._map_overlay._ensure_terrain();world._open_map_note106(world.player.position);world._map_notes159.photo_position=world.player.position;world._map_notes159.photo=null
  var disk:=FileAccess.get_file_as_bytes(SaveData.save_path);world._note_dialog106.saved.emit("Sin captura",true)
  assert_not_null(world._note_dialog106);assert_true(world._map_overlay.notes159().is_empty());assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_true(world.last_error.contains("No hay captura"))
 func test_shared_photo_selection_shows_live_preview_and_large_gold_icons():
  var dialog:=MapNoteDialog106.new();var image:=Image.create(32,16,false,Image.FORMAT_RGBA8);dialog.setup({},"",image);add_child(dialog)
  assert_false(dialog.photo_box.button_pressed);assert_false(dialog.photo_preview.visible);assert_eq(dialog.photo_box.get_theme_icon("unchecked").get_size(),Vector2(36,36))
  dialog.photo_box.button_pressed=true;assert_true(dialog.photo_preview.visible);assert_not_null(dialog.photo_preview.texture);assert_true(dialog.photo_status.text.contains("Guardar"));dialog.photo_box.button_pressed=false;assert_false(dialog.photo_preview.visible);dialog.free()
+
+func test_remote_edit_blocks_photo_in_ui_and_save_preserves_original_image_and_text_edit():
+ world.show_map();world._map_overlay._ensure_terrain();var point:Vector2=world.player.position;world._map_notes159.photo_position=point;world._map_notes159.photo=Image.create(32,16,false,Image.FORMAT_RGBA8)
+ world._open_map_note106(point);world._note_dialog106.saved.emit("Original",true);await get_tree().process_frame
+ var original:Dictionary=WorldNotes106.nearest(world._map_overlay.notes159(),point,10.).duplicate(true);var bytes:=FileAccess.get_file_as_bytes(original.photo)
+ world.player.position=point+Vector2(1000,0);world._map_notes159.photo_position=world.player.position;world._open_map_note106(point)
+ assert_true(world._note_dialog106.photo_box.disabled);assert_true(world._note_dialog106.photo_status.text.contains("lejos"));assert_true(world._note_dialog106.photo_preview.visible)
+ world._note_dialog106.saved.emit("Wrong photo attempt",true);assert_not_null(world._note_dialog106);assert_eq(WorldNotes106.nearest(world._map_overlay.notes159(),point,10.).text,"Original");assert_eq(FileAccess.get_file_as_bytes(original.photo),bytes)
+ world._note_dialog106.saved.emit("Texto editado lejos",false);await get_tree().process_frame
+ var edited:Dictionary=WorldNotes106.nearest(world._map_overlay.notes159(),point,10.);assert_eq(edited.text,"Texto editado lejos");assert_eq(edited.photo,original.photo);assert_eq(FileAccess.get_file_as_bytes(edited.photo),bytes)
+ world.player.position=point;world._open_map_note106(point);assert_true(world._note_dialog106.photo_box.disabled,"returning without recapturing cannot use an image of the other place");world._map_notes159.close();await get_tree().process_frame
+ world._map_notes159.photo_position=point;world._open_map_note106(point);assert_false(world._note_dialog106.photo_box.disabled);world._note_dialog106.saved.emit("Nueva foto local",true);await get_tree().process_frame;assert_ne(WorldNotes106.nearest(world._map_overlay.notes159(),point,10.).photo,original.photo)
+func test_new_remote_note_also_cannot_attach_photo_from_another_place():
+ world.show_map();world._map_overlay._ensure_terrain();world._map_notes159.photo_position=world.player.position;world._map_notes159.photo=Image.create(32,16,false,Image.FORMAT_RGBA8)
+ world._open_map_note106(world.player.position+Vector2(1000,0));assert_true(world._note_dialog106.photo_box.disabled);world._note_dialog106.saved.emit("Lejos",true);assert_true(world._map_overlay.notes159().is_empty())

@@ -10,13 +10,14 @@ var photo_preview:TextureRect
 var photo_status:Label
 var captured_photo:Image
 var stored_photo:Image
-func setup(existing:Dictionary,horse_text:String,capture:Image=null):
- captured_photo=capture
+var photo_allowed:bool=true
+func setup(existing:Dictionary,horse_text:String,capture:Image=null,allow_photo:bool=true):
+ captured_photo=capture;photo_allowed=allow_photo
  note=existing;position=Vector2(270,110);size=Vector2(740,510);clip_contents=true;z_index=150;mouse_filter=Control.MOUSE_FILTER_STOP
  add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("e8b64e"),12))
  var title=Label.new();title.text="Nota del mapa · "+("Caballo" if not horse_text.is_empty() else "Lugar");title.position=Vector2(24,18);title.add_theme_font_size_override("font_size",26);add_child(title)
  entry=TextEdit.new();entry.position=Vector2(24,65);entry.size=Vector2(690,105);entry.text=str(existing.get("text",horse_text));entry.placeholder_text="Ej.: caballo rojo con crin arcoíris";entry.add_theme_font_size_override("font_size",22);add_child(entry)
- photo_box=CheckBox.new();photo_box.text="Adjuntar captura de pantalla";photo_box.position=Vector2(24,183);photo_box.size=Vector2(690,50);QuestButtonStyle.apply(photo_box);photo_box.add_theme_stylebox_override("hover_pressed",photo_box.get_theme_stylebox("pressed"));photo_box.add_theme_color_override("font_hover_pressed_color",Color("342313"));photo_box.add_theme_constant_override("h_separation",16);photo_box.add_theme_icon_override("unchecked",photo_icon160(false));photo_box.add_theme_icon_override("checked",photo_icon160(true));add_child(photo_box)
+ photo_box=CheckBox.new();photo_box.text="Adjuntar captura de pantalla";photo_box.position=Vector2(24,183);photo_box.size=Vector2(690,50);QuestButtonStyle.apply(photo_box);photo_box.add_theme_stylebox_override("hover_pressed",photo_box.get_theme_stylebox("pressed"));photo_box.add_theme_color_override("font_hover_pressed_color",Color("342313"));photo_box.add_theme_stylebox_override("disabled",RanchTheme.box(Color("efb950"),Color("704122"),10));photo_box.add_theme_color_override("font_disabled_color",Color("342313"));photo_box.add_theme_constant_override("h_separation",16);photo_box.add_theme_icon_override("unchecked",photo_icon160(false));photo_box.add_theme_icon_override("checked",photo_icon160(true));photo_box.add_theme_icon_override("unchecked_disabled",photo_icon160(false));photo_box.add_theme_icon_override("checked_disabled",photo_icon160(true));add_child(photo_box)
  var info=Label.new();info.text="La nota no congela al caballo ni cambia su posición.\nMáximo 240 caracteres por nota.";info.position=Vector2(24,235);info.add_theme_font_size_override("font_size",18);add_child(info)
  var photo_path:String=str(existing.get("photo",""))
  if photo_path.begins_with("user://map-photos/") and FileAccess.file_exists(photo_path):stored_photo=Image.load_from_file(photo_path)
@@ -31,12 +32,16 @@ func setup(existing:Dictionary,horse_text:String,capture:Image=null):
   else:button.pressed.connect(func():closed.emit())
 
 func refresh_photo160()->void:
+ photo_box.disabled=not photo_allowed
+ if not photo_allowed:photo_box.set_pressed_no_signal(false)
  var image:Image=captured_photo if photo_box.button_pressed else stored_photo
  photo_box.text="Captura activada · se adjuntará al guardar" if photo_box.button_pressed else "Adjuntar captura de pantalla"
+ if not photo_allowed:photo_box.text="Captura bloqueada · acércate al marcador"
  photo_preview.visible=image!=null
  if image!=null:
   var small:Image=image.duplicate();small.resize(250,113,Image.INTERPOLATE_LANCZOS);photo_preview.texture=ImageTexture.create_from_image(small)
  photo_status.text=("Esta captura se adjuntará cuando pulses Guardar." if captured_photo!=null else "No hay captura disponible. Cierra el mapa y vuelve a abrirlo.") if photo_box.button_pressed else ("Foto ya guardada. Se conserva si no activas otra captura." if stored_photo!=null else "Toca el recuadro amarillo de arriba para añadir la vista del mundo anterior al mapa. Después pulsa Guardar.")
+ if not photo_allowed:photo_status.text="Estás lejos del marcador. Acércate y vuelve a abrir el mapa para guardar su captura. La foto anterior se conserva."
 func photo_icon160(checked:bool)->Texture2D:
  var image:=Image.create(36,36,false,Image.FORMAT_RGBA8)
  for x in 36:

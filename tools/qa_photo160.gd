@@ -26,7 +26,12 @@ func run():
     if button.text=="Guardar":save=button
    assert(save!=null);await tap(save);assert(world._note_dialog106==null)
    var notes:Dictionary=world.ledger.maps.water146.notes if country else SaveData.world_notes106;var note:Dictionary=WorldNotes106.nearest(notes,world.player.position,1000.);assert(not note.is_empty());assert(FileAccess.file_exists(note.photo));assert(Image.load_from_file(note.photo)!=null)
-   SaveData.load_progress();var stored:Dictionary=SaveData.country_ledger146.maps.water146.notes if country else SaveData.world_notes106;assert(WorldNotes106.nearest(stored,world.player.position,1000.).photo==note.photo)
-   world._open_map_note106(world.player.position);await get_tree().process_frame;assert(not world._note_dialog106.find_children("*","TextureRect",true,false).is_empty());await shot("%s-%s-reabierta"%["pais" if country else "frontera",dims.x]);world._map_notes159.close();world.queue_free();await get_tree().process_frame
+   SaveData.load_progress()
+   if not country:world._roaming139.setup(SaveData.world_roaming139,SaveData.world_seed) # Live fixture reload rebinds runtime index, unlike normal cold load.
+   var stored:Dictionary=SaveData.country_ledger146.maps.water146.notes if country else SaveData.world_notes106;assert(WorldNotes106.nearest(stored,world.player.position,1000.).photo==note.photo)
+   world._open_map_note106(world.player.position);await get_tree().process_frame;assert(not world._note_dialog106.find_children("*","TextureRect",true,false).is_empty());await shot("%s-%s-reabierta"%["pais" if country else "frontera",dims.x]);world._map_notes159.close();await get_tree().process_frame
+   var point:Vector2=note.pos;var previous_bytes:=FileAccess.get_file_as_bytes(note.photo);world._toggle_map();world.player.position=point+Vector2(1000,0);await get_tree().create_timer(1.2).timeout;world._toggle_map();world._map_overlay._ensure_terrain();world._open_map_note106(point);await get_tree().process_frame
+   assert(world._note_dialog106.photo_box.disabled);await tap(world._note_dialog106.photo_box);assert(not world._note_dialog106.photo_box.button_pressed);await shot("%s-%s-lejos"%["pais" if country else "frontera",dims.x]);world._note_dialog106.saved.emit("Texto editado desde lejos",false);await get_tree().process_frame
+   notes=world.ledger.maps.water146.notes if country else SaveData.world_notes106;var edited:Dictionary=WorldNotes106.nearest(notes,point,10.);assert(edited.photo==note.photo);assert(FileAccess.get_file_as_bytes(note.photo)==previous_bytes);assert(edited.text=="Texto editado desde lejos");world.queue_free();await get_tree().process_frame
    print("PHOTO160_NATIVE_TAP_SAVE_RELOAD_OK country=",country," size=",dims)
  get_tree().quit()

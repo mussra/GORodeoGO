@@ -3,10 +3,13 @@ extends Node
 ## One note editor/photo/rollback workflow for every world. World adapters own
 ## only scoped note storage and nearby-animal data, never a second dialog flow.
 var world:Node2D
+const PHOTO_RADIUS161:float=120.
+var photo_position:Vector2=Vector2(INF,INF)
 var photo:Image
 var wrapper:Control
 func _ready():world=get_parent()
 func capture()->void:
+ photo_position=world.player.position
  if DisplayServer.get_name()!="headless":photo=get_viewport().get_texture().get_image()
 func photo_dir()->String:return "user://map-photos/"+str(hash(SaveData.save_path))
 func open(pos:Vector2)->void:
@@ -33,10 +36,12 @@ func open(pos:Vector2)->void:
  wrapper.tree_exiting.connect(func():
   if is_instance_valid(viewport_node) and viewport_node.size_changed.is_connected(layout):viewport_node.size_changed.disconnect(layout))
  layout.call()
- var dialog:=MapNoteDialog106.new();dialog.setup(nearest,horse_text,photo);world._note_dialog106=dialog;wrapper.add_child(dialog)
+ var dialog:=MapNoteDialog106.new();dialog.setup(nearest,horse_text,photo,photo_location_allowed161(note.pos));world._note_dialog106=dialog;wrapper.add_child(dialog)
  dialog.closed.connect(close)
  dialog.saved.connect(func(text:String,wants_photo:bool):
   note.text=text.left(240);var new_path:String=""
+  if wants_photo and not photo_location_allowed161(note.pos):
+   dialog.photo_allowed=false;dialog.photo_box.set_pressed_no_signal(false);dialog.refresh_photo160();world.map_note_message159("Acércate al marcador y vuelve a abrir el mapa para guardar su captura. La foto anterior se conserva.");return
   if wants_photo and photo==null:
    world.map_note_message159("No hay captura disponible. Cierra el mapa y vuelve a abrirlo.");return
   if wants_photo and photo!=null:
@@ -58,3 +63,6 @@ func open(pos:Vector2)->void:
 func close()->void:
  if is_instance_valid(wrapper):wrapper.queue_free()
  wrapper=null;world._note_dialog106=null;world.player.set_physics_process(not world._map_overlay.expanded)
+
+func photo_location_allowed161(pos:Vector2)->bool:
+ return photo_position.is_finite() and photo_position.distance_to(pos)<=PHOTO_RADIUS161 and world.player.position.distance_to(pos)<=PHOTO_RADIUS161
