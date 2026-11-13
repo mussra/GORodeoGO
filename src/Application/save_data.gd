@@ -39,6 +39,7 @@ var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
 var world_position: Vector2 = Vector2(0, 160)
 var world_places144:Dictionary={}
+var siesta_rest166:float=0.
 var country_ledger146:Dictionary={} # Separate future-country progress; no entry enabled yet.
 var world_cousins140:Dictionary={} # Four-town journal, separate additive V3 state.
 var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
@@ -95,6 +96,7 @@ func save_progress() -> bool:
 	config.set_value("world","roaming139",world_roaming139)
 	config.set_value("world","cousins140",world_cousins140)
 	config.set_value("world","places144",world_places144)
+	config.set_value("world","siesta_rest166",siesta_rest166)
 	config.set_value("world","countries146",country_ledger146)
 	config.set_value("world", "missions", world_missions)
 	config.set_value("world", "pigs", world_pigs)
@@ -139,7 +141,7 @@ func load_progress() -> void:
 	world_flora138.clear()
 	world_roaming139.clear()
 	world_cousins140.clear()
-	world_places144.clear()
+	world_places144.clear();siesta_rest166=0.
 	country_ledger146.clear()
 	world_missions.clear()
 	world_pigs.clear()
@@ -206,6 +208,7 @@ func load_progress() -> void:
 	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
 	world_cousins140=VillageCousins140.clean(config.get_value("world","cousins140",{}),world_seed)
 	world_places144=WorldPlaces144.clean(config.get_value("world","places144",{}),world_seed,world_generator_version)
+	siesta_rest166=SiestaRest166.clean(config.get_value("world","siesta_rest166",0.))
 	var countries:Variant=config.get_value("world","countries146",{})
 	if not countries is Dictionary or (not countries.is_empty() and not CountryLedger146.valid(countries,world_seed,world_generator_version)):
 		_load_valid=false;return # Preserve unknown/corrupt future-country data instead of replacing it.
@@ -339,7 +342,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["siesta_rest166","country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true

@@ -11,7 +11,7 @@ func shot(name_:String):
 func run():
  TranslationServer.set_locale("es");get_tree().root.size=Vector2i(1280,720)
  for country in [false,true]:
-  SaveData.save_path="user://qa-siesta163-%s.dat"%country;SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_position=WorldNominal98.home();SaveData.world_edits=[];SaveData.world_roaming139={};SaveData.country_ledger146={};SaveData.world_missions={};SaveData.world_quests={};SaveData.world_discovered=[];SaveData.world_places144={};SaveData.world_cousins140={};SaveData.world_flora138={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
+  SaveData.siesta_rest166=0.;SaveData.save_path="user://qa-siesta163-%s.dat"%country;SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_position=WorldNominal98.home();SaveData.world_edits=[];SaveData.world_roaming139={};SaveData.country_ledger146={};SaveData.world_missions={};SaveData.world_quests={};SaveData.world_discovered=[];SaveData.world_places144={};SaveData.world_cousins140={};SaveData.world_flora138={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
   if country:
    world=CountrySession152.new();world.session_state=CountryLedger146.enter(CountryLedger146.fresh(752026,3),SaveData.world_position,752026);add_child(world);await get_tree().physics_frame;world.activate152()
    for path in [world.data.approach,world.data.upstream]:
@@ -39,5 +39,15 @@ func run():
     covered_shot=true;assert(curtain.message.visible);await shot(country_id+"-cargando")
    await get_tree().process_frame
   assert(ok);assert(SaveData.world_quests==before);await get_tree().create_timer(1.,true).timeout;await shot(country_id+"-despues");print("SIESTA163_QA_OK ",country_id," from=",origin," to=",world.player.position)
+  var resting_origin:Vector2=world.player.position
+  var disk:PackedByteArray=FileAccess.get_file_as_bytes(SaveData.save_path)
+  world.player.set_physics_process(false);completed=false;travel.call_deferred(country)
+  await get_tree().create_timer(.7,true).timeout
+  var refusal:SiestaCurtain147=world.curtain if country else world._travel144.curtain
+  assert(is_instance_valid(refusal));assert(refusal.phase=="refusing");assert(refusal.eye.aperture>.5);assert(refusal.message.text==SiestaRest166.REFUSAL)
+  await shot(country_id+"-rechazada")
+  while not completed:await get_tree().process_frame
+  assert(not ok);assert(world.player.position==resting_origin);assert(FileAccess.get_file_as_bytes(SaveData.save_path)==disk)
+  print("SIESTA166_REFUSAL_OK ",country_id)
   world.queue_free();await get_tree().process_frame
  get_tree().quit()

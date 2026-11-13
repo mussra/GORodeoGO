@@ -27,7 +27,7 @@ func close_eye(player:CharacterBody2D,path:PackedVector2Array)->bool:
  message.visible=false
  actor=player;actor_mode=actor.process_mode;actor_input=actor.is_processing_input();actor.process_mode=Node.PROCESS_MODE_ALWAYS;actor.set_process_input(false);_aperture(1.);route=path;phase="closing";walking=true;walk_blocked=false;route_index=1
  var tween:=create_tween();tween.tween_method(_aperture,1.,0.,1.);await tween.finished
- walking=false;actor.velocity=Vector2.ZERO;actor._update_animation(0.);phase="covered";message.visible=true;message.text="Cargando el camino...\nEspera un momento";return not walk_blocked
+ walking=false;actor.velocity=Vector2.ZERO;actor._update_animation(0.);phase="covered";message.visible=true;message.text="Tomando una siesta...";return not walk_blocked
 func open_eye()->void:
  phase="opening";message.visible=false
  var tween:=create_tween();tween.tween_method(_aperture,0.,1.,1.);await tween.finished;phase="done"
@@ -35,7 +35,7 @@ func open_eye()->void:
 func _aperture(value:float)->void:eye.aperture=value;eye.queue_redraw()
 func _physics_process(delta:float):
  clock+=delta
- if phase=="covered" and is_instance_valid(message) and message.text.begins_with("Cargando el camino"):message.text="Cargando el camino"+".".repeat(1+int(clock*2.)%3)+"\nEspera un momento"
+ if phase=="covered" and is_instance_valid(message) and message.text.begins_with("Tomando una siesta"):message.text="Tomando una siesta"+".".repeat(1+int(clock*2.)%3)+""
  if not walking or not is_instance_valid(actor):return
  while route_index<route.size() and actor.position.distance_to(route[route_index])<3.:route_index+=1
  if route_index>=route.size():walking=false;return
@@ -44,3 +44,9 @@ func _physics_process(delta:float):
  actor.gait=WorldGait.PASO;actor.velocity=direction*speed
  if actor.move_and_collide(motion)!=null:walk_blocked=true;walking=false;actor.velocity=Vector2.ZERO
  actor._update_animation(delta)
+
+func refuse_rest166()->void:
+ message.position.y=eye.size.y*.8;message.add_theme_constant_override("outline_size",5);message.add_theme_color_override("font_outline_color",Color("080d12"))
+ phase="refusing";message.text=SiestaRest166.REFUSAL;message.visible=true;_aperture(1.)
+ var tween:=create_tween();tween.tween_method(_aperture,1.,.55,.45);tween.tween_interval(1.4);tween.tween_method(_aperture,.55,1.,.45)
+ await tween.finished;phase="done"

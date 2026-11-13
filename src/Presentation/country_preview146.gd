@@ -18,6 +18,7 @@ var travelling:bool=false
 var last_error:String=""
 var transaction:TravelTransaction147
 var prior_player_processing:bool=true
+var preview_rest166:float=0.
 var travel_target:Dictionary={}
 var travel_origin:Vector2
 var travel_ledger:Dictionary={}
@@ -68,6 +69,9 @@ func _process(delta:float):
  river_clock+=delta
  if tree_sprite155!=null:tree_sprite155.material.set_shader_parameter("rider_uv",(player.position+Vector2(0,-35)-data.tree_art.position)/data.tree_art.size)
  if travelling or is_instance_valid(modal) or is_instance_valid(_note_dialog106):return
+ var riding166:bool=player.is_physics_processing() and player.velocity.length()>5.
+ if persists149():SaveData.siesta_rest166=SiestaRest166.tick(SaveData.siesta_rest166,delta,riding166)
+ else:preview_rest166=SiestaRest166.tick(preview_rest166,delta,riding166)
  MountedStatus154.abilities(player,gauges154,SaveData.horse_collection.find(SaveData.horse_collection.selected))
  stamina154=MountedStatus154.stamina(player,gauges154,stamina154,delta,on_road154(player.position))
  var next:=CountryLedger146.record_position(ledger,player.position)
@@ -172,6 +176,10 @@ func start_siesta(id:String,already_locked:bool=false)->bool:
   last_error="Ese sitio no está visitado." if target.is_empty() else reason_
   if already_locked and not travelling:_unlock_player()
   return false
+ if (SaveData.siesta_rest166 if persists149() else preview_rest166)>0.:
+  if not already_locked:_lock_player()
+  travelling=true;curtain=SiestaCurtain147.new();add_child(curtain)
+  await curtain.refuse_rest166();curtain.queue_free();curtain=null;travelling=false;_unlock_player();last_error=SiestaRest166.REFUSAL;return false
  if not prepare_travel149():
   last_error="No se pudo guardar el origen. No has viajado."
   if already_locked:_unlock_player()
@@ -225,7 +233,7 @@ func _commit_travel148(pos:Vector2)->bool:
  var next:=CountryLedger146.record_position(ledger,pos)
  if next.is_empty():return false
  next.maps.water146.explored=travel_ledger.maps.water146.explored.duplicate(true);next.maps.water146.visited=travel_ledger.maps.water146.visited.duplicate(true)
- player.position=pos;ledger=next;camera.reset_smoothing();return true
+ player.position=pos;ledger=next;preview_rest166=SiestaRest166.SECONDS;camera.reset_smoothing();return true
 func _restore_travel148()->bool:
  player.position=travel_origin;ledger=travel_ledger.duplicate(true);camera.reset_smoothing();return true
 func _unhandled_input(event:InputEvent):

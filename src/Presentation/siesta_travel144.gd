@@ -66,6 +66,16 @@ func start(id:String)->bool:
  if not why.is_empty():last_error=why;world._toast(why);return false
  target=WorldPlaces144.destination(SaveData.world_places144,candidates(),id)
  if target.is_empty():last_error="Ese sitio todavía no está visitado.";return false
+ if SaveData.siesta_rest166>0.:
+  active=true;prior_paused=get_tree().paused;get_tree().paused=true
+  var was_processing:bool=world.player.is_physics_processing()
+  world.player.cancel_input();world.player.velocity=Vector2.ZERO;world.player.set_physics_process(false)
+  var controls:Node=world.get_node_or_null("TouchControls");var was_visible:bool=controls.visible if controls!=null else false
+  if controls!=null:controls.visible=false
+  _cover();await curtain.refuse_rest166();curtain.queue_free();curtain=null;zlabel=null;message=null
+  active=false;get_tree().paused=prior_paused;world.player.set_physics_process(was_processing)
+  if controls!=null:controls.visible=was_visible
+  last_error=SiestaRest166.REFUSAL;return false
  partial163=SiestaRoute163.frontier(world.player.position,target.pos)
  if partial163.is_empty():last_error="No hay una ruta conocida y segura, o queda muy poco camino. Continúa explorando a caballo.";world._toast(last_error);return false
  target=target.duplicate(true);target.pos=partial163.pos
@@ -112,7 +122,9 @@ func _validate_destination147()->Vector2:
 func _commit_destination147(landing:Vector2)->bool:
  world.player.position=landing
  SaveData.world_discovered=discovered_before.duplicate();SaveData.world_missions=missions_before.duplicate(true)
+ var rest_before:float=SaveData.siesta_rest166;SaveData.siesta_rest166=SiestaRest166.SECONDS
  if SaveData.save_world_state(landing):return true
+ SaveData.siesta_rest166=rest_before
  last_error="No se pudo guardar la llegada. Vuelves al origen.";return false
 func _restore_origin147()->bool:
  rollback=true;SaveData.world_missions=missions_before;SaveData.world_discovered=discovered_before;SaveData.world_position=origin;world.player.position=origin;message.text=last_error;travel_started=Time.get_ticks_msec();await _load_area()

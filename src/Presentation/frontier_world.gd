@@ -192,6 +192,7 @@ func _process(delta: float) -> void:
 		if SaveData.country_ledger146.get("active", "frontier")==CountryRoute146.ID:
 			_start_country152(true);return
 	if _travel144!=null:_travel144.record_visits()
+	SaveData.siesta_rest166=SiestaRest166.tick(SaveData.siesta_rest166,delta,player.is_physics_processing() and player.velocity.length()>5.)
 	_tick_npcs()
 	_tick_lasso(delta)
 	_tick_rider_marker()
@@ -1421,7 +1422,7 @@ func _start_country152(resume:bool=false)->bool:
 		_snapshot_roaming139()
 	var session:=CountrySession152.new();_country_transition152=CountryTransition152.new()
 	var cover:=SiestaCurtain147.new();cover.destination="País nuevo";cover.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);cover.hat=SaveData.hat_color;add_child(cover)
-	cover.message.text="Cargando país de prueba…"
+	cover.message.text="Siguiendo el rastro..."
 	var load_scene:Callable=func()->bool:
 		_open_isolated_preview146(session);await get_tree().process_frame;await get_tree().process_frame;return true
 	var validate:Callable=func()->Vector2:return session.landing155(session.ledger.maps.water146.position)

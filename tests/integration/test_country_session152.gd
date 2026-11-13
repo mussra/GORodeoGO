@@ -4,6 +4,7 @@ var transition:CountryTransition152
 var previous:String
 var restored:int=0
 func before_each():
+ SaveData.siesta_rest166=0.
  previous=SaveData.save_path;SaveData.save_path="user://session152.dat";SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=123;SaveData.world_generator_version=3;SaveData.world_position=Vector2(999,470);SaveData.country_ledger146={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.world_discovered=["0,0"];SaveData.world_missions={"original":"done"};SaveData.world_roaming139={};assert_true(SaveData.save_progress());session=CountrySession152.new();transition=CountryTransition152.new();restored=0
 func after_each():
  if is_instance_valid(session):session.free()

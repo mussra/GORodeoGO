@@ -1,6 +1,7 @@
 extends GutTest
 var world:Node2D
 func before_each():
+ SaveData.siesta_rest166=0.
  SaveData.save_path="user://siesta144.dat";SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_edits=[];SaveData.world_flora138={};SaveData.world_cousins140={};SaveData.world_places144={};SaveData.world_discovered=[];SaveData.world_roaming139={};SaveData.world_tamed=[];SaveData.world_missions={};SaveData.world_quests={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.country_ledger146={};SaveData.world_position=WorldNominal98.home()
  world=load("res://src/Presentation/frontier_world.gd").new();add_child(world)
  while world._loading_world:await get_tree().process_frame
@@ -28,6 +29,7 @@ func test_real_round_trip_preserves_quests_mount_and_no_intermediate_discovery()
  var expected:=SiestaRoute163.frontier(origin,site.pos);assert_false(expected.is_empty());var discovered:=SaveData.world_discovered.duplicate()
  assert_true(await world._travel144.start("east138"));assert_lt(world.player.position.distance_to(expected.pos),100.);assert_gt(world.player.position.distance_to(site.pos),120.);assert_eq(SaveData.world_discovered,discovered);assert_false(get_tree().paused);assert_false(world._travel144.active)
  var saved:=ConfigFile.new();assert_eq(saved.load(SaveData.save_path),OK);assert_lt((saved.get_value("world","position") as Vector2).distance_to(expected.pos),100.);assert_eq(SaveData.horse_collection.export_state(),horses);assert_eq(SaveData.world_quests,quests)
+ SaveData.siesta_rest166=0.
  var back:=SiestaRoute163.frontier(world.player.position,origin);assert_true(await world._travel144.start("ranch"));assert_lt(world.player.position.distance_to(back.pos),100.)
 func test_failed_origin_save_does_not_move_or_pause():
  unlock("east138");var path:String=SaveData.save_path;SaveData.save_path="user://missing144/save.dat";var origin:Vector2=world.player.position
@@ -75,3 +77,20 @@ func test_android_back_cancels_confirmation_without_travel():
  world._travel144.choose("ranch");assert_not_null(world._travel144.panel)
  var event:=InputEventAction.new();event.action="ui_cancel";event.pressed=true
  world._travel144._unhandled_input(event);assert_null(world._travel144.panel);assert_false(world._travel144.active)
+
+var refusal_finished166:bool=false
+func _refuse166():
+ assert_false(await world._travel144.start("east138"));refusal_finished166=true
+func test_repeat_refusal_eye_never_closes_fully_and_no_progress_or_save_changes():
+ unlock("east138");SaveData.siesta_rest166=300.;assert_true(SaveData.save_progress())
+ var origin:Vector2=world.player.position;var disk:=FileAccess.get_file_as_bytes(SaveData.save_path);var mounts:=SaveData.horse_collection.export_state()
+ refusal_finished166=false;_refuse166.call_deferred();await get_tree().create_timer(.7,true).timeout
+ assert_true(world._travel144.active);assert_false(world.player.is_physics_processing());assert_eq(world._travel144.curtain.phase,"refusing");assert_almost_eq(world._travel144.curtain.eye.aperture,.55,.01);assert_eq(world._travel144.curtain.message.text,SiestaRest166.REFUSAL)
+ assert_false(await world._travel144.start("ranch"))
+ while not refusal_finished166:await get_tree().process_frame
+ assert_eq(world.player.position,origin);assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_eq(SaveData.horse_collection.export_state(),mounts);assert_eq(SaveData.siesta_rest166,300.);assert_false(world._travel144.active);assert_false(get_tree().paused)
+func test_failed_arrival_does_not_consume_rest_and_success_persists_rest():
+ unlock("east138");var fail:=get_tree().create_timer(.25,true);fail.timeout.connect(func():SaveData._load_valid=false)
+ assert_false(await world._travel144.start("east138"));assert_eq(SaveData.siesta_rest166,0.);SaveData._load_valid=true
+ assert_true(await world._travel144.start("east138"));assert_eq(SaveData.siesta_rest166,300.)
+ var disk:=ConfigFile.new();assert_eq(disk.load(SaveData.save_path),OK);assert_eq(disk.get_value("world","siesta_rest166"),300.)

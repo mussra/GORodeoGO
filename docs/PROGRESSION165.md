@@ -29,7 +29,7 @@ Los contadores de actividad son acumulativos, no se gastan en cada compra. Se cu
 
 ## Sensibilidad del ritmo, NO tiempo medido
 
-Cinco cerdos vendidos + cinco cabras y dos encargos:400+400 puntos de cerdo,200 de cabra y800 de encargos =1.400 puntos por10 capturas, media140. Presupone completar todos los encargos correspondientes y vender todos los cerdos. No incluye viajes, errores, enemigos, compras de caballo, reproducción ni niveles21-40.
+Cinco cerdos vendidos + cinco cabras y dos encargos:400 puntos de cerdo,200 de cabra y800 de encargos =1.400 puntos por10 capturas, media140. Presupone completar todos los encargos correspondientes y vender todos los cerdos. No incluye viajes, errores, enemigos, compras de caballo, reproducción ni niveles21-40.
 
 Los cinco extras suman150.000 puntos. Con50 capturas mixtas/hora hipotéticas serían7.000 puntos/hora:21,4h sin ingresos de campaña;14,8h adicionales después de46.665 de primeras victorias. Con30/h:35,7h o24,6h adicionales; con80/h:13,4h o9,2h adicionales. Un saldo antiguo enorme no elimina los requisitos de280cerdos/220cabras/56encargos para el último extra. Esta barrera requiere500 capturas acumuladas, no un reloj artificial. No extrapolar esta tabla a todo el juego ni prometer un mínimo real sin probar rutas y densidad.
 

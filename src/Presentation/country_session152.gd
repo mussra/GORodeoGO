@@ -36,7 +36,9 @@ func _commit_travel148(pos:Vector2)->bool:
  var next:=CountryLedger146.record_exploration(ledger,pos,cells)
  if next.is_empty():return false
  next.maps.water146.explored=travel_ledger.maps.water146.explored.duplicate(true);next.maps.water146.visited=travel_ledger.maps.water146.visited.duplicate(true)
- if not SaveData.store_country_ledger146(next):return false
+ var rest_before:float=SaveData.siesta_rest166;SaveData.siesta_rest166=SiestaRest166.SECONDS
+ if not SaveData.store_country_ledger146(next):
+  SaveData.siesta_rest166=rest_before;return false
  ledger=next;player.position=pos;visited_cells=cells;camera.reset_smoothing();return true
 func request_return():
  if not activated or travelling or is_instance_valid(modal):return

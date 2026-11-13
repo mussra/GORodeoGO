@@ -3,6 +3,7 @@ var frontier:Node2D
 var session:CountrySession152
 var previous:String
 func before_each():
+ SaveData.siesta_rest166=0.
  previous=SaveData.save_path;SaveData.save_path="user://route152.dat";SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_position=WorldNominal98.home();SaveData.country_ledger146={};SaveData.world_flora138={};SaveData.world_cousins140={};SaveData.world_roaming139={};SaveData.world_places144={};SaveData.world_edits=[];SaveData.world_discovered=[];SaveData.world_missions={};SaveData.world_quests={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
 func after_each():
  if is_instance_valid(session):session.free()
