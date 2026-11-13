@@ -1,4 +1,5 @@
 shader_type canvas_item;
+#include "res://art/adorn169/metal169.gdshaderinc"
 uniform int style=0;
 uniform sampler2D region_mask: filter_nearest;
 uniform sampler2D body_uv: filter_nearest;
@@ -39,4 +40,5 @@ void fragment(){
   float alpha=src.a*(style==2?mix(1.,.70,region):1.);
   COLOR=vec4(col,alpha);
  }
+ COLOR.rgb=apply_adorn169(COLOR.rgb,src.rgb,UV);
 }

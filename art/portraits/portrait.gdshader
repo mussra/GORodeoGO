@@ -1,4 +1,5 @@
 shader_type canvas_item;
+#include "res://art/adorn169/metal169.gdshaderinc"
 uniform int special_finish168=0;
 uniform vec4 emblem_color : source_color = vec4(0.45,0.8,0.7,1.);
 uniform bool emblem_enabled=false;
@@ -277,5 +278,6 @@ void fragment(){
   col=mix(col,finish_color((UV*vec2(800.,840.)+vec2(240.,0.))*.12,shade168),region168);
   if(special_finish168==2)out_alpha*=mix(1.,.70,region168);
  }
+ col=apply_adorn169(col,src.rgb,UV);
  COLOR=vec4(col,out_alpha);
 }

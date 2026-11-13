@@ -48,7 +48,7 @@ func _ready()->void:
  note.size=Vector2(735,135);note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  var finishes:=_button("Acabados especiales",Vector2(800,625),func():add_child(FinishShop168.new()))
  finishes.size=Vector2(430,52)
- var adorns:=_button("Adornos · Vista previa",Vector2(800,561),func():add_child(AdornPreview153.new()))
+ var adorns:=_button("Adornos de oro y plata",Vector2(800,561),func():add_child(AdornShop169.new()))
  adorns.size=Vector2(430,52)
  resized.connect(_layout);_layout();refresh()
 func _label(text:String,pos:Vector2,font:int)->Label:

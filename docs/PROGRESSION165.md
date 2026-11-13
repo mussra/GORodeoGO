@@ -50,3 +50,7 @@ Activo: premios de repetición limitados, recompensa de cabra, contratos alterno
 ## Estado2.7.121
 
 Activo: compra única de acabado oro/cristal/hielo, equipamiento por caballo adulto y retirada gratuita sin cambiar genes. Requisitos de la tabla aplicados con saldo, capturas acumuladas y encargos cobrados. Los contadores de actividad no se consumen. Pendiente: adornos de patas/botas, llaves y niveles21-40, crecimiento normal y ritual.
+
+## Bloque169 /2.7.122
+
+Adornos de plata y oro activados:6.000/12.000puntos,20/40cerdos,15/30cabras,4/8encargos cobrados. Los requisitos del modelo no se han rebajado. Una compra desbloquea cada metal para patas y botas; se equipa por caballo adulto y se puede combinar plata en botas con oro en patas, o al revés. Quitar no cobra puntos. No se hereda ni cambia estadísticas o genes; compatible con los tres acabados. Guardado atómico con reversión del cobro o equipado si falla. Las capturas/encargos no se gastan. Sigue pendiente el bloque de niveles21-40/llaves y la continuación Galaxy/cría/ritual.

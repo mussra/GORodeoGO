@@ -50,7 +50,6 @@ func step(delta:float,wish:Vector2)->bool:
  var horse=SaveData.horse_collection.find(SaveData.horse_collection.selected)
  var pose168:int=0 if elapsed<.45 else 1
  visual.texture=texture(pose168,horse.get("traits",{}),SaveData.hat_color,horse)
- var style168:String=HorseFinish168.style(horse)
- visual.material=FinishPose168.material(style168,FinishPose168.specs()[-1],pose168) if not style168.is_empty() else null
+ visual.material=HorseAdorn169.material(horse,FinishPose168.specs()[-1],pose168)
  visual.flip_h=facing<0;visual.visible=true;actor._sprite_swap._sprite.visible=false
  return true

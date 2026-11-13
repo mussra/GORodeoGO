@@ -89,6 +89,8 @@ func restore(v:Variant)->bool:
    if h.parents.size()==2 and h.parents[0]==h.parents[1]:return false
    if h.get("stage","adult") not in ["foal","adult"]:return false
    if h.has("galaxy_birth143") and not GalaxyPure143.valid_record(h.galaxy_birth143,h.parents):return false
+   for field169 in ["leg_adorn169","boot_adorn169"]:
+    if h.has(field169) and (not h[field169] is String or h[field169] not in ["gold","silver"]):return false
    if h.has("special_finish168") and (not h.special_finish168 is String or h.special_finish168 not in ["gold","crystal","ice"]):return false
    ids[h.id]=true;by_id[h.id]=h
    if group==known:clean_ancestors.append(h.duplicate(true))

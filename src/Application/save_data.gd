@@ -637,3 +637,23 @@ func equip_finish168(horse_id:String,style:String)->bool:
 	else:horse.special_finish168=style
 	if save_progress():return true
 	horse_collection.restore(before);return false
+
+func buy_adorn169(metal:String)->bool:
+	var id:String="adorn_"+metal
+	if trial_session_active or metal not in ["gold","silver"] or equipment_owned.has(id):return false
+	if not ProgressionEconomy165.missing(id,equipment_points,world_pig_captures.size(),world_goat_captures.size(),int(repeat_contract165.completed)).is_empty():return false
+	var before_points:int=equipment_points;var before_owned:Array[String]=equipment_owned.duplicate()
+	equipment_points-=int(ProgressionEconomy165.EXTRAS[id].price);equipment_owned.append(id)
+	if save_progress():return true
+	equipment_points=before_points;equipment_owned=before_owned;return false
+func equip_adorn169(horse_id:String,slot:String,metal:String)->bool:
+	if trial_session_active or slot not in ["legs","boots","both"] or metal not in ["","gold","silver"] or (not metal.is_empty() and not equipment_owned.has("adorn_"+metal)):return false
+	var horse:Dictionary=horse_collection.find(horse_id)
+	if horse.is_empty() or not horse_collection.is_adult(horse_id):return false
+	var before:Dictionary=horse_collection.export_state()
+	for pair in [["legs","leg_adorn169"],["boots","boot_adorn169"]]:
+		if slot==pair[0] or slot=="both":
+			if metal.is_empty():horse.erase(pair[1])
+			else:horse[pair[1]]=metal
+	if save_progress():return true
+	horse_collection.restore(before);return false

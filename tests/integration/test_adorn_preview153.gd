@@ -18,15 +18,15 @@ func test_layout_at_small_landscape_and_back_closes():
  panel.size=Vector2(960,540);panel._layout();assert_eq(panel.canvas.scale,Vector2(.75,.75))
  for runner in panel.runners:assert_lte((runner.position.y+runner.size.y)*.75,510.)
  var event:=InputEventAction.new();event.action="ui_cancel";event.pressed=true;panel._unhandled_input(event);assert_true(panel.is_queued_for_deletion());await get_tree().process_frame
-func test_equipment_has_preview_entry_without_a_purchase():
+func test_equipment_has_live_adorn_shop_entry_without_a_purchase():
  panel=EquipmentPanel.new();add_child(panel);await get_tree().process_frame
  var button:Button
  for child in panel._canvas.get_children():
-  if child is Button and child.text=="Adornos · Vista previa":button=child
+  if child is Button and child.text=="Adornos de oro y plata":button=child
  assert_not_null(button)
  if button==null:return
  button.pressed.emit();await get_tree().process_frame
  var preview:Control
  for child in panel.get_children():
-  if child is AdornPreview153:preview=child
+  if child is AdornShop169:preview=child
  assert_not_null(preview)

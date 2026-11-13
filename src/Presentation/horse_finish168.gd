@@ -16,13 +16,13 @@ static func selected_spec(animation:String,kind:String)->Dictionary:
  return {}
 static func update(sprite:AnimatedSprite2D,horse:Dictionary,kind:String="rider")->void:
  var finish:String=style(horse)
- if finish.is_empty():sprite.material=null;return
+ if finish.is_empty() and not HorseAdorn169.active(horse):sprite.material=null;return
  var spec:=selected_spec(str(sprite.animation),kind)
  if spec.is_empty():sprite.material=null;return
  var frame:int=sprite.frame
  if str(sprite.animation)=="rest_gesture107":frame=1
- sprite.material=FinishPose168.material(finish,spec,frame)
+ sprite.material=HorseAdorn169.material(horse,spec,frame)
 static func install(sprite:AnimatedSprite2D,horse:Dictionary,kind:String="rider")->void:
- if style(horse).is_empty():return
+ if style(horse).is_empty() and not HorseAdorn169.active(horse):return
  var refresh:Callable=func():update(sprite,horse,kind)
  sprite.frame_changed.connect(refresh);sprite.animation_changed.connect(refresh);refresh.call()
