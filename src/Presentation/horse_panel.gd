@@ -102,7 +102,7 @@ func collection_selector182()->void:
 func collection_view()->void:
  var restore_scroll:int=collection_scroll118
  var groups:Array[Dictionary]=HorseAppearanceGroups118.groups(SaveData.horse_collection.horses)
- TextFit181.fixed(label(str(SaveData.horse_collection.horses.size())+" caballos · "+str(groups.size())+" apariencias · despliega para elegir cada caballo",Vector2(30,152),21),Vector2(1190,32),21,18)
+ TextFit181.fixed(label(CollectionCount184.summary(SaveData.horse_collection.horses.size(),groups.size())+" · despliega para elegir cada caballo",Vector2(30,152),21),Vector2(1190,32),21,18)
  var scroll:=ScrollContainer.new();scroll.name="CollectionScroll118";scroll.position=Vector2(30,195);scroll.size=Vector2(1210,445);content.add_child(scroll)
  scroll.scroll_vertical=collection_scroll118
  scroll.get_v_scroll_bar().value_changed.connect(func(value:float):collection_scroll118=int(value))

@@ -46,7 +46,7 @@ func refresh():
  if entries.is_empty():_label("Todavía no tienes caballos en este corral.",Vector2(300,350),700,28)
  for i in entries.size():_card(entries[i],Vector2(30+(i%4)*310,(250 if embedded182 else 190)+int(i/4)*145))
  var prev:=_button("Anterior",Vector2(330,650),190,func():page_index-=1;refresh());prev.disabled=page_index==0
- _label("%d / %d · %d caballos"%[page_index+1,pages,all_.size()],Vector2(535,662),250,21)
+ _label("%d / %d · "%[page_index+1,pages]+CollectionCount184.horses(all_.size()),Vector2(535,662),250,21)
  var next:=_button("Siguiente",Vector2(790,650),190,func():page_index+=1;refresh());next.disabled=page_index==pages-1
 func _ground(rect:Rect2):
  var panel:=Panel.new();panel.position=rect.position;panel.size=rect.size;panel.mouse_filter=Control.MOUSE_FILTER_IGNORE
