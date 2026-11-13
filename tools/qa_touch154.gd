@@ -20,7 +20,7 @@ func button(host:Node,text_:String)->Button:
 func check_controls():
  world.player.set_physics_process(false);await get_tree().process_frame
  await tap(world.map_button.get_global_rect().get_center());assert_true(is_instance_valid(world.modal));assert_false(world.touch_controls.visible)
- var back:=button(world.modal,"VOLVER");assert_not_null(back)
+ var back:=button(world.modal,"X");assert_not_null(back)
  if back!=null:await tap(back.get_global_rect().get_center())
  assert_false(is_instance_valid(world.modal));assert_true(world.touch_controls.visible)
  var count_:Array=[0];world.return_requested.connect(func():count_[0]+=1)

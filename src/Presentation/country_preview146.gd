@@ -26,6 +26,9 @@ var tree_sprite155:Sprite2D
 var gauges154:Dictionary={}
 var stamina154:Dictionary={}
 var map_button:Button
+var _map_overlay:CountryMap148
+var _map_notes159:MapNotesController159
+var _note_dialog106:MapNoteDialog106
 const GRASS=preload("res://art/world/alternative92/grass-cache.png")
 const TREE=preload("res://art/world/supplied/tree_of_life150.png")
 func _ready():
@@ -57,11 +60,13 @@ func _ready():
  stamina154=WorldStamina.new_state(HorseStats.read(horse).get("power",.65));MountedStatus154.abilities(player,gauges154,horse)
  var touch:CanvasLayer=load("res://src/Presentation/touch_controls.tscn").instantiate();add_child(touch);touch_controls=touch
  var joy:VirtualJoystick=touch.get_node("MoveJoystick");var aim:VirtualJoystick=touch.get_node("AimJoystick");aim_joystick=aim;player.lasso.set_aim_joystick(aim);player.dodge.set_move_joystick(joy);JoystickAppearance.apply(self)
+ _map_overlay=CountryMap148.new();_map_overlay.world=self;layer.add_child(_map_overlay)
+ _map_notes159=MapNotesController159.new();add_child(_map_notes159)
  set_process(true);queue_redraw()
 func _process(delta:float):
  river_clock+=delta
  if tree_sprite155!=null:tree_sprite155.material.set_shader_parameter("rider_uv",(player.position+Vector2(0,-35)-data.tree_art.position)/data.tree_art.size)
- if travelling or is_instance_valid(modal):return
+ if travelling or is_instance_valid(modal) or is_instance_valid(_note_dialog106):return
  MountedStatus154.abilities(player,gauges154,SaveData.horse_collection.find(SaveData.horse_collection.selected))
  stamina154=MountedStatus154.stamina(player,gauges154,stamina154,delta,on_road154(player.position))
  var next:=CountryLedger146.record_position(ledger,player.position)
@@ -102,16 +107,41 @@ func request_return():
 func _lock_player():
  prior_player_processing=player.is_physics_processing();player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false);touch_controls.visible=false
 func _unlock_player():
- player.set_physics_process(prior_player_processing);touch_controls.visible=true
+ player.set_physics_process(prior_player_processing and not _map_overlay.expanded and not is_instance_valid(_note_dialog106));touch_controls.visible=not _map_overlay.expanded and not is_instance_valid(_note_dialog106)
 func close_modal(resume:bool=true):
- if is_instance_valid(modal):modal.queue_free()
+ if modal==_map_overlay:_map_overlay.expanded=false;_map_overlay._layout()
+ elif is_instance_valid(modal):modal.queue_free()
  modal=null
  if resume and not travelling:_unlock_player()
 func show_map():
- if travelling or is_instance_valid(modal):return
- _lock_player();var view:=CountryMap148.new();view.world=self;modal=view
- view.closed.connect(close_modal);view.selected.connect(func(id:String):close_modal(false);choose_site.call_deferred(id,true))
- view.sites_requested.connect(func():close_modal(false);show_sites.call_deferred(true));hud_canvas.add_child(view)
+ if travelling:return
+ if _map_overlay.expanded:close_modal();return
+ if is_instance_valid(modal):return
+ _map_notes159.capture();_lock_player();modal=_map_overlay;_map_overlay.expanded=true;_map_overlay.pan=Vector2.ZERO;_map_overlay._layout();_map_overlay._set_zoom(1.)
+func _toggle_map()->void:show_map()
+func _open_map_note106(pos:Vector2)->void:_map_notes159.open(pos)
+func map_note_horses159()->Array:return []
+func map_note_host159()->Node:return hud_canvas.get_parent()
+func map_note_message159(text:String)->void:last_error=text;status.text=text
+func map_note_store159(note:Dictionary)->bool:
+ var before:=ledger.duplicate(true);var notes:Dictionary=ledger.maps.water146.notes.duplicate(true)
+ for rows in notes.values():
+  for i in range(rows.size()-1,-1,-1):
+   if rows[i].id==note.id:rows.remove_at(i)
+ var key:=WorldNotes106.region_key(note.pos)
+ if not notes.has(key):notes[key]=[]
+ notes[key].append(note.duplicate(true));ledger.maps.water146.notes=WorldNotes106.clean(notes)
+ if persists149() and not prepare_travel149():ledger=before;return false
+ _map_overlay._terrain_valid=false;return true
+func map_note_delete159(id:String)->bool:
+ var before:=ledger.duplicate(true);var notes:Dictionary=ledger.maps.water146.notes.duplicate(true)
+ for key in notes.keys():
+  for i in range(notes[key].size()-1,-1,-1):
+   if notes[key][i].id==id:notes[key].remove_at(i)
+  if notes[key].is_empty():notes.erase(key)
+ ledger.maps.water146.notes=notes
+ if persists149() and not prepare_travel149():ledger=before;return false
+ _map_overlay._terrain_valid=false;return true
 func show_sites(already_locked:bool=false):
  if travelling or is_instance_valid(modal):return
  if not already_locked:_lock_player()
@@ -191,6 +221,7 @@ func _restore_travel148()->bool:
 func _unhandled_input(event:InputEvent):
  if event.is_action_pressed("ui_cancel"):
   if travelling:pass
+  elif is_instance_valid(_note_dialog106):_map_notes159.close()
   elif is_instance_valid(modal):close_modal()
   else:request_return()
   get_viewport().set_input_as_handled()

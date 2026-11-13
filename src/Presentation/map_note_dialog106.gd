@@ -12,7 +12,7 @@ func setup(existing:Dictionary,horse_text:String):
  var title=Label.new();title.text="Nota del mapa · "+("Caballo" if not horse_text.is_empty() else "Lugar");title.position=Vector2(24,18);title.add_theme_font_size_override("font_size",26);add_child(title)
  entry=TextEdit.new();entry.position=Vector2(24,65);entry.size=Vector2(690,105);entry.text=str(existing.get("text",horse_text));entry.placeholder_text="Ej.: caballo rojo con crin arcoíris";entry.add_theme_font_size_override("font_size",22);add_child(entry)
  photo_box=CheckBox.new();photo_box.text="Guardar foto local de la vista del mundo";photo_box.position=Vector2(24,183);photo_box.size=Vector2(690,45);add_child(photo_box)
- var info=Label.new();info.text="El caballo sin capturar vuelve a su zona al regresar.\nLa nota no lo congela. Máximo 240 caracteres por nota.";info.position=Vector2(24,235);info.add_theme_font_size_override("font_size",18);add_child(info)
+ var info=Label.new();info.text="La nota no congela al caballo ni cambia su posición.\nMáximo 240 caracteres por nota.";info.position=Vector2(24,235);info.add_theme_font_size_override("font_size",18);add_child(info)
  var photo_path:String=str(existing.get("photo",""))
  if photo_path.begins_with("user://map-photos/") and FileAccess.file_exists(photo_path):
   var image:Image=Image.load_from_file(photo_path)

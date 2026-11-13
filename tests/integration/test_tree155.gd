@@ -15,4 +15,4 @@ func test_actual_root_shape_blocks_rider_and_saved_root_position_has_safe_recove
 func test_tree_is_overhead_and_map_shows_it_only_after_it_is_discovered():
  world=CountryPreview146.new();add_child(world);world.player.set_physics_process(false);assert_gt(world.tree_sprite155.z_index,world.player.z_index);world.show_map();var view:CountryMap148=world.modal;await get_tree().process_frame;assert_false(view.tree_visible155);world.close_modal();await get_tree().process_frame
  world.player.position=world.data.sites.tree;world._process(0.);world.show_map();view=world.modal;await get_tree().process_frame;assert_true(view.tree_visible155)
- var selected_:Array=[];view.selected.connect(func(id):selected_.append(id));view.select_at(view.canvas.get_global_transform_with_canvas()*view.point(world.data.roots));assert_eq(selected_,["tree"])
+ view._ensure_terrain();view._select_site144(view._to_map(world.data.roots,view._map_geometry.data.mins,view._map_geometry.cell,view._map_geometry.origin));await get_tree().process_frame;await get_tree().process_frame;assert_true(world.modal is SiestaConfirmation148);assert_eq(world.modal.destination,"Raíces del árbol")

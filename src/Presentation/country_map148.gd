@@ -1,83 +1,49 @@
 class_name CountryMap148
-extends Control
-signal closed
-signal selected(id:String)
-signal sites_requested
-var world:CountryPreview146
-var canvas:Control
-var map_area:Rect2=Rect2(300,100,500,500)
-var marker_points:Dictionary={}
+extends WorldDiscoveryMap159
+## Country data/terrain adapter only. Gestures, minimap, zoom, find, notes,
+## clipping, player marker and site selection are WorldDiscoveryMap159.
 var tree_visible155:bool=false
-var touches:Dictionary={}
-var first_touch:Vector2
-var moved:bool=false
-func _ready():
- set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=170;MenuInputGuard.install(self)
- var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
- canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);canvas.draw.connect(draw_map)
- MenuNavigation.header(canvas,"MAPA LOCAL · prueba guardada" if world.persists149() else "MAPA LOCAL · maqueta",func():closed.emit())
- var note:=Label.new();note.text="Solo lo explorado · toca un sitio visitado para viajar\nVolver a casa lleva a la entrada de este país, no al rancho.";note.position=Vector2(220,620);note.add_theme_font_size_override("font_size",21);canvas.add_child(note)
- var sites:=Button.new();sites.text="Sitios visitados";sites.position=Vector2(850,200);sites.size=Vector2(260,60);sites.pressed.connect(func():sites_requested.emit());canvas.add_child(sites)
- var home:=Button.new();home.text="Volver a casa";home.position=Vector2(850,290);home.size=Vector2(260,60);home.pressed.connect(func():selected.emit("entry"));canvas.add_child(home)
- if world.persists149():
-  var menu:=Button.new();menu.text="Guardar y menú";menu.position=Vector2(850,490);menu.size=Vector2(260,60);menu.pressed.connect(func():world.suspend_to_menu152());canvas.add_child(menu)
- var disclaimer:=Label.new();disclaimer.text="Prueba con guardado.\nSin puerta normal ni ritual." if world.persists149() else "En esta maqueta\nno se guarda el progreso.";disclaimer.position=Vector2(850,390);disclaimer.add_theme_font_size_override("font_size",21);canvas.add_child(disclaimer)
- resized.connect(layout);layout()
-func layout():
- var k:float=minf(size.x/1280.,size.y/720.);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2.;refresh_markers();canvas.queue_redraw()
-func point(pos:Vector2)->Vector2:return map_area.position+(pos-CountryRoute146.BOUNDS.position)/CountryRoute146.BOUNDS.size*map_area.size
-func draw_map():
- canvas.draw_style_box(MapAppearance.frame(),map_area.grow(5.));canvas.draw_rect(map_area,Color("071b24"))
- for cell in world.visited_cells:
-  var rect:=Rect2(Vector2(cell)*CountryExploration148.CELL,Vector2.ONE*CountryExploration148.CELL).intersection(CountryRoute146.BOUNDS)
-  var mapped:=Rect2(point(rect.position),rect.size/CountryRoute146.BOUNDS.size*map_area.size)
-  canvas.draw_rect(mapped,Color("227e9a"))
-  var cell_poly:=PackedVector2Array([rect.position,rect.position+Vector2(rect.size.x,0),rect.end,rect.position+Vector2(0,rect.size.y)])
-  for land in Geometry2D.intersect_polygons(world.data.island,cell_poly):
+func cell_size159()->float:return CountryExploration148.CELL
+func content_signature159()->int:return hash([world.seed,world.visited_cells,world.ledger.maps.water146.visited])
+func available159()->Array[Dictionary]:
+ var sites:=CountryExploration148.available(world.ledger,world.data)
+ for site in sites:
+  if site.id=="tree":site.pos=world.data.roots
+ return sites
+func notes159()->Dictionary:return world.ledger.maps.water146.notes
+func flowers159()->Dictionary:return {}
+func show_sites159()->void:
+ world.close_modal(false);world.show_sites(true)
+func choose159(id:String)->void:
+ world.close_modal(false);world.choose_site.call_deferred(id,true)
+func _cells()->Dictionary:
+ var cells:Array=world.visited_cells.keys();var mins:=Vector2i.ZERO;var maxs:=Vector2i.ZERO
+ if not cells.is_empty():
+  mins=cells[0];maxs=cells[0]
+  for c in cells:mins=mins.min(c);maxs=maxs.max(c)
+ return {"cells":cells,"mins":mins,"maxs":maxs}
+func _draw_terrain()->void:
+ var area:Rect2=_map_geometry.area;_terrain.draw_set_transform(-area.position)
+ if area.size.x<=0. or area.size.y<=0.:return
+ var mins:Vector2i=_map_geometry.data.mins;var cell:float=_map_geometry.cell;var origin:Vector2=_map_geometry.origin
+ for c in _map_geometry.data.cells:
+  var box:=Rect2(Vector2(c)*cell_size159(),Vector2.ONE*cell_size159()).intersection(CountryRoute146.BOUNDS)
+  var mapped:=Rect2(_to_map(box.position,mins,cell,origin),box.size/cell_size159()*cell)
+  if not Rect2(Vector2.ZERO,size).grow(300.).intersects(mapped):continue
+  _terrain.draw_rect(mapped,Color("227e9a"))
+  var clip:=PackedVector2Array([box.position,Vector2(box.end.x,box.position.y),box.end,Vector2(box.position.x,box.end.y)])
+  for land in Geometry2D.intersect_polygons(world.data.island,clip):
    var mapped_land:=PackedVector2Array()
-   for vertex in land:mapped_land.append(point(vertex))
-   if mapped_land.size()>=3:canvas.draw_colored_polygon(mapped_land,Color("4d7947"))
-  # Clip terrain to each explored cell. No unseen river or road leaks through fog.
+   for vertex in land:mapped_land.append(_to_map(vertex,mins,cell,origin))
+   if mapped_land.size()>=3:_terrain.draw_colored_polygon(mapped_land,Color("4d7947"))
   for entry in [[world.data.approach,Color("cb9d63"),3.],[world.data.bank,Color("cb9d63"),3.],[world.data.river,Color("6bb9c5"),6.]]:
-   var path:PackedVector2Array=entry[0]
-   for i in range(1,path.size()):
-    var a:Vector2=path[i-1];var b:Vector2=path[i];var count_:int=maxi(1,ceili(a.distance_to(b)/24.))
-    for j in count_:
-     var p:Vector2=a.lerp(b,float(j)/count_);var q:Vector2=a.lerp(b,float(j+1)/count_)
-     if rect.has_point((p+q)/2.):canvas.draw_line(point(p),point(q),entry[1],entry[2],true)
+   for segment in Geometry2D.intersect_polyline_with_polygon(entry[0],clip):
+    for i in segment.size()-1:_terrain.draw_line(_to_map(segment[i],mins,cell,origin),_to_map(segment[i+1],mins,cell,origin),entry[1],entry[2],true)
  tree_visible155=world.ledger.maps.water146.visited.get("tree",false)
  if tree_visible155:
   var art:Rect2=world.data.tree_art
-  canvas.draw_texture_rect(CountryPreview146.TREE,Rect2(point(art.position),art.size/CountryRoute146.BOUNDS.size*map_area.size),false)
- for site in CountryExploration148.available(world.ledger,world.data):
-  var pos:Vector2=point(site.pos);canvas.draw_circle(pos,11.,Color("071b24"));canvas.draw_circle(pos,8.,Color("f7d984"));var label_width:float=ThemeDB.fallback_font.get_string_size(site.name,HORIZONTAL_ALIGNMENT_LEFT,-1,18).x
-  var offset:=Vector2(-label_width-15,-12) if pos.x>map_area.get_center().x else Vector2(15,-12)
-  canvas.draw_string(ThemeDB.fallback_font,pos+offset,site.name,HORIZONTAL_ALIGNMENT_LEFT,-1,18,Color("fff2c5"))
- var rider:Vector2=point(world.player.position);canvas.draw_circle(rider,6.,Color("071b24"));canvas.draw_circle(rider,4.,Color("f4fcff"))
-func refresh_markers():
- tree_visible155=world.ledger.maps.water146.visited.get("tree",false)
- marker_points.clear()
- for site in CountryExploration148.available(world.ledger,world.data):marker_points[site.id]=point(site.pos)
-func select_at(screen:Vector2):
- var local:Vector2=canvas.get_global_transform_with_canvas().affine_inverse()*screen
- if world.ledger.maps.water146.visited.get("tree",false) and local.distance_to(point(world.data.roots))<30.:selected.emit("tree");return
- for id in marker_points:
-  if local.distance_to(marker_points[id])<24.:selected.emit(id);return
-func _input(event:InputEvent):
- if event is InputEventScreenTouch:
-  var local:Vector2=canvas.get_global_transform_with_canvas().affine_inverse()*event.position
-  if event.pressed and map_area.has_point(local):
-   touches[event.index]=event.position
-   if touches.size()==1:first_touch=event.position;moved=false
-   else:moved=true
-   get_viewport().set_input_as_handled()
-  elif not event.pressed and touches.has(event.index):
-   touches.erase(event.index);get_viewport().set_input_as_handled()
-   if touches.is_empty() and not moved and event.position.distance_to(first_touch)<12.:select_at(event.position)
- elif event is InputEventScreenDrag and touches.has(event.index):
-  if event.position.distance_to(first_touch)>=12.:moved=true
-  get_viewport().set_input_as_handled()
- elif event is InputEventMouseButton and event.device!=InputEvent.DEVICE_ID_EMULATION and event.button_index==MOUSE_BUTTON_LEFT and not event.pressed:
-  select_at(event.position)
-func _unhandled_input(event:InputEvent):
- if event.is_action_pressed("ui_cancel"):closed.emit();get_viewport().set_input_as_handled()
+  _terrain.draw_texture_rect(CountryPreview146.TREE,Rect2(_to_map(art.position,mins,cell,origin),art.size/cell_size159()*cell),false)
+ for site in available159():
+  if expanded:_terrain.draw_string(get_theme_default_font(),_to_map(site.pos,mins,cell,origin)+Vector2(14,-10),site.name,HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff2c5"))
+
+func minimap_top159()->float:return 114.

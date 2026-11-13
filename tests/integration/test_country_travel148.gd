@@ -19,15 +19,15 @@ func test_blocked_arrival_restores_country_origin_ledger_exploration_and_disk():
  visit_source();var origin:Vector2=world.player.position;var ledger:=world.ledger.duplicate(true);var cells:=world.visited_cells.duplicate(true);var disk:=FileAccess.get_file_as_bytes(SaveData.save_path)
  var blocker:=StaticBody2D.new();blocker.collision_layer=128;blocker.position=world.data.sites.source;var shape:=CollisionShape2D.new();var rect:=RectangleShape2D.new();rect.size=Vector2(500,500);shape.shape=rect;blocker.add_child(shape);world.add_child(blocker);await get_tree().physics_frame
  assert_false(await world.start_siesta("source"));assert_eq(world.player.position,origin);assert_eq(world.ledger,ledger);assert_eq(world.visited_cells,cells);assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_eq(world.transaction.phase,"failed")
-func test_map_known_markers_native_tap_drag_pinch_and_back_cancel():
- world.show_map();var map:CountryMap148=world.modal;map.refresh_markers();assert_eq(map.marker_points.keys(),["entry"]);assert_false(world.touch_controls.visible)
- var point_:Vector2=map.canvas.get_global_transform_with_canvas()*map.marker_points.entry
- var down:=InputEventScreenTouch.new();down.index=0;down.position=point_;down.pressed=true;map._input(down)
- var drag:=InputEventScreenDrag.new();drag.index=0;drag.position=point_+Vector2(70,0);map._input(drag)
- var up:=InputEventScreenTouch.new();up.index=0;up.position=drag.position;up.pressed=false;map._input(up);await get_tree().process_frame;assert_eq(world.modal,map)
- map._input(down);var second:=InputEventScreenTouch.new();second.index=1;second.position=point_+Vector2(30,0);second.pressed=true;map._input(second);second.pressed=false;map._input(second);up.position=point_;map._input(up);await get_tree().process_frame;assert_eq(world.modal,map)
- map._input(down);map._input(up);await get_tree().process_frame;await get_tree().process_frame;assert_true(world.modal is SiestaConfirmation148);assert_false(world.travelling)
- var back:=InputEventAction.new();back.action="ui_cancel";back.pressed=true;world.modal._unhandled_input(back);assert_null(world.modal);assert_true(world.touch_controls.visible);assert_eq(world.player.position,world.data.entry)
+func test_map_uses_shared_gestures_known_sites_and_back_cancel():
+ world.show_map();var map:CountryMap148=world.modal;map._layout();map._ensure_terrain();assert_eq(map.available159().map(func(site):return site.id),["entry"]);assert_false(world.touch_controls.visible)
+ var point_:Vector2=map._to_map(world.data.entry,map._map_geometry.data.mins,map._map_geometry.cell,map._map_geometry.origin)
+ var down:=InputEventScreenTouch.new();down.index=0;down.position=point_;down.pressed=true;map._gui_input(down)
+ var drag:=InputEventScreenDrag.new();drag.index=0;drag.position=point_+Vector2(70,0);map._gui_input(drag)
+ var up:=InputEventScreenTouch.new();up.index=0;up.position=drag.position;up.pressed=false;map._gui_input(up);await get_tree().process_frame;assert_eq(world.modal,map)
+ map._gui_input(down);var second:=InputEventScreenTouch.new();second.index=1;second.position=point_+Vector2(30,0);second.pressed=true;map._gui_input(second);second.pressed=false;map._gui_input(second);up.position=point_;map._gui_input(up);await get_tree().process_frame;assert_eq(world.modal,map)
+ point_=map._to_map(world.data.entry,map._map_geometry.data.mins,map._map_geometry.cell,map._map_geometry.origin);down.position=point_;up.position=point_;map._gui_input(down);map._gui_input(up);await get_tree().process_frame;await get_tree().process_frame;assert_true(world.modal is SiestaConfirmation148);assert_false(world.travelling)
+ var back:=InputEventAction.new();back.action="ui_cancel";back.pressed=true;world.modal._unhandled_input(back);assert_null(world.modal);assert_true(world.touch_controls.visible);assert_eq(world.player.position,world.data.entry);assert_false(map.expanded);assert_true(map.visible)
 func test_siesta_rejects_stun_and_capture_and_concurrency_without_exit():
  visit_source();world.player._stun_time_remaining=1.;assert_false(await world.start_siesta("source"));world.player._stun_time_remaining=0.
  world.travelling=true;assert_false(await world.start_siesta("source"));world.request_return();assert_true(world.travelling);world.travelling=false

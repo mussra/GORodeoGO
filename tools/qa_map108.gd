@@ -17,7 +17,7 @@ func run():
  if horse!=null:
   world.player.position=horse.position+Vector2(80,80)
   await get_tree().create_timer(.3).timeout
-  world._note_photo106=get_viewport().get_texture().get_image()
+  world._map_notes159.photo=get_viewport().get_texture().get_image()
  world._toggle_map();world._map_overlay._layout();world._map_overlay._ensure_terrain();world.player.position=WorldNominal98.home()
  var map=world._map_overlay
  map._find_player108();await shot("centrado")
