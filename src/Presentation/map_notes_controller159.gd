@@ -33,10 +33,12 @@ func open(pos:Vector2)->void:
  wrapper.tree_exiting.connect(func():
   if is_instance_valid(viewport_node) and viewport_node.size_changed.is_connected(layout):viewport_node.size_changed.disconnect(layout))
  layout.call()
- var dialog:=MapNoteDialog106.new();dialog.setup(nearest,horse_text);world._note_dialog106=dialog;wrapper.add_child(dialog)
+ var dialog:=MapNoteDialog106.new();dialog.setup(nearest,horse_text,photo);world._note_dialog106=dialog;wrapper.add_child(dialog)
  dialog.closed.connect(close)
  dialog.saved.connect(func(text:String,wants_photo:bool):
   note.text=text.left(240);var new_path:String=""
+  if wants_photo and photo==null:
+   world.map_note_message159("No hay captura disponible. Cierra el mapa y vuelve a abrirlo.");return
   if wants_photo and photo!=null:
    var directory:=photo_dir();DirAccess.make_dir_recursive_absolute(directory);new_path=directory+"/"+note.id+"_"+str(Time.get_ticks_usec())+".png"
    if photo.save_png(new_path)!=OK:world.map_note_message159("No se pudo guardar la foto");return

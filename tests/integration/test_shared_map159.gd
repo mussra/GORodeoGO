@@ -38,3 +38,12 @@ func test_failed_photo_then_retry_without_photo_never_persists_deleted_file():
  SaveData._load_valid=false;world._note_dialog106.saved.emit("Foto fallida",true);assert_not_null(world._note_dialog106);assert_true(world._map_overlay.notes159().is_empty())
  SaveData._load_valid=true;world._note_dialog106.saved.emit("Sin foto",false);await get_tree().process_frame
  var note:Dictionary=WorldNotes106.nearest(world._map_overlay.notes159(),world.player.position,500.);assert_eq(note.photo,"");assert_eq(note.text,"Sin foto")
+
+func test_requested_photo_without_available_capture_does_not_silently_save_text_only():
+ world.show_map();world._map_overlay._ensure_terrain();world._open_map_note106(world.player.position);world._map_notes159.photo=null
+ var disk:=FileAccess.get_file_as_bytes(SaveData.save_path);world._note_dialog106.saved.emit("Sin captura",true)
+ assert_not_null(world._note_dialog106);assert_true(world._map_overlay.notes159().is_empty());assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk);assert_true(world.last_error.contains("No hay captura"))
+func test_shared_photo_selection_shows_live_preview_and_large_gold_icons():
+ var dialog:=MapNoteDialog106.new();var image:=Image.create(32,16,false,Image.FORMAT_RGBA8);dialog.setup({},"",image);add_child(dialog)
+ assert_false(dialog.photo_box.button_pressed);assert_false(dialog.photo_preview.visible);assert_eq(dialog.photo_box.get_theme_icon("unchecked").get_size(),Vector2(36,36))
+ dialog.photo_box.button_pressed=true;assert_true(dialog.photo_preview.visible);assert_not_null(dialog.photo_preview.texture);assert_true(dialog.photo_status.text.contains("Guardar"));dialog.photo_box.button_pressed=false;assert_false(dialog.photo_preview.visible);dialog.free()
