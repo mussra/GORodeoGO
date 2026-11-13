@@ -44,7 +44,11 @@ func refresh():
  _label("Adultos en movimiento · potrillos quietos · toca un caballo para ver su ficha",Vector2(30,213 if embedded182 else 150),1210,20)
  var entries:Array=RanchPastures141.page(SaveData.horse_collection,tier,page_index)
  if entries.is_empty():_label("Todavía no tienes caballos en este corral.",Vector2(300,350),700,28)
- for i in entries.size():_card(entries[i],Vector2(30+(i%4)*310,(250 if embedded182 else 190)+int(i/4)*145))
+ var scroll:=ScrollContainer.new();scroll.name="RanchCardsScroll185";scroll.position=Vector2(30,250 if embedded182 else 190);scroll.size=Vector2(1240,385 if embedded182 else 445);content.add_child(scroll)
+ var grid:=Control.new();grid.custom_minimum_size=Vector2(1210,ceili(entries.size()/4.)*180.);grid.mouse_filter=Control.MOUSE_FILTER_IGNORE;scroll.add_child(grid)
+ var outer:=content;content=grid
+ for i in entries.size():_card(entries[i],Vector2((i%4)*305,int(i/4)*180))
+ content=outer
  var prev:=_button("Anterior",Vector2(330,650),190,func():page_index-=1;refresh());prev.disabled=page_index==0
  _label("%d / %d · "%[page_index+1,pages]+CollectionCount184.horses(all_.size()),Vector2(535,662),250,21)
  var next:=_button("Siguiente",Vector2(790,650),190,func():page_index+=1;refresh());next.disabled=page_index==pages-1
@@ -57,17 +61,21 @@ func _actor(h:Dictionary,feet:Vector2,scale_:float=1.0):
  else:
   var art=AdultArt.new();art.configure_preview141(h);art.position=feet;art.scale=Vector2.ONE*scale_;content.add_child(art);art.set_motion107(Vector2(120,0));art.walk_dir="side";art._update_anim();animated.append(art)
 func _card(h:Dictionary,at:Vector2):
- _ground(Rect2(at,Vector2(295,132)))
+ _ground(Rect2(at,Vector2(295,170)))
  _actor(h,at+Vector2(66,104),.95)
  if GalaxyPure143.is_pure(h):_label(GalaxyPure143.BADGE,at+Vector2(4,110),108,12).modulate=RanchTheme.GOLD
  _label(str(h.name),at+Vector2(115,8),170,21)
  _label(("Potrillo" if h.get("stage","adult")=="foal" else "Adulto")+(" · equipado" if h.id==SaveData.horse_collection.selected else ""),at+Vector2(115,38),170,18)
  var tap:=_button("",at+Vector2(2,4),108,func():horse_opened.emit(str(h.id)));tap.size.y=124;tap.tooltip_text="Ver ficha: "+str(h.name)
  for state in ["normal","hover","pressed","focus"]:tap.add_theme_stylebox_override(state,StyleBoxEmpty.new())
- var open:=_button("Ficha",at+Vector2(120,74),150,func():horse_opened.emit(str(h.id)));open.name="PastureHorse_"+str(h.id)
+ for skill in HorseTraining.SKILLS:
+  var badge:=JumpBadge.new();badge.skill=skill;badge.capable=HorseTraining.knows(h,skill);badge.position=at+Vector2(116+(0 if skill=="jump" else 40),70);badge.scale=Vector2.ONE*.52;content.add_child(badge)
+ var summary:=HorseSummaryBar185.create(content,h,170);summary.position=at+Vector2(115,112)
+ var open:=_button("Ficha",at+Vector2(205,66),78,func():horse_opened.emit(str(h.id)));open.name="PastureHorse_"+str(h.id)
  if h.parents.size()==2:
-  open.size.x=74
-  var fam:=_button("Familia",at+Vector2(200,74),83,func():family_id=h.id;refresh());fam.add_theme_font_size_override("font_size",16)
+  open.position=at+Vector2(205,50);open.size=Vector2(78,40)
+  var fam:=_button("Familia",at+Vector2(196,94),90,func():family_id=h.id;refresh());fam.size.y=32;fam.add_theme_font_size_override("font_size",16)
+  summary.position=at+Vector2(8,115);summary.custom_minimum_size.x=185;summary.get_node("AverageBar185").custom_minimum_size.x=185
 func _family():
  var members:Array=RanchPastures141.family(SaveData.horse_collection,family_id)
  _label("Padres y cría · solo vista, no cambia crecimiento ni habilidades",Vector2(30,210 if embedded182 else 105),1200,22)

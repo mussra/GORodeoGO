@@ -268,7 +268,7 @@ func test_audit_all_menu_pages_and_overlay_panels()->void:
 
 func test_popup_blocks_background_and_ok_remains_enabled()->void:
  var scroll:=_find_scroll(_panel);scroll.scroll_vertical=2147483647;await wait_process_frames(3)
- var badge:JumpBadge=_buttons_in(_rows()[-1])[0]
+ var badge:JumpBadge=_buttons_in(_rows()[-1]).filter(func(b):return b is JumpBadge)[0]
  badge.show_explanation();await wait_process_frames(4)
  var dialog:AcceptDialog=badge.get_children().filter(func(c):return c is AcceptDialog)[0]
  assert_false(dialog.get_ok_button().disabled,"OK debe funcionar incluso si el icono está dentro de scroll")

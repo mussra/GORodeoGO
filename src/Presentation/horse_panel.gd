@@ -94,9 +94,9 @@ func set_collection_mode182(mode:String)->void:
   if child is RanchPasturePanel141:pasture_tier141=child.tier;pasture_page141=child.page_index
  collection_mode182=mode;refresh()
 func collection_selector182()->void:
- var list_button:=button("Vista de colección",Vector2(30,92),func():set_collection_mode182("list"),330)
+ var list_button:=button("Vista por propiedades",Vector2(30,92),func():set_collection_mode182("list"),330)
  list_button.name="CollectionList182";list_button.disabled=collection_mode182=="list"
- var ranch_button:=button("Vista de rancho",Vector2(375,92),func():set_collection_mode182("ranch"),330)
+ var ranch_button:=button("Vista de colección",Vector2(375,92),func():set_collection_mode182("ranch"),330)
  ranch_button.name="CollectionRanch182";ranch_button.disabled=collection_mode182=="ranch"
  TextFit181.fixed(label("Una colección · dos vistas",Vector2(30,62),18),Vector2(900,32),18,18)
 func collection_view()->void:
@@ -137,7 +137,7 @@ func _collection_horse_row118(rows:VBoxContainer,h:Dictionary)->void:
  var tex:=TextureRect.new();HorsePortrait.apply_horse(tex,h,SaveData.hat_color);tex.custom_minimum_size=Vector2(160,160);tex.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;tex.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(tex)
  var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=tr("UI_082")%[h.name,tr("UI_083") if h.get("stage","adult")=="foal" else "",tr(HorseCollection.COATS[h.traits.coat]),tr(HorseCollection.PATTERNS[h.traits.pattern]),tr(HorseCollection.MANES[h.traits.mane])];l.custom_minimum_size.x=510;
  if GalaxyPure143.is_pure(h):l.text+="\n"+GalaxyPure143.BADGE
- TextFit181.flow(l,510);row.add_child(l)
+ var info:=VBoxContainer.new();info.custom_minimum_size.x=510;info.size_flags_vertical=Control.SIZE_SHRINK_CENTER;row.add_child(info);TextFit181.flow(l,510);info.add_child(l);HorseSummaryBar185.create(info,h,490)
  var badge:=JumpBadge.new();badge.capable=HorseJump.capable(h);row.add_child(badge)
  var dodge_badge:=JumpBadge.new();dodge_badge.skill="dodge";dodge_badge.capable=HorseTraining.knows(h,"dodge");row.add_child(dodge_badge)
  if HorseEmblem.valid(h.traits.get("emblem")):
@@ -211,6 +211,7 @@ func detail_view()->void:
   if GalaxyPure143.is_pure(h):
    var pure:=Label.new();pure.name="GalaxyPureBadge143";pure.text=GalaxyPure143.BADGE+"\nDos padres Galaxy al nacer · todavía no es un unicornio";pure.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;pure.add_theme_font_size_override("font_size",22);pure.modulate=RanchTheme.GOLD;TextFit181.flow(pure,735);box.add_child(pure)
   var completed:=Label.new();completed.text=HorseMastery.level_text(h);completed.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;completed.add_theme_font_size_override("font_size",20);TextFit181.flow(completed,735);box.add_child(completed)
+  HorseSummaryBar185.create(box,h,700)
   HorseStatBars.row(box,"Maestría · %d%%"%roundi(HorseMastery.percent(h)),HorseMastery.percent(h))
   if h.traits.get("finish","")=="galaxy":
    var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: supera 36-40 con este caballo (%d%%)"%roundi(HorseMastery.GALAXY_MASTER_THRESHOLD);galaxy.add_theme_font_size_override("font_size",20);TextFit181.flow(galaxy,735);box.add_child(galaxy)

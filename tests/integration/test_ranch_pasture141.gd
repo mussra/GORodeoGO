@@ -93,6 +93,21 @@ func test_one_collection_menu_entry_and_two_named_views():
   if child is Button and child.text=="Mi rancho":duplicates+=1
  assert_eq(duplicates,0)
  panel.content.get_node("Navigate_collection").pressed.emit();await settle()
- assert_eq(panel.content.get_node("CollectionList182").text,"Vista de colección")
- assert_eq(panel.content.get_node("CollectionRanch182").text,"Vista de rancho")
+ assert_eq(panel.content.get_node("CollectionList182").text,"Vista por propiedades")
+ assert_eq(panel.content.get_node("CollectionRanch182").text,"Vista de colección")
  assert_null(panel.content.find_child("CollectionToRanch181",true,false))
+
+func test_summary_and_skills_in_both_views_without_changing_horse():
+ panel.open_section("collection");await settle()
+ var h:Dictionary=SaveData.horse_collection.find("trial_a")
+ var summary=panel.content.find_child("HorseSummary185_trial_a",true,false)
+ assert_not_null(summary);assert_almost_eq(summary.get_node("AverageBar185").value,HorseSummary185.average(h),.001)
+ panel.content.get_node("CollectionRanch182").pressed.emit();await settle()
+ summary=ranch().content.find_child("HorseSummary185_trial_a",true,false)
+ assert_not_null(summary);assert_almost_eq(summary.get_node("AverageBar185").value,HorseSummary185.average(h),.001)
+ var badges:Array=[]
+ for n in summary.get_parent().get_children():
+  if n is JumpBadge:badges.append(n)
+ assert_eq(badges.size(),8)
+ assert_eq(badges[2].capable,HorseTraining.knows(h,"jump"))
+ assert_eq(badges[3].capable,HorseTraining.knows(h,"dodge"))

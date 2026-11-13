@@ -11,7 +11,7 @@ static func create(host:Node,h:Dictionary,concrete:bool,compact:bool=false)->Hor
  if not concrete:
   var note:=Label.new();note.text="Rendimiento y habilidades: por descubrir";note.add_theme_font_size_override("font_size",15 if compact else 20);note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;view.add_child(note);return view
  var stats:Dictionary=HorseStats.read(h)
- for spec in [["Velocidad","speed",240,300],["Manejo","handling",600,1500],["Fuerza","power",.5,.9],["Agilidad","dodge",.75,1.0],["Serenidad","calm",.5,2.0]]:row(view,spec[0],stats[spec[1]],spec[2],spec[3],compact)
+ for spec in HorseSummary185.STATS:row(view,spec[0],stats[spec[1]],spec[2],spec[3],compact)
  for skill in ["jump","dodge"]:
   var title:String="Salto" if skill=="jump" else "Esquiva"
   var known:bool=HorseTraining.knows(h,skill)
