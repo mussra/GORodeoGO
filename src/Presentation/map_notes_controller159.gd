@@ -7,6 +7,7 @@ const PHOTO_RADIUS161:float=120.
 var photo_position:Vector2=Vector2(INF,INF)
 var photo:Image
 var wrapper:Control
+var notes_list162:MapNotesList162
 func _ready():world=get_parent()
 func capture()->void:
  photo_position=world.player.position
@@ -25,7 +26,7 @@ func open(pos:Vector2)->void:
    var traits:Dictionary=horse.herd.get("traits",{})
    horse_text="Caballo "+HorseCollection.COATS[int(traits.get("coat",0))].to_lower()+" · crin "+HorseCollection.MANES[int(traits.get("mane",0))].to_lower()
  var note:Dictionary=nearest.duplicate(true)
- if note.is_empty():note={"id":"note_%d_%d"%[Time.get_unix_time_from_system(),Time.get_ticks_usec()],"pos":horse_pos,"text":horse_text,"icon":"horse" if not horse_id.is_empty() else "pin","horse":horse_id,"photo":""}
+ if note.is_empty():note={"id":"note_%d_%d"%[Time.get_unix_time_from_system(),Time.get_ticks_usec()],"pos":horse_pos,"text":horse_text,"icon":"horse" if not horse_id.is_empty() else "pin","horse":horse_id,"photo":"","created_at":int(Time.get_unix_time_from_system())}
  map._dragging=false;world.player.velocity=Vector2.ZERO;world.player.set_physics_process(false)
  wrapper=Control.new();wrapper.size=Vector2(1280,720);wrapper.z_index=160;world.map_note_host159().add_child(wrapper)
  var layout:Callable=func():
@@ -66,3 +67,12 @@ func close()->void:
 
 func photo_location_allowed161(pos:Vector2)->bool:
  return photo_position.is_finite() and photo_position.distance_to(pos)<=PHOTO_RADIUS161 and world.player.position.distance_to(pos)<=PHOTO_RADIUS161
+
+func show_list162()->void:
+ if is_instance_valid(notes_list162) or is_instance_valid(world._note_dialog106):return
+ notes_list162=MapNotesList162.new();notes_list162.notes=world._map_overlay.notes159();world.map_note_host159().add_child(notes_list162)
+ notes_list162.closed.connect(close_list162)
+ notes_list162.selected.connect(func(note:Dictionary):close_list162();world._map_overlay.center_note162(note))
+func close_list162()->void:
+ if is_instance_valid(notes_list162):notes_list162.queue_free()
+ notes_list162=null

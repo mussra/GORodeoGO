@@ -10,6 +10,8 @@ var world: Node2D
 var expanded: bool = false
 var zoom: float = 1.0
 var pan: Vector2 = Vector2.ZERO
+var _selected_note162:String=""
+var _note_pan162:Vector2=Vector2.ZERO
 var _dragging: bool = false
 var _drag_from: Vector2 = Vector2.ZERO
 var _pan_from: Vector2 = Vector2.ZERO
@@ -26,6 +28,7 @@ var _touches108:Dictionary={}
 var _pinch_distance108:float=0.
 var _pinch_mid108:Vector2
 var _pinch_used108:bool=false
+var _notes162:Button
 var _sites144:Button
 var _find108:Button
 var _markers108:Control
@@ -68,6 +71,7 @@ func _ensure_terrain() -> void:
  var content = Vector2(cols, rows) * cell
  var limit = ((content - area.size) / 2.0) + Vector2(12,12)
  limit.x = maxf(limit.x, 0.0);limit.y = maxf(limit.y, 0.0)
+ if expanded:limit=limit.max(_note_pan162.abs())
  pan = pan.clamp(-limit, limit)
  _map_geometry = {"data":data,"area":area,"cell":cell,"origin":area.position + (area.size - content) / 2.0 + (pan if expanded else Vector2.ZERO)}
  # Store the normalized pan so clamping does not trigger a second rebuild.
@@ -88,9 +92,10 @@ func _layout() -> void:
  size = Vector2(minf(700, viewport.x - 80), minf(470, viewport.y - 105)) if expanded else Vector2(180, 112)
  position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x - size.x - 18, minimap_top159())
  if size!=previous_size:_terrain_valid=false
- if _sites144!=null:_sites144.visible=expanded
+ if _sites144!=null:_sites144.visible=expanded;_sites144.size=Vector2(170,56)
+ if _notes162!=null:_notes162.visible=expanded;_notes162.position=Vector2(200,16);_notes162.size=Vector2(104,56)
  if _find108!=null:
-  _find108.visible=expanded;_find108.position=Vector2(size.x-346,16);_find108.size=Vector2(238,56)
+  _find108.visible=expanded;_find108.position=Vector2(size.x-380,16);_find108.size=Vector2(272,56)
  if _zoom_btns.size()==2:
   _zoom_btns[0].position=Vector2(24,size.y-76);_zoom_btns[1].position=Vector2(size.x-88,size.y-76)
  if _zoom_slider106!=null:
@@ -158,6 +163,7 @@ func _ready() -> void:
  _zoom_slider106.value_changed.connect(_set_zoom);add_child(_zoom_slider106)
  _zoom_label106=Label.new();_zoom_label106.add_theme_font_size_override("font_size",20);add_child(_zoom_label106)
  _sites144=Button.new();_sites144.text="Sitios visitados";_sites144.tooltip_text="Toca un círculo dorado para viajar. Mantén pulsado el terreno para añadir una nota.";_sites144.position=Vector2(20,16);_sites144.size=Vector2(230,56);QuestButtonStyle.apply(_sites144);_sites144.pressed.connect(func():show_sites159());add_child(_sites144)
+ _notes162=Button.new();_notes162.text="Notas";QuestButtonStyle.apply(_notes162);_notes162.pressed.connect(func():world._map_notes159.show_list162());add_child(_notes162)
  _note_help106=Label.new();_note_help106.text="Mantén pulsado el mapa para añadir o editar una nota";_note_help106.position=Vector2(24,29);_note_help106.add_theme_font_size_override("font_size",14);_note_help106.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_note_help106)
  _set_zoom(zoom)
 
@@ -175,7 +181,7 @@ func _drag106(point:Vector2)->void:
  _last_point106=point
  if not expanded or _long_pressed106:return
  var data:Dictionary=_map_geometry.data;var content:Vector2=Vector2(data.maxs-data.mins+Vector2i.ONE)*_map_geometry.cell
- var limit:Vector2=((content-_map_geometry.area.size)*.5+Vector2.ONE*12.).max(Vector2.ZERO)
+ var limit:Vector2=((content-_map_geometry.area.size)*.5+Vector2.ONE*12.).max(Vector2.ZERO).max(_note_pan162.abs())
  pan=(_pan_from+point-_drag_from).clamp(-limit,limit)
  _map_geometry.origin=_map_geometry.area.position+(_map_geometry.area.size-content)*.5+pan
  _terrain.position=_map_geometry.origin-_draw_origin106
@@ -355,6 +361,7 @@ func _draw_markers108()->void:
   for note in rows:
    var point:Vector2=_to_map(note.pos,mins,cell,origin)
    if Rect2(Vector2(12,12),(size-Vector2(24,100 if expanded else 24)).max(Vector2.ZERO)).has_point(point):
+    if expanded and str(note.id)==_selected_note162:_markers108.draw_arc(point,15.+sin(_pulse*3.)*2.,0,TAU,32,Color("fff1d2"),3.)
     _markers108.draw_circle(point,8.,Color("f2bc51"));_markers108.draw_circle(point,3.,Color("413126"))
  for flower in flowers159().values():
   var point:Vector2=_to_map(flower.position,mins,cell,origin)
@@ -457,3 +464,11 @@ func choose159(id:String)->void:
  if world._travel144!=null:world._travel144.choose(id)
 
 func minimap_top159()->float:return 84.
+
+func center_note162(note:Dictionary)->void:
+ _selected_note162=str(note.id)
+ _ensure_terrain()
+ var data:Dictionary=_map_geometry.data
+ var target:Vector2=note.pos
+ var point:Vector2=_to_map(target,data.mins,_map_geometry.cell,_map_geometry.origin)
+ pan+=_map_geometry.area.get_center()-point;_note_pan162=pan;_terrain_valid=false;_ensure_terrain();queue_redraw()

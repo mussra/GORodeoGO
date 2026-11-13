@@ -18,3 +18,7 @@ func test_zoom_slider_clamp_and_retained_drag_no_rebuild_per_event():
  assert_eq(map.terrain_rebuilds,before);assert_true(map.pan.is_finite());map._end_drag106(Vector2(349,200))
  map._begin_drag106(Vector2.ZERO);map._drag106(Vector2(100000,100000));assert_lt(map.pan.x,100000.);assert_eq(map.pan.y,0.);map._end_drag106(Vector2(100000,100000))
  map.world.free();map.free();SaveData.world_discovered=old
+
+func test_note_dates_clean_sort_and_legacy_unknown_without_inventing_creation_time():
+ var notes={"0,0":[{"id":"old","pos":Vector2.ZERO,"text":"Antigua"},{"id":"new","pos":Vector2.ONE,"text":"Nueva","created_at":1000},{"id":"bad-date","pos":Vector2.ONE,"text":"Fecha rota","created_at":"ayer"}]}
+ var clean:=WorldNotes106.clean(notes);assert_eq(clean["0,0"][0].get("created_at",0),0);assert_eq(clean["0,0"][2].get("created_at",0),0);assert_eq(WorldNotes106.date162(clean["0,0"][0]),"Sin fecha registrada");assert_eq(WorldNotes106.list162(clean)[0].id,"new");assert_eq(WorldNotes106.date162({"created_at":1000}),"01/01/1970 · 00:16 UTC")

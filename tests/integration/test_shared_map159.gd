@@ -62,3 +62,19 @@ func test_remote_edit_blocks_photo_in_ui_and_save_preserves_original_image_and_t
 func test_new_remote_note_also_cannot_attach_photo_from_another_place():
  world.show_map();world._map_overlay._ensure_terrain();world._map_notes159.photo_position=world.player.position;world._map_notes159.photo=Image.create(32,16,false,Image.FORMAT_RGBA8)
  world._open_map_note106(world.player.position+Vector2(1000,0));assert_true(world._note_dialog106.photo_box.disabled);world._note_dialog106.saved.emit("Lejos",true);assert_true(world._map_overlay.notes159().is_empty())
+
+func test_shared_list_centers_note_without_moving_horse_and_keeps_dates_after_reload():
+ world.show_map();world._map_overlay._ensure_terrain();var position:Vector2=world.player.position;world._open_map_note106(position);world._note_dialog106.saved.emit("Mi punto",false);await get_tree().process_frame
+ var note:Dictionary=WorldNotes106.nearest(world._map_overlay.notes159(),position,50.);assert_gt(int(note.created_at),0);SaveData.load_progress();assert_eq(WorldNotes106.nearest(SaveData.country_ledger146.maps.water146.notes,position,50.).created_at,note.created_at)
+ world._map_notes159.show_list162();assert_not_null(world._map_notes159.notes_list162);assert_eq(world._map_notes159.notes_list162.rows.get_child_count(),1);world._map_overlay.pan=Vector2(200,0);world._map_notes159.notes_list162.selected.emit(note);assert_null(world._map_notes159.notes_list162);assert_eq(world.player.position,position)
+ var map:=world._map_overlay;var point:Vector2=map._to_map(note.pos,map._map_geometry.data.mins,map._map_geometry.cell,map._map_geometry.origin);assert_lt(point.distance_to(map._map_geometry.area.get_center()),.1);assert_true(map.expanded)
+func test_empty_list_and_legacy_note_without_photo_are_read_only():
+ world.show_map();world._map_notes159.show_list162();assert_true(world._map_notes159.notes_list162.rows.get_child(0) is Label);world._map_notes159.close_list162();await get_tree().process_frame
+ var old:Dictionary={"id":"legacy162","pos":world.player.position,"text":"Sin fecha ni foto","photo":""};assert_true(world.map_note_store159(old));var disk:=FileAccess.get_file_as_bytes(SaveData.save_path);world._map_notes159.show_list162();assert_eq(world._map_notes159.notes_list162.rows.get_child_count(),1);assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk)
+
+func test_list_scroll_and_back_do_not_move_or_write_and_old_date_stays_unknown():
+ world.show_map();var point:Vector2=world.player.position
+ for i in 15:assert_true(world.map_note_store159({"id":"scroll162_"+str(i),"pos":point+Vector2(i*100,0),"text":"Punto "+str(i),"photo":""}))
+ var disk:=FileAccess.get_file_as_bytes(SaveData.save_path);world._map_notes159.show_list162();await get_tree().process_frame;var list:=world._map_notes159.notes_list162;assert_eq(list.rows.get_child_count(),15)
+ var scroll:ScrollContainer=list.rows.get_parent();scroll.scroll_vertical=10000;await get_tree().process_frame;assert_gt(scroll.scroll_vertical,0);assert_eq(world.player.position,point)
+ var back:=InputEventAction.new();back.action="ui_cancel";back.pressed=true;list._unhandled_input(back);assert_null(world._map_notes159.notes_list162);assert_true(world._map_overlay.expanded);assert_eq(FileAccess.get_file_as_bytes(SaveData.save_path),disk)
