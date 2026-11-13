@@ -619,3 +619,21 @@ func can_capture_animal165(target:String)->bool:
 	if target not in ["pig","goat"]:return false
 	if int(repeat_contract165.completed)>=(1 if target=="pig" else 2):return true
 	return (repeat_contract165.active or repeat_contract165.ready) and ProgressionEconomy165.target(repeat_contract165)==target
+
+func buy_finish168(style:String)->bool:
+	var id:String="finish_"+style
+	if trial_session_active or style not in ["gold","crystal","ice"] or equipment_owned.has(id):return false
+	if not ProgressionEconomy165.missing(id,equipment_points,world_pig_captures.size(),world_goat_captures.size(),int(repeat_contract165.completed)).is_empty():return false
+	var before_points:int=equipment_points;var before_owned:Array[String]=equipment_owned.duplicate()
+	equipment_points-=int(ProgressionEconomy165.EXTRAS[id].price);equipment_owned.append(id)
+	if save_progress():return true
+	equipment_points=before_points;equipment_owned=before_owned;return false
+func equip_finish168(horse_id:String,style:String)->bool:
+	if trial_session_active or style not in ["","gold","crystal","ice"] or (not style.is_empty() and not equipment_owned.has("finish_"+style)):return false
+	var horse:Dictionary=horse_collection.find(horse_id)
+	if horse.is_empty() or not horse_collection.is_adult(horse_id):return false
+	var before:Dictionary=horse_collection.export_state()
+	if style.is_empty():horse.erase("special_finish168")
+	else:horse.special_finish168=style
+	if save_progress():return true
+	horse_collection.restore(before);return false

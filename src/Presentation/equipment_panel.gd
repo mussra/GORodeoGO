@@ -46,7 +46,7 @@ func _ready()->void:
  horse_button.size=Vector2(360,52)
  var note:=_label(tr("UI_054"),Vector2(40,555),18)
  note.size=Vector2(735,135);note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- var finishes:=_button("Acabados · Vista previa",Vector2(800,625),func():add_child(FinishPreview145.new()))
+ var finishes:=_button("Acabados especiales",Vector2(800,625),func():add_child(FinishShop168.new()))
  finishes.size=Vector2(430,52)
  var adorns:=_button("Adornos · Vista previa",Vector2(800,561),func():add_child(AdornPreview153.new()))
  adorns.size=Vector2(430,52)

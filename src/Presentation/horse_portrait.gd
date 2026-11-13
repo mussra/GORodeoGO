@@ -38,3 +38,4 @@ static func apply_horse(view:TextureRect,horse:Dictionary,hat:String="original")
  else:
   apply(view,horse.traits,hat)
   HorseGalaxyLook.configure_portrait(view.material,horse)
+  view.material.set_shader_parameter("special_finish168",HorseFinish168.IDS.find(HorseFinish168.style(horse)))

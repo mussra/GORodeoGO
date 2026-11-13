@@ -1,6 +1,6 @@
 # Progresión exigente: modelo y bloques de implementación
 
-La petición del 13 de noviembre acepta los diseños y exige muchos cerdos, cabras y misiones, sin completar todos los extras en 20-30 minutos. Esta base numérica es calibración de implementación, no una medición ni una promesa de horas. Desde2.7.120 el modelo se usa en premios de victoria, captura de cabra y encargos repetibles. La tabla de extras sigue siendo una base NO activada en compras.
+La petición del 13 de noviembre acepta los diseños y exige muchos cerdos, cabras y misiones, sin completar todos los extras en 20-30 minutos. Esta base numérica es calibración de implementación, no una medición ni una promesa de horas. Desde2.7.120 el modelo se usa en premios de victoria, captura de cabra y encargos repetibles. Desde2.7.121 están activas las compras de acabados oro/cristal/hielo con esos requisitos. Los adornos oro/plata siguen pendientes.
 
 ## Auditoría anterior a2.7.120
 
@@ -46,3 +46,7 @@ El límite de siestas del mismo día es otro bloque y no forma parte de este mod
 ## Estado2.7.120
 
 Activo: premios de repetición limitados, recompensa de cabra, contratos alternos separados, persistencia/cobro atómicos y pantalla del granjero. Sin premios retroactivos. Los encargos aceptados desbloquean la captura necesaria por el mismo lazo que los históricos. Pendiente: cobertura visual y compra de extras; llaves, niveles21-40, crecimiento normal y ritual.
+
+## Estado2.7.121
+
+Activo: compra única de acabado oro/cristal/hielo, equipamiento por caballo adulto y retirada gratuita sin cambiar genes. Requisitos de la tabla aplicados con saldo, capturas acumuladas y encargos cobrados. Los contadores de actividad no se consumen. Pendiente: adornos de patas/botas, llaves y niveles21-40, crecimiento normal y ritual.

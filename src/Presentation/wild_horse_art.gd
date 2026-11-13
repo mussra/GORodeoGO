@@ -64,6 +64,7 @@ func _ready() -> void:
 	centered = false
 	offset = Vector2(-48, -80)  # hooves at node origin, like the code-drawn version
 	_update_anim()
+	if preview_side141:HorseFinish168.install(self,preview_record141,"horse")
 
 func _update_anim() -> void:
 	if sprite_frames==null:return

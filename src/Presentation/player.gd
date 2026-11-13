@@ -166,6 +166,7 @@ func _ready() -> void:
 		if not horse.is_empty():HorseAppearance.apply(_sprite_swap._frames,horse.traits,horse)
 		HatAppearance.apply_classic(_sprite_swap._frames,SaveData.hat_color)
 		PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}),horse)
+		HorseFinish168.install(_sprite_swap._sprite,horse)
 	var cue_layer:=CanvasLayer.new()
 	cue_layer.layer=16
 	add_child(cue_layer)

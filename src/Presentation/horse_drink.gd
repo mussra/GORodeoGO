@@ -48,6 +48,9 @@ func step(delta:float,wish:Vector2)->bool:
   visual.scale=sprite.scale;visual.position=Vector2(sprite.position.x,sprite.position.y+(44+sprite.offset.y)*sprite.scale.y)
  actor.velocity=Vector2.ZERO;elapsed+=delta
  var horse=SaveData.horse_collection.find(SaveData.horse_collection.selected)
- visual.texture=texture(0 if elapsed<.45 else 1,horse.get("traits",{}),SaveData.hat_color,horse)
+ var pose168:int=0 if elapsed<.45 else 1
+ visual.texture=texture(pose168,horse.get("traits",{}),SaveData.hat_color,horse)
+ var style168:String=HorseFinish168.style(horse)
+ visual.material=FinishPose168.material(style168,FinishPose168.specs()[-1],pose168) if not style168.is_empty() else null
  visual.flip_h=facing<0;visual.visible=true;actor._sprite_swap._sprite.visible=false
  return true
