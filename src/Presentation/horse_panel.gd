@@ -224,6 +224,9 @@ func detail_view()->void:
     if spec[0]=="legs":SaveData.set_horse_legs(h.id,i-1)
     else:SaveData.set_horse_pattern_color(h.id,spec[0],i-1 if spec[0]=="spots" else i)
     refresh())
+ if h.get("stage","adult")=="foal":
+  var growth:=Label.new();growth.name="FoalGrowth174";growth.text=FoalGrowth174.text(h);growth.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(growth)
+  var mature:=Button.new();mature.text="Hacerse adulto";mature.custom_minimum_size.y=48;mature.disabled=not FoalGrowth174.ready(h);box.add_child(mature);mature.pressed.connect(func():SaveData.mature_horse174(h.id);refresh())
  var actions:Array=[["Usar caballo",func():SaveData.select_horse(h.id);refresh()],["Mapa genealógico",func():show_page("family")]]
  if can_edit:
   actions.append(["Emblema",func():var editor:=EmblemPanel.new();editor.horse_id=h.id;editor.saved.connect(refresh);add_child(editor)])

@@ -289,6 +289,7 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 	highest_level_completed=maxi(highest_level_completed,level_number)
 	equipment_points+=reward
 	horse_collection.birth_credits+=1
+	FoalGrowth174.advance(horse_collection)
 	HorseTraining.complete(horse_collection,training_session)
 	HorseMastery.record(horse_collection,mounted_horse_id,level_number)
 	if save_progress():return reward
@@ -316,6 +317,11 @@ func breed_horses(a:String,b:String,choices:Dictionary)->Dictionary:
 	if save_progress():return child
 	horse_collection.restore(before)
 	return {}
+func mature_horse174(id:String)->bool:
+	var before:Dictionary=horse_collection.export_state()
+	if not FoalGrowth174.mature(horse_collection,id):return false
+	if save_progress():return true
+	horse_collection.restore(before);return false
 func select_horse(id:String)->bool:
 	if not horse_collection.is_adult(id):return false
 	var before:String=horse_collection.selected
@@ -613,12 +619,13 @@ func accept_repeat_contract165()->bool:
 	repeat_contract165=before;return false
 func claim_repeat_contract165()->int:
 	if trial_session_active:return 0
-	var before:Dictionary=repeat_contract165.duplicate(true);var points:int=equipment_points
+	var before:Dictionary=repeat_contract165.duplicate(true);var points:int=equipment_points;var horses:Dictionary=horse_collection.export_state()
 	var reward:int=ProgressionEconomy165.claim(repeat_contract165)
 	if reward<=0:return 0
 	equipment_points+=reward
+	FoalGrowth174.advance(horse_collection)
 	if save_progress():return reward
-	repeat_contract165=before;equipment_points=points;return 0
+	repeat_contract165=before;equipment_points=points;horse_collection.restore(horses);return 0
 func can_capture_animal165(target:String)->bool:
 	if NpcQuests.can_capture(world_quests,target):return true
 	if target not in ["pig","goat"]:return false

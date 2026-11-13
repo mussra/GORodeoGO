@@ -62,3 +62,7 @@ Siesta recta que despierta antes del primer obstáculo o límite conocido, inclu
 ## Campaña y llaves173 / 2.7.124
 
 Activados21-40, dos llaves de adquisición Galaxy20/40, mercado estable para esas dos ofertas, corte de nuevos cruces Galaxy×normal y maestría por campaña sin rebajar el100%antiguo. Preserva colección y genealogía; migración reconoce Galaxy adquiridos antes para llaves ya ganadas. Victoria20/40 ya no entrega caballo aleatorio. Compra/llave/puntos se guardan o revierten juntos. Véase RELEASE_2_7_124.md. Crecimiento y ritual siguen pendientes; presupuestos4-8min no son medición de duración humana.
+
+## Bloque174, preparado en código después de2.7.124, sin APK
+
+Crianza normal: diez cuidados por cría. Cada victoria futura o cobro válido de encargo repetible suma uno a todas las crías del rancho; no suma por reloj, saldo, créditos antiguos ni modo prueba. Diez es calibración de implementación, no número dictado por el usuario. Al10/10se habilita Hacerse adulto en ficha; no se cobra y requiere pulsación. El cambio conserva identidad/genes/padres/ascendencia y revierte en error de guardado. Persisten los cuidados y los estados inválidos se rechazan. Pantalla0/9/10inspeccionada, incluida960×540. Fuente y transformación todavía no activadas.
