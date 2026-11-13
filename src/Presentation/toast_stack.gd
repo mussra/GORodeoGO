@@ -10,11 +10,7 @@ var wide170:bool=false
 static func reading_seconds(text:String,minimum:float=0.0)->float:
  return maxf(minimum,clampf(2.5+float(text.length())/24.0,3.0,7.0))
 static func backdrop(label:Label)->void:
- var box:=RanchTheme.box(Color(0.035,0.09,0.12,.56),Color(.45,.65,.64,.8),10)
- box.content_margin_left=10;box.content_margin_right=10
- box.content_margin_top=5;box.content_margin_bottom=5
- label.add_theme_stylebox_override("normal",box)
- label.add_theme_color_override("font_color",Color("fff1d2"))
+ DetailCard179.reading_surface(label,true)
  label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 func _ready()->void:
  mouse_filter=Control.MOUSE_FILTER_IGNORE

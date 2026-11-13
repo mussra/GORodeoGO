@@ -61,7 +61,8 @@ func test_navigation_has_no_obsolete_home_button_but_ranch_remains_siesta_destin
  world._open_navigation();assert_not_null(world._navigation)
  var ids:Array=[]
  for entry in world._navigation.entries:ids.append(entry.id)
- assert_false(ids.has("home"));assert_true(ids.has("map"));assert_true(ids.has("exit"))
+ assert_false(ids.has("home"));assert_false(ids.has("map"));assert_true(ids.has("exit"))
+ assert_true(world._map_overlay.visible)
  var panel:NavigationSheet=world._navigation;world._close_navigation();panel.queue_free()
  world._travel144.record_visits();assert_false(world._travel144.destination170("ranch").is_empty());assert_false(world._travel144.active)
 

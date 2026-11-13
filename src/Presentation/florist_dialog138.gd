@@ -7,6 +7,8 @@ func setup_journey(remote_:bool)->void:
  var state:Dictionary=SaveData.world_flora138;var species:String=FloristJourney138.current(state);var current_stage:String=FloristJourney138.stage(state,species)
  var title:=Label.new();title.text="Floristería del Camino del Este" if remote_ else "Florista · semillas de otro pueblo";title.position=Vector2(24,18);title.add_theme_font_size_override("font_size",25);add_child(title)
  var body:=Label.new();body.position=Vector2(24,70);body.size=Vector2(632,245);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",22);add_child(body)
+ DetailCard179.style_panel(self)
+ DetailCard179.reading_surface(body)
  var recognition:String=""
  for key in FloristJourney138.SPECIES:
   if state.fields.get(key,false):recognition+="Gracias a tu muestra, he cultivado "+FloristJourney138.title(key)+" al sur de la tienda.\n"
@@ -30,7 +32,7 @@ func setup_journey(remote_:bool)->void:
     button138("Entregar muestra",Vector2(24,330),"deliver",species)
  button138("Seguir explorando",Vector2(184,448),"close",species)
 func button138(text_:String,at:Vector2,action_:String,species:String)->void:
- var b:=Button.new();b.text=text_;b.position=at;b.size=Vector2(300,58);b.add_theme_font_size_override("font_size",19);add_child(b)
+ var b:=Button.new();b.text=text_;b.position=at;b.size=Vector2(300,58);b.add_theme_font_size_override("font_size",19);QuestButtonStyle.apply(b);add_child(b)
  b.pressed.connect(func():
   if action_=="close":closed.emit()
   else:journey_action.emit(action_,species))

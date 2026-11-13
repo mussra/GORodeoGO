@@ -17,11 +17,13 @@ func _ready():
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas)
  _label("ENCARGOS DEL RANCHO",Vector2(60,35),32)
- var back:=Button.new();back.text="Volver al camino";back.position=Vector2(930,30);back.size=Vector2(290,58);canvas.add_child(back);back.pressed.connect(func():closed.emit();queue_free())
+ var back:=Button.new();back.text="Volver al camino";back.position=Vector2(930,30);back.size=Vector2(290,58);QuestButtonStyle.apply(back);canvas.add_child(back);back.pressed.connect(func():closed.emit();queue_free())
  balance=_label("",Vector2(60,120),23)
  detail=_label("",Vector2(60,190),28);detail.size=Vector2(1120,150);detail.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ DetailCard179.reading_surface(detail)
  var explanation:=_label("Hoy hacen falta cinco animales nuevos. Acepta antes de salir y vuelve a cobrar cuando los hayas capturado. Después tocará el otro rebaño.",Vector2(60,350),24);explanation.size=Vector2(1120,110);explanation.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- action=Button.new();action.name="ContractAction165";action.position=Vector2(60,495);action.size=Vector2(600,66);action.add_theme_font_size_override("font_size",26);canvas.add_child(action)
+ DetailCard179.reading_surface(explanation)
+ action=Button.new();action.name="ContractAction165";action.position=Vector2(60,495);action.size=Vector2(600,66);action.add_theme_font_size_override("font_size",26);QuestButtonStyle.apply(action);canvas.add_child(action)
  action.pressed.connect(func():
   var ready:bool=SaveData.repeat_contract165.ready
   var ok:bool=SaveData.claim_repeat_contract165()>0 if ready else SaveData.accept_repeat_contract165()

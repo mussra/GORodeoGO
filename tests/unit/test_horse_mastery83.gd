@@ -2,10 +2,10 @@ extends GutTest
 func test_distinct_levels_exact_threshold_and_no_skill_or_calm_shortcut():
  var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy";h["mastery"]={"jump":100,"dodge":100};h["stats"]={"calm":2.0}
  assert_eq(HorseMastery.percent(h),0.0);assert_false(HorseMastery.galaxy_master(h))
- for n in range(1,17):assert_true(HorseMastery.record(c,h.id,n))
+ for n in range(36,40):assert_true(HorseMastery.record(c,h.id,n))
  assert_eq(HorseMastery.percent(h),80.0);assert_false(HorseMastery.galaxy_master(h));assert_true(HorseMastery.galaxy_master(h,80))
- assert_false(HorseMastery.record(c,h.id,16));assert_eq(HorseMastery.percent(h),80.0)
- for n in range(17,21):assert_true(HorseMastery.record(c,h.id,n))
+ assert_false(HorseMastery.record(c,h.id,39));assert_eq(HorseMastery.percent(h),80.0)
+ for n in range(40,41):assert_true(HorseMastery.record(c,h.id,n))
  assert_true(HorseMastery.galaxy_master(h));assert_eq(HorseMastery.percent(h),100.0)
  h.stage="foal";assert_false(HorseMastery.galaxy_master(h));h.stage="adult";h.traits.finish="normal";assert_false(HorseMastery.galaxy_master(h))
 func test_legacy_empty_validation_and_restore():
@@ -32,13 +32,13 @@ func test_portrait_glow_is_master_only_and_intensity_is_configurable():
  assert_ne(view.material.get_shader_parameter("mastery_moon"),true)
  assert_true(view.material.get_shader_parameter("galaxy_palette_preview"))
  assert_almost_eq(view.material.get_shader_parameter("galaxy_star_density"),.04,.0001)
- for n in range(1,11):HorseMastery.record(c,h.id,n)
+ for n in range(36,38):HorseMastery.record(c,h.id,n)
  HorsePortrait.apply_horse(view,h)
- assert_almost_eq(view.material.get_shader_parameter("galaxy_star_density"),.52,.0001)
+ assert_almost_eq(view.material.get_shader_parameter("galaxy_star_density"),.424,.0001)
  assert_ne(view.material.get_shader_parameter("mastery_aura"),true)
  assert_ne(view.material.get_shader_parameter("mastery_sun"),true)
  assert_ne(view.material.get_shader_parameter("mastery_moon"),true)
- for n in range(1,21):HorseMastery.record(c,h.id,n)
+ for n in range(36,41):HorseMastery.record(c,h.id,n)
  HorsePortrait.apply_horse(view,h)
  assert_true(view.material.get_shader_parameter("mastery_aura"))
  assert_true(view.material.get_shader_parameter("mastery_sun"))
@@ -57,7 +57,7 @@ func test_gameplay_look_uses_horse_progress_not_genes_and_does_not_mutate():
  var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy";h.traits.emblem=HorseEmblem.DEFAULT.duplicate(true)
  var before=h.duplicate(true);var zero=HorseGalaxyLook.state(h)
  assert_false(zero.master);assert_eq(zero.percent,0.);assert_eq(h,before)
- for n in range(1,21):HorseMastery.record(c,h.id,n)
+ for n in range(36,41):HorseMastery.record(c,h.id,n)
  var look=HorseGalaxyLook.state(h);assert_true(look.master);assert_eq(look.percent,100.)
  var old=h.duplicate(true)
  var normal=PixelLabTrial.pose_texture("rider","side",0,h.traits)
@@ -90,7 +90,7 @@ func test_galaxy_mane_tail_coverage_all_nominal_views_without_mask_edits():
    assert_eq(protected_errors,0,"rider/tack stay original "+view+str(frame))
 func test_master_all_views_protect_original_rider_and_keeps_marks_on_coat():
  var c=HorseCollection.new();c.seed_trial();var h=c.find("original");h.traits.finish="galaxy"
- for n in range(1,21):HorseMastery.record(c,h.id,n)
+ for n in range(36,41):HorseMastery.record(c,h.id,n)
  for view in ["side","down","up","diag_down","diag_up"]:
   for frame in 9:
    var raw:Image=load("res://art/experimental/pixellab/rider/%s/frame_%02d.png"%[view,frame]).get_image()
@@ -111,3 +111,23 @@ func test_master_all_views_protect_original_rider_and_keeps_marks_on_coat():
    else:assert_eq(sun,0,"no chest sun from rear")
    if view!="down":assert_gt(moon,0,"thigh moon visible "+view+str(frame))
    else:assert_eq(moon,0,"no thigh moon from front")
+
+func test_only_final_five_count_repeats_do_not_and_new_campaign1_cannot_unlock():
+ var c:=HorseCollection.new();c.seed_trial();var h:=c.find("original")
+ for n in range(1,36):HorseMastery.record(c,h.id,n)
+ assert_eq(HorseMastery.percent(h),0.);assert_false(HorseMastery.legacy_master179(h))
+ for n in [40,36,38,37]:HorseMastery.record(c,h.id,n)
+ assert_eq(HorseMastery.percent(h),80.);assert_false(HorseMastery.record(c,h.id,40));assert_eq(HorseMastery.percent(h),80.)
+ HorseMastery.record(c,h.id,39);assert_eq(HorseMastery.percent(h),100.)
+ var copy:=HorseCollection.new();assert_true(copy.restore(c.export_state()));assert_eq(HorseMastery.percent(copy.find(h.id)),100.)
+func test_legacy_complete_campaigns_kept_after_reload_but_partial_cannot_finish_old_rule():
+ for span in [range(1,21),range(21,41),range(1,20)]:
+  var c:=HorseCollection.new();c.seed_trial();c.find("original")["completed_levels"]=span
+  var state:=c.export_state();state.erase("mastery_rule179")
+  var loaded:=HorseCollection.new();assert_true(loaded.restore(state));var h:=loaded.find("original")
+  assert_eq(HorseMastery.percent(h),100. if span.size()==20 else 0.)
+  if span.size()==19:
+   HorseMastery.record(loaded,h.id,20);assert_eq(HorseMastery.percent(h),0.)
+  else:
+   assert_true(h.mastery_legacy179);assert_true(HorseMastery.level_text(h).contains("conservada"))
+  var twice:=HorseCollection.new();assert_true(twice.restore(loaded.export_state()));assert_eq(twice.export_state(),loaded.export_state())

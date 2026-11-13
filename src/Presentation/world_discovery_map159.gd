@@ -90,7 +90,7 @@ func _layout() -> void:
  var viewport: Vector2 = get_viewport_rect().size
  var previous_size:Vector2=size
  size = Vector2(minf(700, viewport.x - 80), minf(470, viewport.y - 105)) if expanded else Vector2(180, 112)
- position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x - size.x - 18, minimap_top159())
+ position = (viewport - size) / 2.0 if expanded else Vector2(18, minimap_top159())
  if size!=previous_size:_terrain_valid=false
  if _sites144!=null:_sites144.visible=expanded;_sites144.size=Vector2(170,56)
  if _notes162!=null:_notes162.visible=expanded;_notes162.position=Vector2(200,16);_notes162.size=Vector2(104,56)
@@ -165,7 +165,15 @@ func _ready() -> void:
  _sites144=Button.new();_sites144.text="Sitios visitados";_sites144.tooltip_text="Toca un círculo dorado para viajar. Mantén pulsado el terreno para añadir una nota.";_sites144.position=Vector2(20,16);_sites144.size=Vector2(230,56);QuestButtonStyle.apply(_sites144);_sites144.pressed.connect(func():show_sites159());add_child(_sites144)
  _notes162=Button.new();_notes162.text="Notas";QuestButtonStyle.apply(_notes162);_notes162.pressed.connect(func():world._map_notes159.show_list162());add_child(_notes162)
  _note_help106=Label.new();_note_help106.text="Mantén pulsado el mapa para añadir o editar una nota";_note_help106.position=Vector2(24,29);_note_help106.add_theme_font_size_override("font_size",14);_note_help106.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(_note_help106)
- _set_zoom(zoom)
+ _layout();_set_zoom(zoom)
+ restore_minimap179.call_deferred()
+
+func restore_minimap179()->void:
+ visible=true
+ _layout();_terrain_valid=false;_ensure_terrain()
+ if _close_btn!=null:_close_btn.visible=expanded
+ for b in _zoom_btns:b.visible=expanded
+ queue_redraw()
 
 func _set_zoom(z: float) -> void:
  zoom = clampf(z, 0.5, 32.0)

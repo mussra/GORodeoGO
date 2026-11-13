@@ -30,6 +30,7 @@ var _flower_sample138:WorldFlowerTarget105
 var _npc_dialog:Control
 var _npc_button:Button
 var _quest_label:Label
+var _quest_details179:QuestDetails179
 var _quest_toggle:Button
 var _quest_panel:PanelContainer
 var _quests_expanded:bool=false
@@ -183,6 +184,7 @@ func _process(delta: float) -> void:
 		DecorScript.clear_spawn121(player)
 		_loading_world=false
 		visible=true
+		_map_overlay.restore_minimap179()
 		if _returning_home:
 			_returning_home=false;_home_pending=false;SaveData.save_world_state(player.position)
 		FrontierTransition.obtain(get_tree()).reveal()
@@ -1024,7 +1026,7 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"map","title":"Mapa","hint":"Exploración y encargos"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"country_saved152","title":"País guardado","hint":"Progreso separado · sin ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"country_saved152","title":"País guardado","hint":"Progreso separado · sin ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
@@ -1042,6 +1044,7 @@ func _close_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=not _edit_mode
 	_navigation=null
+	if is_instance_valid(_map_overlay):_map_overlay.restore_minimap179()
 
 func _toggle_map() -> void:
 	# Toggles collapsed <-> expanded; the small map never disappears (Ant 22:49).
@@ -1065,6 +1068,7 @@ func _open_board() -> void:
 	_board_panel.position = Vector2(390, 200)
 	_board_panel.size = Vector2(500, 240)
 	_board_panel.z_index = 50
+	DetailCard179.style_panel(_board_panel)
 	_hud.add_child(_board_panel)
 	var title := Label.new()
 	title.text = tr("WORLD_BOARD")
@@ -1076,6 +1080,7 @@ func _open_board() -> void:
 	body.size = Vector2(460, 110)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_theme_font_size_override("font_size", 18)
+	DetailCard179.reading_surface(body)
 	_board_panel.add_child(body)
 	if encargo.is_empty():
 		body.text = tr("WORLD_BOARD_NONE")
@@ -1089,6 +1094,7 @@ func _open_board() -> void:
 	close.position = Vector2(190, 180)
 	close.size = Vector2(120, 42)
 	close.pressed.connect(func(): _board_panel.queue_free())
+	QuestButtonStyle.apply(close)
 	_board_panel.add_child(close)
 
 # Compatibility name for existing callers. All map behavior lives in one shared component.
@@ -1149,12 +1155,16 @@ func _setup_npcs()->void:
 	var journal_button:=Button.new();journal_button.text="Primos";journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(902,4);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
-	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(652,56);_quest_panel.size=Vector2(610,0);_quest_panel.visible=false;_hud.add_child(_quest_panel)
-	_quest_label=Label.new();_quest_label.custom_minimum_size=Vector2(590,0);_quest_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_quest_label.add_theme_font_size_override("font_size",18);var quest_content105=VBoxContainer.new();_quest_panel.add_child(quest_content105);quest_content105.add_child(_quest_label)
+	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(652,56);_quest_panel.size=Vector2(610,490);_quest_panel.visible=false;DetailCard179.style_panel(_quest_panel);_hud.add_child(_quest_panel)
+	var quest_content105:=VBoxContainer.new();quest_content105.add_theme_constant_override("separation",12);_quest_panel.add_child(quest_content105)
+	var heading179:=Label.new();heading179.text="ENCARGOS";DetailCard179.style_body(heading179,24);heading179.add_theme_color_override("font_color",Color("f7cf7c"));quest_content105.add_child(heading179)
+	var hint179:=Label.new();hint179.text="Objetivos y recompensas · desliza para ver más";DetailCard179.style_body(hint179,18);hint179.add_theme_color_override("font_color",Color("bed0d0"));quest_content105.add_child(hint179)
+	_quest_details179=QuestDetails179.new();_quest_details179.size_flags_vertical=Control.SIZE_EXPAND_FILL;quest_content105.add_child(_quest_details179)
+	_quest_label=Label.new();_quest_label.visible=false;quest_content105.add_child(_quest_label) # Legacy text summary for read-only callers.
 	_flower_strip105=HBoxContainer.new();quest_content105.add_child(_flower_strip105)
 	_quest_toggle.pressed.connect(func():
 		_quests_expanded=not _quests_expanded;_quest_panel.visible=_quests_expanded
-		if is_instance_valid(_map_overlay) and not _map_overlay.expanded:_map_overlay.visible=not _quests_expanded
+		if is_instance_valid(_map_overlay):_map_overlay.visible=true
 		_quest_toggle.text="Encargos ▾" if _quests_expanded else "Encargos ▸")
 	_story_flower=Sprite2D.new();_story_flower.texture=DecorScript.FLOWER_TEXS[14];_story_flower.scale=Vector2.ONE*30.0/_story_flower.texture.get_height();_story_flower.visible=false;add_child(_story_flower)
 	_flower_button=Button.new();_flower_button.position=Vector2(500,520);_flower_button.size=Vector2(280,48);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
@@ -1200,6 +1210,7 @@ func _refresh_quest_hud()->void:
 	if is_instance_valid(_quest_label):
 		_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)+"\n"+RepeatContractsPanel165.summary()
 		if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():_quest_label.text+="\n"+FloristJourney138.hud(SaveData.world_flora138)
+	if is_instance_valid(_quest_details179):_quest_details179.update_states(SaveData.world_quests,SaveData.repeat_contract165,SaveData.world_flora138 if SaveData.world_generator_version>=3 else {})
 	if not is_instance_valid(_flower_strip105):return
 	var signature:int=hash(SaveData.world_quests)
 	if signature==_flower_hud_signature105:return
@@ -1245,6 +1256,7 @@ func _open_isolated_preview146(preview:Node2D)->void:
 		preview.queue_free()
 		visible=true;process_mode=prior_mode
 		if _hud!=null:_hud.visible=true
+		if is_instance_valid(_map_overlay):_map_overlay.restore_minimap179()
 		if touch!=null:touch.visible=not _edit_mode
 		if is_instance_valid(prior_camera):prior_camera.make_current())
 
@@ -1301,8 +1313,7 @@ func _tick_flowers105()->void:
 
 func _toast_top105()->float:
 	if is_instance_valid(_map_overlay) and _map_overlay.expanded:return 60.
-	var top:float=216. if is_instance_valid(_edit_panel) and _edit_panel.visible else 132.
-	if is_instance_valid(_quest_panel) and _quest_panel.visible:top=maxf(top,_quest_panel.position.y+_quest_panel.size.y+12.)
+	var top:float=216. # Below the always-visible minimap.
 	return top
 
 func _open_map_note106(pos:Vector2)->void:_map_notes159.open(pos)
@@ -1419,8 +1430,13 @@ func _show_journal140()->void:
 	player.cancel_input();player.set_physics_process(false)
 	_journal140=Panel.new();_journal140.position=Vector2(250,110);_journal140.size=Vector2(780,550);_journal140.z_index=150;_journal140.add_theme_stylebox_override("panel",RanchTheme.box(RanchTheme.INK,Color("6d9b94"),12));_hud.add_child(_journal140)
 	var scroll:=ScrollContainer.new();scroll.position=Vector2(24,24);scroll.size=Vector2(732,430);_journal140.add_child(scroll)
-	var body:=Label.new();body.text=VillageCousins140.journal(SaveData.world_cousins140);body.custom_minimum_size.x=700;body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",21);scroll.add_child(body)
-	var back:=Button.new();back.text="Cerrar diario";back.position=Vector2(230,475);back.size=Vector2(320,52);_journal140.add_child(back);back.pressed.connect(func():_journal140.queue_free();_journal140=null;player.set_physics_process(not is_instance_valid(_npc_dialog)))
+	DetailCard179.style_panel(_journal140)
+	var entries179:=VBoxContainer.new();entries179.custom_minimum_size.x=700;entries179.size_flags_horizontal=Control.SIZE_EXPAND_FILL;entries179.add_theme_constant_override("separation",12);scroll.add_child(entries179)
+	var known179:=DetailCard179.new();known179.setup("Diario de primos","Primos conocidos · %d/4"%SaveData.world_cousins140.known.size());entries179.add_child(known179)
+	for id179 in VillageCousins140.IDS:
+		if SaveData.world_cousins140.known.get(id179,false):
+			var card179:=DetailCard179.new();card179.setup(str(VillageCousins140.LABELS[id179]),VillageCousins140.clue(id179));entries179.add_child(card179)
+	var back:=Button.new();back.text="Cerrar diario";back.position=Vector2(230,475);back.size=Vector2(320,52);QuestButtonStyle.apply(back);_journal140.add_child(back);back.pressed.connect(func():_journal140.queue_free();_journal140=null;player.set_physics_process(not is_instance_valid(_npc_dialog)))
 
 func _start_country152(resume:bool=false)->bool:
 	if _country_transition152!=null and _country_transition152.busy:return false

@@ -11,7 +11,7 @@ func test_all_second_campaign_levels_have_ten_unique_bulls_and_valid_links():
 func test_old_mastery_stays_100_and_campaigns_do_not_mix_half_completions():
  var h:Dictionary={"completed_levels":range(1,21)};assert_eq(HorseMastery.percent(h),100.);assert_eq(HorseMastery.campaign_percent173(h,2),0.)
  h.completed_levels=range(21,41);assert_eq(HorseMastery.percent(h),100.);assert_eq(HorseMastery.campaign_percent173(h,1),0.)
- h.completed_levels=range(1,11)+range(21,31);assert_eq(HorseMastery.percent(h),50.)
+ h.completed_levels=range(1,11)+range(21,31);assert_eq(HorseMastery.percent(h),0.)
 func test_keys_cannot_be_bought_or_repeated_and_restore_persists_consumption():
  var c:=HorseCollection.new();c.seed_trial();assert_eq(GalaxyKeys173.available(c,19),[]);assert_eq(GalaxyKeys173.available(c,20),[20])
  assert_true(GalaxyKeys173.consume(c,20));assert_eq(GalaxyKeys173.available(c,39),[]);assert_false(GalaxyKeys173.consume(c,39));assert_eq(GalaxyKeys173.available(c,40),[40])

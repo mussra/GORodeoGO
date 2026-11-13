@@ -70,7 +70,7 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  if not proof.is_empty():child["galaxy_birth143"]=proof
  child["can_jump"]=false;child["can_dodge"]=false;child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
- return {"galaxy_keys173":galaxy_keys173.duplicate(),"galaxy_rule173":galaxy_rule173,"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
+ return {"mastery_rule179":1,"galaxy_keys173":galaxy_keys173.duplicate(),"galaxy_rule173":galaxy_rule173,"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
  if not v is Dictionary or not v.get("horses") is Array:return false
  if not v.get("training_pair",{}) is Dictionary or not v.get("affinities",{}) is Dictionary:return false
@@ -120,6 +120,9 @@ func restore(v:Variant)->bool:
   if h.get("stage","adult")=="adult":adult_id=h.id;break
  if adult_id.is_empty():return false
  galaxy_keys173.assign(raw_keys);galaxy_rule173=clampi(int(v.get("galaxy_rule173",0)),0,1)
+ if not v.has("mastery_rule179"):
+  for h in clean+clean_ancestors:
+   if not HorseMastery.levels(h).is_empty():HorseMastery.migrate179(h)
  horses=clean;ancestors=clean_ancestors;selected=str(v.get("selected",adult_id))
  if not is_adult(selected):selected=adult_id
  var offers:Variant=v.get("bought_offers",[])

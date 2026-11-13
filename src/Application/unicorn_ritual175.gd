@@ -72,7 +72,7 @@ static func prepare(c:HorseCollection,id:String,country_id:String,position:Vecto
  if h.get("species","")=="unicorn":reasons.append("Ya se transformó")
  if not c.is_adult(id):reasons.append("Necesita ser adulto")
  if not GalaxyPure143.is_pure(h):reasons.append("Necesita ser Galaxy puro de nacimiento")
- if not HorseMastery.galaxy_master(h):reasons.append("Necesita completar una campaña con esta montura")
+ if not HorseMastery.galaxy_master(h):reasons.append("Necesita superar los niveles 36-40 con esta montura")
  var source:Vector2=data.get("sites",{}).get("source",Vector2(INF,INF))
  if country_id!=CountryRoute146.ID or not source.is_finite() or not position.is_finite() or position.distance_to(source)>SOURCE_RADIUS:reasons.append("Acércate a la fuente")
  elif not data.has("island") or CountryRoute146.blocked(data,position):reasons.append("Acércate por la orilla transitable")

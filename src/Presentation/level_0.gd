@@ -66,7 +66,7 @@ func _ready() -> void:
 	_upgrades = PlayerUpgrades.for_progress(SaveData.effective_progress())
 	_apply_unlocked_upgrades()
 	if SaveData.trial_session_active:
-		var banner:=Label.new();banner.text=tr("ENSAYO AISLADO · sin premios ni guardado · equipo prestado");banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);ToastStack.backdrop(banner);hud.add_child(banner)
+		var banner:=Label.new();banner.text=tr("ENSAYO AISLADO · sin premios ni guardado · equipo prestado");banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);ToastStack.backdrop(banner);hud.add_child(banner);hud._toasts.set_top(156.)
 	_level_number = level_data.level_number
 	_arena_scale=ArenaLayout.scale_for_level(_level_number)
 	world_bounds=ArenaLayout.bounds_for_level(_level_number)

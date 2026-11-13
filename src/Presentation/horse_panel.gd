@@ -198,9 +198,9 @@ func detail_view()->void:
   if GalaxyPure143.is_pure(h):
    var pure:=Label.new();pure.name="GalaxyPureBadge143";pure.text=GalaxyPure143.BADGE+"\nDos padres Galaxy al nacer · todavía no es un unicornio";pure.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;pure.add_theme_font_size_override("font_size",22);pure.modulate=RanchTheme.GOLD;box.add_child(pure)
   var completed:=Label.new();completed.text=HorseMastery.level_text(h);completed.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;completed.add_theme_font_size_override("font_size",20);box.add_child(completed)
-  HorseStatBars.row(box,"Maestría de campaña · %d%%"%roundi(HorseMastery.percent(h)),HorseMastery.percent(h))
+  HorseStatBars.row(box,"Maestría · %d%%"%roundi(HorseMastery.percent(h)),HorseMastery.percent(h))
   if h.traits.get("finish","")=="galaxy":
-   var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: necesita %d%% de maestría de campaña"%roundi(HorseMastery.GALAXY_MASTER_THRESHOLD);galaxy.add_theme_font_size_override("font_size",20);box.add_child(galaxy)
+   var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: supera 36-40 con este caballo (%d%%)"%roundi(HorseMastery.GALAXY_MASTER_THRESHOLD);galaxy.add_theme_font_size_override("font_size",20);box.add_child(galaxy)
  for text in HorseValues.visual(t)+(HorseValues.hidden_genes(t) if owned else [])+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
   var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);box.add_child(line)
  HorseStatBars.create(box,h,owned)
