@@ -32,9 +32,11 @@ func save_now152()->bool:
  ledger=state;save_error="";return true
 func prepare_travel149()->bool:return save_now152()
 func _commit_travel148(pos:Vector2)->bool:
- var cells:=visited_cells.duplicate(true);CountryExploration148.reveal(cells,pos)
+ var cells:=visited_cells.duplicate(true)
  var next:=CountryLedger146.record_exploration(ledger,pos,cells)
- if next.is_empty() or not SaveData.store_country_ledger146(next):return false
+ if next.is_empty():return false
+ next.maps.water146.explored=travel_ledger.maps.water146.explored.duplicate(true);next.maps.water146.visited=travel_ledger.maps.water146.visited.duplicate(true)
+ if not SaveData.store_country_ledger146(next):return false
  ledger=next;player.position=pos;visited_cells=cells;camera.reset_smoothing();return true
 func request_return():
  if not activated or travelling or is_instance_valid(modal):return

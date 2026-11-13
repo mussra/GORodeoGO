@@ -1,21 +1,44 @@
 class_name SiestaCurtain147
 extends CanvasLayer
-## Shared siesta visual. The destination adapter owns state, loading and commits.
+## Shared eye transition and initial autonomous walk for all siesta adapters.
 var destination:String=""
 var horse:Dictionary={}
 var hat:String="original"
 var message:Label
 var zlabel:Label
 var clock:float=0.
+var eye:SiestaEye163
+var phase:String="idle"
+var actor:CharacterBody2D
+var route:PackedVector2Array
+var route_index:int=1
+var walking:bool=false
+var walk_blocked:bool=false
+var actor_mode:int
+var actor_input:bool
 func _ready():
  layer=220;process_mode=Node.PROCESS_MODE_ALWAYS
- var cover:=ColorRect.new();cover.color=Color("10252d");cover.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(cover)
- var image:=TextureRect.new();HorsePortrait.apply_horse(image,horse,hat);image.position=Vector2(480,200);image.size=Vector2(320,320);cover.add_child(image)
- zlabel=Label.new();zlabel.text="Z z z";zlabel.add_theme_font_size_override("font_size",42);zlabel.position=Vector2(780,190);cover.add_child(zlabel)
- message=Label.new();message.text="Una siesta rumbo a "+destination;message.position=Vector2(120,550);message.size.x=1040;message.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;message.add_theme_font_size_override("font_size",28);cover.add_child(message)
- var fit:Callable=func():
-  var size_:Vector2=get_viewport().get_visible_rect().size;var k:float=minf(size_.x/1280.,size_.y/720.);image.scale=Vector2.ONE*k;image.position=(size_-Vector2(320,320)*k)/2.;zlabel.position=image.position+Vector2(300,-20)*k;message.position=Vector2(20,size_.y*.80);message.size.x=size_.x-40
- cover.resized.connect(fit);fit.call()
-func _process(delta:float):
+ eye=SiestaEye163.new();eye.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);eye.mouse_filter=Control.MOUSE_FILTER_STOP;add_child(eye)
+ message=Label.new();message.text="Una siesta rumbo a "+destination;message.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;message.add_theme_font_size_override("font_size",24);message.visible=false;eye.add_child(message)
+ zlabel=Label.new();zlabel.text="";zlabel.visible=false;eye.add_child(zlabel)
+ var fit:Callable=func():message.position=Vector2(20,eye.size.y*.7);message.size.x=eye.size.x-40;eye.queue_redraw()
+ eye.resized.connect(fit);fit.call()
+func close_eye(player:CharacterBody2D,path:PackedVector2Array)->bool:
+ actor=player;actor_mode=actor.process_mode;actor_input=actor.is_processing_input();actor.process_mode=Node.PROCESS_MODE_ALWAYS;actor.set_process_input(false);_aperture(1.);route=path;phase="closing";walking=true;walk_blocked=false;route_index=1
+ var tween:=create_tween();tween.tween_method(_aperture,1.,0.,1.);await tween.finished
+ walking=false;actor.velocity=Vector2.ZERO;actor._update_animation(0.);phase="covered";return not walk_blocked
+func open_eye()->void:
+ phase="opening";message.visible=false
+ var tween:=create_tween();tween.tween_method(_aperture,0.,1.,1.);await tween.finished;phase="done"
+ if is_instance_valid(actor):actor.process_mode=actor_mode;actor.set_process_input(actor_input)
+func _aperture(value:float)->void:eye.aperture=value;eye.queue_redraw()
+func _physics_process(delta:float):
  clock+=delta
- if is_instance_valid(zlabel):zlabel.modulate.a=.55+.45*sin(clock*4.);zlabel.rotation=sin(clock*2.)*.08
+ if not walking or not is_instance_valid(actor):return
+ while route_index<route.size() and actor.position.distance_to(route[route_index])<3.:route_index+=1
+ if route_index>=route.size():walking=false;return
+ var direction:Vector2=actor.position.direction_to(route[route_index]);var speed:float=minf(90.,actor.max_speed*.35)
+ var motion:Vector2=direction*minf(speed*delta,actor.position.distance_to(route[route_index]))
+ actor.gait=WorldGait.PASO;actor.velocity=direction*speed
+ if actor.move_and_collide(motion)!=null:walk_blocked=true;walking=false;actor.velocity=Vector2.ZERO
+ actor._update_animation(delta)

@@ -25,6 +25,7 @@ var curtain:SiestaCurtain147
 var tree_sprite155:Sprite2D
 var gauges154:Dictionary={}
 var stamina154:Dictionary={}
+var partial_route163:Dictionary={}
 var map_button:Button
 var _map_overlay:CountryMap148
 var _map_notes159:MapNotesController159
@@ -176,13 +177,21 @@ func start_siesta(id:String,already_locked:bool=false)->bool:
   if already_locked:_unlock_player()
   return false
  if not already_locked:_lock_player()
+ partial_route163=SiestaRoute163.country(player.position,target.pos,data,visited_cells)
+ if partial_route163.is_empty():
+  last_error="No hay una ruta conocida y segura, o queda muy poco camino. Continúa explorando a caballo.";_unlock_player();return false
+ target=target.duplicate(true);target.pos=partial_route163.pos
  travelling=true;travel_target=target;travel_origin=player.position;travel_ledger=ledger.duplicate(true)
  curtain=SiestaCurtain147.new();curtain.destination=target.name;curtain.horse=SaveData.horse_collection.find(SaveData.horse_collection.selected);curtain.hat=SaveData.hat_color;add_child(curtain)
- await get_tree().create_timer(.65,true).timeout
+ player.cancel_input()
+ var walking_ok:bool=await curtain.close_eye(player,partial_route163.path)
+ if not walking_ok:
+  player.position=travel_origin;camera.reset_smoothing();last_error="El paso está bloqueado. Sigues en el origen."
+  await curtain.open_eye();curtain.queue_free();curtain=null;travelling=false;_unlock_player();return false
  transaction=TravelTransaction147.new();var result:=await transaction.run(_load_travel148,_validate_travel148,_commit_travel148,_restore_travel148)
  if not result.ok:last_error="No se pudo guardar la llegada. Sigues en el origen." if result.reason=="save" else "No hay llegada libre. Sigues en el origen."
- curtain.message.text="Has llegado a "+str(target.name) if result.ok else last_error
- await get_tree().create_timer(.35,true).timeout
+ curtain.message.text="Has avanzado media ruta hacia "+str(target.name) if result.ok else last_error
+ await curtain.open_eye()
  curtain.queue_free();curtain=null;travelling=false;_unlock_player();return result.ok
 func _load_travel148()->bool:
  await get_tree().process_frame;await get_tree().process_frame;return true
@@ -211,11 +220,12 @@ func landing155(requested:Vector2)->Vector2:
   if result.is_finite():return result
  return Vector2(INF,INF)
 func _validate_travel148()->Vector2:
- return TravelLanding148.find(player,travel_target.pos,func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos))
+ return TravelLanding148.find(player,travel_target.pos,func(pos:Vector2)->bool:return CountryRoute146.blocked(data,pos) or (not partial_route163.is_empty() and not partial_route163.allowed.call(pos)))
 func _commit_travel148(pos:Vector2)->bool:
  var next:=CountryLedger146.record_position(ledger,pos)
  if next.is_empty():return false
- player.position=pos;ledger=next;CountryExploration148.reveal(visited_cells,pos);camera.reset_smoothing();return true
+ next.maps.water146.explored=travel_ledger.maps.water146.explored.duplicate(true);next.maps.water146.visited=travel_ledger.maps.water146.visited.duplicate(true)
+ player.position=pos;ledger=next;camera.reset_smoothing();return true
 func _restore_travel148()->bool:
  player.position=travel_origin;ledger=travel_ledger.duplicate(true);camera.reset_smoothing();return true
 func _unhandled_input(event:InputEvent):

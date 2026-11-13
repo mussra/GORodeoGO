@@ -13,10 +13,14 @@ func load_session()->bool:
 func validate()->Vector2:return TravelLanding148.find(session.player,session.ledger.maps.water146.position,func(pos):return CountryRoute146.blocked(session.data,pos))
 func restore()->bool:restored+=1;return true
 func enter()->Dictionary:return await transition.enter152(session,SaveData.world_position,load_session,validate,restore)
+func know_route163():
+ for path in [session.data.approach,session.data.upstream]:
+  for i in range(1,path.size()):
+   for j in ceili(path[i-1].distance_to(path[i])/200.)+1:CountryExploration148.reveal(session.visited_cells,path[i-1].move_toward(path[i],j*200.))
 func test_entry_save_walk_reload_and_local_siesta_never_modify_original_world():
  var result:=await enter();assert_true(result.ok);assert_true(session.activated);session.player.set_physics_process(false)
- var data:=session.data;session.player.position=data.sites.source;session._process(0.);assert_true(session.save_now152());var saved:=SaveData.country_ledger146.duplicate(true);assert_eq(SaveData.world_position,Vector2(999,470));assert_eq(SaveData.world_discovered,["0,0"]);assert_eq(SaveData.world_missions,{"original":"done"})
- SaveData.load_progress();assert_eq(SaveData.country_ledger146,saved);assert_true(await session.start_siesta("entry"));assert_eq(SaveData.country_ledger146.maps.water146.position,data.entry);SaveData.load_progress();assert_eq(SaveData.country_ledger146.maps.water146.position,data.entry)
+ know_route163();var data:=session.data;session.player.position=data.sites.source;session._process(0.);assert_true(session.save_now152());var saved:=SaveData.country_ledger146.duplicate(true);assert_eq(SaveData.world_position,Vector2(999,470));assert_eq(SaveData.world_discovered,["0,0"]);assert_eq(SaveData.world_missions,{"original":"done"})
+ SaveData.load_progress();assert_eq(SaveData.country_ledger146,saved);var target:=SiestaRoute163.country(session.player.position,data.entry,data,session.visited_cells);assert_true(await session.start_siesta("entry"));assert_lt(SaveData.country_ledger146.maps.water146.position.distance_to(target.pos),100.);var reached:Vector2=session.player.position;SaveData.load_progress();assert_eq(SaveData.country_ledger146.maps.water146.position,reached)
 func test_new_entry_load_and_save_failure_leave_disk_on_original_country():
  var before:=FileAccess.get_file_as_bytes(SaveData.save_path)
  var result:=await transition.enter152(session,SaveData.world_position,func():return false,func():return Vector2.ZERO,restore)
@@ -27,7 +31,7 @@ func test_blocked_initial_landing_does_not_commit_or_activate():
  var result:=await transition.enter152(session,SaveData.world_position,load_session,func():return Vector2(INF,INF),restore)
  assert_false(result.ok);assert_false(session.activated);assert_eq(SaveData.country_ledger146,{});assert_eq(restored,1)
 func test_failed_siesta_destination_save_restores_origin_both_in_memory_and_disk():
- assert_true((await enter()).ok);session.player.set_physics_process(false);session.player.position=session.data.sites.source;session._process(0.);assert_true(session.save_now152());assert_true(await session.start_siesta("entry"));var origin:Vector2=session.player.position
+ assert_true((await enter()).ok);know_route163();session.player.set_physics_process(false);session.player.position=session.data.sites.source;session._process(0.);assert_true(session.save_now152());assert_true(await session.start_siesta("entry"));var origin:Vector2=session.player.position
  var fail:=get_tree().create_timer(.25,true);fail.timeout.connect(func():SaveData._load_valid=false)
  assert_false(await session.start_siesta("source"));assert_eq(session.player.position,origin);assert_eq(SaveData.country_ledger146.maps.water146.position,origin);var config:=ConfigFile.new();assert_eq(config.load(SaveData.save_path),OK);assert_eq(config.get_value("world","countries146").maps.water146.position,origin)
 func test_exit_validates_original_arrival_then_atomically_changes_active_map_and_position():

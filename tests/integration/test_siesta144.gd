@@ -1,13 +1,17 @@
 extends GutTest
 var world:Node2D
 func before_each():
- SaveData.save_path="user://siesta144.dat";SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_edits=[];SaveData.world_flora138={};SaveData.world_cousins140={};SaveData.world_places144={};SaveData.world_discovered=[];SaveData.world_roaming139={};SaveData.world_tamed=[];SaveData.world_missions={};SaveData.world_quests={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.world_position=WorldNominal98.home()
+ SaveData.save_path="user://siesta144.dat";SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_edits=[];SaveData.world_flora138={};SaveData.world_cousins140={};SaveData.world_places144={};SaveData.world_discovered=[];SaveData.world_roaming139={};SaveData.world_tamed=[];SaveData.world_missions={};SaveData.world_quests={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.country_ledger146={};SaveData.world_position=WorldNominal98.home()
  world=load("res://src/Presentation/frontier_world.gd").new();add_child(world)
  while world._loading_world:await get_tree().process_frame
  world.set_process(false);world.set_physics_process(false);world.player.set_physics_process(false);world._travel144.record_visits()
 func after_each():
  get_tree().paused=false;world.free();await get_tree().process_frame;DirAccess.remove_absolute(SaveData.save_path)
 func unlock(id:String):
+ for x in range(-8,15):
+  for y in range(-1,2):
+   var key:=WorldMap.chunk_key(x,y)
+   if not SaveData.world_discovered.has(key):SaveData.world_discovered.append(key)
  var state:=WorldPlaces144.clean(SaveData.world_places144,SaveData.world_seed,3);state.visited[id]=true;assert_true(SaveData.commit_places144(state,world.player.position))
 func test_visit_not_chunk_discovery_and_persistence():
  assert_eq(world._travel144.available().map(func(s):return s.id),["ranch"])
@@ -21,12 +25,13 @@ func test_no_capture_release_and_no_unknown_destination():
 func test_real_round_trip_preserves_quests_mount_and_no_intermediate_discovery():
  unlock("east138");var site:Dictionary=world._travel144.candidates()[1];var origin:Vector2=world.player.position
  var horses:=SaveData.horse_collection.export_state();var quests:Dictionary=SaveData.world_quests.duplicate(true)
- assert_true(await world._travel144.start("east138"));assert_lt(world.player.position.distance_to(site.pos),100.);assert_false(get_tree().paused);assert_false(world._travel144.active)
- var saved:=ConfigFile.new();assert_eq(saved.load(SaveData.save_path),OK);assert_lt((saved.get_value("world","position") as Vector2).distance_to(site.pos),100.);assert_eq(SaveData.horse_collection.export_state(),horses);assert_eq(SaveData.world_quests,quests)
- assert_true(await world._travel144.start("ranch"));assert_lt(world.player.position.distance_to(origin),100.)
+ var expected:=SiestaRoute163.frontier(origin,site.pos);assert_false(expected.is_empty());var discovered:=SaveData.world_discovered.duplicate()
+ assert_true(await world._travel144.start("east138"));assert_lt(world.player.position.distance_to(expected.pos),100.);assert_gt(world.player.position.distance_to(site.pos),120.);assert_eq(SaveData.world_discovered,discovered);assert_false(get_tree().paused);assert_false(world._travel144.active)
+ var saved:=ConfigFile.new();assert_eq(saved.load(SaveData.save_path),OK);assert_lt((saved.get_value("world","position") as Vector2).distance_to(expected.pos),100.);assert_eq(SaveData.horse_collection.export_state(),horses);assert_eq(SaveData.world_quests,quests)
+ var back:=SiestaRoute163.frontier(world.player.position,origin);assert_true(await world._travel144.start("ranch"));assert_lt(world.player.position.distance_to(back.pos),100.)
 func test_failed_origin_save_does_not_move_or_pause():
- var path:String=SaveData.save_path;SaveData.save_path="user://missing144/save.dat";var origin:Vector2=world.player.position
- assert_false(await world._travel144.start("ranch"));assert_push_error_count(1);assert_eq(world.player.position,origin);assert_false(get_tree().paused);SaveData.save_path=path
+ unlock("east138");var path:String=SaveData.save_path;SaveData.save_path="user://missing144/save.dat";var origin:Vector2=world.player.position
+ assert_false(await world._travel144.start("east138"));assert_push_error_count(1);assert_eq(world.player.position,origin);assert_false(get_tree().paused);SaveData.save_path=path
 func test_destination_save_failure_rolls_back_origin():
  unlock("east138");var origin:Vector2=world.player.position
  # Origin save succeeds, then final arrival save is made unavailable during the cover.
@@ -58,7 +63,7 @@ func test_travel_rejects_ongoing_transitions_and_records_save_failure_atomically
  world._travel144.active=true;assert_false(await world._travel144.start("ranch"));world._travel144.active=false
 func test_blocked_destination_returns_to_saved_origin_without_unlocking_route():
  unlock("east138");var origin:Vector2=world.player.position;var site:Dictionary=world._travel144.candidates()[1]
- var blocker:=StaticBody2D.new();blocker.collision_layer=world.player.collision_mask;var shape:=CollisionShape2D.new();var rectangle:=RectangleShape2D.new();rectangle.size=Vector2(500,500);shape.shape=rectangle;blocker.add_child(shape);world.add_child(blocker);blocker.position=site.pos
+ var blocker:=StaticBody2D.new();blocker.collision_layer=world.player.collision_mask;var shape:=CollisionShape2D.new();var rectangle:=RectangleShape2D.new();rectangle.size=Vector2(500,500);shape.shape=rectangle;blocker.add_child(shape);world.add_child(blocker);blocker.position=SiestaRoute163.frontier(origin,site.pos).pos
  await get_tree().physics_frame
  assert_false(await world._travel144.start("east138"));assert_true(world._travel144.rollback);assert_eq(world.player.position,origin);assert_false(get_tree().paused)
  var saved:=ConfigFile.new();assert_eq(saved.load(SaveData.save_path),OK);assert_eq(saved.get_value("world","position"),origin)

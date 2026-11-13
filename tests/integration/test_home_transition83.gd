@@ -1,14 +1,15 @@
 extends GutTest
 func _check_home(version:int):
- SaveData.save_path="user://home148-regression.dat";SaveData._load_valid=true;SaveData.world_places144={};SaveData.world_generator_version=version;SaveData.trial_session_active=false;SaveData.horse_collection.seed_trial();SaveData.world_quests={};SaveData.world_seed=752026;SaveData.world_position=Vector2(14000,160);SaveData.world_discovered=[]
+ SaveData.country_ledger146={};SaveData.save_path="user://home148-regression.dat";SaveData._load_valid=true;SaveData.world_places144={};SaveData.world_generator_version=version;SaveData.trial_session_active=false;SaveData.horse_collection.seed_trial();SaveData.world_quests={};SaveData.world_seed=752026;SaveData.world_position=Vector2(14000,160);SaveData.world_discovered=[]
  var world=load("res://src/Presentation/frontier_world.tscn").instantiate();add_child_autofree(world)
  while world._loading_world or get_tree().root.get_node_or_null("FrontierTransition")!=null:await wait_process_frames(1)
  var previous=SaveData.world_discovered.duplicate()
  world._home()
  # Since144 home is an explicit siesta confirmation, not an immediate teleport.
  assert_not_null(world._travel144.panel);assert_eq(world.player.position,Vector2(14000,160));world._travel144.close_confirmation()
- assert_true(await world._travel144.start("ranch"))
- assert_lt(world.player.position.distance_to(WorldNominal98.home() if version>=2 else world.HOME_POS),.01)
+ # An old distant save has no known connecting route. Siesta may not explore it.
+ assert_false(await world._travel144.start("ranch"))
+ assert_eq(world.player.position,Vector2(14000,160))
  assert_eq(world.player.velocity,Vector2.ZERO)
  assert_false(world._loading_world);assert_true(world.visible)
  var added=0
