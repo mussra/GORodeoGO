@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "source_box": [
+      55,
+      218,
+      298,
+      782
+    ],
+    "assigned_view": null,
+    "approved": false
+  },
+  {
+    "id": 2,
+    "source_box": [
+      390,
+      218,
+      610,
+      782
+    ],
+    "assigned_view": null,
+    "approved": false
+  },
+  {
+    "id": 3,
+    "source_box": [
+      678,
+      220,
+      910,
+      782
+    ],
+    "assigned_view": null,
+    "approved": false
+  },
+  {
+    "id": 4,
+    "source_box": [
+      984,
+      222,
+      1200,
+      780
+    ],
+    "assigned_view": null,
+    "approved": false
+  },
+  {
+    "id": 5,
+    "source_box": [
+      1267,
+      218,
+      1490,
+      782
+    ],
+    "assigned_view": null,
+    "approved": false
+  }
+]
