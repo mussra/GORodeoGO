@@ -9,3 +9,11 @@ static func apply(button:Button):
  for state in ["font_color","font_hover_color","font_pressed_color"]:button.add_theme_color_override(state,Color("342313"))
  button.add_theme_font_size_override("font_size",20)
  var focus=RanchTheme.box(Color(1,1,1,.05),Color("fff1d2"),10);focus.set_border_width_all(3);button.add_theme_stylebox_override("focus",focus)
+
+static func contextual180(button:Button)->void:
+ apply(button)
+ button.add_theme_font_size_override("font_size",22)
+ button.custom_minimum_size=Vector2(330,56)
+ button.size=button.size.max(button.custom_minimum_size)
+ # The same gold face, focus ring and pressed state as the rest of the HUD.
+ button.mouse_filter=Control.MOUSE_FILTER_STOP

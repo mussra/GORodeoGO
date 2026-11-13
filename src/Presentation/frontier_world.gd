@@ -180,6 +180,7 @@ func _process(delta: float) -> void:
 	_drain_chunk_builds()
 	if _loading_world:
 		if not _build_queue.is_empty():return
+		if is_instance_valid(_flora_layer138) and not _flora_layer138.visible_ready180():return
 		WorldFence.clear_spawn(player)
 		DecorScript.clear_spawn121(player)
 		_loading_world=false
@@ -862,10 +863,10 @@ func _toggle_edit() -> void:
 
 func _open_edit_palette() -> void:
 	if is_instance_valid(_edit_panel):_edit_panel.queue_free()
-	_edit_panel=Panel.new();_edit_panel.position=Vector2(20,56);_edit_panel.size=Vector2(600,74);_edit_panel.z_index=40;_hud.add_child(_edit_panel)
+	_edit_panel=Panel.new();_edit_panel.position=Vector2(220,56);_edit_panel.size=Vector2(600,74);_edit_panel.z_index=40;_hud.add_child(_edit_panel)
 	var tool_label:=Label.new();tool_label.text="Editor · "+_edit_tool;tool_label.position=Vector2(18,22);_edit_panel.add_child(tool_label)
-	var choose:=Button.new();choose.text="Herramientas";choose.position=Vector2(230,12);choose.size=Vector2(205,50);choose.pressed.connect(_open_edit_tools);_edit_panel.add_child(choose)
-	var close:=Button.new();close.text="Terminar";close.position=Vector2(450,12);close.size=Vector2(135,50);close.pressed.connect(_toggle_edit);_edit_panel.add_child(close)
+	var choose:=Button.new();choose.text="Herramientas";choose.position=Vector2(230,12);choose.size=Vector2(205,50);QuestButtonStyle.apply(choose);choose.pressed.connect(_open_edit_tools);_edit_panel.add_child(choose)
+	var close:=Button.new();close.text="Terminar";close.position=Vector2(450,12);close.size=Vector2(135,50);QuestButtonStyle.apply(close);close.pressed.connect(_toggle_edit);_edit_panel.add_child(close)
 func _open_edit_tools()->void:
 	var drawer:=FilterDrawer.new();drawer.title="Editor · herramientas";drawer.show_clear=false;drawer.confirm_text="Seguir editando";_hud.add_child(drawer)
 	var tools_:Array=[["tree","WORLD_DECOR_TREE"],["pine","WORLD_DECOR_PINE"],["fruit_tree","WORLD_DECOR_FRUIT"],["bush","WORLD_DECOR_BUSH"],["rock","WORLD_DECOR_ROCK"],["cactus","WORLD_DECOR_CACTUS"],["flower","WORLD_DECOR_FLOWER"],["pigs","WORLD_EDIT_PIGS"],["erase","WORLD_ERASE"]]
@@ -966,8 +967,9 @@ func _build_hud() -> void:
 	_hud.add_child(_toasts)
 	_board_button = Button.new()
 	_board_button.text = tr("WORLD_BOARD")
-	_board_button.position = Vector2(510, 640)
-	_board_button.size = Vector2(260, 46)
+	_board_button.position = Vector2(475, 632)
+	_board_button.size = Vector2(330, 56)
+	QuestButtonStyle.contextual180(_board_button)
 	_board_button.visible = false
 	_board_button.pressed.connect(_open_board)
 	_hud.add_child(_board_button)
@@ -1150,9 +1152,9 @@ func _setup_npcs()->void:
 	for data in _npcs98():
 		if data.id=="farmer":
 			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
-	_npc_button=Button.new();_npc_button.position=Vector2(510,580);_npc_button.size=Vector2(260,48);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
+	_npc_button=Button.new();_npc_button.position=Vector2(475,566);_npc_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_npc_button);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
 	_npc_button.pressed.connect(func():_open_npc(_nearest_npc105()))
-	var journal_button:=Button.new();journal_button.text="Primos";journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
+	var journal_button:=Button.new();journal_button.name="CousinJournal180";journal_button.text="Primos";QuestButtonStyle.apply(journal_button);journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(902,4);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
 	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(652,56);_quest_panel.size=Vector2(610,490);_quest_panel.visible=false;DetailCard179.style_panel(_quest_panel);_hud.add_child(_quest_panel)
@@ -1167,7 +1169,7 @@ func _setup_npcs()->void:
 		if is_instance_valid(_map_overlay):_map_overlay.visible=true
 		_quest_toggle.text="Encargos ▾" if _quests_expanded else "Encargos ▸")
 	_story_flower=Sprite2D.new();_story_flower.texture=DecorScript.FLOWER_TEXS[14];_story_flower.scale=Vector2.ONE*30.0/_story_flower.texture.get_height();_story_flower.visible=false;add_child(_story_flower)
-	_flower_button=Button.new();_flower_button.position=Vector2(500,520);_flower_button.size=Vector2(280,48);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
+	_flower_button=Button.new();_flower_button.position=Vector2(475,500);_flower_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_flower_button);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)
 func _open_npc(data:Dictionary)->void:
 	if data.has("cousin140"):_open_cousin140(str(data.cousin140));return
@@ -1461,7 +1463,7 @@ func _start_country152(resume:bool=false)->bool:
 			var controls:Node=get_node_or_null("TouchControls")
 			if controls!=null:controls.visible=false
 			cover.message.text="No se pudo reabrir el país. Su progreso sigue guardado."
-			var back:=Button.new();back.text="Menú principal";back.position=Vector2(20,20);back.size=Vector2(260,60);cover.add_child(back);back.pressed.connect(func():get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn"))
+			var back:=Button.new();back.text="Menú principal";back.position=Vector2(20,20);back.size=Vector2(260,60);QuestButtonStyle.apply(back);cover.add_child(back);back.pressed.connect(func():get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn"))
 		else:cover.queue_free();_toast("No se pudo abrir el país. El origen sigue guardado.")
 		return false
 	cover.queue_free()

@@ -20,33 +20,59 @@ func _ready()->void:
 func _exit_tree()->void:
  if is_instance_valid(remote):remote.queue_free()
  if is_instance_valid(gardens):gardens.queue_free()
+const PRELOAD180:float=640.
+const RETAIN180:float=1152.
+const LOOKAHEAD180:float=2.
+var visible_tiles180:Dictionary={}
+var plan_ready180:bool=false
+func _camera_rect180()->Rect2:
+ var camera:Camera2D=get_viewport().get_camera_2d()
+ var zoom:Vector2=camera.zoom if camera!=null else Vector2.ONE
+ var center:Vector2=camera.get_screen_center_position() if camera!=null else world.player.position
+ return Rect2(center-get_viewport_rect().size/zoom/2.,get_viewport_rect().size/zoom)
+func _field_tiles180(rect:Rect2)->Dictionary:
+ var result:Dictionary={}
+ var low:=Vector2i((rect.position/TILE).floor());var high:=Vector2i((rect.end/TILE).floor())
+ for x in range(low.x,high.x+1):
+  for y in range(low.y,high.y+1):
+   var c:=Vector2i(x,y);var bounds:=Rect2(Vector2(c)*TILE,Vector2.ONE*TILE)
+   for f in descriptors:
+    if (f.rect as Rect2).grow(150.).intersects(bounds):result[c]=true;break
+ return result
+func visible_ready180()->bool:
+ if not plan_ready180:return false
+ for c in visible_tiles180:
+  if not tiles.has(c):return false
+ return true
 func _process(_delta:float)->void:
  if SaveData.world_flora138.is_empty() or not is_instance_valid(world.player):return
- var center:Vector2i=Vector2i((world.player.position/TILE).floor())
- var camera:Camera2D=get_viewport().get_camera_2d();var zoom:Vector2=camera.zoom if camera!=null else Vector2.ONE
- var signature:int=hash([center,SaveData.world_flora138.fields,get_viewport_rect().size,zoom])
+ var rect:=_camera_rect180();var motion:Vector2=(world.player.velocity*LOOKAHEAD180).limit_length(1024.)
+ var ahead:Rect2=rect.grow(PRELOAD180).merge(Rect2(rect.position+motion,rect.size).grow(PRELOAD180))
+ var fs:int=hash(SaveData.world_flora138.fields)
+ var signature:int=hash([Vector2i((ahead.position/TILE).floor()),Vector2i((ahead.end/TILE).floor()),Vector2i((rect.position/TILE).floor()),Vector2i((rect.end/TILE).floor()),fs])
  if signature!=last_signature:
-  last_signature=signature;descriptors=FloristJourney138.descriptors(SaveData.world_flora138,SaveData.world_seed)
-  var fs:int=hash(SaveData.world_flora138.fields)
+  last_signature=signature
   if field_signature!=fs:
+   descriptors=FloristJourney138.descriptors(SaveData.world_flora138,SaveData.world_seed)
+   for field in descriptors:field["polygon180"]=FloristJourney138.boundary(field)
    for node in tiles.values():node.queue_free()
    tiles.clear();field_signature=fs
-  pending.clear();desired.clear()
-  var half:Vector2=get_viewport_rect().size/zoom/2.+Vector2.ONE*80.
-  var low:Vector2i=Vector2i(((world.player.position-half)/TILE).floor());var high:Vector2i=Vector2i(((world.player.position+half)/TILE).floor())
-  for x in range(low.x,high.x+1):
-   for y in range(low.y,high.y+1):
-    var c:=Vector2i(x,y);var bounds:=Rect2(Vector2(c)*TILE,Vector2.ONE*TILE)
-    for f in descriptors:
-     if (f.rect as Rect2).grow(150.).intersects(bounds):desired[c]=true;break
+  visible_tiles180=_field_tiles180(rect.grow(40.));desired=_field_tiles180(ahead)
+  var retain:=rect.grow(RETAIN180).merge(ahead)
   for old in tiles.keys():
-   if not desired.has(old):tiles[old].queue_free();tiles.erase(old)
+   if not retain.intersects(Rect2(Vector2(old)*TILE,Vector2.ONE*TILE)):tiles[old].queue_free();tiles.erase(old)
+  pending.clear()
   for c in desired:
    if not tiles.has(c):pending.append(c)
-  pending.sort_custom(func(a,b):return a.distance_squared_to(center)<b.distance_squared_to(center))
- # At most one512px tile is generated per rendered frame, no full-field scan.
- if not pending.is_empty():
-  var c:Vector2i=pending.pop_front();var start:int=Time.get_ticks_usec();var node:Node2D=_tile(c);tile_build_usec=maxi(tile_build_usec,Time.get_ticks_usec()-start);add_child(node);tiles[c]=node
+  var center:=Vector2i((rect.get_center()/TILE).floor())
+  pending.sort_custom(func(a,b):
+   if visible_tiles180.has(a)!=visible_tiles180.has(b):return visible_tiles180.has(a)
+   return a.distance_squared_to(center)<b.distance_squared_to(center))
+  plan_ready180=true
+ # Bounded work, performed ahead of the camera. Startup waits for visible tiles.
+ var started:int=Time.get_ticks_usec();var built:int=0
+ while not pending.is_empty() and built<2 and Time.get_ticks_usec()-started<3000:
+  var c:Vector2i=pending.pop_front();var start:int=Time.get_ticks_usec();var node:Node2D=_tile(c);tile_build_usec=maxi(tile_build_usec,Time.get_ticks_usec()-start);add_child(node);tiles[c]=node;built+=1
  _remote_tick()
 func _tile(c:Vector2i)->Node2D:
  var root:=Node2D.new();root.position=Vector2(c)*TILE;var bounds:=Rect2(root.position,Vector2.ONE*TILE)
@@ -57,7 +83,7 @@ func _tile(c:Vector2i)->Node2D:
   if edit.get("pos") is Vector2 and bounds.grow(90).has_point(edit.pos):edited.append(edit.pos)
  for field in descriptors:
   if not (field.rect as Rect2).grow(150.).intersects(bounds):continue
-  var polygon:PackedVector2Array=FloristJourney138.boundary(field);var rng=RandomNumberGenerator.new();rng.seed=hash(str(field.seed)+str(c))
+  var polygon:PackedVector2Array=field.get("polygon180",PackedVector2Array());var rng=RandomNumberGenerator.new();rng.seed=hash(str(field.seed)+str(c))
   var points:Array=[]
   var step:int=29 if not field.planted else 28
   for x in range(0,TILE,step):
@@ -78,7 +104,7 @@ func _tile(c:Vector2i)->Node2D:
   var mm:=MultiMesh.new();mm.transform_format=MultiMesh.TRANSFORM_2D;mm.mesh=mesh;mm.instance_count=points.size()
   for i in points.size():
    var h:float=points[i][1];var w:float=h*tex.get_width()/tex.get_height()
-   mm.set_instance_transform_2d(i,Transform2D(Vector2(w,0),Vector2(0,h),points[i][0]-Vector2(0,h/2.)))
+   mm.set_instance_transform_2d(i,Transform2D(Vector2(w,0),Vector2(0,-h),points[i][0]-Vector2(0,h/2.)))
   var batch:=MultiMeshInstance2D.new();batch.multimesh=mm;batch.texture=tex;root.add_child(batch);built_flower_count+=points.size()
  return root
 func _reserved(pos:Vector2,edited:Array)->bool:

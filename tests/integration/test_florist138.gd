@@ -64,7 +64,7 @@ func test_crops_access_destination_and_camera_tile_retention():
  await settle_at(FloristJourney138.sample_point(state,"red")+Vector2(50,0))
  var layer=world._flora_layer138
  for i in 25:layer._process(.016)
- assert_lte(layer.tiles.size(),20)
+ assert_lte(layer.tiles.size(),96) # Bounded preload and retention rings, no full-field render.
  var previous:Dictionary=layer.tiles.duplicate();world.player.position+=Vector2(512,0);layer._process(.016)
  var shared:int=0
  for key in previous:
@@ -105,3 +105,18 @@ func test_follow_continuous_real_road_from_origin_to_destination_and_fields():
    world.player.position=p
    assert_false(world.player.test_move(world.player.global_transform,(goal-start).normalized()*4.),"Field spur clear")
    assert_true(world._get_surface98().contains(p,0.),"Field guidance follows actual path")
+
+func test_initial_field_is_ready_before_world_is_revealed_and_batches_stay_upright():
+ SaveData.world_flora138=FloristJourney138.fresh([])
+ SaveData.world_position=FloristJourney138.field_rect(SaveData.world_flora138,"red").get_center()
+ await create_world()
+ var layer:FlowerExpansion138=world._flora_layer138
+ assert_true(layer.visible_ready180());assert_true(world.visible)
+ for c in layer.visible_tiles180:assert_true(layer.tiles.has(c))
+ var batches:int=0
+ for tile in layer.tiles.values():
+  for batch in tile.get_children():
+   if batch.multimesh.instance_count>0:
+    batches+=1
+    if DisplayServer.get_name()!="headless":assert_lt(batch.multimesh.get_instance_transform_2d(0).y.y,0.,"QuadMesh UV correction keeps petals above leaves")
+ assert_gt(batches,0)
