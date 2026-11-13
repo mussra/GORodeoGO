@@ -49,7 +49,7 @@ func test_victory_repeats_purchase_equip_reload_and_player_effect()->void:
  assert_true(level.player.dodge_available)
  assert_eq(level.player.dodge_path_limit,420.0)
  var panel:=EquipmentPanel.new();add_child(panel)
- assert_eq(panel._equip["whip_long"].text,"EQUIPADA")
+ assert_eq(panel._equip["whip_long"].text,tr("UI_061"))
  assert_true(panel._equip["whip_long"].disabled)
  panel.free();level.free()
 func test_new_profile_gets_ten_points_first_win_and_only_next_level()->void:

@@ -290,8 +290,8 @@ func _end_lasso() -> void:
 ## The shared controller resolved a capture: start the hold session (trust
 ## fills while the animal is held in place; it flees/spooks when the hold ends).
 func _on_lasso_prey_captured(prey: Node2D) -> void:
-	if prey.get_script()==PigScript and not NpcQuests.can_capture(SaveData.world_quests,"pig"):return
-	if prey.get_script()==GoatScript and not NpcQuests.can_capture(SaveData.world_quests,"goat"):return
+	if prey.get_script()==PigScript and not SaveData.can_capture_animal165("pig"):return
+	if prey.get_script()==GoatScript and not SaveData.can_capture_animal165("goat"):return
 	_lasso_horse = prey
 	prey.roped = true
 	prey.rider = player
@@ -784,7 +784,7 @@ func _tick_pigs(delta: float) -> void:
 				else:
 					st = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
 				pig.state = st
-			if WorldPigs.captured(st) and NpcQuests.can_capture(SaveData.world_quests,"pig"):
+			if WorldPigs.captured(st) and SaveData.can_capture_animal165("pig"):
 				if pig == _lasso_horse:
 					_end_lasso()
 				_audio.play("return")
@@ -1002,8 +1002,8 @@ func _build_hud() -> void:
 		for key in _herd_horses:
 			if is_instance_valid(_herd_horses[key]):
 				out.append(_herd_horses[key])
-		if NpcQuests.can_capture(SaveData.world_quests,"pig"):out.append_array(_lasso_pigs())
-		if NpcQuests.can_capture(SaveData.world_quests,"goat"):out.append_array(_prototype_goats.get_children())
+		if SaveData.can_capture_animal165("pig"):out.append_array(_lasso_pigs())
+		if SaveData.can_capture_animal165("goat"):out.append_array(_prototype_goats.get_children())
 		return out
 	player.lasso.can_capture = func() -> bool: return _lasso_state == ""
 	player.lasso.prey_captured.connect(_on_lasso_prey_captured)
@@ -1125,12 +1125,12 @@ func _tick_goats(delta:float)->void:
 			if goat==_lasso_horse:_end_lasso()
 			if contact:player.stun()
 			_toast(tr("WORLD_GOAT_ESCAPED"))
-		elif float(st.progress)>=1.0 and NpcQuests.can_capture(SaveData.world_quests,"goat"):
+		elif float(st.progress)>=1.0 and SaveData.can_capture_animal165("goat"):
 			if goat==_lasso_horse:_end_lasso()
 			if not SaveData.record_goat104(str(goat.get_meta("capture_id112","goat:"+str(goat.get_meta("origin",goat.position))))):
 				_toast(tr("WORLD_SAVE_FAILED104"));continue
 			_refresh_quest_hud()
-			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED"))
+			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED")+" · +%d puntos"%ProgressionEconomy165.GOAT_CAPTURE_POINTS)
 			continue
 		if not bool(st.get("tired",false)) and (goat.roped or escaping):goat.move_from_or_towards(player.position,delta,goat.roped)
 		else:goat.movement=Vector2.ZERO
@@ -1167,6 +1167,9 @@ func _open_npc(data:Dictionary)->void:
 	else:
 		_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests)
 	_hud.add_child(_npc_dialog)
+	if _npc_dialog is NpcDialog:_npc_dialog.contracts_requested165.connect(func():
+		_close_npc();player.cancel_input();player.set_physics_process(false)
+		var contracts:=RepeatContractsPanel165.new();_npc_dialog=contracts;_hud.add_child(contracts);contracts.closed.connect(_close_npc))
 	_npc_dialog.closed.connect(_close_npc)
 	_npc_dialog.pigs_sold104.connect(func(count:int,price:int):
 		var sale:Dictionary=SaveData.sell_pigs104(count,price)
@@ -1182,7 +1185,7 @@ func _open_npc(data:Dictionary)->void:
 func _close_npc()->void:
 	if is_instance_valid(_npc_dialog):_npc_dialog.queue_free()
 	if is_instance_valid(_npc_block):_npc_block.queue_free()
-	_npc_dialog=null;player.set_physics_process(true)
+	_npc_dialog=null;player.set_physics_process(true);_refresh_quest_hud()
 func _quest_event(kind:String,target:String,event_id:String)->void:
 	for id in NpcQuests.record(SaveData.world_quests,kind,target,event_id):
 		var q:Dictionary=NpcQuests.QUESTS[id];var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
@@ -1191,7 +1194,7 @@ func _quest_event(kind:String,target:String,event_id:String)->void:
 	_refresh_missions();_refresh_quest_hud()
 func _refresh_quest_hud()->void:
 	if is_instance_valid(_quest_label):
-		_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)
+		_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)+"\n"+RepeatContractsPanel165.summary()
 		if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():_quest_label.text+="\n"+FloristJourney138.hud(SaveData.world_flora138)
 	if not is_instance_valid(_flower_strip105):return
 	var signature:int=hash(SaveData.world_quests)

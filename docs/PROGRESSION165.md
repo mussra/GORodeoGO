@@ -1,8 +1,8 @@
-# Progresión exigente: base de trabajo, aún no activada
+# Progresión exigente: modelo y bloques de implementación
 
-La petición del 13 de noviembre acepta los diseños y exige muchos cerdos, cabras y misiones, sin completar todos los extras en 20-30 minutos. Esta base numérica es calibración de implementación, no una medición ni una promesa de horas. El modelo `ProgressionEconomy165` aún NO se usa en guardado, cobros o tienda.
+La petición del 13 de noviembre acepta los diseños y exige muchos cerdos, cabras y misiones, sin completar todos los extras en 20-30 minutos. Esta base numérica es calibración de implementación, no una medición ni una promesa de horas. Desde2.7.120 el modelo se usa en premios de victoria, captura de cabra y encargos repetibles. La tabla de extras sigue siendo una base NO activada en compras.
 
-## Auditoría actual
+## Auditoría anterior a2.7.120
 
 - La victoria20 paga 8.500 puntos cada vez. Las primeras victorias1-20 suman46.665. Subir precios sin cerrar esa vía incentiva repetir el nivel20 y no explorar.
 - Cerdo:40 al capturarlo y40 al venderlo. Cabra:0. Cada captura tiene ID persistente y no se repite como animal nuevo.
@@ -42,3 +42,7 @@ Los cinco extras suman150.000 puntos. Con50 capturas mixtas/hora hipotéticas se
 5. Crecimiento normal, maestría pura y ritual explícito. Las alternativas contradictorias de categoría no se convierten en dos categorías a la vez.
 
 El límite de siestas del mismo día es otro bloque y no forma parte de este modelo.
+
+## Estado2.7.120
+
+Activo: premios de repetición limitados, recompensa de cabra, contratos alternos separados, persistencia/cobro atómicos y pantalla del granjero. Sin premios retroactivos. Los encargos aceptados desbloquean la captura necesaria por el mismo lazo que los históricos. Pendiente: cobertura visual y compra de extras; llaves, niveles21-40, crecimiento normal y ritual.

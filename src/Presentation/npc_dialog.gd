@@ -1,12 +1,16 @@
 class_name NpcDialog
 extends Panel
 signal pigs_sold104(count:int,unit_price:int)
+signal contracts_requested165
 signal acknowledged(quest_id:String)
 signal closed
 signal accepted(quest_id:String)
 func setup(npc:Dictionary,states:Dictionary):
  add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("6d9b94"),12))
  position=Vector2(300,180);size=Vector2(680,460);z_index=100;mouse_filter=Control.MOUSE_FILTER_STOP
+ if npc.id=="farmer":
+  size.y=530
+  var contracts:=Button.new();contracts.name="RepeatContracts165";contracts.text="Encargos del rancho";contracts.position=Vector2(24,450);contracts.size=Vector2(620,55);add_child(contracts);contracts.pressed.connect(func():contracts_requested165.emit())
  if npc.id=="farmer" and not npc.has("town_id123"):add_sale104()
  var definitions:Dictionary=RegionalVillages123.definitions(npc.town_id123,npc.profile123) if npc.has("town_id123") else NpcQuests.QUESTS
  var finished123:bool=npc.get("regional_close123",false) and RegionalVillages123.all_done(states,npc)
@@ -32,3 +36,10 @@ func add_sale104()->void:
  var price=Label.new();price.name="PigPrice104";price.text=tr("WORLD_PIG_PRICE104") % [quote.unit_price,count];price.position=Vector2(24,340);price.add_theme_font_size_override("font_size",20);add_child(price)
  var sell=Button.new();sell.name="SellPigs104";sell.position=Vector2(24,385);sell.size=Vector2(620,52);sell.text=tr("WORLD_PIG_SELL104") % [count,quote.total];sell.disabled=count<=0;add_child(sell)
  sell.pressed.connect(func():pigs_sold104.emit(count,quote.unit_price))
+
+func _ready():
+ _fit165();get_viewport().size_changed.connect(_fit165)
+func _fit165():
+ var viewport_size:Vector2=get_viewport_rect().size
+ var k:float=minf(viewport_size.x/1280.,viewport_size.y/720.)
+ scale=Vector2.ONE*k;position=(viewport_size-size*k)*.5
