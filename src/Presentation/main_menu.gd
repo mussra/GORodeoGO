@@ -152,6 +152,11 @@ func _build_menu() -> void:
 		if _transitioning:return
 		_transitioning=true
 		get_tree().change_scene_to_file("res://src/Presentation/joust196.tscn"))
+	var memory_button:=Button.new();memory_button.name="MemoryEntry207";memory_button.text="Salto de memoria";memory_button.position=Vector2(590,126);memory_button.size=Vector2(270,48);_hero.add_child(memory_button)
+	memory_button.pressed.connect(func():
+		if _transitioning:return
+		_transitioning=true
+		get_tree().change_scene_to_file("res://src/Presentation/jump_memory207.tscn"))
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
