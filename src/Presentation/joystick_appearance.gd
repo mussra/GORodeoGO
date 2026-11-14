@@ -33,6 +33,9 @@ static func apply(level:Node)->void:
  # Native sticks only consume theme colors. Do not synthesize unused220pxart.
  if needs_textures and not cache.has(key):cache[key]=[texture_for(traits,false),texture_for(traits,true)]
  for v in sticks:
+  # Native styleboxes support the supplied ring without changing touch mechanics.
+  v.add_theme_stylebox_override("normal_joystick",AntIcons188.joystick_ring(false))
+  v.add_theme_stylebox_override("pressed_joystick",AntIcons188.joystick_ring(true))
   # Godot 4.7 native VirtualJoystick has no texture properties (custom stick era did);
   # assign only when present so apply() never aborts mid-theming.
   if "joystick_texture" in v:v.joystick_texture=cache[key][0]

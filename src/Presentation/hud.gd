@@ -297,10 +297,7 @@ func _build_dual_lasso_panel() -> void:
 
 ## Two crossed lasso loops in the ranch gold — pure HUD vector drawing, no art dependency.
 func _draw_dual_lasso_icon(icon: Control) -> void:
-	icon.draw_arc(Vector2(32, 36), 22, 0.0, TAU, 40, RanchTheme.GOLD, 5.0, true)
-	icon.draw_arc(Vector2(68, 36), 22, 0.0, TAU, 40, RanchTheme.CREAM, 5.0, true)
-	icon.draw_line(Vector2(32, 14), Vector2(24, 2), RanchTheme.GOLD, 4.0, true)
-	icon.draw_line(Vector2(68, 14), Vector2(76, 2), RanchTheme.CREAM, 4.0, true)
+	AntIcons188.draw_fit(icon,7,Rect2(0,0,100,70))
 
 func _on_dual_lasso_accept_pressed() -> void:
 	_dual_lasso_panel.visible = false

@@ -361,8 +361,12 @@ func _draw_markers108()->void:
  if expanded:
   for site in available159():
    var point:Vector2=_to_map(site.pos,mins,cell,origin)
-   _markers108.draw_circle(point,8.,Color("efb950"))
-   _markers108.draw_arc(point,11.,0,TAU,24,Color("fff1d2"),2.)
+   if str(site.id)=="ranch":
+    _markers108.draw_arc(point,13.,0,TAU,24,Color("fff1d2"),2.)
+    AntIcons188.draw_fit(_markers108,6,Rect2(point-Vector2(11,10),Vector2(22,20)))
+   else:
+    _markers108.draw_circle(point,8.,Color("efb950"))
+    _markers108.draw_arc(point,11.,0,TAU,24,Color("fff1d2"),2.)
 
  for rows in notes159().values():
   for note in rows:
@@ -437,14 +441,13 @@ func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2
     _terrain.draw_circle(p, dot, Color("e86a8a"))
 
 func _draw_ranch(r: Rect2) -> void:
+ var center:Vector2
  if WorldNominal98.enabled():
-  var point=_to_map(WorldNominal98.home(),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
-  _terrain.draw_circle(point,maxf(3.,r.size.x*.06),Color("f2d987"));return
- # little house: brown body + red roof, cartoon icon for home
- var center: Vector2 = r.position + Vector2(r.size.x * 0.16, r.size.y * 0.2)
- var s: float = maxf(4.0, r.size.x * 0.09)
- _terrain.draw_rect(Rect2(center - Vector2(s, s * 0.4), Vector2(s * 2.0, s * 1.2)), Color("8a5a33"))
- _terrain.draw_colored_polygon(PackedVector2Array([center + Vector2(-s * 1.2, -s * 0.4), center + Vector2(0, -s * 1.3), center + Vector2(s * 1.2, -s * 0.4)]), Color("b4452f"))
+  center=_to_map(WorldNominal98.home(),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
+ else:center=r.position+Vector2(r.size.x*.16,r.size.y*.2)
+ if not expanded:
+  _terrain.draw_circle(center,maxf(3.,r.size.x*.06),Color("f2d987"));return
+ AntIcons188.draw_fit(_terrain,6,Rect2(center-Vector2(11,10),Vector2(22,20)))
 
 func _mission_mark(c: Vector2i, r: Rect2, font: Font, cell: float) -> void:
  var mission_id: String = WorldMap.herd_mission_id(c.x, c.y)
