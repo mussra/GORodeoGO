@@ -2,7 +2,7 @@ class_name WorldHerd
 extends RefCounted
 ## Stable individuals derived from the existing herd genotype. A separate RNG
 ## keeps old decoration, base genetics and mission locations unchanged.
-static func members(base:Dictionary,seed:int,cx:int,cy:int)->Array:
+static func members(base:Dictionary,seed:int,cx:int,cy:int,use_town217:bool=true)->Array:
  if base.is_empty():return []
  var rng:=RandomNumberGenerator.new();rng.seed=hash("herd-members-%d-%d-%d"%[seed,cx,cy])
  var count:int=rng.randi_range(3,5);var out:Array=[]
@@ -18,6 +18,7 @@ static func members(base:Dictionary,seed:int,cx:int,cy:int)->Array:
    horse.traits.eyes=(int(horse.traits.get("eyes",0))+1)%HorseCollection.EYES.size()
    horse.traits.legs=int(horse.traits.coat)
   out.append(horse)
+ if use_town217 and SaveData.world_herd_town217.get("seed",0)==seed:return HerdTown217.apply_saved(out,SaveData.world_herd_town217,cx,cy)
  return out
 static func member_id(cx:int,cy:int,index:int)->String:
  return WorldMap.herd_mission_id(cx,cy)+"#"+str(index)

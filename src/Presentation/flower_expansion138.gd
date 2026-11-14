@@ -122,7 +122,7 @@ func _remote_tick()->void:
   remote.add_child(path)
   var shop:=Sprite2D.new();shop.texture=WorldFloristShop.SHOP;shop.position=door+Vector2(-20,2);shop.scale=Vector2.ONE*200./shop.texture.get_height();shop.offset=Vector2(0,-shop.texture.get_height()/2.);remote.add_child(shop)
   WorldPhysics.add_box(remote,Rect2(door+Vector2(-130,-113),Vector2(235,85)))
-  var npc:=Sprite2D.new();npc.texture=WorldFloristShop.FLORIST;npc.position=door+Vector2(110,32);NpcScale214.apply(npc,npc.texture);remote.add_child(npc)
+  var npc:=Sprite2D.new();npc.texture=WorldFloristShop.FLORIST;npc.position=door+Vector2(110,32);NpcScale214.apply(npc,npc.texture);remote.add_child(npc);NpcActivity218.attach(world,npc)
   var label:=Label.new();label.text="Floristería · "+TownIdentity215.title(SaveData.world_cousins140,"east138");label.position=door+Vector2(-150,-238);label.add_theme_font_size_override("font_size",20);remote.add_child(label)
   for side in [-1,1]:
    var home:=Sprite2D.new();home.texture=WorldTestZone.HOUSE_TEX;home.position=door+Vector2(side*550,-260);home.scale=Vector2.ONE*116./home.texture.get_height();home.offset=Vector2(0,-home.texture.get_height()/2.);remote.add_child(home)

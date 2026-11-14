@@ -42,6 +42,7 @@ var world_places144:Dictionary={}
 var siesta_rest166:float=0.
 var repeat_contract165:Dictionary=ProgressionEconomy165.new_contract()
 var country_ledger146:Dictionary={} # Separate future-country progress; no entry enabled yet.
+var world_herd_town217:Dictionary={}
 var world_cousins140:Dictionary={} # Four-town journal, separate additive V3 state.
 var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
 var world_garden212:Dictionary=Garden212.fresh()
@@ -98,6 +99,7 @@ func save_progress() -> bool:
 	config.set_value("world","garden212",world_garden212)
 	config.set_value("world","roaming139",world_roaming139)
 	config.set_value("world","cousins140",world_cousins140)
+	config.set_value("world","herd_town217",world_herd_town217)
 	config.set_value("world","places144",world_places144)
 	config.set_value("world","siesta_rest166",siesta_rest166)
 	config.set_value("world","repeat_contract165",repeat_contract165)
@@ -145,7 +147,7 @@ func load_progress() -> void:
 	world_flora138.clear()
 	world_garden212=Garden212.fresh()
 	world_roaming139.clear()
-	world_cousins140.clear()
+	world_cousins140.clear();world_herd_town217.clear()
 	world_places144.clear();siesta_rest166=0.;repeat_contract165=ProgressionEconomy165.new_contract()
 	country_ledger146.clear()
 	world_missions.clear()
@@ -217,6 +219,9 @@ func load_progress() -> void:
 	world_garden212=Garden212.clean(garden_raw)
 	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
 	world_cousins140=VillageCousins140.clean(config.get_value("world","cousins140",{}),world_seed)
+	var herd_policy:Variant=config.get_value("world","herd_town217",{})
+	if not herd_policy is Dictionary or (not herd_policy.is_empty() and not HerdTown217.valid(herd_policy,world_seed)):_load_valid=false;return
+	world_herd_town217=herd_policy.duplicate(true)
 	world_places144=WorldPlaces144.clean(config.get_value("world","places144",{}),world_seed,world_generator_version)
 	siesta_rest166=SiestaRest166.clean(config.get_value("world","siesta_rest166",0.))
 	var contract165:Variant=config.get_value("world","repeat_contract165",ProgressionEconomy165.new_contract())
@@ -363,7 +368,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
@@ -712,3 +717,19 @@ func relocate_garden214(anchors:Dictionary)->bool:
 	world_garden212=before.duplicate(true);world_garden212.anchors=anchors.duplicate(true);world_garden212.layout214=2
 	if save_progress():return true
 	world_garden212=before;return false
+
+func ensure_herd_town217()->bool:
+	if world_generator_version<3 or world_cousins140.is_empty():return false
+	if not world_herd_town217.is_empty():return true
+	world_herd_town217=HerdTown217.fresh(world_seed,world_cousins140,world_discovered,world_roaming139,world_tamed)
+	if save_progress():return true
+	world_herd_town217={};return false
+func prepare_herd217(base:Dictionary,cx:int,cy:int)->bool:
+	if base.is_empty() or not HerdTown217.eligible(world_herd_town217,cx,cy):return true
+	if HerdTown217.influence(world_herd_town217.towns,base.pos).total<=0.:return true
+	var key:=WorldMap.chunk_key(cx,cy)
+	if world_herd_town217.herds.has(key):return true
+	var members_:Array=HerdTown217.colored(WorldHerd.members(base,world_seed,cx,cy,false),world_herd_town217,cx,cy)
+	world_herd_town217.herds[key]=members_.map(func(h):return h.traits.duplicate(true))
+	if save_progress():return true
+	world_herd_town217.herds.erase(key);return false

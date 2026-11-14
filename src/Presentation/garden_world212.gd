@@ -41,6 +41,7 @@ func _ready():
  description=Label.new();description.position=plot+Vector2(-125,-98);description.add_theme_font_size_override("font_size",18);description.text="Huerto de Lucía · piloto";description.modulate=Color("fff1cd");marker.add_child(description)
  var label:=Label.new();label.position=sample+Vector2(-115,-55);label.add_theme_font_size_override("font_size",18);label.text="Zanahoria silvestre";label.modulate=Color("fff1cd");marker.add_child(label)
  gardener=Sprite2D.new();gardener.name="Lucia213";gardener.position=plot+Vector2(150,25);world.add_child(gardener);set_pose("idle")
+ var activity:=NpcActivity218.attach(world,gardener,["water","plant","harvest"]);activity.chosen.connect(set_pose)
  button=Button.new();button.position=Vector2(475,565);button.size=Vector2(330,56);QuestButtonStyle.apply(button);world._hud.add_child(button);button.pressed.connect(open)
  direction_label=Label.new();direction_label.position=Vector2(235,55);direction_label.size=Vector2(770,54);direction_label.mouse_filter=Control.MOUSE_FILTER_IGNORE;direction_label.add_theme_font_size_override("font_size",20);world._hud.add_child(direction_label);ToastStack.backdrop(direction_label)
 func clear_point(base:Vector2)->Vector2:

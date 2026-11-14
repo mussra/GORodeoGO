@@ -19,7 +19,7 @@ func _process(_delta:float):
  previous=world.player.position
 func _build(id:String,point:Vector2)->Node2D:
  var root:=Node2D.new();root.name="Cousin_"+id;root.y_sort_enabled=true;world.add_child(root)
- var art:=Sprite2D.new();art.name="CousinArt";art.position=point;root.add_child(art)
+ var art:=Sprite2D.new();art.name="CousinArt";art.position=point;root.add_child(art);NpcActivity218.attach(world,art)
  var label:=Label.new();label.text="Loco del pueblo";label.position=point+Vector2(-55,8);label.add_theme_font_size_override("font_size",16);root.add_child(label)
  var path=load("res://src/Presentation/world_draw_node.gd").new();path.z_index=-5;path.draw_fn=func(n):ContinuousRoadArt.access(n,PackedVector2Array([Vector2(point.x,470),point]),32.)
  root.add_child(path)

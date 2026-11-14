@@ -15,11 +15,14 @@ static func texture(look:Dictionary)->Texture2D:
   for y in 128:
    for x in 128:
     var weight:float=0.
-    if int(look.pattern)==10:weight=1.-giraffe.get_pixel(x,y).r
+    if int(look.pattern)==10:weight=giraffe.get_pixel(x,y).r
     elif int(look.pattern)==6:
      for center in [Vector2(32,32),Vector2(96,96)]:
       if HorseAppearance.shape_point((Vector2(x,y)-center)/20.,6):weight=1.
-    image.set_pixel(x,y,base.lerp(spot,weight))
+    if int(look.pattern)==6 and weight==0.:
+     for center in [Vector2(32,32),Vector2(96,96)]:
+      if HorseAppearance.shape_point((Vector2(x,y)-center)/22.,6):image.set_pixel(x,y,Color("30283f"));break
+    if weight>0.:image.set_pixel(x,y,base.lerp(spot,weight))
  var result:=ImageTexture.create_from_image(image);textures[key]=result;return result
 static func wall(node:CanvasItem,box:Rect2,look:Dictionary,full_width:float=0.,center_x:float=INF):
  var points:=PackedVector2Array([box.position,Vector2(box.end.x,box.position.y),box.end,Vector2(box.position.x,box.end.y)])
@@ -52,7 +55,9 @@ static func icon(node:CanvasItem,rect:Rect2,look:Dictionary):
  for side in [-1,1]:
   var wall_box:=Rect2(at+Vector2(73,0 if side<0 else 47)*unit,Vector2(18,25)*unit)
   node.draw_rect(wall_box,base)
-  if int(look.pattern)==6:star(node,wall_box.get_center(),minf(wall_box.size.x,wall_box.size.y)*.40,spot)
+  if int(look.pattern)==6:
+   star(node,wall_box.get_center(),minf(wall_box.size.x,wall_box.size.y)*.47,Color("30283f"))
+   star(node,wall_box.get_center(),minf(wall_box.size.x,wall_box.size.y)*.38,spot)
   if int(look.pattern)==10:node.draw_texture_rect_region(texture(look),wall_box,Rect2(0,0,48,64))
   node.draw_line(wall_box.position,wall_box.position+Vector2(wall_box.size.x,0),Color("f4dfb5"),maxf(1.,unit.y*3.))
  for x in [22,48]:

@@ -3,7 +3,7 @@ func test_shared_art_and_contained_dialog():
  var npc=WorldNpc.new();npc.setup(NpcQuests.NPCS[0]);add_child_autofree(npc)
  assert_false(NpcQuests.NPCS[0].placeholder)
  assert_eq(npc.get_node("FarmerArt").texture,WorldNpc.PORTRAIT)
- assert_almost_eq(npc.get_node("FarmerArt").scale.y*WorldNpc.PORTRAIT.get_height(),90.0,.01)
+ assert_almost_eq(npc.get_node("FarmerArt").scale.y*NpcScale214.visible_bounds(WorldNpc.PORTRAIT).size.y,NpcScale214.ADULT,.01)
  var dialog=NpcDialog.new();dialog.setup(NpcQuests.NPCS[0],{});add_child_autofree(dialog)
  var portrait=dialog.get_node("FarmerPortrait")
  assert_eq(portrait.texture,WorldNpc.PORTRAIT)

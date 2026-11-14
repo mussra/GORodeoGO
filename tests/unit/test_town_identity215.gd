@@ -33,3 +33,20 @@ func test_hint_keeps_real_visit_and_direction_rules_separate():
  assert_true(VillageCousins140.cousin_hint(next,"home").contains(VillageCousins140.direction(VillageCousins140.point(state,"home"),VillageCousins140.point(state,id))))
  assert_false(state.revealed215.has(id));assert_true(next.revealed215.has(id))
  assert_true(VillageCousins140.hear(next,id));assert_eq(next.hint215,"")
+
+func test_independent_spot216_palette_migrates_without_renaming_town():
+ var palette:=TownIdentity215.fresh(752026);var colors:Array=[]
+ for id in VillageCousins140.IDS:
+  assert_ne(palette[id].coat,palette[id].spot_index)
+  assert_eq(palette[id].spot,HorseAppearance.COLORS[palette[id].spot_index])
+  colors.append(palette[id].spot)
+ var unique:Dictionary={}
+ for color in colors:unique[color]=true
+ assert_gt(unique.size(),1)
+ var old:=palette.duplicate(true)
+ for id in old:old[id].version=1;old[id].spot="30283f";old[id].erase("spot_index")
+ var next:=TownIdentity215.clean(old,752026)
+ for id in old:
+  assert_eq(next[id].base,old[id].base);assert_eq(next[id].name,old[id].name);assert_eq(next[id].pattern,old[id].pattern)
+  assert_eq(next[id].spot,palette[id].spot)
+ assert_eq(TownIdentity215.clean(next,752026),next)

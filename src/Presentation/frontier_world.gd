@@ -151,6 +151,7 @@ func _ready() -> void:
 		_flora_layer138=FlowerExpansion138.new();_flora_layer138.name="FlowerExpansion138";_flora_layer138.z_index=-1;add_child(_flora_layer138)
 	if SaveData.ensure_cousins140():
 		_cousin_layer140=CousinLayer140.new();add_child(_cousin_layer140)
+	SaveData.ensure_herd_town217()
 	_travel144=SiestaTravel144.new();add_child(_travel144)
 	_setup_goat_prototype()
 	_setup_npcs()
@@ -440,6 +441,8 @@ func _advance_builder(b: Dictionary) -> void:
 	match int(b["phase"]):
 		0:
 			b["data"] = WorldEdits.apply(WorldMap.generate(SaveData.world_seed, cx, cy), SaveData.world_edits, cx, cy)
+			if not SaveData.prepare_herd217(b.data.get("herd",{}),cx,cy):
+				b.data.herd={};_toast("No se pudo guardar esta manada nueva. Se reintentará al volver a cargar la zona.")
 			var node := Node2D.new()
 			node.set_meta("c", Vector2i(cx, cy))
 			node.y_sort_enabled=true
@@ -1434,6 +1437,7 @@ func _open_cousin140(id:String)->void:
 	if SaveData.world_cousins140.is_empty() or is_instance_valid(_npc_dialog) or player.position.distance_to(VillageCousins140.point(SaveData.world_cousins140,id))>155.:return
 	var next:Dictionary=SaveData.world_cousins140.duplicate(true)
 	if VillageCousins140.hear(next,id) and not SaveData.commit_cousins140(next,player.position):_toast(tr("WORLD_SAVE_FAILED104"));return
+	_travel144.visit_clock=0.;_travel144.record_visits()
 	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
 	var dialog:=CousinDialog140.new();dialog.world_position215=player.position;dialog.setup(id,SaveData.world_cousins140,VillageCousins140.surprised(SaveData.horse_collection.find(SaveData.horse_collection.selected)));_hud.add_child(dialog);_npc_dialog=dialog
 	dialog.closed.connect(_close_npc);dialog.journal_requested.connect(_show_journal140)

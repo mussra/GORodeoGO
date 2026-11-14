@@ -1,0 +1,982 @@
+{
+  "conditions": "Each integration script in a clean profile. Headless fixed 60 fps, except joystick_origin211 with real viewport (pixel read waits without rendering). A matching baseline run was required for each remaining failure.",
+  "baseline": "2.7.156 / 21648fe",
+  "scripts": [
+    {
+      "script": "test_activity218.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_adorn_preview153.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_adorn_shop169.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_ai_plan204.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_animals69.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_animation_assets.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_arena_minimap.gd",
+      "exit_code": 1,
+      "tests": 2,
+      "passed": 1,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_awareness110.gd",
+      "exit_code": 0,
+      "tests": 9,
+      "passed": 9,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_bull_run70.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_bullet_time.gd",
+      "exit_code": 1,
+      "tests": 4,
+      "passed": 3,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_campaign173.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_campaign_completion.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_campaign_herd.gd",
+      "exit_code": 0,
+      "tests": 6,
+      "passed": 6,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_campaign_live_tow.gd",
+      "exit_code": 1,
+      "tests": 5,
+      "passed": 0,
+      "failed": 5,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_chase_prediction.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_country146.gd",
+      "exit_code": 0,
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_country_route152.gd",
+      "exit_code": 0,
+      "tests": 6,
+      "passed": 6,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_country_session152.gd",
+      "exit_code": 0,
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_country_storage149.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_country_travel148.gd",
+      "exit_code": 0,
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_courier_tracks.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_cousins140.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": 0
+    },
+    {
+      "script": "test_cup_rewards195.gd",
+      "exit_code": 0,
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_dash_escape78.gd",
+      "exit_code": 1,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_discovery_cache84.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_dodge.gd",
+      "exit_code": 0,
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_dodge_audio.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_dodge_edge.gd",
+      "exit_code": 1,
+      "tests": 2,
+      "passed": 1,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_dodge_endpoint_inertia.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_dodge_preview.gd",
+      "exit_code": 1,
+      "tests": 2,
+      "passed": 1,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_duel193.gd",
+      "exit_code": 1,
+      "tests": 9,
+      "passed": 8,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_edge_indicator_boundaries.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_equipment_flow.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_fence_frontier83.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_finish_preview145.gd",
+      "exit_code": 1,
+      "tests": 3,
+      "passed": 2,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_finish_shop168.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_fixes170.gd",
+      "exit_code": 0,
+      "tests": 6,
+      "passed": 6,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_flee_crossing95.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_florist138.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_florist83.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_flowers105.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_foal_growth174.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_focused_trail.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_frontier_chase.gd",
+      "exit_code": 1,
+      "tests": 3,
+      "passed": 0,
+      "failed": 3,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_frontier_depth_collision.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_frontier_dodge.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": 0
+    },
+    {
+      "script": "test_frontier_herd.gd",
+      "exit_code": 0,
+      "tests": 9,
+      "passed": 9,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_frontier_lasso.gd",
+      "exit_code": 0,
+      "tests": 9,
+      "passed": 9,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_frontier_streaming.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_frontier_touch.gd",
+      "exit_code": 1,
+      "tests": 4,
+      "passed": 1,
+      "failed": 3,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_galaxy_pure143.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_ganjo_slot205.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_garden212.gd",
+      "exit_code": 0,
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_gate_escape_margin.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_genealogy_ui.gd",
+      "exit_code": 1,
+      "tests": 5,
+      "passed": 3,
+      "failed": 2,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_goal_latch_proximity.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_goat_population112.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_herd_count70.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_herd_stream139.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_home_transition83.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_horse_drink83.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_horse_jump.gd",
+      "exit_code": 0,
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_island156.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_isolated_trial.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_joust196.gd",
+      "exit_code": 1,
+      "tests": 10,
+      "passed": 9,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_joystick_origin211.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": 124
+    },
+    {
+      "script": "test_jump_memory207.gd",
+      "exit_code": 1,
+      "tests": 12,
+      "passed": 11,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_lasso_capacity_and_follow.gd",
+      "exit_code": 0,
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_lasso_rope_review.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_lasso_stun.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_level20_herd.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_level_smoke.gd",
+      "exit_code": 1,
+      "tests": 44,
+      "passed": 43,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_livestock104.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": 0
+    },
+    {
+      "script": "test_map_notes106.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": 0
+    },
+    {
+      "script": "test_map_release209.gd",
+      "exit_code": 1,
+      "tests": 7,
+      "passed": 0,
+      "failed": 7,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_mastery_level83.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": 0
+    },
+    {
+      "script": "test_memory_art208.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_menu_routes213.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_menu_variants.gd",
+      "exit_code": 1,
+      "tests": 2,
+      "passed": 0,
+      "failed": 2,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_mode_separation.gd",
+      "exit_code": 0,
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_mode_text203.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_modular_map93.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_mountains103.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": 0
+    },
+    {
+      "script": "test_music.gd",
+      "exit_code": 1,
+      "tests": 3,
+      "passed": 1,
+      "failed": 2,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_music_start202.gd",
+      "exit_code": 1,
+      "tests": 3,
+      "passed": 2,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_night_boundaries.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_nominal98.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_npc_flow75.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": 0
+    },
+    {
+      "script": "test_perf_load67.gd",
+      "exit_code": 1,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_physical_delivery.gd",
+      "exit_code": 0,
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_prestart_aim198.gd",
+      "exit_code": 1,
+      "tests": 5,
+      "passed": 4,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_puzzle_corrals.gd",
+      "exit_code": 0,
+      "tests": 6,
+      "passed": 6,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_race190.gd",
+      "exit_code": 1,
+      "tests": 25,
+      "passed": 23,
+      "failed": 2,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_race_cup194.gd",
+      "exit_code": 0,
+      "tests": 7,
+      "passed": 7,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_race_recovery197.gd",
+      "exit_code": 1,
+      "tests": 7,
+      "passed": 6,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_ranch_pasture141.gd",
+      "exit_code": 1,
+      "tests": 10,
+      "passed": 9,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_release_overlap.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_released_normal_speed.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_repeat_contract167.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_road_rules94.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_running_repress204.gd",
+      "exit_code": 1,
+      "tests": 8,
+      "passed": 7,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_sequence_puzzle.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_sequential_menu.gd",
+      "exit_code": 1,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_serenity142.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_shared_map159.gd",
+      "exit_code": 0,
+      "tests": 14,
+      "passed": 14,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_siesta144.gd",
+      "exit_code": 0,
+      "tests": 14,
+      "passed": 14,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_spacious_arenas.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_spacious_playthrough.gd",
+      "exit_code": 1,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_sprint_indicator206.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_station_art.gd",
+      "exit_code": 1,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_streamed_pigs70.gd",
+      "exit_code": 1,
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "baseline_exit": 1
+    },
+    {
+      "script": "test_touch154.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_tow_behind.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_tow_collision_recovery.gd",
+      "exit_code": 0,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_towns215.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_training_levels.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_tree155.gd",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_trees121.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_trial_gameplay_fixes.gd",
+      "exit_code": 0,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_velocity_lasso83.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_wild_heading129.gd",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "baseline_exit": null
+    },
+    {
+      "script": "test_world_rules96.gd",
+      "exit_code": 0,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "baseline_exit": null
+    }
+  ]
+}
