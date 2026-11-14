@@ -208,6 +208,8 @@ func detail_view()->void:
  var scroll:=ScrollContainer.new();scroll.position=Vector2(470,130);scroll.size=Vector2(770,540);content.add_child(scroll)
  var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(735,0);box.add_theme_constant_override("separation",12);scroll.add_child(box)
  if owned:
+  if CupRewards195.has_temper(h):
+   var temper:=Label.new();temper.name="CupTemper195";temper.text="Temple de cruce · heredable\nRoce del molino: 0,52 s en vez de 0,65 s. No cambia la velocidad. Se transmite con un progenitor portador.";temper.add_theme_font_size_override("font_size",20);TextFit181.flow(temper,735);box.add_child(temper)
   if GalaxyPure143.is_pure(h):
    var pure:=Label.new();pure.name="GalaxyPureBadge143";pure.text=GalaxyPure143.BADGE+"\nDos padres Galaxy al nacer · todavía no es un unicornio";pure.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;pure.add_theme_font_size_override("font_size",22);pure.modulate=RanchTheme.GOLD;TextFit181.flow(pure,735);box.add_child(pure)
   var completed:=Label.new();completed.text=HorseMastery.level_text(h);completed.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;completed.add_theme_font_size_override("font_size",20);TextFit181.flow(completed,735);box.add_child(completed)

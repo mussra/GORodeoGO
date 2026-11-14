@@ -21,11 +21,12 @@ func test_full_campaign_accepts_distinct_realistic_results_without_rewards():
  var state:=RaceCup194.fresh();var sequence:int=0
  for goal in RaceCup194.CHALLENGES:
   sequence+=1
-  var result:Dictionary=race(sequence,maxi(0,goal.get("course",0))) if goal.mode=="race" else {"sequence":sequence,"mode":"duel","finished":true,"player_wins":2,"rival_wins":1}
+  var result:Dictionary=race(sequence,maxi(0,goal.get("course",0))) if goal.mode=="race" else {"sequence":sequence,"mode":"duel","finished":true,"player_wins":2,"rival_wins":0}
+  if goal.mode=="race":result.landed=2;result.dodges=3
   assert_true(RaceCup194.record(state,result).advanced)
- assert_eq(state.completed.size(),16)
+ assert_eq(state.completed.size(),RaceCup194.CHALLENGES.size())
  assert_true(RaceCup194.current(state).is_empty())
- assert_true(RaceCup194.record(state,race(17)).complete)
+ assert_true(RaceCup194.record(state,race(RaceCup194.CHALLENGES.size()+1)).complete)
  assert_eq(state.keys().size(),3,"No money, reward flags, horses or story objects are created")
 func test_current_returns_copy_and_ledger_can_round_trip_safely():
  var state:=RaceCup194.fresh();var goal:=RaceCup194.current(state);goal.title="changed"

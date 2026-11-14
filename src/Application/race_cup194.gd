@@ -1,7 +1,6 @@
 class_name RaceCup194
 extends RefCounted
-## Preparation-only objective ledger. No integration, saves, money, horse or story
-## effects. A caller must explicitly opt in after the proposal has been reviewed.
+## Opt-in ordered objective ledger. Effects are handled by a separate claim transaction.
 const RULE:int=1
 const CHALLENGES:Array[Dictionary]=[
  {"id":"learn_oval","chapter":1,"title":"Primera vuelta","mode":"race","course":0,"rank":4},
@@ -19,7 +18,23 @@ const CHALLENGES:Array[Dictionary]=[
  {"id":"win_oval","chapter":4,"title":"Victoria en el óvalo","mode":"race","course":0,"rank":1},
  {"id":"win_valley","chapter":4,"title":"Victoria en el valle","mode":"race","course":1,"rank":1},
  {"id":"win_serpent","chapter":4,"title":"Victoria en serpiente","mode":"race","course":2,"rank":1},
- {"id":"win_crossing","chapter":4,"title":"Victoria en el cruce","mode":"race","course":3,"rank":1}
+ {"id":"win_crossing","chapter":4,"title":"Victoria en el cruce","mode":"race","course":3,"rank":1},
+ {"id":"tech_lasso_0","chapter":5,"title":"Lazo en óvalo","mode":"race","course":0,"rank":2,"landed":2},
+ {"id":"tech_lasso_1","chapter":5,"title":"Lazo en valle","mode":"race","course":1,"rank":2,"landed":2},
+ {"id":"tech_lasso_2","chapter":5,"title":"Lazo en serpiente","mode":"race","course":2,"rank":2,"landed":2},
+ {"id":"tech_lasso_3","chapter":5,"title":"Lazo en cruce","mode":"race","course":3,"rank":2,"landed":2},
+ {"id":"tech_dodge_0","chapter":6,"title":"Regate en óvalo","mode":"race","course":0,"rank":2,"dodges":3},
+ {"id":"tech_dodge_1","chapter":6,"title":"Regate en valle","mode":"race","course":1,"rank":2,"dodges":3},
+ {"id":"tech_dodge_2","chapter":6,"title":"Regate en serpiente","mode":"race","course":2,"rank":2,"dodges":3},
+ {"id":"tech_dodge_3","chapter":6,"title":"Regate en cruce","mode":"race","course":3,"rank":2,"dodges":3},
+ {"id":"tech_clean_0","chapter":7,"title":"Línea limpia en óvalo","mode":"race","course":0,"rank":2,"max_hits":0},
+ {"id":"tech_clean_1","chapter":7,"title":"Línea limpia en valle","mode":"race","course":1,"rank":2,"max_hits":0},
+ {"id":"tech_clean_2","chapter":7,"title":"Línea limpia en serpiente","mode":"race","course":2,"rank":2,"max_hits":0},
+ {"id":"tech_clean_3","chapter":7,"title":"Línea limpia en cruce","mode":"race","course":3,"rank":2,"max_hits":0},
+ {"id":"duel_perfect","chapter":8,"title":"Duelo sin ceder manga","mode":"duel","max_rival_wins":0},
+ {"id":"final_lasso","chapter":8,"title":"Victoria con precisión","mode":"race","course":2,"rank":1,"landed":2},
+ {"id":"final_dodge","chapter":8,"title":"Victoria con regate","mode":"race","course":1,"rank":1,"dodges":3},
+ {"id":"final_crossing","chapter":8,"title":"Final del molino","mode":"race","course":3,"rank":1,"max_hits":0}
 ]
 static func fresh()->Dictionary:return {"rule":RULE,"completed":[],"last_sequence":0}
 static func valid(state:Variant)->bool:
@@ -47,7 +62,7 @@ static func valid_result(result:Dictionary)->bool:
  return true
 static func matches(goal:Dictionary,result:Dictionary)->bool:
  if not valid_result(result) or goal.get("mode")!=result.mode:return false
- if result.mode=="duel":return result.player_wins==2
+ if result.mode=="duel":return result.player_wins==2 and result.rival_wins<=goal.get("max_rival_wins",1)
  return (goal.course<0 or goal.course==result.course) and result.rank<=goal.rank and result.landed>=goal.get("landed",0) and result.dodges>=goal.get("dodges",0) and result.hits<=goal.get("max_hits",2147483647)
 static func record(state:Dictionary,result:Dictionary)->Dictionary:
  if not valid(state):return {"accepted":false,"reason":"invalid_state"}

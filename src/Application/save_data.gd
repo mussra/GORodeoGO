@@ -669,3 +669,16 @@ func equip_adorn169(horse_id:String,slot:String,metal:String)->bool:
 			else:horse[pair[1]]=metal
 	if save_progress():return true
 	horse_collection.restore(before);return false
+
+## No spending. Completion and mode verified from the cup ledger at claim time.
+func claim_cup195()->Dictionary:
+	if trial_session_active:return {"ok":false,"reason":"trial_session"}
+	var loaded:=RaceCupSession194.load_state()
+	if not loaded.ok:return loaded
+	if not RaceCup194.current(loaded.state).is_empty():return {"ok":false,"reason":"cup_incomplete"}
+	var before:=horse_collection.export_state()
+	var granted:=CupRewards195.claim(horse_collection)
+	if not granted.ok or granted.already:return granted
+	if save_progress():return granted
+	horse_collection.restore(before)
+	return {"ok":false,"reason":"save_failed"}

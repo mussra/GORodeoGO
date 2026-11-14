@@ -9,7 +9,8 @@ func after_each()->void:
  for p in [SaveData.normal_mode_path,SaveData.debug_mode_path]:DirAccess.remove_absolute(p)
  SaveData.save_path=old.save_path;SaveData.debug_mode=old.debug_mode;SaveData.normal_mode_path=old.normal_mode_path;SaveData.debug_mode_path=old.debug_mode_path;SaveData.horse_collection.restore(old.horses);SaveData.highest_level_completed=old.highest;SaveData.equipment_points=old.points;SaveData.points_legacy_credit_applied=old.credit;SaveData.equipment_owned.assign(old.owned);SaveData.equipment_equipped=old.equipped;SaveData.hat_color=old.hat
 func test_switch_roundtrip_keeps_both_progress_and_horses()->void:
- SaveData.highest_level_completed=2;SaveData.equipment_points=17;assert_true(SaveData.save_progress());var bytes:PackedByteArray=FileAccess.get_file_as_bytes(SaveData.normal_mode_path)
+ # Canonicalize existing roaming/place defaults before comparing mode-roundtrip bytes.
+ SaveData.highest_level_completed=2;SaveData.equipment_points=17;assert_true(SaveData.save_progress());SaveData.load_progress();assert_true(SaveData.save_progress());var bytes:PackedByteArray=FileAccess.get_file_as_bytes(SaveData.normal_mode_path)
  assert_true(SaveData.switch_mode(true));assert_eq(SaveData.effective_progress(),LevelCatalog.MAX_LEVEL);assert_true(GameState.debug_cheats_active());SaveData.horse_collection.add_random_trial_pair();SaveData.highest_level_completed=9;SaveData.equipment_points=999;var debug_count:int=SaveData.horse_collection.horses.size()
  assert_true(SaveData.switch_mode(false));assert_eq(SaveData.highest_level_completed,2);assert_eq(SaveData.equipment_points,17);assert_eq(SaveData.horse_collection.horses.size(),1);assert_false(GameState.debug_cheats_active());assert_eq(FileAccess.get_file_as_bytes(SaveData.normal_mode_path),bytes)
  assert_true(SaveData.switch_mode(true));assert_eq(SaveData.highest_level_completed,9);assert_eq(SaveData.equipment_points,999);assert_eq(SaveData.horse_collection.horses.size(),debug_count)

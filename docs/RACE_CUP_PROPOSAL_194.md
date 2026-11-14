@@ -1,3 +1,5 @@
+> Nota histórica: este documento refleja el checkpoint local 194. El ciclo 195 lo amplía y activa premios; consultar RELEASE_2_7_140.md y CUP_DECISIONS_195.md para el estado publicado.
+
 # Siguiente ciclo: copa de carreras y vínculo con la historia
 
 Estado: copa optativa implementada LOCALMENTE, sin publicar. Se entra desde el selector de carreras y registra resultados reales en un archivo separado del guardado anterior. Las recompensas siguen siendo propuestas, no están implementadas. No incluida en el APK 2.7.139 publicado.

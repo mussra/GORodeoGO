@@ -7,7 +7,7 @@ func before_each():
  RaceCupSession194.path_override=PATH;RaceCupSession194.active=false
  if FileAccess.file_exists(PATH):DirAccess.remove_absolute(PATH)
 func after_each():
- RaceCupSession194.active=false;RaceCupSession194.path_override=""
+ RaceCupSession194.active=false;RaceCupSession194.path_override="";RaceCupSession194.pending_result.clear();RaceCupSession194.pending_path=""
  SaveData.horse_collection=collection;SaveData.save_path=path
  if FileAccess.file_exists(PATH):DirAccess.remove_absolute(PATH)
 func test_free_race_finish_does_not_create_cup_state():
@@ -40,7 +40,7 @@ func test_cup_view_has_real_current_goal_and_no_reward_side_effect():
  var before:String=var_to_str(SaveData.horse_collection.horses)
  var view=load("res://src/Presentation/race_cup194.tscn").instantiate();add_child(view);await wait_physics_frames(3)
  assert_eq(view.goal.id,"learn_oval");assert_false(view.play.disabled)
- assert_true(view.body.text.contains("Sin premios"))
+ assert_true(view.body.text.contains("Sin esperas"))
  assert_false(FileAccess.file_exists(PATH));assert_eq(var_to_str(SaveData.horse_collection.horses),before)
  view.free()
 

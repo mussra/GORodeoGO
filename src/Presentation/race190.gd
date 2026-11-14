@@ -220,7 +220,7 @@ func _build_selector()->void:
  _label(selector,"CARRERAS CON LAZO · PRUEBA",Vector2(26,18),25)
  _label(selector,"Velocidad igualada. El salto depende de tu caballo.
 Vallas parciales: salta o rodea por el hueco.
-Sin daño ni premios todavía.",Vector2(26,65),20)
+Sin daño. Carreras libres sin premios.",Vector2(26,65),20)
  for i in RaceCourse190.TITLES.size():
   var b:=_button(selector,RaceCourse190.TITLES[i],Vector2(26,172+i*64),_choose_course.bind(i));b.size=Vector2(700,54)
  _button(selector,"Menú",Vector2(500,430),_menu)
@@ -257,5 +257,5 @@ func _crossing_contacts192()->void:
    if separation<course.length*.25:continue
    for rider in [a,b]:
     if rider.crossing_protected>0.:continue
-    rider.crossing_slow=.65;rider.crossing_protected=1.5;rider.velocity*=.72
+    rider.crossing_slow=CupRewards195.crossing_duration(SaveData.horse_collection.find(SaveData.horse_collection.selected)) if rider==player else .65;rider.crossing_protected=1.5;rider.velocity*=.72
     if rider==player:toasts.push("Roce en el cruce · freno breve, sin daño",1.5,"crossing192")

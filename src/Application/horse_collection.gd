@@ -9,6 +9,7 @@ const EYES=COATS+["Arcoíris","Galaxy"]
 static func spots_index(t:Dictionary)->int:return int(t.get("spots",-1))
 static func legs_index(t:Dictionary)->int:return int(t.get("legs",-1))
 static func eye_index(t:Dictionary)->int:return int(t.get("eyes",10))
+var cup_rewards195:Dictionary={}
 var horses:Array[Dictionary]=[]
 var ancestors:Array[Dictionary]=[]
 var selected:String="original"
@@ -68,11 +69,13 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
  var proof:Dictionary=GalaxyPure143.birth(find(a),find(b))
  if not proof.is_empty():child["galaxy_birth143"]=proof
+ if CupRewards195.has_temper(find(a)) or CupRewards195.has_temper(find(b)):child["cup_temper195"]=CupRewards195.TEMPER
  child["can_jump"]=false;child["can_dodge"]=false;child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
- return {"mastery_rule179":1,"galaxy_keys173":galaxy_keys173.duplicate(),"galaxy_rule173":galaxy_rule173,"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
+ return {"cup_rewards195":cup_rewards195.duplicate(true),"mastery_rule179":1,"galaxy_keys173":galaxy_keys173.duplicate(),"galaxy_rule173":galaxy_rule173,"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
  if not v is Dictionary or not v.get("horses") is Array:return false
+ if not CupRewards195.valid_receipts(v.get("cup_rewards195",{})):return false
  if not v.get("training_pair",{}) is Dictionary or not v.get("affinities",{}) is Dictionary:return false
  var offers_state:Variant=v.get("bought_offers",[])
  if not offers_state is Array:return false
@@ -93,6 +96,7 @@ func restore(v:Variant)->bool:
    if h.id=="original" and not h.parents.is_empty():return false
    if h.parents.size()==2 and h.parents[0]==h.parents[1]:return false
    if h.get("stage","adult") not in ["foal","adult"]:return false
+   if h.has("cup_temper195") and h.cup_temper195!=CupRewards195.TEMPER:return false
    if h.has("growth174") and not FoalGrowth174.valid(h.growth174):return false
    if h.has("galaxy_birth143") and not GalaxyPure143.valid_record(h.galaxy_birth143,h.parents):return false
    for field169 in ["leg_adorn169","boot_adorn169"]:
@@ -123,6 +127,7 @@ func restore(v:Variant)->bool:
  if not v.has("mastery_rule179"):
   for h in clean+clean_ancestors:
    if not HorseMastery.levels(h).is_empty():HorseMastery.migrate179(h)
+ cup_rewards195=v.get("cup_rewards195",{}).duplicate(true)
  horses=clean;ancestors=clean_ancestors;selected=str(v.get("selected",adult_id))
  if not is_adult(selected):selected=adult_id
  var offers:Variant=v.get("bought_offers",[])
