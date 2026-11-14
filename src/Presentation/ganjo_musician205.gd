@@ -6,6 +6,7 @@ const ART_PATH:String="res://art/npc/ganjo_musician205.tres"
 var art_ready:bool=false
 func _ready()->void:
  name="GanjoMusician205"
+ z_index=5
  var sprite:=AnimatedSprite2D.new();sprite.name="Artist";add_child(sprite)
  sprite.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
  var frames:SpriteFrames=null
@@ -19,9 +20,9 @@ func configure_frames205(frames:SpriteFrames)->void:
  sprite.sprite_frames=frames
  var texture:Texture2D=frames.get_frame_texture("play",0)
  if texture==null:art_ready=false;visible=false;return
- sprite.scale=Vector2.ONE*86./maxf(texture.get_height(),1.)
- sprite.position.y=-43.
+ sprite.scale=Vector2.ONE*100./maxf(texture.get_height(),1.)
+ sprite.position.y=-50.
  sprite.play("play")
 static func beside_race205(course:RaceCourse190)->Vector2:
  # Outside the course and fence, near the starting line. Never an obstacle.
- return course.at(0.)+course.tangent(0.)*85.+course.tangent(0.).orthogonal()*265.
+ return course.at(0.)+course.tangent(0.)*165.+course.tangent(0.).orthogonal()*-265.

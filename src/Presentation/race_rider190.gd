@@ -104,7 +104,7 @@ func try_capture(landing:Vector2)->bool:
 func _draw()->void:
  if dodge==null:return
  super._draw()
- if ai:draw_arc(Vector2(0,-4),27.,0,TAU,32,tint,3.,true)
+ draw_arc(Vector2(0,-4),27.,0,TAU,32,tint,3.,true)
  if slow_left>0.:
   LassoRopeStyle.draw_loop(self,Vector2(0,-26))
  elif protected_left>0.:
@@ -126,4 +126,4 @@ func _aim_allowed198()->bool:
  return race.running or (race.has_method("prestart_aim198") and race.prestart_aim198())
 
 func draw_dodge_recharge204()->void:
- if not ai:DodgeVisuals.draw_clock204(self,Vector2(0,-4),dodge.cooldown,dodge.recharge_seconds)
+ pass # Recharge belongs inside the sprint button, never under the horse.

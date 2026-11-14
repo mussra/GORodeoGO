@@ -1,5 +1,6 @@
 extends "res://src/Presentation/duel193.gd"
 ## Nonviolent, isolated test mode: automatic opposite passes, shared lazo; planned regate.
+var sprint_gauge206:RadialGauge
 var pass_number:int=0
 var end_wait:float=0.
 func _ready()->void:
@@ -7,6 +8,8 @@ func _ready()->void:
  super._ready()
  ModeText203.apply(info,28);ModeText203.apply(guidance,26)
  guidance.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;guidance.offset_top=-84.
+ sprint_gauge206=RadialGauge.new();sprint_gauge206.name="SprintGauge206";sprint_gauge206.skill="stamina";hud.add_child(sprint_gauge206)
+ sprint_gauge206.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT);sprint_gauge206.offset_left=-178.;sprint_gauge206.offset_right=-94.;sprint_gauge206.offset_top=-182.;sprint_gauge206.offset_bottom=-98.
  var counter:=StartCountdown198.new();counter.name="StartCountdown198";counter.session=self;hud.add_child(counter)
  var pause_title:Label=pause_panel.get_child(0);pause_title.text="JUSTA DE LAZOS EN PAUSA"
 func _make_rider()->DuelRider193:return JoustRider196.new()
@@ -18,6 +21,7 @@ func _reset_round()->void:
  _refresh()
 func _physics_process(delta:float)->void:
  super._physics_process(delta)
+ if is_instance_valid(sprint_gauge206):sprint_gauge206.set_state(true,1.-player.dodge.cooldown/player.dodge.recharge_seconds)
  if not running:return
  var arrived:bool=true
  for rider in riders:

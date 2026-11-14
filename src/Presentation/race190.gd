@@ -10,6 +10,7 @@ var aim_joystick:VirtualJoystick
 var camera:Camera2D
 var running:bool=false
 var countdown:float=3.
+var sprint_gauge206:RadialGauge
 var elapsed:float=0.
 var hud:Control
 var info:Label
@@ -81,6 +82,8 @@ func _build_hud()->void:
  progress_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE);progress_bar.offset_left=18.;progress_bar.offset_top=96.;progress_bar.offset_right=-18.;progress_bar.offset_bottom=102.
  progress_bar.add_theme_stylebox_override("fill",RanchTheme.box(Color("8be3ba"),Color("8be3ba"),3))
  progress_bar.add_theme_stylebox_override("background",RanchTheme.box(Color("2d4947"),Color("2d4947"),3))
+ sprint_gauge206=RadialGauge.new();sprint_gauge206.name="SprintGauge206";sprint_gauge206.skill="stamina";hud.add_child(sprint_gauge206)
+ sprint_gauge206.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT);sprint_gauge206.offset_left=-178.;sprint_gauge206.offset_right=-94.;sprint_gauge206.offset_top=-174.;sprint_gauge206.offset_bottom=-90.
  var counter:=StartCountdown198.new();counter.name="StartCountdown198";counter.session=self;hud.add_child(counter)
  ModeText203.apply(info,26);ModeText203.apply(telemetry);ModeText203.apply(standings);ModeText203.apply(guidance)
  toasts=ToastStack.new();toasts.font_size203=24;toasts.top_offset=414;hud.add_child(toasts)
@@ -100,6 +103,7 @@ func _button(host:Control,text:String,at:Vector2,action:Callable)->Button:
 func _panel(extent:Vector2)->Panel:
  var p:=Panel.new();p.set_anchors_and_offsets_preset(Control.PRESET_CENTER);p.position=-extent*.5;p.size=extent;hud.add_child(p);return p
 func _physics_process(delta:float)->void:
+ if is_instance_valid(sprint_gauge206):sprint_gauge206.set_state(true,1.-player.dodge.cooldown/player.dodge.recharge_seconds)
  if is_instance_valid(selector) and selector.visible:return
  if countdown>0.:
   countdown=maxf(0.,countdown-delta)
@@ -126,7 +130,7 @@ func _physics_process(delta:float)->void:
  var order:Array=riders.duplicate();order.sort_custom(_ahead);race_order=order
  var rank:int=order.find(player)+1
  progress_bar.value=course.route_score(player.position,player.next_gate,player.route_s)/course.length*100.
- telemetry.text="%d m/s · %d%% del circuito\nLazo %s · Regate %s"%[roundi(player.velocity.length()/10.),roundi(progress_bar.value),"EN VUELO" if player.lasso.is_in_flight() else "APUNTANDO" if player.lasso.is_charging() else "LISTO" if player.attack_cooldown<=0. else "%.1fs"%player.attack_cooldown,"LISTO" if player.dodge.cooldown<=0. else "%.1fs"%player.dodge.cooldown]
+ telemetry.text="%d m/s · %d%% del circuito\nLazo %s"%[roundi(player.velocity.length()/10.),roundi(progress_bar.value),"EN VUELO" if player.lasso.is_in_flight() else "APUNTANDO" if player.lasso.is_charging() else "LISTO" if player.attack_cooldown<=0. else "%.1fs"%player.attack_cooldown]
  standings.text=""
  for i in order.size():standings.text+="%d  %s%s\n"%[i+1,order[i].racer_name," ◀" if order[i]==player else ""]
  # Gradual zoom, never rotate the world or change control directions.

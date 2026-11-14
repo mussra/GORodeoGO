@@ -1,6 +1,7 @@
 extends GutTest
 func test_missing_art_stays_hidden_and_cannot_change_gameplay():
  var slot:=GanjoMusician205.new();add_child_autofree(slot)
+ slot.configure_frames205(null)
  assert_false(slot.art_ready);assert_false(slot.visible)
  assert_eq(slot.get_child_count(),1)
  assert_true(slot.get_child(0) is AnimatedSprite2D)
