@@ -10,7 +10,7 @@ func layout()->void:
  if expanded:
   set_anchors_and_offsets_preset(Control.PRESET_CENTER);offset_left=-370.;offset_right=370.;offset_top=-230.;offset_bottom=230.
  else:
-  set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);offset_left=-254.;offset_right=-16.;offset_top=88.;offset_bottom=290.
+  set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);offset_left=-254.;offset_right=-16.;offset_top=122.;offset_bottom=324.
 func geometry()->Dictionary:
  var bounds:=Rect2(race.course.points[0],Vector2.ZERO)
  for p in race.course.points:bounds=bounds.expand(p)
@@ -48,8 +48,8 @@ func _draw()->void:
   if rider==race.player:
    var heading:Vector2=rider.velocity.normalized() if rider.velocity.length()>5. else race.course.tangent(rider.route_s)
    draw_colored_polygon(PackedVector2Array([p+heading*10.,p+heading*4.+heading.orthogonal()*4.,p+heading*4.-heading.orthogonal()*4.]),rider.tint)
- draw_string(ThemeDB.fallback_font,Vector2(14,23),"MAPA · "+("TOCA PARA CERRAR" if expanded else "TOCA +"),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("fff1cd"))
- draw_string(ThemeDB.fallback_font,Vector2(14,size.y-13),"| Meta   ○ Siguiente   ━ Valla",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("c1d7cf"))
+ draw_string(ThemeDB.fallback_font,Vector2(14,26),"MAPA · "+("TOCA PARA CERRAR" if expanded else "TOCA +"),HORIZONTAL_ALIGNMENT_LEFT,-1,18,Color("fff1cd"))
+ draw_string(ThemeDB.fallback_font,Vector2(14,size.y-13),"Meta | Puerta ○ Valla ━",HORIZONTAL_ALIGNMENT_LEFT,-1,17,Color("fff8e8"))
 func toggle()->void:
  expanded=not expanded
  if expanded:race.player.cancel_input();get_tree().paused=true

@@ -5,6 +5,8 @@ var end_wait:float=0.
 func _ready()->void:
  RaceCupSession194.active=false
  super._ready()
+ ModeText203.apply(info,28);ModeText203.apply(guidance,26)
+ guidance.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;guidance.offset_top=-84.
  var counter:=StartCountdown198.new();counter.name="StartCountdown198";counter.session=self;hud.add_child(counter)
  var pause_title:Label=pause_panel.get_child(0);pause_title.text="JUSTA DE LAZOS EN PAUSA"
 func _make_rider()->DuelRider193:return JoustRider196.new()

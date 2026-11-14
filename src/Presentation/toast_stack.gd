@@ -7,6 +7,7 @@ var pending:Array[Dictionary]=[]
 var column:VBoxContainer
 var top_offset:float=60.0
 var wide170:bool=false
+var font_size203:int=20
 static func reading_seconds(text:String,minimum:float=0.0)->float:
  return maxf(minimum,clampf(2.5+float(text.length())/24.0,3.0,7.0))
 static func backdrop(label:Label)->void:
@@ -53,7 +54,8 @@ func _fill()->void:
   var label:=Label.new();label.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED
   label.text=next.text;label.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT
   label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-  label.add_theme_font_size_override("font_size",20);backdrop(label)
+  label.add_theme_font_size_override("font_size",font_size203);backdrop(label)
+  if font_size203>20:ModeText203.apply(label,font_size203)
   label.custom_minimum_size.x=column.size.x;label.size.x=column.size.x
   column.add_child(label)
   active.append({"text":next.text,"left":next.duration,"label":label,"key":next.key})
