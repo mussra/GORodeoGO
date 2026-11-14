@@ -32,6 +32,7 @@ func _ready()->void:
  dodge_available=true;dodge_recharge_seconds=2.5
  dodge.can_start=func()->bool:return race.running and finish_time<0. and _jump_time<=0.
  lasso.throw_guard=func()->bool:return race.running and finish_time<0. and _jump_time<=0. and attack_cooldown<=0. and not lasso.is_in_flight()
+ lasso.aim_hold_guard=func()->bool:return race.running and finish_time<0. and _jump_time<=0.
  lasso.can_capture=func()->bool:return race.running
  lasso.prey_provider=func()->Array:return race.targets_for(self)
  lasso.lasso_released.connect(func():attack_cooldown=3.)
@@ -60,10 +61,13 @@ func _physics_process(delta:float)->void:
   if not dodge.step_path(max_speed,delta) and not dodge.step_coast(max_speed,delta) and not dodge.step_dash(max_speed,delta):
    var progress:Dictionary=race.course.route_project(position,route_s)
    var ahead:float=progress.s+130.
-   var goal:Vector2=race.course.at(ahead)+race.course.tangent(ahead).orthogonal()*race.course.ai_lane(progress.s,lane,can_jump and _ai_bypass<=0.)
+   # Use the inside racing line, not the original decorative starting lane.
+   # Every rider uses the same speed; fences still require a real jump/bypass.
+   var racing_lane:float=-100.+float(racer_index%4)*14.
+   var goal:Vector2=race.course.at(ahead)+race.course.tangent(ahead).orthogonal()*race.course.ai_lane(progress.s,racing_lane,can_jump and _ai_bypass<=0.)
    var wish:Vector2=(goal-position).normalized()
    velocity=velocity.move_toward(wish*max_speed,acceleration*delta);move_and_slide()
-  gait=WorldGait.GALOPE;_update_animation(delta);_evade();_think(delta)
+  gait=WorldGait.GALOPE;_update_animation(delta);_evade();_boost197();_think(delta)
  queue_redraw()
 func _evade()->void:
  # Evasion reacts to an already airborne rope, not future input or future landings.
@@ -102,3 +106,14 @@ func _draw()->void:
  elif protected_left>0.:
   draw_arc(Vector2(0,-32),37.,0,TAU,32,Color(tint,.5),2.,true)
  draw_string(ThemeDB.fallback_font,Vector2(-34,-125),racer_name,HORIZONTAL_ALIGNMENT_LEFT,-1,20,tint)
+
+## Same traced regate and same cooldown as a player drawing forward. No catch-up.
+func _boost197()->void:
+ if dodge.cooldown>0. or dodge.remaining>0. or _jump_time>0.:return
+ var projection:Dictionary=race.course.route_project(position,route_s)
+ for fence in race.course.fences:
+  if fposmod(fence-projection.s,race.course.length)<360.:return
+ var forward:Vector2=race.course.tangent(projection.s)
+ # Avoid boosting into an outer boundary while recovering from a side-step.
+ if absf((position-projection.point).dot(forward.orthogonal()))>135.:return
+ dodge.request_path(PackedVector2Array([Vector2.ZERO,forward*125.,forward*250.]))

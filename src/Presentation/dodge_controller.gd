@@ -294,3 +294,10 @@ func cancel() -> void:
 func _clamp_to_bounds() -> void:
 	if world_bounds.has_area():
 		owner_body.global_position = owner_body.global_position.clamp(world_bounds.position, world_bounds.end)
+
+## A scene's non-collision boundary can clip movement after step_path returns.
+## Release an unreachable trace without refunding cooldown or forcing a new direction.
+func stop_clipped_path()->void:
+	if path.is_empty():return
+	path.clear();remaining=0.;coast_remaining=0.;run_after_dodge=Vector2.ZERO
+	owner_body.velocity=Vector2.ZERO;dodge_finished.emit();on_moved.call()

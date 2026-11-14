@@ -44,6 +44,7 @@ var aim_direction: Vector2 = Vector2.RIGHT
 var rider_velocity:Callable=func()->Vector2:return Vector2.ZERO
 static func inherited_landing(origin:Vector2,aim:Vector2,distance:float,velocity:Vector2,travel:float)->Vector2:
 	return origin+aim.normalized()*distance+velocity*travel
+var aim_hold_guard:Callable=func()->bool:return throw_guard.call()
 var throw_guard: Callable = func() -> bool: return true
 var prey_provider: Callable = func() -> Array: return []
 var can_capture: Callable = func() -> bool: return true
@@ -92,11 +93,11 @@ func set_aim_joystick(aim_joystick: VirtualJoystick) -> void:
 	aim_joystick.released.connect(_on_aim_released)
 
 func _on_aim_pressed() -> void:
-	if not throw_guard.call():
+	if not aim_hold_guard.call():
 		return
 	_touch_aim_active = true
 	_lasso_gesture.press(_now_seconds())
-	if not _is_charging and not _lasso_in_flight:
+	if throw_guard.call() and not _is_charging and not _lasso_in_flight:
 		if has_free_lasso_slot():
 			_start_charging()
 		else:
@@ -124,8 +125,9 @@ func _on_aim_released(input_vector: Vector2) -> void:
 ## Keyboard/mouse path: aim_* actions steer, throw_lasso charges and releases.
 func process_throw_input(delta: float) -> void:
 	if not throw_guard.call():
-		cancel_input()
+		if not (_touch_aim_active and aim_hold_guard.call()):cancel_input()
 		return
+	if _touch_aim_active and not _is_charging and not _lasso_in_flight and has_free_lasso_slot():_start_charging()
 	if _is_charging:
 		var aim_vec: Vector2 = Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
 		if aim_vec.length() > 0.0:

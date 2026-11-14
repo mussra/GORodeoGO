@@ -103,6 +103,7 @@ func _physics_process(delta:float)->void:
   if countdown<=0.:running=true;toasts.push("¡Ya! Sigue las puertas en orden · una vuelta",3.)
  if running:elapsed+=delta
  for rider in riders:
+  var unclipped:Vector2=rider.position
   if course.variant==3:
    var q:Dictionary=course.route_project(rider.position,rider.route_s)
    # No remote-branch snap, including a dodge across the intersection.
@@ -111,6 +112,7 @@ func _physics_process(delta:float)->void:
    var center:Vector2=course.at(rider.route_s)
    rider.position=center+(rider.position-center).limit_length(RaceCourse190.WIDTH*.5-18.)
   else:rider.position=course.constrain(rider.position);rider.route_s=course.project(rider.position).s
+  if rider.position.distance_to(unclipped)>.5:rider.dodge.stop_clipped_path()
   if running and rider.finish_time<0. and course.crossed_gate(rider.previous_position,rider.position,rider.next_gate) and (course.variant!=3 or absf(rider.route_s-course.length*rider.next_gate/16.)<100.):
    rider.next_gate+=1
    if rider.next_gate>RaceCourse190.GATES:
@@ -121,7 +123,7 @@ func _physics_process(delta:float)->void:
  var order:Array=riders.duplicate();order.sort_custom(_ahead);race_order=order
  var rank:int=order.find(player)+1
  progress_bar.value=course.route_score(player.position,player.next_gate,player.route_s)/course.length*100.
- telemetry.text="%d m/s · %d%% del circuito\nLazo %s · Regate %s"%[roundi(player.velocity.length()/10.),roundi(progress_bar.value),"LISTO" if player.attack_cooldown<=0. else "%.1fs"%player.attack_cooldown,"LISTO" if player.dodge.cooldown<=0. else "%.1fs"%player.dodge.cooldown]
+ telemetry.text="%d m/s · %d%% del circuito\nLazo %s · Regate %s"%[roundi(player.velocity.length()/10.),roundi(progress_bar.value),"EN VUELO" if player.lasso.is_in_flight() else "APUNTANDO" if player.lasso.is_charging() else "LISTO" if player.attack_cooldown<=0. else "%.1fs"%player.attack_cooldown,"LISTO" if player.dodge.cooldown<=0. else "%.1fs"%player.dodge.cooldown]
  standings.text=""
  for i in order.size():standings.text+="%d  %s%s\n"%[i+1,order[i].racer_name," ◀" if order[i]==player else ""]
  # Gradual zoom, never rotate the world or change control directions.
