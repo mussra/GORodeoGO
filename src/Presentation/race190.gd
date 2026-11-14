@@ -24,6 +24,9 @@ var progress_bar:ProgressBar
 var _track_visual:RaceScenery191
 var hit_count:int=0
 var throws_count:int=0
+var landed194:int=0
+var dodges194:int=0
+var received194:int=0
 var story_dialog:NpcDialog
 var pause_panel:Panel
 var pause_button:Button
@@ -52,7 +55,8 @@ func _ready()->void:
  player.lasso.set_aim_joystick(aim_joystick);player.dodge.set_move_joystick(move);JoystickAppearance.apply(self)
  var sound:=RanchAudio.new();sound.enabled=GameState.sound_enabled;add_child(sound)
  player.lasso.lasso_thrown.connect(func(_o,_p):sound.play("throw");throws_count+=1)
- player.dodge.dodge_started.connect(func():sound.play("dodge"))
+ player.dodge.dodge_started.connect(func():sound.play("dodge");dodges194+=1)
+ player.lasso.prey_captured.connect(func(_target):landed194+=1)
  _build_hud()
  _build_selector()
  if RaceCourse190.start_selected:selector.hide();RaceCourse190.start_selected=false
@@ -145,14 +149,21 @@ func targets_for(attacker:RaceRider190)->Array:
  return list
 func notice_hit(target:RaceRider190)->void:
  hit_count+=1
+ if target==player:received194+=1
  if target==player:toasts.push("Te han enlazado: freno breve, sin daño. Luego tienes protección.",2.)
 func _finish()->void:
+ var cup_run:bool=RaceCupSession194.active
  _announced=true;running=false;toasts.clear()
  for rider in riders:rider.cancel_input()
  var order:Array=riders.duplicate();order.sort_custom(_ahead)
  var lines:String="META · %d/4 · %.2fs\n\n"%[order.find(player)+1,player.finish_time]
  for i in order.size():
   lines+="%d. %s · %s\n"%[i+1,order[i].racer_name,("%.2fs"%order[i].finish_time) if order[i].finish_time>=0. else "en pista"]
+ if cup_run:
+  RaceCupSession194.finish({"mode":"race","finished":true,"course":course.variant,"rank":order.find(player)+1,"gates":mini(16,player.next_gate-1),"landed":landed194,"dodges":dodges194,"hits":received194})
+  for child in results.get_children():
+   if child is Button:child.hide()
+  _button(results,"Volver a la copa",Vector2(195,310),func():get_tree().change_scene_to_file("res://src/Presentation/race_cup194.tscn"))
  result_text.text=lines
  result_text.add_theme_font_size_override("font_size",21)
  _label(results,"Prototipo · sin premios ni cambios en tus caballos.",Vector2(28,268),17)
@@ -171,10 +182,11 @@ func _retry()->void:
  RaceCourse190.start_selected=true
  get_tree().paused=false;Engine.time_scale=1.;get_tree().reload_current_scene()
 func _menu()->void:
+ RaceCupSession194.active=false
  get_tree().paused=false;Engine.time_scale=1.;get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn")
 func _exit_tree()->void:
  Engine.time_scale=1.;get_tree().paused=false
- for action in ["move_left","move_right","move_up","move_down","throw_lasso"]:Input.action_release(action)
+ for action in ["move_left","move_right","move_up","move_down","aim_left","aim_right","aim_up","aim_down","throw_lasso"]:Input.action_release(action)
 func _draw()->void:
  for i in 16:
   var s:float=course.length*i/16.;var center:Vector2=course.at(s);var side:Vector2=course.tangent(s).orthogonal();var color:=Color("8d6745")
@@ -212,6 +224,7 @@ Sin daño ni premios todavía.",Vector2(26,65),20)
  for i in RaceCourse190.TITLES.size():
   var b:=_button(selector,RaceCourse190.TITLES[i],Vector2(26,172+i*64),_choose_course.bind(i));b.size=Vector2(700,54)
  _button(selector,"Menú",Vector2(500,430),_menu)
+ var cup_button:=_button(selector,"Copa de objetivos · prueba",Vector2(26,430),func():RaceCupSession194.active=false;get_tree().change_scene_to_file("res://src/Presentation/race_cup194.tscn"));cup_button.size.x=440.
 func _choose_course(index:int)->void:
  if index!=course.variant:
   RaceCourse190.selected=index;RaceCourse190.start_selected=true;_retry();return

@@ -193,6 +193,7 @@ func request_dash(dir: Vector2) -> bool:
 	direction = dir.normalized()
 	remaining = DODGE_SECONDS
 	cooldown = recharge_seconds
+	dodge_started.emit()
 	return true
 
 ## Ground trail housekeeping: keeps fading even while other branches run.

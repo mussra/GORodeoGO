@@ -86,9 +86,15 @@ func _resolve_round()->void:
  if pending.size()==1:scores[pending[0]]+=1
  finished=scores[0]>=2 or scores[1]>=2
  var title:String="Impactos simultáneos · repetimos sin punto" if pending.size()==2 else ("¡Manga para ti!" if pending[0]==0 else "Luna gana la manga")
+ var cup_done:bool=finished and RaceCupSession194.active
+ if cup_done:
+  RaceCupSession194.finish({"mode":"duel","finished":true,"player_wins":scores[0],"rival_wins":scores[1]})
+  next_button.text="Volver a la copa"
+  for connection in next_button.pressed.get_connections():next_button.pressed.disconnect(connection.callable)
+  next_button.pressed.connect(func():get_tree().change_scene_to_file("res://src/Presentation/race_cup194.tscn"))
  if finished:title="¡Has ganado el duelo!" if scores[0]>=2 else "Luna gana el duelo"
  result_text.text=title+"\n\nTú %d - %d Luna\nSin premios ni cambios en tus caballos."%[scores[0],scores[1]]
- next_button.text="Repetir duelo" if finished else "Repetir manga" if pending.size()==2 else "Siguiente manga"
+ next_button.text="Volver a la copa" if cup_done else "Repetir duelo" if finished else "Repetir manga" if pending.size()==2 else "Siguiente manga"
  result.show();_refresh()
 func _clear_actions()->void:
  for action in ["move_left","move_right","move_up","move_down","aim_left","aim_right","aim_up","aim_down","throw_lasso"]:Input.action_release(action)
@@ -111,6 +117,7 @@ func navigate_back()->void:
 func _unhandled_input(event:InputEvent)->void:
  if event.is_action_pressed("ui_cancel"):navigate_back();get_viewport().set_input_as_handled()
 func _menu()->void:
+ RaceCupSession194.active=false
  get_tree().paused=false;get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn")
 func _exit_tree()->void:
  get_tree().paused=false;Engine.time_scale=1.
