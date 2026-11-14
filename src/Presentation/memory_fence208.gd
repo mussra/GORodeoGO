@@ -1,7 +1,7 @@
 class_name MemoryFence208
 extends Node2D
 ## One geometry for obstacle collision, scoring and minimap orientation.
-const VERTICAL=[false,true,false,true]
+const VERTICAL=[false,false,false,false]
 var index:int=0
 static func half_axis(index_value:int)->Vector2:
  return Vector2(0,75) if VERTICAL[index_value] else Vector2(75,0)

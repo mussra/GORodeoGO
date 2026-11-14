@@ -10,5 +10,7 @@ func test_visual_collision_and_scoring_axes_agree():
  for index in 4:
   var fence:=MemoryFence208.new();fence.index=index;add_child_autofree(fence)
   var shape:RectangleShape2D=fence.get_child(0).get_child(0).shape
-  assert_eq(shape.size,Vector2(8,151) if index%2==1 else Vector2(151,8))
+  assert_eq(shape.size,Vector2(151,8))
+  assert_true(fence.get_node("FenceArt").texture.resource_path.ends_with("%d-horizontal.png"%[index+1]))
+  assert_eq(MemoryFence208.half_axis(index),Vector2(75,0))
   assert_almost_eq(MemoryFence208.half_axis(index).dot(MemoryFence208.normal(index)),0.,.001)
