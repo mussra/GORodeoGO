@@ -3,6 +3,12 @@ var world:Node
 func _ready():run.call_deferred()
 func shot(name_:String):
  for i in 3:await get_tree().process_frame
+ world._update_chunks()
+ while not world._build_queue.is_empty():world._step_chunk_build()
+ world._update_chunks()
+ for child in world._toasts.get_children():
+  if child is CanvasItem:child.visible=false
+ for i in 3:await get_tree().process_frame
  await RenderingServer.frame_post_draw
  get_viewport().get_texture().get_image().save_png("/downloads/garden212-"+name_+".png")
 func run():
