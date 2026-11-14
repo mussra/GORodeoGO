@@ -23,7 +23,9 @@ func _watch_root209(node:Node)->void:
   game.move_child.call_deferred(self,-1)
 func _watch_ui209(node:Node)->void:
  if node is VirtualJoystick:
-  if not sticks.has(node):sticks.append(node)
+  if not sticks.has(node):
+   sticks.append(node)
+   _full_touch_area211.call_deferred(node)
   return
  if node is Control and not controls209.has(node):controls209.append(node)
  if not node.child_entered_tree.is_connected(_watch_ui209):node.child_entered_tree.connect(_watch_ui209)
@@ -43,14 +45,11 @@ func _ui_at(_node:Node,point:Vector2)->bool:
  for control in controls209:
   if is_instance_valid(control) and control.is_visible_in_tree() and control.mouse_filter!=Control.MOUSE_FILTER_IGNORE and control.get_global_rect().has_point(point):return true
  return false
-func _stick_at(point:Vector2)->VirtualJoystick:
- var fallback:VirtualJoystick
- for stick in sticks:
-  if not is_instance_valid(stick) or not stick.is_visible_in_tree():continue
-  fallback=stick
-  var rect:=stick.get_global_rect()
-  if point.x>=rect.position.x and point.x<=rect.end.x:return stick
- return fallback
+func _full_touch_area211(stick:VirtualJoystick)->void:
+ if not is_instance_valid(stick):return
+ # UI tap/drag ownership is decided above the sticks. Both native touch areas
+ # can cover the full height of their half without relocating any input event.
+ stick.anchor_top=0.;stick.offset_top=0.;stick.anchor_bottom=1.;stick.offset_bottom=0.
 func _input(event:InputEvent)->void:
  if event.get_meta("routed209",false):return
  if event is InputEventMouse and event.device==InputEvent.DEVICE_ID_EMULATION and not dispatching209 and (_can_begin() or not touches.is_empty()):
@@ -76,10 +75,6 @@ func _input(event:InputEvent)->void:
   get_viewport().set_input_as_handled()
   if not state.play and event.position.distance_to(state.press.position)>=DRAG_DISTANCE:
    state.play=true
-   var stick:=_stick_at(state.press.position)
-   if stick!=null:
-    var area:=stick.get_global_rect().grow(-minf(stick.joystick_size*.5+2.,minf(stick.size.x,stick.size.y)*.4))
-    state.offset=state.press.position.clamp(area.position,area.end)-state.press.position
    _send(state.press,state.offset,true)
   if state.play:_send(event,state.offset,true)
 func _filters(_node:Node,out:Array)->void:
@@ -100,7 +95,10 @@ func _dispatch(event:InputEvent,offset:Vector2,bypass:bool)->void:
    if is_instance_valid(stick):
     modes.append([stick,stick.process_mode]);stick.process_mode=Node.PROCESS_MODE_ALWAYS
  dispatching209=true
- Input.parse_input_event(event);Input.flush_buffered_events()
+ # _input is already in viewport coordinates. parse_input_event accepts screen
+ # coordinates, so replay must apply stretch exactly once, not twice.
+ var screen_event:InputEvent=event.xformed_by(get_viewport().get_final_transform())
+ Input.parse_input_event(screen_event);Input.flush_buffered_events()
  dispatching209=false
  for saved in filters:
   if is_instance_valid(saved[0]):saved[0].mouse_filter=saved[1]
