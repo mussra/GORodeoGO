@@ -16,6 +16,12 @@ func run():
  race.countdown=0.;race.running=true
  Input.action_press("move_right");await get_tree().create_timer(.9).timeout;Input.action_release("move_right")
  await shot("running")
+ race.map_view.toggle();await shot("map-expanded");race.map_view.toggle()
+ for index in 2:
+  var e:=InputEventScreenTouch.new();e.index=index;e.position=Vector2(180+600*index,420);e.pressed=true;Input.parse_input_event(e)
+ await shot("controls")
+ for index in 2:
+  var e:=InputEventScreenTouch.new();e.index=index;e.position=Vector2(180+600*index,420);e.pressed=false;Input.parse_input_event(e)
  # Show the real flight shared by all modes, with live rivals as targets.
  var target=race.riders[1];target.position=race.player.position+Vector2(140,0)
  race.player.lasso.aim_direction=Vector2.RIGHT;race.player.lasso._start_charging();race.player.lasso._charge_distance=140.;race.player.lasso._release_throw()
@@ -31,6 +37,9 @@ func run():
  Engine.time_scale=1.;auto=false
  for a in ["move_right","move_left","move_up","move_down"]:Input.action_release(a)
  await shot("finish")
+ if not is_instance_valid(race.story_dialog):race._winner_story()
+ await shot("story")
+ var body=race.story_dialog.get_node("StoryScroll/StoryBody");print("STORY191 size=",body.size," panel=",race.story_dialog.size)
  get_tree().root.size=Vector2i(1600,720);await shot("wide")
  print("RACE190_QA gates=",race.player.next_gate," finish=",race.player.finish_time," elapsed=",race.elapsed)
  race.free();get_tree().quit()

@@ -11,6 +11,8 @@ const GATES:int=16
 var points:PackedVector2Array=PackedVector2Array()
 var lengths:Array[float]=[0.]
 var length:float=0.
+var _project_frame:int=-1
+var _projection_cache:Dictionary={}
 func _init(index:int=0)->void:
  variant=clampi(index,0,2)
  for i in 193:
@@ -24,15 +26,19 @@ func _init(index:int=0)->void:
  for gate in [3,7,11,15]:fences.append(length*gate/16.)
 func at(distance:float)->Vector2:
  var s:float=fposmod(distance,length)
- for i in range(1,points.size()):
-  if lengths[i]>=s:return points[i-1].lerp(points[i],(s-lengths[i-1])/(lengths[i]-lengths[i-1]))
- return points[0]
+ var i:int=clampi(lengths.bsearch(s),1,points.size()-1)
+ return points[i-1].lerp(points[i],(s-lengths[i-1])/(lengths[i]-lengths[i-1]))
 func tangent(distance:float)->Vector2:return (at(distance+8)-at(distance-8)).normalized()
 func project(p:Vector2)->Dictionary:
- var best:float=INF;var result:Dictionary={}
+ var frame:int=Engine.get_physics_frames()
+ if frame!=_project_frame:_projection_cache.clear();_project_frame=frame
+ if _projection_cache.has(p):return _projection_cache[p]
+ var best:float=INF;var best_point:=Vector2.ZERO;var best_s:float=0.
  for i in range(points.size()-1):
   var v:Vector2=points[i+1]-points[i];var t:float=clampf((p-points[i]).dot(v)/v.length_squared(),0.,1.);var q:Vector2=points[i]+v*t;var d:float=p.distance_squared_to(q)
-  if d<best:best=d;result={"point":q,"s":lengths[i]+v.length()*t,"distance":sqrt(d)}
+  if d<best:best=d;best_point=q;best_s=lengths[i]+v.length()*t
+ var result:Dictionary={"point":best_point,"s":best_s,"distance":sqrt(best)}
+ _projection_cache[p]=result
  return result
 func constrain(p:Vector2)->Vector2:
  var q:Dictionary=project(p)

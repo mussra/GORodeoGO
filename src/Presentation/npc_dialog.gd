@@ -46,3 +46,15 @@ func _fit165():
  var viewport_size:Vector2=get_viewport_rect().size
  var k:float=minf(viewport_size.x/1280.,viewport_size.y/720.)
  scale=Vector2.ONE*k;position=(viewport_size-size*k)*.5
+
+## Optional story-only dialogue. Same panel, portrait, reading surface and fitting,
+## without quest acceptance, rewards or mutations of the caller's state.
+func setup_story(speaker:String,title_text:String,text:String)->void:
+ size=Vector2(720,430);z_index=100;mouse_filter=Control.MOUSE_FILTER_STOP
+ DetailCard179.style_panel(self)
+ var title:=Label.new();title.text=speaker+" · "+title_text;title.position=Vector2(24,20);add_child(title);TextFit181.fixed(title,Vector2(672,54),25,20,2)
+ var portrait:=Sprite2D.new();portrait.texture=WorldNpc.PORTRAIT;portrait.position=Vector2(86,171);portrait.scale=Vector2.ONE*(180./portrait.texture.get_height());add_child(portrait)
+ var scroll:=ScrollContainer.new();scroll.name="StoryScroll";scroll.position=Vector2(170,85);scroll.size=Vector2(520,245);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;add_child(scroll)
+ var body:=Label.new();body.name="StoryBody";body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.text=text;scroll.add_child(body)
+ DetailCard179.reading_surface(body);TextFit181.flow(body,490.)
+ var close:=Button.new();close.text="Entendido · ver resultado";close.position=Vector2(170,355);close.size=Vector2(520,52);QuestButtonStyle.apply(close);add_child(close);close.pressed.connect(func():closed.emit())

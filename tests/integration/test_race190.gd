@@ -117,9 +117,9 @@ func test_exit_cancels_bullet_time_and_input()->void:
  assert_false(Input.is_action_pressed("move_right"))
 
 func touch(index:int,point:Vector2,pressed:bool)->void:
- var e:=InputEventScreenTouch.new();e.index=index;e.position=point;e.pressed=pressed;Input.parse_input_event(e)
+ var e:=InputEventScreenTouch.new();e.index=index;e.position=point;e.pressed=pressed;Input.parse_input_event(e);Input.flush_buffered_events()
 func drag(index:int,point:Vector2)->void:
- var e:=InputEventScreenDrag.new();e.index=index;e.position=point;Input.parse_input_event(e)
+ var e:=InputEventScreenDrag.new();e.index=index;e.position=point;Input.parse_input_event(e);Input.flush_buffered_events()
 func test_native_touch_movement_and_aim_throw()->void:
  start();var extent:Vector2=get_viewport().get_visible_rect().size
  var from:Vector2=extent*Vector2(.15,.75);var at:Vector2=race.player.position
@@ -129,7 +129,8 @@ func test_native_touch_movement_and_aim_throw()->void:
  var aim:Vector2=extent*Vector2(.75,.75)
  touch(1,aim,true);await wait_physics_frames(2);drag(1,aim+Vector2(75,0));await wait_physics_frames(3)
  assert_true(race.player.lasso.is_charging())
- touch(1,aim+Vector2(75,0),false);await wait_physics_frames(1)
+ await wait_seconds(.22) # Drag, not the intentional quick-tap gesture.
+ touch(1,aim+Vector2(75,0),false);await wait_physics_frames(3)
  assert_true(race.player.lasso.is_in_flight())
  assert_gt(race.player.attack_cooldown,2.5)
 
@@ -163,3 +164,79 @@ func test_selector_stops_countdown_and_has_three_courses()->void:
  assert_false(race.selector.visible)
  await wait_physics_frames(4)
  assert_lt(race.countdown,left)
+
+func test_actual_map_geometry_fits_every_course_with_corridor()->void:
+ for index in 3:
+  race.course=RaceCourse190.new(index)
+  for expanded in [false,true]:
+   race.map_view.expanded=expanded;race.map_view.layout()
+   var g:Dictionary=race.map_view.geometry()
+   for point in race.course.points:
+    var pixel:Vector2=race.map_view.point(point,g)
+    var margin:float=RaceCourse190.WIDTH*.5*g.scale
+    assert_true(Rect2(Vector2(18,36),race.map_view.size-Vector2(36,72)).grow(-margin).has_point(pixel))
+ race.map_view.expanded=false;race.map_view.layout()
+func test_native_touch_map_pauses_without_aim_and_back_only_closes_map()->void:
+ start();var map:RaceMap191=race.map_view
+ var point:Vector2=map.get_global_rect().get_center()
+ touch(3,point,true);await wait_frames(2)
+ assert_true(map.expanded);assert_true(get_tree().paused)
+ assert_false(race.player.lasso.is_charging())
+ var elapsed:float=race.elapsed;await wait_frames(3);assert_eq(race.elapsed,elapsed)
+ touch(3,point,false);race.navigate_back();await wait_frames(2)
+ assert_false(map.expanded);assert_false(get_tree().paused);assert_false(race.pause_panel.visible)
+ assert_false(race.player.lasso.is_in_flight())
+func test_story_dialog_is_shared_bounded_and_has_no_progress_effect()->void:
+ start();var before:String=var_to_str(SaveData.horse_collection.horses)
+ race._winner_story();await wait_frames(4)
+ assert_true(race.story_dialog is NpcDialog)
+ var body:Label=race.story_dialog.get_node("StoryScroll/StoryBody")
+ assert_lte(body.size.x,520.)
+ assert_eq(body.max_lines_visible,-1)
+ assert_false(body.clip_text)
+ assert_lt(body.position.x+body.size.x,race.story_dialog.size.x)
+ assert_false(body.text.is_empty())
+ race.navigate_back();await wait_frames(2)
+ assert_false(is_instance_valid(race.story_dialog))
+ assert_eq(var_to_str(SaveData.horse_collection.horses),before)
+ assert_false(FileAccess.file_exists(SaveData.save_path))
+func test_ai_evasion_not_gated_by_attack_think_timer()->void:
+ start()
+ for rider in race.riders:rider.set_physics_process(false)
+ var bot:RaceRider190=race.riders[1];var player:RaceRider190=race.player
+ player.velocity=Vector2.ZERO;player.position=bot.position-Vector2(100,0)
+ player.lasso.aim_direction=Vector2.RIGHT;player.lasso._start_charging();player.lasso._charge_distance=100.;player.lasso._release_throw()
+ bot.set_physics_process(true);bot.attack_think=.6;bot._evade()
+ assert_gt(bot.dodge.remaining,0.,"Existing flight can be evaded without waiting for next attack decision")
+ assert_almost_eq(bot.attack_think,.6,.001)
+func test_ai_leads_target_but_keeps_shared_inherited_flight()->void:
+ start()
+ for rider in race.riders:rider.set_physics_process(false)
+ var bot:RaceRider190=race.riders[1];var target:RaceRider190=race.player
+ bot.position=race.course.at(200.);target.position=race.course.at(340.)
+ bot.velocity=Vector2(260,0);target.velocity=Vector2(180,10)
+ race.riders[2].position=race.course.at(1000.);race.riders[3].position=race.course.at(2000.)
+ bot.attack_think=0.;bot._think(.016)
+ assert_true(bot.lasso.is_in_flight())
+ assert_almost_eq(bot.lasso._flight_line.landing.distance_to(target.position+target.velocity*.35),0.,.1)
+func test_scenery_and_decorated_fences_use_existing_shared_physics()->void:
+ assert_true(race.get_node("RaceScenery191") is RaceScenery191)
+ assert_eq(race.fence_bodies.size(),4)
+ for fence in race.fence_bodies:
+  assert_true(fence.is_in_group("world_fence"))
+  assert_eq(fence.collision_layer,HorseJump.FENCE_LAYER)
+
+func test_top_down_sliding_recovers_from_diagonal_valley_fence()->void:
+ start()
+ for rider in race.riders:rider.set_physics_process(false)
+ # Reproduce the diagonal fence that previously trapped a grounded body.
+ var c:=RaceCourse190.new(1);var fixture:=Node2D.new();add_child(fixture)
+ var at:Vector2=c.at(c.fences[0]);var side:Vector2=c.tangent(c.fences[0]).orthogonal()
+ WorldFence.segment(fixture,at-side*175.,at+side*40.,true,true)
+ var bot:RaceRider190=race.riders[1];race.course=c
+ bot.position=Vector2(2234.611,-982.222);bot.previous_position=bot.position;bot.next_gate=3;bot.can_jump=false;bot.attack_cooldown=999.;bot.set_physics_process(true)
+ assert_eq(bot.motion_mode,CharacterBody2D.MOTION_MODE_FLOATING)
+ await wait_seconds(1.4)
+ assert_gte(bot.next_gate,4)
+ assert_gt((bot.position-at).dot(c.tangent(c.fences[0])),30.)
+ fixture.free()

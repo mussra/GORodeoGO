@@ -19,6 +19,8 @@ var tether_from:Node2D
 var passed:int=0
 func _ready()->void:
  super._ready()
+ # Top-down riders slide along diagonal fences, never treat them as slopes.
+ motion_mode=CharacterBody2D.MOTION_MODE_FLOATING
  collision_layer=0;collision_mask=HorseJump.FENCE_LAYER
  max_speed=base_pace;acceleration=900.
  dodge_available=true;dodge_recharge_seconds=2.5
@@ -49,12 +51,9 @@ func _physics_process(delta:float)->void:
    var goal:Vector2=race.course.at(ahead)+race.course.tangent(ahead).orthogonal()*race.course.ai_lane(progress.s,lane,can_jump)
    var wish:Vector2=(goal-position).normalized()
    velocity=velocity.move_toward(wish*max_speed,acceleration*delta);move_and_slide()
-  gait=WorldGait.GALOPE;_update_animation(delta);_think(delta)
+  gait=WorldGait.GALOPE;_update_animation(delta);_evade();_think(delta)
  queue_redraw()
-func _think(delta:float)->void:
- attack_think-=delta
- if attack_think>0.:return
- attack_think=.35+float(racer_index)*.11
+func _evade()->void:
  # Evasion reacts to an already airborne rope, not future input or future landings.
  for opponent in race.riders:
   if opponent==self or not opponent.lasso.is_in_flight():continue
@@ -64,13 +63,18 @@ func _think(delta:float)->void:
    var projection:Dictionary=race.course.project(position)
    var offset:float=(position-projection.point).dot(side)
    dodge.request_dash(side*(-1. if offset>0. else 1.));break
+func _think(delta:float)->void:
+ attack_think-=delta
+ if attack_think>0.:return
+ attack_think=.35+float(racer_index)*.11
  if attack_cooldown>0. or lasso.is_in_flight() or dodge.remaining>0.:return
  var candidates:Array=race.targets_for(self)
  if candidates.is_empty():return
  var target:Node2D=candidates[0]
  # Use the normal shared charge/release, inheritance and fixed flight time.
- lasso.aim_direction=(target.position-position).normalized()
- lasso._start_charging();lasso._charge_distance=position.distance_to(target.position)
+ var aim:Vector2=target.position+target.velocity*LassoController.FLIGHT_SECONDS-position-velocity*LassoController.FLIGHT_SECONDS
+ lasso.aim_direction=aim.normalized()
+ lasso._start_charging();lasso._charge_distance=minf(aim.length(),lasso.max_throw_distance)
  lasso._release_throw()
 func try_capture(landing:Vector2)->bool:
  if not race.running or finish_time>=0. or protected_left>0. or position.distance_to(landing)>58.:return false
