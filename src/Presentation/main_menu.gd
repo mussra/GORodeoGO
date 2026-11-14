@@ -142,11 +142,16 @@ func _build_menu() -> void:
 		if _transitioning:return
 		_transitioning=true
 		get_tree().change_scene_to_file("res://src/Presentation/race190.tscn"))
-	var duel_button:=Button.new();duel_button.name="DuelEntry193";duel_button.text="Duelo de lazos · prueba";duel_button.position=Vector2(590,16);duel_button.size=Vector2(330,48);_hero.add_child(duel_button)
+	var duel_button:=Button.new();duel_button.name="DuelEntry193";duel_button.text="Duelo de lazos";duel_button.position=Vector2(590,16);duel_button.size=Vector2(250,48);_hero.add_child(duel_button)
 	duel_button.pressed.connect(func():
 		if _transitioning:return
 		_transitioning=true
 		get_tree().change_scene_to_file("res://src/Presentation/duel193.tscn"))
+	var joust_button:=Button.new();joust_button.name="JoustEntry196";joust_button.text="Justa con lazos";joust_button.position=Vector2(850,16);joust_button.size=Vector2(260,48);_hero.add_child(joust_button)
+	joust_button.pressed.connect(func():
+		if _transitioning:return
+		_transitioning=true
+		get_tree().change_scene_to_file("res://src/Presentation/joust196.tscn"))
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)

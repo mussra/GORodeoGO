@@ -24,7 +24,7 @@ func _ready()->void:
  process_physics_priority=50
  RanchMusic.play_context("world")
  for index in 2:
-  var rider:=DuelRider193.new();rider.race=self;rider.ai=index==1;rider.racer_index=index;rider.racer_name="Tú" if index==0 else "Luna";rider.tint=Color("7de1cc") if index==0 else Color("ffb473")
+  var rider:=_make_rider();rider.race=self;rider.ai=index==1;rider.racer_index=index;rider.racer_name="Tú" if index==0 else "Luna";rider.tint=Color("7de1cc") if index==0 else Color("ffb473")
   add_child(rider);riders.append(rider)
  player=riders[0]
  var camera:=Camera2D.new();camera.position=Vector2(0,-20);camera.zoom=Vector2.ONE*.88;add_child(camera)
@@ -43,6 +43,7 @@ func _ready()->void:
  _label(pause_panel,"DUELO EN PAUSA",Vector2(26,24),26)
  _button(pause_panel,"Continuar",Vector2(26,110),_resume);_button(pause_panel,"Menú",Vector2(345,110),_menu);pause_panel.hide()
  _reset_round();queue_redraw()
+func _make_rider()->DuelRider193:return DuelRider193.new()
 func _label(parent:Control,text:String,at:Vector2,font:int)->Label:
  var label:=Label.new();label.text=text;label.position=at;label.add_theme_font_size_override("font_size",font);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;parent.add_child(label);return label
 func _button(parent:Control,text:String,at:Vector2,action:Callable)->Button:

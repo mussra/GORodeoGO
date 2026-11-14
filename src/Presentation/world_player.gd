@@ -152,7 +152,7 @@ func step_shared_movement(delta:float)->void:
 	_jump_cooldown=maxf(0,_jump_cooldown-delta)
 	if _jump_time>0:HorseJumpMotion.process(self,delta);return
 	if can_jump and velocity.length()>60 and HorseJumpMotion.try_ahead(self):return
-	lasso.process_throw_input(delta)
+	process_lasso_input(delta)
 	dodge.cooldown = maxf(0.0, dodge.cooldown - delta)
 	if dodge.fade_trail(delta):
 		queue_redraw()
@@ -174,7 +174,7 @@ func step_shared_movement(delta:float)->void:
 		return
 	if dodge.step_dash(max_speed, delta):
 		return
-	var wish := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var wish := movement_wish()
 	gait = mini(WorldGait.update(gait, wish.length()), gait_cap)
 	var gait_speed: float = WorldGait.speed_for(gait, max_speed)
 	if wish.length() > 0.1:
@@ -184,6 +184,11 @@ func step_shared_movement(delta:float)->void:
 	move_and_slide()
 	_update_animation(delta)
 	queue_redraw()
+
+## Default unchanged. A scripted test mode can constrain steering without forking movement.
+func process_lasso_input(delta:float)->void:lasso.process_throw_input(delta)
+func movement_wish()->Vector2:
+	return Input.get_vector("move_left", "move_right", "move_up", "move_down")
 
 ## Same dodge drawing as the corral rider (DodgeVisuals): trail, bullet-time
 ## preview, recharge bar and dust.
