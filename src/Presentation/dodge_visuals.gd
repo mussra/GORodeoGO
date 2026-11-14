@@ -61,3 +61,13 @@ static func draw_flash_path(item: CanvasItem, points: PackedVector2Array, alpha:
 			if j % 4 == 0:
 				item.draw_circle(p, 2 + pulse * 2, Color(.96, 1.0, .84, alpha * .8))
 			distance += length / steps
+
+## Clock starts at twelve; using sprint empties it, cooldown fills clockwise.
+static func clock_fraction204(remaining:float,total:float)->float:
+	return clampf(1.-remaining/maxf(total,.01),0.,1.)
+static func draw_clock204(item:CanvasItem,center:Vector2,remaining:float,total:float)->void:
+	var ready:float=clock_fraction204(remaining,total)
+	item.draw_arc(center,32.,0.,TAU,64,Color("102d35"),7.,true)
+	if ready>.001:item.draw_arc(center,32.,-PI*.5,-PI*.5+TAU*ready,64,Color("ffd36d") if ready>=.999 else Color("7de1cc"),5.,true)
+	var hand:Vector2=Vector2.from_angle(-PI*.5+TAU*ready)
+	item.draw_line(center+hand*24.,center+hand*36.,Color("fff8e8"),2.,true)

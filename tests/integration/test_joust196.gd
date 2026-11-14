@@ -54,7 +54,7 @@ func test_steering_and_reverse_input_never_reverse_pass():
  var old_x:float=joust.player.position.x;await wait_physics_frames(20)
  assert_gt(joust.player.position.x,old_x);assert_lt(joust.player.position.y,-45.)
  Input.action_release("move_left");Input.action_release("move_up")
- assert_false(joust.player.request_dodge(Vector2.LEFT));old_x=joust.player.position.x
+ assert_true(joust.player.request_dodge(Vector2.LEFT));old_x=joust.player.position.x
  await wait_physics_frames(10);assert_gte(joust.player.position.x,old_x);assert_gte(joust.player.position.y,-140.)
 func test_bot_never_uses_players_lasso_action():
  start();joust.riders[1].attack_cooldown=99.
@@ -95,13 +95,11 @@ func test_menu_entries_do_not_cover_each_other_or_quit_at_supported_sizes():
   assert_lte(second.get_global_rect().end.x,extent.x)
  menu.free()
 
-func test_regate_disabled_for_both_riders_and_stays_off_after_round_reset():
+func test_regate_reenabled_for_both_and_stays_on_after_round_reset():
  start()
  for rider in joust.riders:
-  assert_false(rider.dodge.available)
-  assert_false(rider.request_dodge(Vector2.UP))
-  assert_false(rider.request_dodge_path(PackedVector2Array([Vector2.ZERO,Vector2(0,80)])))
-  rider.dodge.on_move_pressed();rider.dodge.on_move_released(Vector2.ZERO);rider.dodge.on_move_pressed()
-  assert_false(rider.dodge.drawing);assert_eq(Engine.time_scale,1.)
+  assert_true(rider.dodge.available)
+  assert_true(rider.request_dodge(Vector2.UP))
+  rider.cancel_input();rider.dodge.cooldown=0.
  joust._miss_pass();joust._next_round()
- for rider in joust.riders:assert_false(rider.dodge.available)
+ for rider in joust.riders:assert_true(rider.dodge.available)

@@ -31,7 +31,7 @@ func test_race_prestart_aim_without_launch_or_movement():
  assert_true(scene.player.dodge.available)
 func test_joust_prestart_aim_without_launch_or_movement():
  await make_scene("res://src/Presentation/joust196.tscn");await check_countdown()
- assert_false(scene.player.dodge.available)
+ assert_true(scene.player.dodge.available)
 func test_free_duel_still_has_dodge_and_no_new_prestart_aim():
  await make_scene("res://src/Presentation/duel193.tscn")
  assert_true(scene.player.dodge.available)

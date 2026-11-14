@@ -1,5 +1,5 @@
 extends "res://src/Presentation/duel193.gd"
-## Nonviolent, isolated test mode: automatic opposite passes, shared lazo; no regate.
+## Nonviolent, isolated test mode: automatic opposite passes, shared lazo; planned regate.
 var pass_number:int=0
 var end_wait:float=0.
 func _ready()->void:
@@ -40,7 +40,7 @@ func _next_round()->void:
  else:super._next_round()
 func _refresh()->void:
  info.text="JUSTA CON LAZOS · %d - %d · mejor de tres\nManga %d · pasada %d · sin lanzas ni daño"%[scores[0],scores[1],round_number,maxi(1,pass_number)]
- guidance.text="PREPARADOS · %d · apunta ahora; suelta después de salir"%ceili(countdown) if countdown>0. else "Pasada automática · izquierda: arriba/abajo · SIN REGATE · derecha: apunta y suelta"
+ guidance.text="PREPARADOS · %d · apunta ahora; suelta después de salir"%ceili(countdown) if countdown>0. else "Pasada automática · izquierda: arriba/abajo · levanta y apoya: SPRINT · derecha: apunta y suelta"
 func _draw()->void:
  super._draw()
  draw_rect(Rect2(-520,-165,1040,330),Color("c8aa78"),false,4.)

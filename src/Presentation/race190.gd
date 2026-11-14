@@ -135,8 +135,8 @@ func _physics_process(delta:float)->void:
  if results.visible:guidance.text="Carrera terminada · otra carrera o menú"
  elif countdown>0.:guidance.text="PREPARADOS · %d · puedes apuntar; suelta después de salir"%ceili(countdown)
  elif player.slow_left>0.:guidance.text="ENLAZADO · sigues moviéndote · %.1fs"%player.slow_left
- elif player.attack_cooldown>0.:guidance.text="Lazo %.1fs · doble toque al mover: regate · sigue la puerta brillante"%player.attack_cooldown
- else:guidance.text="Mueve izquierda · apunta/suelta derecha: lazo · doble toque al mover: regate"
+ elif player.attack_cooldown>0.:guidance.text="Lazo %.1fs · levanta y apoya: sprint · sigue la puerta brillante"%player.attack_cooldown
+ else:guidance.text="Mueve izquierda · apunta/suelta derecha: lazo · levanta y apoya: sprint"
  map_view.queue_redraw();queue_redraw()
 func _ahead(a:RaceRider190,b:RaceRider190)->bool:
  if a.finish_time>=0. and b.finish_time>=0.:return a.finish_time<b.finish_time

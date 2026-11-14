@@ -80,6 +80,7 @@ func _ready() -> void:
 	add_child(lasso)
 	dodge = DodgeController.new()
 	dodge.owner_body = self
+	dodge.moving_with_input = func() -> bool: return velocity.length() > 1.0 and _stun_time_remaining <= 0.0
 	dodge.can_start = func() -> bool: return _jump_time<=0 and _stun_time_remaining <= 0.0 and is_physics_processing()
 	dodge.resumed = func(dir: Vector2) -> void: velocity = dir * max_speed
 	dodge.on_moved = func() -> void:
@@ -197,11 +198,14 @@ func _draw() -> void:
 	if dodge.drawing:
 		DodgeVisuals.draw_drawing(self, dodge.preview_points(dodge.draw_points))
 	if dodge_available:
-		DodgeVisuals.draw_recharge(self, Vector2(0, -110), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
+		draw_dodge_recharge204()
 	if dodge.remaining > 0.0:
 		DodgeVisuals.draw_dash_dust(self, dodge.direction, Vector2.ZERO)
 	# Charge-aim circle: shared with the corral rider (Ant 21:47, it was missing here).
 	lasso.draw_charge_aim(self)
+
+func draw_dodge_recharge204()->void:
+	DodgeVisuals.draw_recharge(self, Vector2(0, -110), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
 
 func _update_animation(delta: float) -> void:
 	if _sprite_swap == null:return

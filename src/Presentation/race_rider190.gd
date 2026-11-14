@@ -20,6 +20,8 @@ var passed:int=0
 var route_s:float=-30.
 var crossing_slow:float=0.
 var crossing_protected:float=0.
+var sprint_plan204:float=6.
+var sprint_count204:int=0
 var _ai_previous:Vector2=Vector2.INF
 var _ai_blocked:float=0.
 var _ai_bypass:float=0.
@@ -39,6 +41,7 @@ func _ready()->void:
  lasso.lasso_released.connect(func():attack_cooldown=3.)
  lasso.prey_captured.connect(func(target):target.tether_from=self)
  lasso.capture_area_visual_radius=58.
+ sprint_plan204=5.5+float(racer_index)*1.3
  if ai:set_process_input(false)
 func _input(event:InputEvent)->void:
  if not ai and _aim_allowed198() and finish_time<0.:super._input(event)
@@ -70,18 +73,16 @@ func _physics_process(delta:float)->void:
    var goal:Vector2=race.course.at(ahead)+race.course.tangent(ahead).orthogonal()*race.course.ai_lane(progress.s,racing_lane,can_jump and _ai_bypass<=0.)
    var wish:Vector2=(goal-position).normalized()
    velocity=velocity.move_toward(wish*max_speed,acceleration*delta);move_and_slide()
-  gait=WorldGait.GALOPE;_update_animation(delta);_evade();_boost197();_think(delta)
+  gait=WorldGait.GALOPE;_update_animation(delta);_plan_sprint204(delta);_think(delta)
  queue_redraw()
-func _evade()->void:
- # Evasion reacts to an already airborne rope, not future input or future landings.
- for opponent in race.riders:
-  if opponent==self or not opponent.lasso.is_in_flight():continue
-  var flight=opponent.lasso._flight_line
-  if is_instance_valid(flight) and position.distance_to(flight.landing)<100. and dodge.cooldown<=0.:
-   var side:Vector2=race.course.tangent(race.course.route_project(position,route_s).s).orthogonal()
-   var projection:Dictionary=race.course.route_project(position,route_s)
-   var offset:float=(position-projection.point).dot(side)
-   dodge.request_dash(side*(-1. if offset>0. else 1.));break
+func _evade()->void:pass # No reaction to the opponent's rope, even after launch.
+func _plan_sprint204(delta:float)->void:
+ sprint_plan204-=delta
+ if sprint_plan204>0.:return
+ sprint_count204+=1
+ sprint_plan204=6.5+float((racer_index+sprint_count204)%3)*1.2
+ _planned_sprint204()
+func _planned_sprint204()->void:_boost197()
 func _think(delta:float)->void:
  attack_think-=delta
  if attack_think>0.:return
@@ -103,7 +104,7 @@ func try_capture(landing:Vector2)->bool:
 func _draw()->void:
  if dodge==null:return
  super._draw()
- draw_arc(Vector2(0,-4),27.,0,TAU,32,tint,3.,true)
+ if ai:draw_arc(Vector2(0,-4),27.,0,TAU,32,tint,3.,true)
  if slow_left>0.:
   LassoRopeStyle.draw_loop(self,Vector2(0,-26))
  elif protected_left>0.:
@@ -123,3 +124,6 @@ func _boost197()->void:
 
 func _aim_allowed198()->bool:
  return race.running or (race.has_method("prestart_aim198") and race.prestart_aim198())
+
+func draw_dodge_recharge204()->void:
+ if not ai:DodgeVisuals.draw_clock204(self,Vector2(0,-4),dodge.cooldown,dodge.recharge_seconds)

@@ -23,17 +23,14 @@ func _physics_process(delta:float)->void:
    velocity=velocity.move_toward(wish*max_speed,acceleration*delta);move_and_slide()
   gait=WorldGait.GALOPE;_update_animation(delta)
   if position.x>480. or position.x< -480. or absf(position.y)>210.:orbit_sign*=-1.
-  _evade();_think(delta)
+  _plan_sprint204(delta);_think(delta)
  position=position.clamp(world_bounds.position,world_bounds.end)
  queue_redraw()
-func _evade()->void:
- var opponent:Node2D=race.riders[1] if self==race.riders[0] else race.riders[0]
- if not opponent.lasso.is_in_flight() or dodge.cooldown>0.:return
- var flight=opponent.lasso._flight_line
- if is_instance_valid(flight) and position.distance_to(flight.landing)<95.:
-  var away:Vector2=(position-flight.landing).normalized()
-  if away.length()<.2:away=(position-opponent.position).orthogonal().normalized()
-  dodge.request_dash(away)
+func _evade()->void:pass # Opponent's flight/landing never informs the sprint plan.
+func _planned_sprint204()->void:
+ if dodge.cooldown>0. or dodge.remaining>0.:return
+ var direction:=Vector2(-.55,orbit_sign).normalized()
+ dodge.request_dash(direction)
 func try_capture(landing:Vector2)->bool:
  if not race.running or position.distance_to(landing)>58.:return false
  race.capture_landed(self)

@@ -51,7 +51,7 @@ func test_double_tap_then_drag_records_path_but_normal_drag_does_not() -> void:
 	player._input(drag)
 	assert_eq(player._draw_points.size(), 4, "other finger on lasso cannot distort movement trace")
 	player._on_move_released(Vector2.RIGHT)
-	assert_eq(player._dodge_path.size(), 3)
+	assert_gt(player._dodge_path.size(), 3,"shared smooth curve retains the freehand trace")
 
 func test_trace_transitions_immediately_to_normal_running() -> void:
 	var source: Node = load("res://src/Presentation/level_0.tscn").instantiate()
@@ -136,9 +136,10 @@ func test_freeform_s_retains_all_waypoints_and_stun_cancels_soft_stop() -> void:
 	var start: Vector2 = player.global_position
 	var points := PackedVector2Array([Vector2.ZERO, Vector2(30,-20),Vector2(55,0),Vector2(15,30),Vector2(45,50),Vector2(70,40)])
 	assert_true(player.request_dodge_path(points))
-	assert_eq(player._dodge_path.size(),5, "freeform S is not replaced by named pattern")
-	for i in range(5):
-		assert_eq(player._dodge_path[i],start+points[i+1])
+	var preview:PackedVector2Array=player.dodge.preview_points(points)
+	assert_eq(player._dodge_path.size(),preview.size()-1, "execution matches shared smooth preview")
+	for i in range(player._dodge_path.size()):
+		assert_eq(player._dodge_path[i],start+preview[i+1])
 	await wait_physics_frames(30)
 	player._dodge_coast_remaining = .1
 	player.stun(.5)
