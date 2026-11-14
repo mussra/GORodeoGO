@@ -22,6 +22,7 @@ static func texture_for(traits:Dictionary,knob:bool)->Texture2D:
    var c:=coat.lerp(hair,border);c.a*=1-smoothstep(.985,1,r);im.set_pixel(x,y,c)
  return ImageTexture.create_from_image(im)
 static func apply(level:Node)->void:
+ GameplayGestures209.install(level)
  var save:Node=level.get_node("/root/SaveData")
  var h:Dictionary=save.horse_collection.find(save.horse_collection.selected)
  var traits:Dictionary=h.get("traits",{"coat":10,"pattern":0,"mane":1})

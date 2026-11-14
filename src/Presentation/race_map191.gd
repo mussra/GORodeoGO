@@ -3,6 +3,7 @@ extends Control
 ## Fit the actual circuit, gates, fences and live race order, never a generic oval.
 var race:Node
 var expanded:bool=false
+var _map_touches209:Dictionary={}
 func _ready()->void:
  mouse_filter=Control.MOUSE_FILTER_STOP
  tooltip_text="Mapa de carrera · toca para ampliar"
@@ -59,6 +60,15 @@ func _gui_input(event:InputEvent)->void:
  if event is InputEventMouseButton and event.device!=InputEvent.DEVICE_ID_EMULATION and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
   toggle();accept_event()
 func _input(event:InputEvent)->void:
- if event is InputEventScreenTouch and visible and get_global_rect().has_point(event.position):
+ if event.get_meta("riding209",false):return
+ if event is InputEventScreenTouch and visible:
+  if event.pressed and get_global_rect().has_point(event.position):
+   _map_touches209[event.index]={"origin":event.position,"dragged":false}
+   get_viewport().set_input_as_handled()
+  elif not event.pressed and _map_touches209.has(event.index):
+   var state:Dictionary=_map_touches209[event.index];_map_touches209.erase(event.index)
+   get_viewport().set_input_as_handled()
+   if not state.dragged and event.position.distance_to(state.origin)<GameplayGestures209.DRAG_DISTANCE and get_global_rect().has_point(event.position):toggle()
+ elif event is InputEventScreenDrag and _map_touches209.has(event.index):
+  if event.position.distance_to(_map_touches209[event.index].origin)>=GameplayGestures209.DRAG_DISTANCE:_map_touches209[event.index].dragged=true
   get_viewport().set_input_as_handled()
-  if event.pressed:toggle()
