@@ -15,6 +15,7 @@ var _caption: Label
 var _equipment_caption: Label
 var _jump_badge:JumpBadge
 var _dodge_badge:JumpBadge
+var _skill_column189:Control
 var _hd_rider: Sprite2D
 var _bull: AnimatedSprite2D
 var _intro: Tween
@@ -120,6 +121,8 @@ func _build_menu() -> void:
 		_transitioning=true
 		FrontierTransition.obtain(get_tree(),false).enter_world())
 	_hero.add_child(_world_button)
+	MenuEntryArt189.apply(_world_button,"frontier")
+	MenuEntryArt189.apply(_missions,"levels")
 	_equipment_panel=EquipmentPanel.new()
 	_equipment_panel.visible=false
 	add_child(_equipment_panel)
@@ -143,8 +146,9 @@ func _build_menu() -> void:
 	_hd_rider.position = Vector2(0,0)
 	_hd_rider.scale = Vector2.ONE * .51
 	rider_host.add_child(_hd_rider)
-	_jump_badge=JumpBadge.new();_jump_badge.position=Vector2(1070,525);_jump_badge.size=Vector2(64,56);_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));add_child(_jump_badge)
-	_dodge_badge=JumpBadge.new();_dodge_badge.skill="dodge";_dodge_badge.position=Vector2(1145,525);_dodge_badge.size=Vector2(64,56);_dodge_badge.capable=HorseTraining.knows(SaveData.horse_collection.find(SaveData.horse_collection.selected),"dodge");add_child(_dodge_badge)
+	_skill_column189=Control.new();_skill_column189.name="MountedSkills189";_skill_column189.mouse_filter=Control.MOUSE_FILTER_IGNORE;_hero.add_child(_skill_column189)
+	_jump_badge=JumpBadge.new();_jump_badge.position=Vector2.ZERO;_jump_badge.size=Vector2(64,56);_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));_skill_column189.add_child(_jump_badge)
+	_dodge_badge=JumpBadge.new();_dodge_badge.skill="dodge";_dodge_badge.position=Vector2(0,80);_dodge_badge.size=Vector2(64,56);_dodge_badge.capable=HorseTraining.knows(SaveData.horse_collection.find(SaveData.horse_collection.selected),"dodge");_skill_column189.add_child(_dodge_badge)
 	_equipment_caption = _label("",16,Color("9cbcc0"))
 	_equipment_caption.position=Vector2(850,600)
 	add_child(_equipment_caption)
@@ -197,15 +201,19 @@ func _layout() -> void:
 	_play.position = Vector2(68,411)
 	_play.size = Vector2(418,70)
 	_world_button.position = Vector2(68,493)
-	_world_button.size = Vector2(418,52)
-	_missions.position = Vector2(68,557)
-	_missions.size = Vector2(270,50)
-	_missions.add_theme_font_size_override("font_size",13)
-	_equipment_button.position=Vector2(350,557)
-	_equipment_button.size=Vector2(136,50)
+	_world_button.size = Vector2(418,64)
+	_world_button.add_theme_font_size_override("font_size",22)
+	_missions.position = Vector2(68,569)
+	_missions.size = Vector2(270,60)
+	_missions.add_theme_font_size_override("font_size",15)
+	_missions.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	_equipment_button.position=Vector2(350,569)
+	_equipment_button.size=Vector2(136,60)
 	_caption.position = Vector2(70,634)
 	_hero.get_node("Rider").position = Vector2(912,355)
 	_hero.get_node("Rider").scale = Vector2.ONE
+	_skill_column189.position=Vector2(1170,245)
+	_skill_column189.size=Vector2(64,136)
 	var footer: Control = get_node("Footer")
 	footer.position = Vector2(32,size.y-35)
 	quit_button.position = Vector2(size.x-118,22)

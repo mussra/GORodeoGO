@@ -4,5 +4,7 @@ var kind:String="collection"
 const CELLS={"collection":5,"editor":5,"breed":6,"atlas":7,"map":7,"home":9,"exit":10,"training":11,"genealogy":12}
 func _ready()->void:mouse_filter=Control.MOUSE_FILTER_IGNORE
 func _draw()->void:
- if CELLS.has(kind):AntIcons187.draw_fit(self,CELLS[kind],Rect2(2,2,56,56))
+ var replacement:=MenuEntryArt189.texture(kind)
+ if replacement!=null:AntIcons188.draw_texture_fit(self,replacement,Rect2(2,2,56,56))
+ elif CELLS.has(kind):AntIcons187.draw_fit(self,CELLS[kind],Rect2(2,2,56,56))
  elif kind=="market":AntIcons188.draw_fit(self,1,Rect2(2,2,56,56))

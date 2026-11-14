@@ -27,6 +27,7 @@ var _active_bulls: Array = []
 var _bulls_returned: int = 0
 var _time_remaining: float = 0.0
 var _game_over: bool = false
+var _no_lasso_room_hint_shown189:bool=false
 var _tranquilizer_available: bool = false
 var _level_number: int = 1
 var _max_simultaneous_captures: int = 1
@@ -482,6 +483,9 @@ func _on_prey_captured(prey: Node2D) -> void:
 ## the available slots — 1 normally, 2 with the dual lasso). The throw is refused in
 ## player.gd; here we explain why and how to free a slot.
 func _on_throw_blocked() -> void:
+	# One explanation per level attempt, even after freeing/refilling slots.
+	if _no_lasso_room_hint_shown189:return
+	_no_lasso_room_hint_shown189=true
 	hud.flash_hint(tr("Sin hueco: doble toque en el lazo para soltar un toro antes de lanzar"), 1.8)
 
 ## One-shot dual-lasso unlock celebration: pause the action, show the animated overlay,

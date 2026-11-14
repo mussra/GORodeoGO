@@ -94,7 +94,7 @@ func test_throw_blocked_without_free_slot_single_lasso() -> void:
 	Input.action_release("throw_lasso")
 	assert_false(level.player.lasso._is_charging, "no throw starts with every slot occupied")
 	assert_signal_emitted(level.player, "throw_blocked")
-	assert_gt(level.hud._flash_hint_until_seconds, Time.get_ticks_msec() / 1000.0, "HUD explains how to free a slot")
+	assert_true(level.hud._toasts.active.any(func(n):return str(n.text).contains("hueco") or str(n.text).contains("room")), "HUD explains how to free a slot")
 
 func test_throw_allowed_with_dual_lasso_while_one_slot_free() -> void:
 	var level: Node = await _spawn_level(3, LevelCatalog.MAX_LEVEL)  # dual capture unlocked
@@ -201,3 +201,25 @@ func test_contact_still_drops_capture_with_full_herd() -> void:
 		Input.action_release(action)
 	assert_true(dropped, "Ant 19:58 explicitly keeps losing capture on a hit")
 	assert_gt(level.player._stun_time_remaining, 0.0, "drop accompanies actual rider stun")
+
+func test_no_room_hint_only_once_per_level_attempt189()->void:
+	var level:Node=await _spawn_level(3,LevelCatalog.MAX_LEVEL)
+	level.hud._toasts.clear();level.hud._toasts.set_process(false)
+	assert_false(level._no_lasso_room_hint_shown189)
+	level._on_throw_blocked()
+	assert_true(level._no_lasso_room_hint_shown189)
+	assert_eq(level.hud._toasts.active.size(),1)
+	level.hud._toasts.advance(1.)
+	var left:float=level.hud._toasts.active[0].left
+	level._on_throw_blocked()
+	assert_eq(level.hud._toasts.active[0].left,left,"Repeated attempts must not restart the toast")
+	level.hud._toasts.clear()
+	level.player.set_active_capture_count(0)
+	level.player.set_active_capture_count(2)
+	level._on_throw_blocked()
+	assert_true(level.hud._toasts.active.is_empty(),"Still quiet after freeing and filling slots")
+	var next:Node=await _spawn_level(3,LevelCatalog.MAX_LEVEL)
+	next.hud._toasts.clear()
+	assert_false(next._no_lasso_room_hint_shown189,"Retry/new level may explain once again")
+	next._on_throw_blocked()
+	assert_eq(next.hud._toasts.active.size(),1)
