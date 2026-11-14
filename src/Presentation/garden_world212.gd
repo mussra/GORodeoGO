@@ -113,4 +113,7 @@ func _draw_plot(_canvas:Node2D):
 
 func set_pose(pose:String):
  pose_name=pose;gardener.texture=GARDENER[pose]
+ # The watering sheet pours right. Face the plot and place the stream over its center.
+ gardener.position=plot+Vector2(48,25) if pose=="water" else plot+Vector2(150,25)
+ gardener.flip_h=plot.x<gardener.position.x
  gardener.scale=Vector2.ONE*120./gardener.texture.get_height();gardener.offset=Vector2(0,-gardener.texture.get_height()*.5)
