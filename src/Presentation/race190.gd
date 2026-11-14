@@ -99,16 +99,24 @@ func _physics_process(delta:float)->void:
   if countdown<=0.:running=true;toasts.push("¡Ya! Sigue las puertas en orden · una vuelta",3.)
  if running:elapsed+=delta
  for rider in riders:
-  rider.position=course.constrain(rider.position)
-  if running and rider.finish_time<0. and course.crossed_gate(rider.previous_position,rider.position,rider.next_gate):
+  if course.variant==3:
+   var q:Dictionary=course.route_project(rider.position,rider.route_s)
+   # No remote-branch snap, including a dodge across the intersection.
+   var allowed:float=rider.position.distance_to(rider.previous_position)+2.
+   rider.route_s=clampf(q.s,rider.route_s-allowed,rider.route_s+allowed)
+   var center:Vector2=course.at(rider.route_s)
+   rider.position=center+(rider.position-center).limit_length(RaceCourse190.WIDTH*.5-18.)
+  else:rider.position=course.constrain(rider.position);rider.route_s=course.project(rider.position).s
+  if running and rider.finish_time<0. and course.crossed_gate(rider.previous_position,rider.position,rider.next_gate) and (course.variant!=3 or absf(rider.route_s-course.length*rider.next_gate/16.)<100.):
    rider.next_gate+=1
    if rider.next_gate>RaceCourse190.GATES:
     rider.finish_time=elapsed;rider.velocity=Vector2.ZERO;rider.cancel_input()
   rider.previous_position=rider.position
+ if running:_crossing_contacts192()
  if player.finish_time>=0. and not _announced:_finish()
  var order:Array=riders.duplicate();order.sort_custom(_ahead);race_order=order
  var rank:int=order.find(player)+1
- progress_bar.value=course.score(player.position,player.next_gate)/course.length*100.
+ progress_bar.value=course.route_score(player.position,player.next_gate,player.route_s)/course.length*100.
  telemetry.text="%d m/s · %d%% del circuito\nLazo %s · Regate %s"%[roundi(player.velocity.length()/10.),roundi(progress_bar.value),"LISTO" if player.attack_cooldown<=0. else "%.1fs"%player.attack_cooldown,"LISTO" if player.dodge.cooldown<=0. else "%.1fs"%player.dodge.cooldown]
  standings.text=""
  for i in order.size():standings.text+="%d  %s%s\n"%[i+1,order[i].racer_name," ◀" if order[i]==player else ""]
@@ -126,12 +134,12 @@ func _ahead(a:RaceRider190,b:RaceRider190)->bool:
  if a.finish_time>=0. and b.finish_time>=0.:return a.finish_time<b.finish_time
  if a.finish_time>=0.:return true
  if b.finish_time>=0.:return false
- return course.score(a.position,a.next_gate)>course.score(b.position,b.next_gate)
+ return course.route_score(a.position,a.next_gate,a.route_s)>course.route_score(b.position,b.next_gate,b.route_s)
 func targets_for(attacker:RaceRider190)->Array:
- var list:Array=[];var at:float=course.project(attacker.position).s
+ var list:Array=[];var at:float=fposmod(attacker.route_s,course.length) if course.variant==3 else course.project(attacker.position).s
  for candidate in riders:
   if candidate==attacker or candidate.finish_time>=0.:continue
-  var delta:float=fposmod(course.project(candidate.position).s-at,course.length)
+  var delta:float=fposmod((fposmod(candidate.route_s,course.length) if course.variant==3 else course.project(candidate.position).s)-at,course.length)
   if delta>4. and delta<220. and attacker.position.distance_to(candidate.position)<=220.:list.append(candidate)
  list.sort_custom(func(a,b):return attacker.position.distance_to(a.position)<attacker.position.distance_to(b.position))
  return list
@@ -196,14 +204,14 @@ func _unhandled_input(event:InputEvent)->void:
   navigate_back();get_viewport().set_input_as_handled()
 
 func _build_selector()->void:
- selector=_panel(Vector2(760,420));selector.name="RaceSelector190"
+ selector=_panel(Vector2(760,500));selector.name="RaceSelector190"
  _label(selector,"CARRERAS CON LAZO · PRUEBA",Vector2(26,18),25)
  _label(selector,"Velocidad igualada. El salto depende de tu caballo.
 Vallas parciales: salta o rodea por el hueco.
 Sin daño ni premios todavía.",Vector2(26,65),20)
- for i in 3:
+ for i in RaceCourse190.TITLES.size():
   var b:=_button(selector,RaceCourse190.TITLES[i],Vector2(26,172+i*64),_choose_course.bind(i));b.size=Vector2(700,54)
- _button(selector,"Menú",Vector2(500,360),_menu)
+ _button(selector,"Menú",Vector2(500,430),_menu)
 func _choose_course(index:int)->void:
  if index!=course.variant:
   RaceCourse190.selected=index;RaceCourse190.start_selected=true;_retry();return
@@ -216,7 +224,25 @@ func _winner_story()->void:
  var clues:Array[String]=[
   "¡Buena carrera! Los mejores jinetes no solo corren: miran la pista y eligen cuándo lanzar el lazo y cuándo esquivarlo.",
   "Una valla no obliga a todos a hacer lo mismo. Algunos caballos la saltan; otros pueden ganar tomando bien el paso lateral.",
-  "Se habla de un caballo especial reservado a las grandes carreras. Tal vez esas pistas nos acerquen algún día a los unicornios."
+  "Se habla de un caballo especial reservado a las grandes carreras. Tal vez esas pistas nos acerquen algún día a los unicornios.",
+  "En el cruce, mira también a los lados. Ceder un poco de velocidad puede evitar un roce. Cada tramo tiene su camino: el cruce no es un atajo."
  ]
  story_dialog.setup_story("Granjero","Después de la carrera",clues[course.variant]+"\n\nEsta es una carrera de prueba: aún no entrega premios ni desbloquea caballos.")
  hud.add_child(story_dialog);story_dialog.closed.connect(func():story_dialog.queue_free())
+
+## A soft crossing contact, never a collision wall, stun, damage or capture drop.
+func _crossing_contacts192()->void:
+ if course.variant!=3:return
+ for i in riders.size():
+  var a:RaceRider190=riders[i]
+  if a.finish_time>=0. or not course.crossing_zone(a.position):continue
+  for j in range(i+1,riders.size()):
+   var b:RaceRider190=riders[j]
+   if b.finish_time>=0. or a.position.distance_to(b.position)>48.:continue
+   if a._jump_time>0. or b._jump_time>0.:continue
+   var separation:float=absf(fposmod(a.route_s-b.route_s+course.length*.5,course.length)-course.length*.5)
+   if separation<course.length*.25:continue
+   for rider in [a,b]:
+    if rider.crossing_protected>0.:continue
+    rider.crossing_slow=.65;rider.crossing_protected=1.5;rider.velocity*=.72
+    if rider==player:toasts.push("Roce en el cruce · freno breve, sin daño",1.5,"crossing192")

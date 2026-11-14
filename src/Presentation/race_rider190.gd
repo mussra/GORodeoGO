@@ -17,6 +17,12 @@ var base_pace:float=260.
 var lane:float=0.
 var tether_from:Node2D
 var passed:int=0
+var route_s:float=-30.
+var crossing_slow:float=0.
+var crossing_protected:float=0.
+var _ai_previous:Vector2=Vector2.INF
+var _ai_blocked:float=0.
+var _ai_bypass:float=0.
 func _ready()->void:
  super._ready()
  # Top-down riders slide along diagonal fences, never treat them as slopes.
@@ -37,18 +43,24 @@ func _input(event:InputEvent)->void:
 func _physics_process(delta:float)->void:
  if not race.running or finish_time>=0.:return
  slow_left=maxf(0.,slow_left-delta);protected_left=maxf(0.,protected_left-delta);attack_cooldown=maxf(0.,attack_cooldown-delta)
- max_speed=base_pace*(.75 if slow_left>0. else 1.)
+ crossing_slow=maxf(0.,crossing_slow-delta);crossing_protected=maxf(0.,crossing_protected-delta)
+ max_speed=base_pace*minf(.75 if slow_left>0. else 1.,.72 if crossing_slow>0. else 1.)
  if not ai:super._physics_process(delta)
  else:
+  _ai_bypass=maxf(0.,_ai_bypass-delta)
+  if _jump_time<=0. and _ai_previous!=Vector2.INF and position.distance_to(_ai_previous)<1. and velocity.length()>40.:_ai_blocked+=delta
+  else:_ai_blocked=0.
+  _ai_previous=position
+  if _ai_blocked>.4:_ai_bypass=2.5;_ai_blocked=0.
   _jump_cooldown=maxf(0.,_jump_cooldown-delta)
   if _jump_time>0.:HorseJumpMotion.process(self,delta);return
-  if can_jump and velocity.length()>60. and HorseJumpMotion.try_ahead(self):return
+  if can_jump and _ai_bypass<=0. and velocity.length()>60. and HorseJumpMotion.try_ahead(self):return
   dodge.cooldown=maxf(0.,dodge.cooldown-delta)
   dodge.fade_trail(delta)
   if not dodge.step_path(max_speed,delta) and not dodge.step_coast(max_speed,delta) and not dodge.step_dash(max_speed,delta):
-   var progress:Dictionary=race.course.project(position)
+   var progress:Dictionary=race.course.route_project(position,route_s)
    var ahead:float=progress.s+130.
-   var goal:Vector2=race.course.at(ahead)+race.course.tangent(ahead).orthogonal()*race.course.ai_lane(progress.s,lane,can_jump)
+   var goal:Vector2=race.course.at(ahead)+race.course.tangent(ahead).orthogonal()*race.course.ai_lane(progress.s,lane,can_jump and _ai_bypass<=0.)
    var wish:Vector2=(goal-position).normalized()
    velocity=velocity.move_toward(wish*max_speed,acceleration*delta);move_and_slide()
   gait=WorldGait.GALOPE;_update_animation(delta);_evade();_think(delta)
@@ -59,8 +71,8 @@ func _evade()->void:
   if opponent==self or not opponent.lasso.is_in_flight():continue
   var flight=opponent.lasso._flight_line
   if is_instance_valid(flight) and position.distance_to(flight.landing)<100. and dodge.cooldown<=0.:
-   var side:Vector2=race.course.tangent(race.course.project(position).s).orthogonal()
-   var projection:Dictionary=race.course.project(position)
+   var side:Vector2=race.course.tangent(race.course.route_project(position,route_s).s).orthogonal()
+   var projection:Dictionary=race.course.route_project(position,route_s)
    var offset:float=(position-projection.point).dot(side)
    dodge.request_dash(side*(-1. if offset>0. else 1.));break
 func _think(delta:float)->void:

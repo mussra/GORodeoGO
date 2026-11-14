@@ -32,6 +32,10 @@ func _draw()->void:
  for s in race.course.fences:
   var center:Vector2=race.course.at(s);var side:Vector2=race.course.tangent(s).orthogonal()
   draw_line(point(center-side*175.,g),point(center+side*40.,g),Color("9a5934"),3.,true)
+ if race.course.variant==3:
+  var cross:=point(Vector2.ZERO,g)
+  draw_circle(cross,8.,Color("ffcd74"))
+  draw_string(ThemeDB.fallback_font,cross+Vector2(10,-5),"CRUCE",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("fff1cd"))
  var gate:float=race.course.length*mini(race.player.next_gate,16)/16.
  var at:=point(race.course.at(gate),g)
  draw_arc(at,9.,0,TAU,24,Color("8bffcf"),2.,true)
@@ -42,7 +46,7 @@ func _draw()->void:
   draw_circle(p,6.5 if rider==race.player else 4.5,Color("10252e"))
   draw_circle(p,4.5 if rider==race.player else 3.,rider.tint)
   if rider==race.player:
-   var heading:Vector2=rider.velocity.normalized() if rider.velocity.length()>5. else race.course.tangent(race.course.project(rider.position).s)
+   var heading:Vector2=rider.velocity.normalized() if rider.velocity.length()>5. else race.course.tangent(rider.route_s)
    draw_colored_polygon(PackedVector2Array([p+heading*10.,p+heading*4.+heading.orthogonal()*4.,p+heading*4.-heading.orthogonal()*4.]),rider.tint)
  draw_string(ThemeDB.fallback_font,Vector2(14,23),"MAPA · "+("TOCA PARA CERRAR" if expanded else "TOCA +"),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("fff1cd"))
  draw_string(ThemeDB.fallback_font,Vector2(14,size.y-13),"| Meta   ○ Siguiente   ━ Valla",HORIZONTAL_ALIGNMENT_LEFT,-1,12,Color("c1d7cf"))

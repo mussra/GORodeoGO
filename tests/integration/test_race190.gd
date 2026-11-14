@@ -240,3 +240,56 @@ func test_top_down_sliding_recovers_from_diagonal_valley_fence()->void:
  assert_gte(bot.next_gate,4)
  assert_gt((bot.position-at).dot(c.tangent(c.fences[0])),30.)
  fixture.free()
+
+func test_crossing_soft_contact_only_different_branches_and_never_stuns():
+ start();race.course=RaceCourse190.new(3)
+ for rider in race.riders:rider.set_physics_process(false);rider.position=Vector2(1000,1000)
+ var a:RaceRider190=race.player;var b:RaceRider190=race.riders[1]
+ a.position=Vector2.ZERO;b.position=Vector2(10,0);a.route_s=race.course.length*.25;b.route_s=race.course.length*.75
+ a.velocity=Vector2(260,0);b.velocity=Vector2(30,0)
+ race._crossing_contacts192()
+ assert_eq(a.crossing_slow,.65);assert_eq(b.crossing_slow,.65)
+ assert_almost_eq(a.velocity.x,187.2,.01)
+ assert_eq(a._stun_time_remaining,0.);assert_eq(a.slow_left,0.)
+ a.crossing_slow=.1;race._crossing_contacts192();assert_eq(a.crossing_slow,.1)
+ a.crossing_protected=0.;a.crossing_slow=0.;b.route_s=a.route_s+20.
+ race._crossing_contacts192();assert_eq(a.crossing_slow,0.)
+func test_crossing_attempt_cannot_snap_to_other_branch_or_skip_gates():
+ start();race.course=RaceCourse190.new(3)
+ for rider in race.riders:rider.set_physics_process(false)
+ var p:RaceRider190=race.player;p.route_s=race.course.length*.25-40.;p.next_gate=4
+ p.previous_position=race.course.at(p.route_s);p.position=race.course.at(race.course.length*.75+70.)
+ race._physics_process(.016)
+ assert_lt(absf(p.route_s-race.course.length*.25),260.)
+ assert_lt(p.next_gate,6)
+ assert_lt(race.course.route_score(p.position,p.next_gate,p.route_s),race.course.length*.35)
+
+func test_jumper_blocked_at_crossing_course_fence_can_take_shared_bypass():
+ start();race.course=RaceCourse190.new(3)
+ for rider in race.riders:rider.set_physics_process(false);rider.position=Vector2(3000,3000)
+ for body in race.fence_bodies:body.free()
+ race.fence_bodies.clear()
+ var s:float=race.course.fences[3];var at:Vector2=race.course.at(s);var side:Vector2=race.course.tangent(s).orthogonal()
+ race.fence_bodies.append(WorldFence.segment(race,at-side*175.,at+side*40.,true,true))
+ var bot:RaceRider190=race.riders[2]
+ bot.can_jump=true;bot.position=Vector2(-2072.177,-855.9821);bot.previous_position=bot.position;bot.route_s=s-11.;bot.next_gate=15;bot.velocity=Vector2(-126.7239,227.0266);bot.attack_cooldown=999.;bot.set_physics_process(true)
+ await wait_seconds(3.)
+ assert_gte(bot.next_gate,16)
+ assert_gt(bot.route_s,s+25.)
+
+func test_sustained_wrong_turn_at_crossing_cannot_take_remote_half_lap():
+ start();race.course=RaceCourse190.new(3)
+ for rider in race.riders:rider.set_physics_process(false);rider.position=Vector2(3000,3000)
+ var p:RaceRider190=race.player;var a:float=race.course.length*.25
+ p.route_s=a-20.;p.next_gate=4;p.position=race.course.at(p.route_s);p.previous_position=p.position;p.velocity=Vector2.ZERO;p.can_jump=false;p.set_physics_process(true)
+ # Follow the other branch for three seconds, with genuine movement actions.
+ var wrong:Vector2=race.course.at(race.course.length*.75+600.)
+ for i in 180:
+  var direction:Vector2=(wrong-p.position).normalized()
+  for pair in [["move_right",maxf(0.,direction.x)],["move_left",maxf(0.,-direction.x)],["move_down",maxf(0.,direction.y)],["move_up",maxf(0.,-direction.y)]]:
+   if pair[1]>.001:Input.action_press(pair[0],pair[1])
+   else:Input.action_release(pair[0])
+  await wait_physics_frames(1)
+ assert_lt(p.next_gate,6)
+ assert_lt(p.route_s,a+650.)
+ assert_gt(p.position.distance_to(wrong),180.)

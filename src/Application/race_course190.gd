@@ -4,7 +4,7 @@ extends RefCounted
 const WIDTH:float=380.
 static var selected:int=0
 static var start_selected:bool=false
-const TITLES=["1 · Óvalo", "2 · Curvas del valle", "3 · Circuito serpiente"]
+const TITLES=["1 · Óvalo", "2 · Curvas del valle", "3 · Circuito serpiente", "4 · Cruce del molino"]
 var variant:int=0
 var fences:Array[float]=[]
 const GATES:int=16
@@ -14,12 +14,15 @@ var length:float=0.
 var _project_frame:int=-1
 var _projection_cache:Dictionary={}
 func _init(index:int=0)->void:
- variant=clampi(index,0,2)
+ variant=clampi(index,0,3)
  for i in 193:
   var a:float=i*TAU/192.
   var point:=Vector2(2300.*sin(a),-1500.*cos(a))
   if variant==1:point.x+=500.*sin(2.*a)
   elif variant==2:point.x+=420.*sin(3.*a);point.y+=170.*sin(2.*a)
+  if variant==3:
+   var t:float=a-PI*.5
+   point=Vector2(2300.*sin(t),-1200.*sin(2.*t))
   points.append(point)
   if i>0:length+=points[i].distance_to(points[i-1]);lengths.append(length)
  points[-1]=points[0]
@@ -62,3 +65,26 @@ func ai_lane(distance:float,preferred:float,jumper:bool)->float:
   var behind:float=fposmod(distance-fence,length)
   if ahead<430. or behind<120.:return 132.
  return preferred
+
+## Branch-aware local projection for a crossing. The previous route distance, not
+## the closest remote branch, decides which road this rider is following.
+func route_project(p:Vector2,hint:float)->Dictionary:
+ if variant!=3:return project(p)
+ var best:float=INF;var result:Dictionary={}
+ for i in range(points.size()-1):
+  var midpoint:float=(lengths[i]+lengths[i+1])*.5
+  var unwrapped:float=hint+fposmod(midpoint-hint+length*.5,length)-length*.5
+  if absf(unwrapped-hint)>260.:continue
+  var v:Vector2=points[i+1]-points[i];var t:float=clampf((p-points[i]).dot(v)/v.length_squared(),0.,1.)
+  var q:Vector2=points[i]+v*t;var d:float=p.distance_squared_to(q)
+  if d<best:
+   best=d
+   var at_s:float=lengths[i]+v.length()*t
+   result={"point":q,"s":hint+fposmod(at_s-hint+length*.5,length)-length*.5,"distance":sqrt(d)}
+ return result
+func crossing_zone(p:Vector2)->bool:return variant==3 and p.length()<270.
+func route_score(p:Vector2,gate:int,hint:float)->float:
+ if variant!=3:return score(p,gate)
+ if gate>GATES:return length
+ var passed:float=length*(gate-1)/GATES
+ return passed+clampf(hint-passed,0.,length/GATES)

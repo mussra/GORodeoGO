@@ -7,13 +7,14 @@ const TREE=preload("res://art/world/cartoon/tree.png")
 const BARREL=preload("res://art/world/cartoon/barrel.png")
 func _draw()->void:
  draw_rect(Rect2(-6000,-5000,12000,10000),Color("56754a"))
- draw_colored_polygon(course.points,Color("426443"))
+ if course.variant!=3:draw_colored_polygon(course.points,Color("426443"))
  draw_polyline(course.points,Color("2c4534"),RaceCourse190.WIDTH+44.,true)
  draw_polyline(course.points,Color("80633c"),RaceCourse190.WIDTH+22.,true)
  draw_polyline(course.points,Color("d4b780"),RaceCourse190.WIDTH,true)
  for i in 192:
   var s:float=course.length*i/192.;var center:Vector2=course.at(s);var side:Vector2=course.tangent(s).orthogonal()
   for direction in [-1.,1.]:
+   if course.variant==3 and center.length()<420.:continue
    var p:Vector2=center+side*direction*181.
    draw_line(p,course.at(s+course.length/192.)+course.tangent(s+course.length/192.).orthogonal()*direction*181.,Color("f3deaa") if i%2==0 else Color("9c6e43"),9.,true)
   # Small ruts and gravel, deterministic and outside the rider's centre.
@@ -23,10 +24,17 @@ func _draw()->void:
  for i in 80:
   var s:float=course.length*(i+.3)/80.;var side:Vector2=course.tangent(s).orthogonal();var direction:float=-1. if i%2==0 else 1.
   var p:Vector2=course.at(s)+side*direction*(260.+absf(sin(i*13.))*90.)
+  if course.variant==3 and course.project(p).distance<RaceCourse190.WIDTH*.5+30.:continue
   var texture:Texture2D=TREE if i%7==0 else BUSH
   var extent:=Vector2(90,110) if i%7==0 else Vector2(58,42)
   draw_circle(p+Vector2(9,4),extent.x*.3,Color(0,0,0,.1))
   AntIcons188.draw_texture_fit(self,texture,Rect2(p-Vector2(extent.x*.5,extent.y),extent))
+ if course.variant==3:
+  var gold:=Color("f5df98")
+  for turn in [PI*.25,-PI*.25]:
+   for sign in [-1.,1.]:
+    var p:Vector2=Vector2(0,sign*240.).rotated(turn)
+    draw_arc(p,25.,0,TAU,24,gold,3.,true)
  # Start/finish checkerboard aligned across the full track.
  var forward:Vector2=course.tangent(0.);var finish_side:Vector2=forward.orthogonal();var home:Vector2=course.at(0.)
  for row in 2:
