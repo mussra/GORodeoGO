@@ -34,7 +34,7 @@ var result_text:Label
 var _announced:bool=false
 func _ready()->void:
  process_physics_priority=50
- RanchMusic.play_context("race")
+ RanchMusic.stop_context()
  _track_visual=RaceScenery191.new();_track_visual.name="RaceScenery191";_track_visual.course=course;add_child(_track_visual)
  var names:Array[String]=["Tú","Luna","Sol","Brisa"]
  var colors:Array[Color]=[Color("7de1cc"),Color("ffb473"),Color("a8b7ff"),Color("f4a3d1")]
@@ -101,7 +101,7 @@ func _physics_process(delta:float)->void:
  if is_instance_valid(selector) and selector.visible:return
  if countdown>0.:
   countdown=maxf(0.,countdown-delta)
-  if countdown<=0.:running=true;toasts.push("¡Ya! Sigue las puertas en orden · una vuelta",3.)
+  if countdown<=0.:running=true;RanchMusic.play_context("race");toasts.push("¡Ya! Sigue las puertas en orden · una vuelta",3.)
  if running:elapsed+=delta
  for rider in riders:
   var unclipped:Vector2=rider.position

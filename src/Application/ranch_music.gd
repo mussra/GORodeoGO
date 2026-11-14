@@ -37,6 +37,15 @@ func play_context(next: String) -> void:
 	_transition.tween_callback(_replace_track.bind(next))
 	_transition.tween_property(voice, "volume_db", -80.0 if _muted else MUSIC_DB, .25)
 
+func stop_context() -> void:
+	# Cancel pending fades too, so an old menu/race cannot start during preparation.
+	if is_instance_valid(_transition):
+		_transition.kill()
+	_requested = ""
+	context = ""
+	voice.stop()
+	voice.stream = null
+
 func _replace_track(next: String) -> void:
 	var stream: AudioStreamWAV = load(TRACKS[next]).duplicate()
 	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
