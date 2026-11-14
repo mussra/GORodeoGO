@@ -577,13 +577,16 @@ func ensure_flora138()->bool:
 	if world_generator_version<3:return false
 	if not world_flora138.is_empty():return true
 	return commit_flora138(FloristJourney138.fresh(world_discovered),world_position)
-func commit_flora138(next:Dictionary,pos:Vector2)->bool:
+func commit_flora138(next:Dictionary,pos:Vector2,town_hint215:String="")->bool:
 	var clean:Dictionary=FloristJourney138.clean(next)
 	if clean.is_empty():return false
 	var before:Dictionary=world_flora138.duplicate(true);var previous:Vector2=world_position
+	var towns_before:Dictionary=world_cousins140.duplicate(true)
+	if town_hint215 in VillageCousins140.IDS and not world_cousins140.is_empty():
+		world_cousins140=towns_before.duplicate(true);world_cousins140.hint215=town_hint215;world_cousins140.revealed215[town_hint215]=true
 	world_flora138=clean
 	if save_world_state(pos):return true
-	world_flora138=before;world_position=previous;return false
+	world_flora138=before;world_cousins140=towns_before;world_position=previous;return false
 
 func ensure_cousins140()->bool:
 	if world_generator_version<3:return false

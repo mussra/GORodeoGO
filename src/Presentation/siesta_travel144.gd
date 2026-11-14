@@ -29,6 +29,10 @@ func record_visits()->void:
  if WorldPlaces144.visit(state,world.player.position,candidates(),SaveData.world_cousins140.get("known",{})) or changed:
   if not SaveData.commit_places144(state,world.player.position):
    visit_clock=Time.get_ticks_msec()+5000.;world._toast("No se pudo guardar este sitio visitado. Se reintentará.")
+ # A map clue is not a visit. Clear its active marker only after a real visit was saved.
+ var target_id:String=SaveData.world_cousins140.get("hint215","")
+ if not target_id.is_empty() and SaveData.world_places144.get("visited",{}).get(target_id,false):
+  var next:=SaveData.world_cousins140.duplicate(true);next.hint215="";SaveData.commit_cousins140(next,world.player.position)
 func available()->Array[Dictionary]:
  var out:=WorldPlaces144.available(SaveData.world_places144,candidates())
  out.append_array(SiestaDestinations170.notes(SaveData.world_notes106,func(pos:Vector2)->bool:

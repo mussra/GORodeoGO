@@ -201,6 +201,10 @@ func _end_drag106(point:Vector2)->void:
   else:_select_site144(point)
  _dragging=false;_ensure_terrain()
 func _select_site144(point:Vector2)->void:
+ for id in TownIdentity215.known_ids(SaveData.world_cousins140):
+  if not _town_visible215(id):continue
+  if point.distance_to(_town_marker215(id)+_map_geometry.area.position)<24.:
+   _show_town215(id);return
  var nearest:String="";var distance:float=24.
  for site in available159():
   var mapped:Vector2=_to_map(site.pos,_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
@@ -298,7 +302,7 @@ func _draw_terrain() -> void:
    if not lod_buckets106.has(bucket):lod_buckets106[bucket]=true;_terrain.draw_rect(Rect2(Vector2(bucket)*3.,Vector2.ONE*maxf(3.,cell)),Color("3f7a45"))
    if SaveData.world_generator_version>=3:
     for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
-     var box:Rect2=ridge.box;_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),Vector2(maxf(1.,box.size.x/1024.*cell),maxf(1.,box.size.y/1024.*cell))),Color("777384"))
+     var box:Rect2=ridge.box;_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),Vector2(maxf(1.,box.size.x/1024.*cell),maxf(1.,box.size.y/1024.*cell))),Color(TownIdentity215.look(SaveData.world_cousins140,TownIdentity215.nearest(SaveData.world_cousins140,ridge.port)).base))
    _draw_fields138(c,mins,cell,origin)
    continue
   # cartoon ground tile with a soft rim
@@ -340,7 +344,7 @@ func _draw_fields138(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
    if box.has_point(cousin):
     var point:Vector2=_to_map(cousin,mins,cell,origin)
     _terrain.draw_circle(point,3.,Color("efb950"))
-    if expanded and cell>24.:_terrain.draw_string(get_theme_default_font(),point+Vector2(8,0),str(VillageCousins140.LABELS[id]),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("fff2bc"))
+    if expanded and cell>24.:_terrain.draw_string(get_theme_default_font(),point+Vector2(8,0),TownIdentity215.title(SaveData.world_cousins140,id),HORIZONTAL_ALIGNMENT_LEFT,-1,14,Color("fff2bc"))
  var destination:Vector2=FloristJourney138.door(SaveData.world_flora138)
  if box.has_point(destination):
   var point:Vector2=_to_map(destination,mins,cell,origin)
@@ -378,6 +382,25 @@ func _draw_markers108()->void:
   var point:Vector2=_to_map(flower.position,mins,cell,origin)
   if Rect2(Vector2.ZERO,size).has_point(point):
    _markers108.draw_circle(point,7.,Color(flower.color,.25));WorldFlowerTarget105.glyph(_markers108,point,4.,flower.color)
+ for id in TownIdentity215.known_ids(SaveData.world_cousins140):
+  var active:bool=SaveData.world_cousins140.get("hint215","")==id
+  var true_point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),mins,cell,origin)
+  if not active and not Rect2(Vector2(22,22),_clip106.size-Vector2(44,44)).has_point(true_point):continue
+  var point:Vector2=_town_marker215(id)
+  var icon_size:=Vector2(44,32) if expanded else Vector2(26,19)
+  if active:
+   _markers108.draw_circle(point,25. if expanded else 16.,Color("f2c86d"))
+  TownPaint215.icon(_markers108,Rect2(point-icon_size*.5,icon_size),TownIdentity215.look(SaveData.world_cousins140,id))
+  if true_point.distance_to(point)>10.:
+   var direction:Vector2=(true_point-point).normalized()
+   _markers108.draw_line(point+direction*23.,point+direction*30.,Color("fff0bf"),3.)
+   _markers108.draw_colored_polygon(PackedVector2Array([point+direction*34.,point+direction*27.+direction.orthogonal()*4.,point+direction*27.-direction.orthogonal()*4.]),Color("fff0bf"))
+  if expanded and active:
+   var name_:String=TownIdentity215.title(SaveData.world_cousins140,id)
+   var font:=get_theme_default_font();var width:float=font.get_string_size(name_,HORIZONTAL_ALIGNMENT_LEFT,-1,16).x
+   var at:=Vector2(clampf(point.x-width*.5,4.,maxf(4.,_clip106.size.x-width-4.)),clampf(point.y+33.,18.,_clip106.size.y-4.))
+   _markers108.draw_rect(Rect2(at-Vector2(4,17),Vector2(width+8,23)),Color("18302c"))
+   _markers108.draw_string(font,at,name_,HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff0bf"))
  MapPlayerMarker99.draw(_markers108,ppos,world.player.velocity,_pulse)
 
 func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
@@ -385,7 +408,7 @@ func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: 
   if SaveData.world_generator_version>=3:
    for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
     var box:Rect2=ridge.box
-    _terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),box.size/cell_size159()*cell),Color("777384"))
+    _terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),box.size/cell_size159()*cell),Color(TownIdentity215.look(SaveData.world_cousins140,TownIdentity215.nearest(SaveData.world_cousins140,ridge.port)).base))
   var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c,SaveData.world_generator_version)
   for tile in graph:
    var p=ModularWorldLayout93.world(tile)
@@ -482,3 +505,21 @@ func center_note162(note:Dictionary)->void:
  var target:Vector2=note.pos
  var point:Vector2=_to_map(target,data.mins,_map_geometry.cell,_map_geometry.origin)
  pan+=_map_geometry.area.get_center()-point;_note_pan162=pan;_terrain_valid=false;_ensure_terrain();queue_redraw()
+
+func _town_marker215(id:String)->Vector2:
+ var point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin-_map_geometry.area.position)
+ return point.clamp(Vector2(26,24),(_clip106.size-Vector2(26,28)).max(Vector2(26,24)))
+func _show_town215(id:String):
+ var sheet:=NavigationSheet.new();sheet.title=TownIdentity215.title(SaveData.world_cousins140,id)
+ sheet.entries=[{"id":"focus215","title":"Ver destino en el mapa","hint":"La pista no descubre terreno ni permite la primera siesta"}]
+ if SaveData.world_places144.get("visited",{}).get(id,false):sheet.entries.append({"id":"sleep215","title":"Ir con una siesta","hint":"Pueblo visitado · conserva el avance de media ruta"})
+ sheet.selected.connect(func(action:String):
+  if action=="sleep215":choose159(id)
+  else:center_note162({"id":"town215:"+id,"pos":VillageCousins140.point(SaveData.world_cousins140,id)}))
+ world._hud.add_child(sheet)
+ var icon:=TownIcon215.new();icon.look=TownIdentity215.look(SaveData.world_cousins140,id);icon.position=Vector2(570,560);icon.size=Vector2(140,100);sheet.canvas.add_child(icon)
+
+func _town_visible215(id:String)->bool:
+ if SaveData.world_cousins140.get("hint215","")==id:return true
+ var point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin-_map_geometry.area.position)
+ return Rect2(Vector2(22,22),_clip106.size-Vector2(44,44)).has_point(point)

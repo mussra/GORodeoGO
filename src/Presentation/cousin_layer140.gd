@@ -23,12 +23,13 @@ func _build(id:String,point:Vector2)->Node2D:
  var label:=Label.new();label.text="Loco del pueblo";label.position=point+Vector2(-55,8);label.add_theme_font_size_override("font_size",16);root.add_child(label)
  var path=load("res://src/Presentation/world_draw_node.gd").new();path.z_index=-5;path.draw_fn=func(n):ContinuousRoadArt.access(n,PackedVector2Array([Vector2(point.x,470),point]),32.)
  root.add_child(path)
+ var town_sign:=Label.new();town_sign.text=TownIdentity215.title(SaveData.world_cousins140,id);town_sign.position=point+Vector2(-130,-155);town_sign.add_theme_font_size_override("font_size",18);root.add_child(town_sign)
  if id in ["west140","east140"]:
   var door:Vector2=SaveData.world_cousins140.doors[id]
   for side in [-1,1]:
    var house:=Sprite2D.new();house.texture=WorldTestZone.HOUSE_TEX;house.position=door+Vector2(side*210,-48);house.offset=Vector2(0,-house.texture.get_height()/2.);house.scale=Vector2.ONE*116./house.texture.get_height();root.add_child(house)
    WorldPhysics.add_box(root,Rect2(house.position+Vector2(-58,-50),Vector2(116,30)))
-  var sign:=Label.new();sign.text=VillageCousins140.LABELS[id];sign.position=door+Vector2(-170,-220);sign.add_theme_font_size_override("font_size",20);root.add_child(sign)
+  var sign:=Label.new();sign.text=TownIdentity215.title(SaveData.world_cousins140,id);sign.position=door+Vector2(-170,-220);sign.add_theme_font_size_override("font_size",20);root.add_child(sign)
  return root
 func _exit_tree():
  for node in nodes.values():

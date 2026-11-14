@@ -77,8 +77,8 @@ static func hud(state:Dictionary)->String:
  if species.is_empty():return "Floristas: entregas terminadas. Tus dos cultivos siguen creciendo junto a la tienda."
  match stage(state,species):
   "active":
-   if state.quests[species].get("route","")=="field":return "Desde la florista del Este, sigue el camino al "+("norte" if species=="red" else "sur")+" y recoge una muestra de "+title(species)+"."
-   return "Florista: sigue el camino hacia el este hasta el siguiente pueblo. Pide una muestra de "+title(species)+" a su florista o pregúntale dónde encontrarla."
+   if state.quests[species].get("route","")=="field":return "Desde la florista de "+TownIdentity215.title(SaveData.world_cousins140,"east138")+", sigue el camino al "+("norte" if species=="red" else "sur")+" y recoge una muestra de "+title(species)+"."
+   return "Florista: sigue el camino hacia el este hasta "+TownIdentity215.title(SaveData.world_cousins140,"east138")+". Pide una muestra de "+title(species)+" a su florista o pregúntale dónde encontrarla."
   "sample":return "Tienes la muestra de "+title(species)+". Vuelve a la florista del rancho y entrégala."
  return "Florista: habla con ella para el siguiente encargo entre poblados."
 

@@ -61,7 +61,7 @@ func test_arrival_from_actual_previous_side_not_camera_and_stream_no_duplicates(
  var before=layer.nodes.home;layer._process(.016);assert_eq(layer.nodes.home,before)
  world.player.position=Vector2(20000,20000);layer._process(.016);assert_false(layer.nodes.has("home"))
  world.player.position=point;layer._process(.016);assert_true(layer.nodes.has("home"))
- var art:Sprite2D=layer.nodes.home.get_node("CousinArt");assert_eq(art.scale,Vector2.ONE*.625)
+ var art:Sprite2D=layer.nodes.home.get_node("CousinArt");assert_almost_eq(NpcScale214.visible_bounds(art.texture).size.y*art.scale.y,NpcScale214.ADULT,.01)
  assert_eq(art.texture.get_size(),Vector2(192,192))
  SaveData.horse_collection.find(SaveData.horse_collection.selected).species="unicorn";layer._process(.016)
  assert_true(art.texture.resource_path.contains("sorpresa"))

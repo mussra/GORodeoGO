@@ -19,12 +19,16 @@ static func fresh(seed_:int,discovered:Array,flora:Dictionary)->Dictionary:
  var east:int=maxi(int(flora.get("region",1))+1,ceili(float(right+2)/5.))
  var home:Vector2=FloristJourney138.home_door(seed_)
  var doors:Dictionary={"home":home,"east138":FloristJourney138.door(flora),"west140":Vector2(west*5120.+320.,358.),"east140":Vector2(east*5120.+320.,358.)}
- return {"version":1,"seed":seed_,"doors":doors,"known":{},"arrivals":{}}
+ return {"version":1,"seed":seed_,"doors":doors,"known":{},"arrivals":{},"towns215":TownIdentity215.fresh(seed_),"hint215":"","revealed215":{}}
 static func clean(raw:Variant,seed_:int)->Dictionary:
  if not raw is Dictionary or raw.get("version",0)!=1 or raw.get("seed",0)!=seed_:return {}
  if not raw.get("doors") is Dictionary:return {}
  var out:Dictionary={"version":1,"seed":seed_,"doors":{},"known":{},"arrivals":{}}
+ out["towns215"]=TownIdentity215.clean(raw.get("towns215",{}),seed_)
+ out["hint215"]=str(raw.get("hint215","")) if raw.get("hint215","") in IDS else ""
+ out["revealed215"]={}
  for id in IDS:
+  if raw.get("revealed215",{}) is Dictionary and raw.get("revealed215",{}).get(id,false)==true:out.revealed215[id]=true
   var p:Variant=raw.doors.get(id)
   if not p is Vector2 or not p.is_finite():return {}
   out.doors[id]=p
@@ -39,7 +43,9 @@ static func direction(from:Vector2,to:Vector2)->String:
 static func clue(id:String)->String:return CLUES[IDS.find(id)] if id in IDS else ""
 static func hear(state:Dictionary,id:String)->bool:
  if id not in IDS or state.known.get(id,false):return false
- state.known[id]=true;return true
+ state.known[id]=true
+ if state.get("hint215","")==id:state.hint215=""
+ return true
 static func next_unknown(state:Dictionary,from_id:String)->String:
  var nearest:float=INF;var choice:String=""
  if from_id not in IDS:return choice
@@ -54,10 +60,10 @@ static func cousin_hint(state:Dictionary,from_id:String)->String:
  var side:String=direction(point(state,from_id),point(state,target))
  var arrival:String=state.arrivals.get(from_id,"")
  var lead:String=("¿Vienes del "+arrival+"? ") if not arrival.is_empty() else ""
- return lead+"Todavía no conoces a mi primo de "+str(LABELS[target])+". Sigue el camino hacia el "+side+" para llegar a su pueblo."
+ return lead+"Todavía no conoces a mi primo de "+TownIdentity215.title(state,target)+". Sigue el camino hacia el "+side+" para llegar a su pueblo. Te lo marco en el mapa."
 static func journal(state:Dictionary)->String:
  var text:String="Primos conocidos · %d/4\n"%state.known.size()
  for id in IDS:
-  if state.known.get(id,false):text+="\n"+str(LABELS[id])+"\n"+clue(id)+"\n"
+  if state.known.get(id,false):text+="\n"+TownIdentity215.title(state,id)+"\n"+clue(id)+"\n"
  return text
 static func surprised(horse:Dictionary)->bool:return horse.get("species","")=="unicorn"

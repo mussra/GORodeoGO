@@ -1284,7 +1284,7 @@ func _npcs98()->Array:
 		data[0].position=WorldNominal98.home()+Vector2(100,10)
 		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)+Vector2(110,-20)
 	else:data[1].position=WorldFloristShop.FLORIST_FEET
-	if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista del Camino del Este","position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
+	if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista de "+TownIdentity215.title(SaveData.world_cousins140,"east138"),"position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
 	if SaveData.world_generator_version>=3 and not SaveData.world_cousins140.is_empty():
 		for id in VillageCousins140.IDS:data.append({"id":"cousin140:"+id,"name":"Loco del pueblo","position":VillageCousins140.point(SaveData.world_cousins140,id),"cousin140":id,"quests":[]})
 	return data
@@ -1356,7 +1356,7 @@ func _journey_action138(action_:String,species:String)->void:
 			else:_toast("No se pudo guardar la pista. Puedes volver a preguntar.")
 			_refresh_quest_hud();_close_npc();return
 	if changed:
-		if SaveData.commit_flora138(next,player.position):
+		if SaveData.commit_flora138(next,player.position,"east138" if action_=="begin" else ""):
 			_toast("Entrega guardada. Tu nuevo cultivo está al sur de la tienda." if action_=="deliver" else "Muestra obtenida: vuelve a entregarla." if action_=="sample" else FloristJourney138.hud(next),"journey138")
 			if is_instance_valid(_flora_layer138):_flora_layer138.refresh()
 		else:_toast("No se pudo guardar. No se ha consumido la muestra ni cambiado el encargo.")
@@ -1435,7 +1435,7 @@ func _open_cousin140(id:String)->void:
 	var next:Dictionary=SaveData.world_cousins140.duplicate(true)
 	if VillageCousins140.hear(next,id) and not SaveData.commit_cousins140(next,player.position):_toast(tr("WORLD_SAVE_FAILED104"));return
 	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
-	var dialog:=CousinDialog140.new();dialog.setup(id,SaveData.world_cousins140,VillageCousins140.surprised(SaveData.horse_collection.find(SaveData.horse_collection.selected)));_hud.add_child(dialog);_npc_dialog=dialog
+	var dialog:=CousinDialog140.new();dialog.world_position215=player.position;dialog.setup(id,SaveData.world_cousins140,VillageCousins140.surprised(SaveData.horse_collection.find(SaveData.horse_collection.selected)));_hud.add_child(dialog);_npc_dialog=dialog
 	dialog.closed.connect(_close_npc);dialog.journal_requested.connect(_show_journal140)
 func _show_journal140()->void:
 	if SaveData.world_cousins140.is_empty() or is_instance_valid(_journal140):return

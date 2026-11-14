@@ -5,7 +5,7 @@ func setup_journey(remote_:bool)->void:
  add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("6d9b94"),12))
  position=Vector2(300,145);size=Vector2(680,530);z_index=100;mouse_filter=Control.MOUSE_FILTER_STOP
  var state:Dictionary=SaveData.world_flora138;var species:String=FloristJourney138.current(state);var current_stage:String=FloristJourney138.stage(state,species)
- var title:=Label.new();title.text="Floristería del Camino del Este" if remote_ else "Florista · semillas de otro pueblo";title.position=Vector2(24,18);title.add_theme_font_size_override("font_size",25);add_child(title);TextFit181.fixed(title,Vector2(size.x-48,44),24,20,2)
+ var title:=Label.new();title.text="Floristería · "+TownIdentity215.title(SaveData.world_cousins140,"east138") if remote_ else "Florista · semillas de otro pueblo";title.position=Vector2(24,18);title.add_theme_font_size_override("font_size",25);add_child(title);TextFit181.fixed(title,Vector2(size.x-48,44),24,20,2)
  var body:=Label.new();body.position=Vector2(24,70);body.size=Vector2(632,245);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",22);add_child(body)
  DetailCard179.style_panel(self)
  DetailCard179.reading_surface(body)
@@ -25,7 +25,7 @@ func setup_journey(remote_:bool)->void:
  else:
   match current_stage:
    "locked":
-    body.text=recognition+"Aquí no crecen "+FloristJourney138.title(species)+". Mi compañera del pueblo del Camino del Este puede darte una muestra o decirte dónde conseguirla. Vuelve a entregármela.\nSigue el camino hacia el este: pasa por su pueblo."
+    body.text=recognition+"Aquí no crecen "+FloristJourney138.title(species)+". Mi compañera de "+TownIdentity215.title(SaveData.world_cousins140,"east138")+" puede darte una muestra o decirte dónde conseguirla. Vuelve a entregármela.\nSigue el camino hacia el este: pasa por su pueblo. Al aceptar te marco el destino."
     button138("Aceptar encargo",Vector2(24,330),"begin",species)
    "active":body.text=recognition+FloristJourney138.hud(state)
    "sample":
