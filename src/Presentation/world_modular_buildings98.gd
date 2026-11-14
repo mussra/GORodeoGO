@@ -27,7 +27,8 @@ func _buildings():
  var door=Layout.world(doors.florist);var offset=door-WorldFloristShop.DOOR
  _sprite(WorldFloristShop.SHOP,WorldFloristShop.BASE+offset,200,"FloristShop")
  _solid(Rect2(WorldFloristShop.BODY.position+offset,WorldFloristShop.BODY.size))
- _sprite(WorldFloristShop.FLORIST,WorldFloristShop.FLORIST_FEET+offset,92,"Florist")
+ var florist:=_sprite(WorldFloristShop.FLORIST,WorldFloristShop.FLORIST_FEET+offset,92,"Florist")
+ NpcScale214.apply(florist,florist.texture)
  for i in 16:
   var side=-1 if i<8 else 1;var feet=door+Vector2(side*(65+(i%4)*16),18+(i%4)*10)
   _sprite(WorldFloristShop.Decor.FLOWER_TEXS[i%WorldFloristShop.Decor.FLOWER_TEXS.size()],feet,18+i%3*3,"Flower%d"%i)

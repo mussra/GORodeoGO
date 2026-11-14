@@ -20,8 +20,8 @@ func configure_frames205(frames:SpriteFrames)->void:
  sprite.sprite_frames=frames
  var texture:Texture2D=frames.get_frame_texture("play",0)
  if texture==null:art_ready=false;visible=false;return
- sprite.scale=Vector2.ONE*100./maxf(texture.get_height(),1.)
- sprite.position.y=-50.
+ NpcScale214.apply(sprite,texture)
+ sprite.position.y=0.
  sprite.play("play")
 static func beside_race205(course:RaceCourse190)->Vector2:
  # Outside the course and fence, near the starting line. Never an obstacle.

@@ -20,15 +20,25 @@ var pose_name:String="idle"
 const GARDENER={"idle":preload("res://art/garden212/lucia-idle.png"),"walk":preload("res://art/garden212/lucia-walk.png"),"water":preload("res://art/garden212/lucia-water.png"),"plant":preload("res://art/garden212/lucia-plant.png"),"harvest":preload("res://art/garden212/lucia-harvest.png")}
 func _ready():
  world=get_parent();home=world._npcs98()[1].position
- plot=clear_point(home+Vector2(-190,160))
+ plot=plot_point214(home)
  sample=clear_point(home+Vector2(-650,-480))
  var anchors:Dictionary=SaveData.world_garden212.anchors
- if not anchors.is_empty():home=anchors.home;plot=anchors.plot;sample=anchors.sample
+ if not anchors.is_empty():
+  home=anchors.home;sample=anchors.sample
+  if SaveData.world_garden212.get("layout214",1)<2:
+   var next_plot:=plot_point214(home)
+   if SaveData.relocate_garden214({"home":home,"plot":next_plot,"sample":sample}):plot=next_plot
+   else:plot=anchors.plot;notice="No se pudo guardar la nueva parcela; se mantiene su posición anterior."
+  else:plot=anchors.plot
+ var path:Node2D=load("res://src/Presentation/world_draw_node.gd").new();path.name="GardenAccess214";path.z_index=-6
+ path.draw_fn=func(n):
+  if SaveData.world_garden212.stage!="locked":ContinuousRoadArt.access(n,Garden212.lane214(plot),32.)
+ world.add_child(path)
  previous=world.player.position
  marker=load("res://src/Presentation/world_draw_node.gd").new();marker.z_index=-1;marker.draw_fn=_draw_plot;world.add_child(marker)
  for spot in [plot,sample]:
   var leaves:=Sprite2D.new();leaves.texture=CARROTS[1] if spot==plot else CARROTS[3];leaves.position=spot;leaves.scale=Vector2.ONE*.55;marker.add_child(leaves)
- description=Label.new();description.position=plot+Vector2(-125,-65);description.add_theme_font_size_override("font_size",18);description.text="Huerto de Lucía · piloto";description.modulate=Color("fff1cd");marker.add_child(description)
+ description=Label.new();description.position=plot+Vector2(-125,-98);description.add_theme_font_size_override("font_size",18);description.text="Huerto de Lucía · piloto";description.modulate=Color("fff1cd");marker.add_child(description)
  var label:=Label.new();label.position=sample+Vector2(-115,-55);label.add_theme_font_size_override("font_size",18);label.text="Zanahoria silvestre";label.modulate=Color("fff1cd");marker.add_child(label)
  gardener=Sprite2D.new();gardener.name="Lucia213";gardener.position=plot+Vector2(150,25);world.add_child(gardener);set_pose("idle")
  button=Button.new();button.position=Vector2(475,565);button.size=Vector2(330,56);QuestButtonStyle.apply(button);world._hud.add_child(button);button.pressed.connect(open)
@@ -102,7 +112,8 @@ func _process(delta:float):
  direction_label.text="Huerto · "+location_hint()+(" · alimento: %ds"%ceili(state.food.left) if state.food.left>0. else "")
  button.visible=active and state.stage!="locked" and (world.player.position.distance_to(plot)<150. or (state.stage=="search" and world.player.position.distance_to(sample)<130.))
  button.text="Recoger zanahoria silvestre" if state.stage=="search" and world.player.position.distance_to(sample)<130. else "Hablar con Lucía"
- if state.stage!=last_stage:last_stage=state.stage;marker.queue_redraw()
+ if state.stage!=last_stage:
+  last_stage=state.stage;marker.queue_redraw();world.get_node("GardenAccess214").queue_redraw()
 func _draw_plot(_canvas:Node2D):
  if SaveData.world_garden212.stage=="locked":return
  marker.draw_style_box(RanchTheme.box(Color("755134"),Color("b39461"),5),Rect2(plot-Vector2(125,40),Vector2(250,95)))
@@ -114,6 +125,25 @@ func _draw_plot(_canvas:Node2D):
 func set_pose(pose:String):
  pose_name=pose;gardener.texture=GARDENER[pose]
  # The watering sheet pours right. Face the plot and place the stream over its center.
- gardener.position=plot+Vector2(48,25) if pose=="water" else plot+Vector2(150,25)
+ gardener.position=plot+Vector2(31,12) if pose=="water" else plot+Vector2(150,25)
  gardener.flip_h=plot.x<gardener.position.x
- gardener.scale=Vector2.ONE*120./gardener.texture.get_height();gardener.offset=Vector2(0,-gardener.texture.get_height()*.5)
+ NpcScale214.apply(gardener,gardener.texture,NpcScale214.CHILD,474.)
+
+func plot_point214(origin:Vector2)->Vector2:
+ # Keep the existing town and flower shop fixed. Give the garden its own southern approach.
+ for offset in [Vector2(-520,420),Vector2(-620,420),Vector2(-420,420),Vector2(-520,520),Vector2(520,420)]:
+  var candidate:Vector2=origin+offset
+  var clear_:bool=true
+  for p in [candidate+Vector2(-160,-80),candidate+Vector2(180,-80),candidate+Vector2(-160,115),candidate+Vector2(180,115),candidate]:
+   if SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,p,60.):clear_=false
+  for edit in SaveData.world_edits:
+   if edit.get("type","") in ["add_decor","add_pigs"] and edit.get("pos") is Vector2:
+    var point:Vector2=edit.pos
+    if Rect2(candidate+Vector2(-230,-150),Vector2(480,350)).has_point(point) or Garden212.on_lane214(point,candidate,100.):clear_=false
+  var lane:=Garden212.lane214(candidate)
+  for i in lane.size()-1:
+   if SaveData.world_generator_version>=3 and WorldTerrain103.safe_step(SaveData.world_seed,lane[i],lane[i+1],24.).distance_to(lane[i+1])>1.:clear_=false
+  if clear_:return candidate
+ return clear_point(origin+Vector2(-520,420))
+func reserved214(point:Vector2)->bool:
+ return Rect2(plot+Vector2(-165,-90),Vector2(360,240)).has_point(point) or Garden212.on_lane214(point,plot,45.)

@@ -61,6 +61,9 @@ func test_florist_offers_garden_and_real_world_cycle_saves():
  assert_eq(world._navigation.title,"FRONTERA · DEBUG");assert_eq(world._navigation.entries.size(),4)
  world._close_navigation();assert_false(get_tree().paused)
  var garden:GardenWorld212=world.garden212;garden.set_process(false)
+ assert_gt(garden.home.distance_to(garden.plot),500.)
+ var lane:=Garden212.lane214(garden.plot)
+ for i in lane.size()-1:assert_almost_eq(WorldTerrain103.safe_step(SaveData.world_seed,lane[i],lane[i+1],24.).distance_to(lane[i+1]),0.,.01)
  world.player.position=garden.home;world._open_npc(world._npcs98()[1])
  var found:Button
  for child in world._npc_dialog.get_children():
@@ -78,7 +81,7 @@ func test_florist_offers_garden_and_real_world_cycle_saves():
  world.player.position=garden.sample;garden.open();garden.act("sample");garden.close();assert_eq(SaveData.world_garden212.seeds,1)
  world.player.position=garden.plot;garden.open();garden.act("plant");garden.act("water")
  assert_true(garden.gardener.flip_h,"Watering faces left toward the plot")
- assert_eq(garden.gardener.position,garden.plot+Vector2(48,25),"Water stream lands on the plants")
+ assert_eq(garden.gardener.position,garden.plot+Vector2(31,12),"Water stream lands on the plants")
  garden.close()
  SaveData.world_garden212=Garden212.tick(SaveData.world_garden212,900.,0.)
  garden.open();garden.act("harvest");assert_eq(SaveData.world_garden212.crops,3);garden.act("feed");assert_eq(SaveData.world_garden212.crops,2)
@@ -122,3 +125,25 @@ func test_live_load_preserves_crop_food_anchors_and_legacy_is_additive():
  var c:=ConfigFile.new();assert_eq(c.load(SaveData.save_path),OK);c.erase_section_key("world","garden212");assert_eq(c.save(SaveData.save_path),OK)
  SaveData.load_progress();assert_true(SaveData._load_valid);assert_eq(SaveData.world_garden212,Garden212.fresh())
  c.set_value("world","garden212",{"version":999});assert_eq(c.save(SaveData.save_path),OK);SaveData.load_progress();assert_false(SaveData._load_valid);assert_false(SaveData.save_progress());SaveData._load_valid=true
+
+func test_layout214_is_atomic_preserves_crop_progress_and_old_anchors():
+ var s:=Garden212.fresh();s.stage="growing";s.watered=true;s.distance=456.;s.seeds=2;s.crops=7;s.harvests=3;s.food={"horse":"original","left":42.}
+ s.anchors={"home":Vector2(100,200),"plot":Vector2(0,0),"sample":Vector2(-100,-200)};s.erase("layout214")
+ SaveData.world_garden212=Garden212.clean(s);assert_eq(SaveData.world_garden212.layout214,1)
+ var before:=SaveData.world_garden212.duplicate(true);var anchors:Dictionary=s.anchors.duplicate(true);anchors.plot=Vector2(-420,620)
+ SaveData._load_valid=false;assert_false(SaveData.relocate_garden214(anchors));assert_eq(SaveData.world_garden212,before)
+ SaveData._load_valid=true;assert_true(SaveData.relocate_garden214(anchors));assert_eq(SaveData.world_garden212.layout214,2)
+ var expected:=before.duplicate(true);expected.anchors=anchors;expected.layout214=2
+ assert_eq(SaveData.world_garden212,expected);SaveData.load_progress();assert_eq(SaveData.world_garden212,expected)
+func test_shared_npc214_visible_size_and_feet_and_garden_lane():
+ for path in ["farmer","florist","loco-normal140","loco-sorpresa140","ganjo_musician205"]:
+  var texture:Texture2D=load("res://art/npc/"+path+".png");var sprite:=Sprite2D.new();sprite.texture=texture;NpcScale214.apply(sprite,texture)
+  var bounds:=NpcScale214.visible_bounds(texture)
+  assert_almost_eq(bounds.size.y*sprite.scale.y,92.,.01,path)
+  assert_almost_eq((bounds.end.y-texture.get_height()*.5+sprite.offset.y)*sprite.scale.y,0.,.01,path+" feet")
+  sprite.free()
+ var girl:=Sprite2D.new();girl.texture=GardenWorld212.GARDENER.idle;NpcScale214.apply(girl,girl.texture,NpcScale214.CHILD,474.)
+ assert_almost_eq(girl.texture.get_height()*girl.scale.y,76.,.01);assert_lt(girl.texture.get_height()*girl.scale.y,92.);girl.free()
+ var plot:=Vector2(500,730);var lane:=Garden212.lane214(plot)
+ assert_eq(lane[0],Vector2(310,470));assert_eq(lane[-1],plot+Vector2(0,90))
+ assert_true(Garden212.on_lane214(lane[0].lerp(lane[1],.5),plot));assert_false(Garden212.on_lane214(plot,plot))

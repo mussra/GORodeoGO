@@ -33,6 +33,10 @@ func run():
   if child is CanvasItem:child.visible=false
  garden.open();garden.act("plant");garden.act("water");garden.close()
  await shot("parcela")
+ var cam:=get_viewport().get_camera_2d();var old_position:Vector2=world.player.position
+ world.player.position=(garden.plot+garden.home)*.5;cam.zoom=Vector2.ONE*.72;cam.reset_smoothing()
+ await shot("barrio214")
+ world.player.position=old_position;cam.zoom=Vector2.ONE;cam.reset_smoothing()
  world.player.position=garden.plot+Vector2(0,65)
  SaveData.world_garden212=Garden212.tick(SaveData.world_garden212,900.,0.)
  garden.open();garden.act("harvest");await shot("cosecha");garden.act("feed");await shot("alimento")

@@ -7,13 +7,14 @@ const GROW_DISTANCE:=900.0
 const FOOD_SECONDS:=120.0
 const DRAIN_MULT:=0.85
 static func fresh()->Dictionary:
- return {"version":VERSION,"town_id":BASE_TOWN_ID,"anchors":{},"stage":"locked","seeds":0,"crops":0,"watered":false,"distance":0.0,"discovered":false,"harvests":0,"food":{"horse":"","left":0.0}}
+ return {"version":VERSION,"town_id":BASE_TOWN_ID,"layout214":2,"anchors":{},"stage":"locked","seeds":0,"crops":0,"watered":false,"distance":0.0,"discovered":false,"harvests":0,"food":{"horse":"","left":0.0}}
 static func clean(raw:Variant)->Dictionary:
  if not raw is Dictionary or raw.get("version",0)!=VERSION:return fresh()
  var out:=fresh()
  if raw.get("stage","") not in ["locked","intro","search","empty","growing","ripe"]:return out
  out.stage=raw.stage
  if raw.get("town_id",BASE_TOWN_ID) is String:out.town_id=raw.get("town_id",BASE_TOWN_ID)
+ out.layout214=2 if raw.get("layout214",1)==2 or (raw.get("anchors",{}) is Dictionary and raw.get("anchors",{}).is_empty()) else 1
  var anchors:Variant=raw.get("anchors",{})
  if anchors is Dictionary and ["home","plot","sample"].all(func(k):return anchors.get(k) is Vector2 and anchors[k].is_finite()):out.anchors=anchors.duplicate(true)
  for key in ["seeds","crops","harvests"]:
@@ -71,3 +72,12 @@ static func summary(state:Dictionary)->String:
   "growing":return "Riega la parcela para empezar." if not state.watered else "Brote cuidado · %d%%. Explora a caballo y vuelve; no se marchita."%int(state.distance/GROW_DISTANCE*100.)
   "ripe":return "Zanahorias listas. Cosecha: tres para los caballos y una semilla para replantar."
  return ""
+
+static func lane214(point:Vector2)->PackedVector2Array:
+ var junction_y:float=470. if WorldNominal98.enabled() else WorldMap.trail_y_at(SaveData.world_seed,point.x-190.)
+ return PackedVector2Array([Vector2(point.x-190,junction_y),point+Vector2(-190,90),point+Vector2(0,90)])
+static func on_lane214(point:Vector2,plot:Vector2,margin:float=0.)->bool:
+ var lane:=lane214(plot)
+ for i in lane.size()-1:
+  if point.distance_to(Geometry2D.get_closest_point_to_segment(point,lane[i],lane[i+1]))<=16.+margin:return true
+ return false

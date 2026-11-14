@@ -28,7 +28,7 @@ func _ready():
  # Sort at the bottom of the image; no enterable interior is claimed.
  var solid=WorldPhysics.add_box(world,BODY);solid.name="FloristShopBody"
  if world.has_method("register_occluder"):world.register_occluder("florist_shop",Rect2(BASE-Vector2(WIDTH*.5,HEIGHT),Vector2(WIDTH,HEIGHT-30)))
- var woman=Sprite2D.new();woman.name="FloristArt";woman.texture=FLORIST;woman.scale=Vector2.ONE*(92.0/FLORIST.get_height());woman.position=FLORIST_FEET;woman.offset=Vector2(0,-FLORIST.get_height()*.5);world.add_child(woman)
+ var woman=Sprite2D.new();woman.name="FloristArt";woman.texture=FLORIST;NpcScale214.apply(woman,FLORIST);woman.position=FLORIST_FEET;world.add_child(woman)
  var flower_positions=[Vector2(500,365),Vector2(510,400),Vector2(525,430),Vector2(550,445),Vector2(580,440),Vector2(610,435),Vector2(635,425),Vector2(783,360),Vector2(800,390),Vector2(800,425),Vector2(780,450),Vector2(760,465),Vector2(725,465),Vector2(622,395),Vector2(730,390),Vector2(515,310),Vector2(795,315),Vector2(490,405)]
  for i in flower_positions.size():
   var flower=Sprite2D.new();flower.name="FloristFlowers%d"%i;flower.texture=Decor.FLOWER_TEXS[i%Decor.FLOWER_TEXS.size()];flower.scale=Vector2.ONE*((18.+i%3*3)/flower.texture.get_height());flower.position=flower_positions[i];flower.offset=Vector2(0,-flower.texture.get_height()*.5);world.add_child(flower)

@@ -455,6 +455,7 @@ func _advance_builder(b: Dictionary) -> void:
 				b["phase"] = 2
 				return
 			var d: Dictionary = todo.pop_front()
+			if not d.get("edited",false) and is_instance_valid(garden212) and garden212.reserved214(d.pos):return
 			if SaveData.world_generator_version>=3 and not d.get("edited",false):
 				if CousinLayer140.reserved(SaveData.world_cousins140,d.pos) or FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):return
 			if WorldNominal98.enabled():

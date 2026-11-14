@@ -13,11 +13,13 @@ func _process(_delta:float):
   if world.player.position.distance_to(previous)<300. and previous.distance_to(point)>=600. and world.player.position.distance_to(point)<600.:state.arrivals[id]=VillageCousins140.direction(point,previous)
   if near and not nodes.has(id):nodes[id]=_build(id,point)
   if not near and nodes.has(id):nodes[id].queue_free();nodes.erase(id)
-  if nodes.has(id):nodes[id].get_node("CousinArt").texture=load("res://art/npc/loco-"+("sorpresa" if surprise else "normal")+"140.png")
+  if nodes.has(id):
+   var art:Sprite2D=nodes[id].get_node("CousinArt")
+   art.texture=load("res://art/npc/loco-"+("sorpresa" if surprise else "normal")+"140.png");NpcScale214.apply(art,art.texture)
  previous=world.player.position
 func _build(id:String,point:Vector2)->Node2D:
  var root:=Node2D.new();root.name="Cousin_"+id;root.y_sort_enabled=true;world.add_child(root)
- var art:=Sprite2D.new();art.name="CousinArt";art.position=point;art.offset=Vector2(0,-88);art.scale=Vector2.ONE*.625;root.add_child(art)
+ var art:=Sprite2D.new();art.name="CousinArt";art.position=point;root.add_child(art)
  var label:=Label.new();label.text="Loco del pueblo";label.position=point+Vector2(-55,8);label.add_theme_font_size_override("font_size",16);root.add_child(label)
  var path=load("res://src/Presentation/world_draw_node.gd").new();path.z_index=-5;path.draw_fn=func(n):ContinuousRoadArt.access(n,PackedVector2Array([Vector2(point.x,470),point]),32.)
  root.add_child(path)

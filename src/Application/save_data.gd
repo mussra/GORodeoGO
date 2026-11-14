@@ -702,3 +702,10 @@ func garden_action212(action_:String,horse:String="",anchors:Dictionary={})->boo
 	world_garden212=next
 	if save_progress():return true
 	world_garden212=before;return false
+
+func relocate_garden214(anchors:Dictionary)->bool:
+	if trial_session_active or not ["home","plot","sample"].all(func(k):return anchors.get(k) is Vector2 and anchors[k].is_finite()):return false
+	var before:=world_garden212.duplicate(true)
+	world_garden212=before.duplicate(true);world_garden212.anchors=anchors.duplicate(true);world_garden212.layout214=2
+	if save_progress():return true
+	world_garden212=before;return false
