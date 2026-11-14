@@ -35,6 +35,7 @@ var _announced:bool=false
 func _ready()->void:
  process_physics_priority=50
  RanchMusic.stop_context()
+ var musician205:=GanjoMusician205.new();musician205.position=GanjoMusician205.beside_race205(course);add_child(musician205)
  _track_visual=RaceScenery191.new();_track_visual.name="RaceScenery191";_track_visual.course=course;add_child(_track_visual)
  var names:Array[String]=["Tú","Luna","Sol","Brisa"]
  var colors:Array[Color]=[Color("7de1cc"),Color("ffb473"),Color("a8b7ff"),Color("f4a3d1")]

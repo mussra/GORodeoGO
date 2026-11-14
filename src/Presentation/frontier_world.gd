@@ -1149,6 +1149,9 @@ func _tick_goats(delta:float)->void:
 
 
 func _setup_npcs()->void:
+	var musician205:=GanjoMusician205.new()
+	musician205.position=(WorldNominal98.home() if WorldNominal98.enabled() else HOME_POS)+Vector2(-180,100)
+	add_child(musician205)
 	for data in _npcs98():
 		if data.id=="farmer":
 			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
