@@ -1,0 +1,117 @@
+{
+  "tracks": {
+    "race": {
+      "bpm": 156,
+      "bars": 16,
+      "duration": 24.615375,
+      "frames": 1181538,
+      "sample_rate": 48000,
+      "peak_dbfs": -2.5001885662438443,
+      "rms_dbfs": -20.936000716068257,
+      "boundary_delta": 0,
+      "clipped_samples": 0,
+      "sha256": "2510ff011d439f4d99ca478c9725a34ae107667c37d2f9d081d8d09072d2f8a1",
+      "notes": 240
+    },
+    "duel": {
+      "bpm": 132,
+      "bars": 16,
+      "duration": 29.090916666666665,
+      "frames": 1396364,
+      "sample_rate": 48000,
+      "peak_dbfs": -2.5026633297775467,
+      "rms_dbfs": -22.846971772731727,
+      "boundary_delta": 0,
+      "clipped_samples": 0,
+      "sha256": "5a24342d5ca274b8b8cfe76452e2d71201f5fb1180a24da662a5feb261d051cd",
+      "notes": 240
+    }
+  },
+  "sample_sources": [
+    {
+      "note": "E3",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20E3.wav",
+      "sha256": "f2f72ceca428b717b60af936d0616eec98d3cf1d838ab32f94a03dbf3ef35cb5"
+    },
+    {
+      "note": "F3",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20F3.wav",
+      "sha256": "df45b5a48f908271526d811b6618edf9a887b8a32a8893625337b11345fbb6f7"
+    },
+    {
+      "note": "F#3",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20F%233.wav",
+      "sha256": "47e7795f2100e50fd9a0e2a633070502ebb7659ad911fada600b9c44678cc2dd"
+    },
+    {
+      "note": "G3",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20G3.wav",
+      "sha256": "9a2ea983af8e54e970dc8e4577656ff978f3f927f87648d1fcd727b5c6560d2d"
+    },
+    {
+      "note": "A3",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20A3.wav",
+      "sha256": "4bf313ada6ac3dc5c447e2f8cc41f609c89147e360e24dba81b20b594c86ad25"
+    },
+    {
+      "note": "B3",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20B3.wav",
+      "sha256": "fddf1c9e1794a3582181976d83ec8ada29dae9ba08676e4e3553a83861df9c3e"
+    },
+    {
+      "note": "C#4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20C%234.wav",
+      "sha256": "070cd8c909036d6dd48bdabeabb832ed8c640dfc10eab67f19a6d845e1613ec0"
+    },
+    {
+      "note": "D4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20D4.wav",
+      "sha256": "6a1dc3895786eb7a2ddd41664e28577bf6334f43de2ebd11f917b125dc89355e"
+    },
+    {
+      "note": "E4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20E4.wav",
+      "sha256": "c5d755bd77593b58f1b0eb7c4eb6a73ffa3a1015ff6b1a35cd99ae4b99f60c94"
+    },
+    {
+      "note": "F4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20F4.wav",
+      "sha256": "6a6923e3fa830210b9ebe109c85b9671a387e49576c72725d2a985d0059a55f6"
+    },
+    {
+      "note": "F#4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20F%234.wav",
+      "sha256": "d9cca6e0ded4e40b72a04671663482a3db0dfbb60eb054ff1825b209af7d85da"
+    },
+    {
+      "note": "G4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20G4.wav",
+      "sha256": "548f5ad1d45cd4243cee1acc511ffe258db990eebe52f2bfc41fa1e8438a18cd"
+    },
+    {
+      "note": "A4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20A4.wav",
+      "sha256": "fd31432fb20652fe9a21516ff0a552c2c32752e36a0e3d33b83b05a512f09de4"
+    },
+    {
+      "note": "B4",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20B4.wav",
+      "sha256": "61888e9e14dbd4a678e118e094393bb419b8e9dbd8e766c95f72e8be7d149f2b"
+    },
+    {
+      "note": "C#5",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20C%235.wav",
+      "sha256": "22a2168943ac0224b9a27f2574cb7825c1d2d6795a57e666f3eeaa6bafe8e321"
+    },
+    {
+      "note": "D#5",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20D%235.wav",
+      "sha256": "946371632900964f9d3734ecb9b667bd91ff6aad820a19de4c24d4f9f4586683"
+    },
+    {
+      "note": "G5",
+      "url": "https://raw.githubusercontent.com/sfzinstruments/ganjo/ccff5cd5cd3b513873a48994c07724d9d3c39e1c/Common/Banjo_Common%20-%20G5.wav",
+      "sha256": "0d10f756de3e96f692a485719b434c65626608bdd8de0a2432adec094eb8bbe2"
+    }
+  ]
+}

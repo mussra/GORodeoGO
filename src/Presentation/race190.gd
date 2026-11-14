@@ -34,7 +34,7 @@ var result_text:Label
 var _announced:bool=false
 func _ready()->void:
  process_physics_priority=50
- RanchMusic.play_context("world")
+ RanchMusic.play_context("race")
  _track_visual=RaceScenery191.new();_track_visual.name="RaceScenery191";_track_visual.course=course;add_child(_track_visual)
  var names:Array[String]=["Tú","Luna","Sol","Brisa"]
  var colors:Array[Color]=[Color("7de1cc"),Color("ffb473"),Color("a8b7ff"),Color("f4a3d1")]
@@ -80,6 +80,7 @@ func _build_hud()->void:
  progress_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE);progress_bar.offset_left=18.;progress_bar.offset_top=68.;progress_bar.offset_right=-18.;progress_bar.offset_bottom=74.
  progress_bar.add_theme_stylebox_override("fill",RanchTheme.box(Color("8be3ba"),Color("8be3ba"),3))
  progress_bar.add_theme_stylebox_override("background",RanchTheme.box(Color("2d4947"),Color("2d4947"),3))
+ var counter:=StartCountdown198.new();counter.name="StartCountdown198";counter.session=self;hud.add_child(counter)
  toasts=ToastStack.new();toasts.top_offset=380;hud.add_child(toasts)
  pause_panel=_panel(Vector2(560,275));pause_panel.process_mode=Node.PROCESS_MODE_ALWAYS;pause_panel.hide()
  _label(pause_panel,"PAUSA · CARRERAS",Vector2(28,20),25)
@@ -131,7 +132,7 @@ func _physics_process(delta:float)->void:
  camera.zoom=camera.zoom.lerp(Vector2.ONE*target_zoom,minf(1.,delta*2.))
  info.text="CARRERAS · LAZO     %d/4     1 vuelta · %02d:%02d\nPuerta %d/%d · caballos igualados · sin daño"%[rank,int(elapsed)/60,int(elapsed)%60,mini(player.next_gate,16),16]
  if results.visible:guidance.text="Carrera terminada · otra carrera o menú"
- elif countdown>0.:guidance.text="PREPARADOS · %d"%ceili(countdown)
+ elif countdown>0.:guidance.text="PREPARADOS · %d · puedes apuntar; suelta después de salir"%ceili(countdown)
  elif player.slow_left>0.:guidance.text="ENLAZADO · sigues moviéndote · %.1fs"%player.slow_left
  elif player.attack_cooldown>0.:guidance.text="Lazo %.1fs · doble toque al mover: regate · sigue la puerta brillante"%player.attack_cooldown
  else:guidance.text="Mueve izquierda · apunta/suelta derecha: lazo · doble toque al mover: regate"
@@ -261,3 +262,6 @@ func _crossing_contacts192()->void:
     if rider.crossing_protected>0.:continue
     rider.crossing_slow=CupRewards195.crossing_duration(SaveData.horse_collection.find(SaveData.horse_collection.selected)) if rider==player else .65;rider.crossing_protected=1.5;rider.velocity*=.72
     if rider==player:toasts.push("Roce en el cruce · freno breve, sin daño",1.5,"crossing192")
+
+func prestart_aim198()->bool:
+ return countdown>0. and is_instance_valid(selector) and not selector.visible

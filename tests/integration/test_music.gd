@@ -43,3 +43,11 @@ func test_pause_and_mute_keep_position() -> void:
 	RanchMusic.set_paused(false)
 	await wait_seconds(.1)
 	assert_gt(RanchMusic.voice.get_playback_position(), before)
+
+func test_new_race_and_duel_tracks_use_one_voice_and_correct_loop_frames()->void:
+	for next in ["race","duel"]:
+		RanchMusic.play_context(next);await wait_seconds(.55)
+		assert_eq(RanchMusic.context,next);assert_eq(RanchMusic.get_child_count(),1)
+		assert_eq(RanchMusic.voice.stream.loop_end,1181538 if next=="race" else 1396364)
+		assert_eq(RanchMusic.voice.stream.mix_rate,48000)
+		assert_true(RanchMusic.voice.playing)

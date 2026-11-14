@@ -22,7 +22,7 @@ var aim_joystick:VirtualJoystick
 var controls:CanvasLayer
 func _ready()->void:
  process_physics_priority=50
- RanchMusic.play_context("world")
+ RanchMusic.play_context("duel")
  for index in 2:
   var rider:=_make_rider();rider.race=self;rider.ai=index==1;rider.racer_index=index;rider.racer_name="Tú" if index==0 else "Luna";rider.tint=Color("7de1cc") if index==0 else Color("ffb473")
   add_child(rider);riders.append(rider)

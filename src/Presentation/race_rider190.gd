@@ -31,8 +31,9 @@ func _ready()->void:
  max_speed=base_pace;acceleration=900.
  dodge_available=true;dodge_recharge_seconds=2.5
  dodge.can_start=func()->bool:return race.running and finish_time<0. and _jump_time<=0.
- lasso.throw_guard=func()->bool:return race.running and finish_time<0. and _jump_time<=0. and attack_cooldown<=0. and not lasso.is_in_flight()
- lasso.aim_hold_guard=func()->bool:return race.running and finish_time<0. and _jump_time<=0.
+ lasso.throw_guard=func()->bool:return _aim_allowed198() and finish_time<0. and _jump_time<=0. and attack_cooldown<=0. and not lasso.is_in_flight()
+ lasso.launch_guard=func()->bool:return race.running
+ lasso.aim_hold_guard=func()->bool:return _aim_allowed198() and finish_time<0. and _jump_time<=0.
  lasso.can_capture=func()->bool:return race.running
  lasso.prey_provider=func()->Array:return race.targets_for(self)
  lasso.lasso_released.connect(func():attack_cooldown=3.)
@@ -40,9 +41,11 @@ func _ready()->void:
  lasso.capture_area_visual_radius=58.
  if ai:set_process_input(false)
 func _input(event:InputEvent)->void:
- if not ai and race.running and finish_time<0.:super._input(event)
+ if not ai and _aim_allowed198() and finish_time<0.:super._input(event)
 func _physics_process(delta:float)->void:
- if not race.running or finish_time>=0.:return
+ if not race.running or finish_time>=0.:
+  if not ai and _aim_allowed198():lasso.process_throw_input(delta)
+  return
  slow_left=maxf(0.,slow_left-delta);protected_left=maxf(0.,protected_left-delta);attack_cooldown=maxf(0.,attack_cooldown-delta)
  crossing_slow=maxf(0.,crossing_slow-delta);crossing_protected=maxf(0.,crossing_protected-delta)
  max_speed=base_pace*minf(.75 if slow_left>0. else 1.,.72 if crossing_slow>0. else 1.)
@@ -117,3 +120,6 @@ func _boost197()->void:
  # Avoid boosting into an outer boundary while recovering from a side-step.
  if absf((position-projection.point).dot(forward.orthogonal()))>135.:return
  dodge.request_path(PackedVector2Array([Vector2.ZERO,forward*125.,forward*250.]))
+
+func _aim_allowed198()->bool:
+ return race.running or (race.has_method("prestart_aim198") and race.prestart_aim198())

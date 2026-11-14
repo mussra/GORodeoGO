@@ -7,3 +7,9 @@ MP3 para escucha, WAV48kHz para loops. Ver métricas JSON.
 No auditivamente certificado; aprobación usuario pendiente.
 
 Implementation approval: Antonio, 2026-11-04 20:36 CET, both Rancho02 tracks. Zumbel signature not included.
+
+Ciclo 198: dos arreglos nuevos de notas individuales del mismo Ganjo, 16 compases.
+race198.wav: 156 BPM, carrera. duel198.wav: 132 BPM, justa/duelo.
+Secuencias originales reproducibles en tools/audio/compose_race_duel198.py.
+Fuente y licencia verificadas de nuevo en el commit ccff5cd5cd3b513873a48994c07724d9d3c39e1c, sin gasto.
+Los nuevos temas no se presentan como aprobados auditivamente por el usuario.

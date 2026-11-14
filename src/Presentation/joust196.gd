@@ -1,10 +1,11 @@
 extends "res://src/Presentation/duel193.gd"
-## Nonviolent, isolated test mode: automatic opposite passes, shared lazo/regate.
+## Nonviolent, isolated test mode: automatic opposite passes, shared lazo; no regate.
 var pass_number:int=0
 var end_wait:float=0.
 func _ready()->void:
  RaceCupSession194.active=false
  super._ready()
+ var counter:=StartCountdown198.new();counter.name="StartCountdown198";counter.session=self;hud.add_child(counter)
  var pause_title:Label=pause_panel.get_child(0);pause_title.text="JUSTA DE LAZOS EN PAUSA"
 func _make_rider()->DuelRider193:return JoustRider196.new()
 func _reset_round()->void:
@@ -37,7 +38,7 @@ func _next_round()->void:
  else:super._next_round()
 func _refresh()->void:
  info.text="JUSTA CON LAZOS · %d - %d · mejor de tres\nManga %d · pasada %d · sin lanzas ni daño"%[scores[0],scores[1],round_number,maxi(1,pass_number)]
- guidance.text="PREPARADOS · %d · galope automático"%ceili(countdown) if countdown>0. else "Pasada automática · izquierda: arriba/abajo y regate · derecha: apunta y suelta"
+ guidance.text="PREPARADOS · %d · apunta ahora; suelta después de salir"%ceili(countdown) if countdown>0. else "Pasada automática · izquierda: arriba/abajo · SIN REGATE · derecha: apunta y suelta"
 func _draw()->void:
  super._draw()
  draw_rect(Rect2(-520,-165,1040,330),Color("c8aa78"),false,4.)
@@ -47,3 +48,5 @@ func _draw()->void:
   draw_line(center,center+Vector2(-side*48.,0),Color("ffe9b5"),4.)
   draw_line(center+Vector2(-side*48.,0),center+Vector2(-side*34.,-11),Color("ffe9b5"),4.)
   draw_line(center+Vector2(-side*48.,0),center+Vector2(-side*34.,11),Color("ffe9b5"),4.)
+
+func prestart_aim198()->bool:return countdown>0. and not result.visible

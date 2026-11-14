@@ -44,6 +44,7 @@ var aim_direction: Vector2 = Vector2.RIGHT
 var rider_velocity:Callable=func()->Vector2:return Vector2.ZERO
 static func inherited_landing(origin:Vector2,aim:Vector2,distance:float,velocity:Vector2,travel:float)->Vector2:
 	return origin+aim.normalized()*distance+velocity*travel
+var launch_guard:Callable=func()->bool:return true
 var aim_hold_guard:Callable=func()->bool:return throw_guard.call()
 var throw_guard: Callable = func() -> bool: return true
 var prey_provider: Callable = func() -> Array: return []
@@ -205,7 +206,7 @@ func _cancel_charge() -> void:
 ## [param final_vector]: the aim stick's exact release vector when present
 ## (avoids one-frame staleness); zero means keyboard/mouse fallback.
 func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
-	if not throw_guard.call():
+	if not throw_guard.call() or not launch_guard.call():
 		cancel_input()
 		return
 	if not has_free_lasso_slot():

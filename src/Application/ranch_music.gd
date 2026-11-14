@@ -5,6 +5,8 @@ extends Node
 const TRACKS: Dictionary = {
 	"menu": "res://audio/music/menu.wav",
 	"gameplay": "res://audio/music/gameplay.wav",
+	"race": "res://audio/music/race198.wav",
+	"duel": "res://audio/music/duel198.wav",
 }
 const MUSIC_DB: float = -13.0
 var voice: AudioStreamPlayer
@@ -39,7 +41,7 @@ func _replace_track(next: String) -> void:
 	var stream: AudioStreamWAV = load(TRACKS[next]).duplicate()
 	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	stream.loop_begin = 0
-	stream.loop_end = 1843200 if next == "menu" else 1245405
+	stream.loop_end = {"menu":1843200,"gameplay":1245405,"race":1181538,"duel":1396364}[next]
 	voice.stop()
 	voice.stream = stream
 	voice.volume_db = -80.0 if _muted else -60.0
