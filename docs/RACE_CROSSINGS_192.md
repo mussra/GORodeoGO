@@ -23,3 +23,5 @@ No se publica APK ni web con este cambio. Falta prueba humana en Android, más v
 107/107 pruebas dirigidas de integración aprobadas. El lote específico de carreras/diálogos/cruces pasa 38/38. Las ocho combinaciones (cuatro circuitos, con/sin salto) terminan con los cuatro participantes: se repitieron también las seis combinaciones antiguas tras el cambio. Cruce del molino: 69,90 s sin salto y 68,70 s con salto hasta la última llegada.
 
 No se ha generado, subido ni publicado un APK nuevo. La versión disponible en GitHub sigue siendo la 2.7.138, anterior a los cruces.
+
+Actualización posterior: este cambio se incluye en la versión de pruebas 2.7.139, junto con el duelo. La indicación anterior de no publicación describe el cierre local inicial, antes de recibir la orden de preparar ese APK.

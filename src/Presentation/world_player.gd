@@ -145,6 +145,9 @@ func request_dodge_path(points: PackedVector2Array) -> bool:
 	return dodge.request_path(points)
 
 func _physics_process(delta: float) -> void:
+	step_shared_movement(delta)
+
+func step_shared_movement(delta:float)->void:
 	if drink.step(delta,Input.get_vector("move_left","move_right","move_up","move_down")):return
 	_jump_cooldown=maxf(0,_jump_cooldown-delta)
 	if _jump_time>0:HorseJumpMotion.process(self,delta);return

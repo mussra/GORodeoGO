@@ -24,3 +24,5 @@ Sin violencia. La captura termina la manga, sin daño, golpes, combate ni castig
 Pruebas de 2-0 y 2-1, primer impacto, empate simultáneo, lazo en vuelo al terminar, pausa, reinicio, salida, tacto simultáneo y ausencia de escrituras de progreso. Luego sesiones humanas para ajustar tamaño de arena, dificultad y lectura del rival antes de ofrecer premios o conexiones con la historia.
 
 Es un modo separado de las carreras y no reemplaza el objetivo de preparar el juego completo para producción.
+
+Actualización posterior: el prototipo jugador contra IA, mejor de tres y empate simultáneo sin punto se implementa en 2.7.139. Esta propuesta conserva el diseño previo; las decisiones aplicadas y límites actuales están en DUEL_DECISIONS_2_7_139.md.

@@ -142,6 +142,11 @@ func _build_menu() -> void:
 		if _transitioning:return
 		_transitioning=true
 		get_tree().change_scene_to_file("res://src/Presentation/race190.tscn"))
+	var duel_button:=Button.new();duel_button.name="DuelEntry193";duel_button.text="Duelo de lazos · prueba";duel_button.position=Vector2(590,16);duel_button.size=Vector2(330,48);_hero.add_child(duel_button)
+	duel_button.pressed.connect(func():
+		if _transitioning:return
+		_transitioning=true
+		get_tree().change_scene_to_file("res://src/Presentation/duel193.tscn"))
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
