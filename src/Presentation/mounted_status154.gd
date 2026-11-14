@@ -11,5 +11,5 @@ static func abilities(player:CharacterBody2D,gauges:Dictionary,horse:Dictionary)
  player.can_jump=HorseJump.capable(horse);player.jump_recovery_multiplier=HorseTraining.recovery(horse,"jump")
  gauges.jump.set_state(player.can_jump,1.-player._jump_cooldown/maxf(.01,1.2*player.jump_recovery_multiplier))
  gauges.dodge.set_state(player.dodge_available,1.-player.dodge_cooldown/maxf(.01,player.dodge_recharge_seconds))
-static func stamina(player:CharacterBody2D,gauges:Dictionary,state:Dictionary,delta:float,on_road:bool)->Dictionary:
- var next:=WorldStamina.tick(state,player.gait,player.velocity.length()>12.,delta,on_road);player.gait_cap=WorldStamina.cap_gait(next,WorldGait.GALOPE);gauges.stamina.set_state(true,WorldStamina.ratio(next));return next
+static func stamina(player:CharacterBody2D,gauges:Dictionary,state:Dictionary,delta:float,on_road:bool,nutrition_mult:float=1.0)->Dictionary:
+ var next:=WorldStamina.tick(state,player.gait,player.velocity.length()>12.,delta,on_road,nutrition_mult);player.gait_cap=WorldStamina.cap_gait(next,WorldGait.GALOPE);gauges.stamina.set_state(true,WorldStamina.ratio(next));return next

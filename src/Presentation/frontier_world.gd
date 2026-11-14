@@ -66,6 +66,7 @@ var _save_timer: float = 0.0
 var _last_gait: int = -1
 var _pigs_label: Label
 var _edit_mode: bool = false
+var garden212:GardenWorld212
 var _stamina: Dictionary = {}
 var _note_dialog106:MapNoteDialog106
 var _map_notes159:MapNotesController159
@@ -153,6 +154,7 @@ func _ready() -> void:
 	_travel144=SiestaTravel144.new();add_child(_travel144)
 	_setup_goat_prototype()
 	_setup_npcs()
+	garden212=GardenWorld212.new();garden212.name="Garden212";add_child(garden212)
 	_stamina = WorldStamina.new_state(HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).get("power", 0.65))
 	_hoof_player = AudioStreamPlayer.new()
 	_hoof_player.volume_db = -12.0
@@ -174,6 +176,7 @@ func _physics_process(delta:float)->void:
 	_tick_goats(delta)
 
 func _process(delta: float) -> void:
+	if garden212!=null and is_instance_valid(garden212.panel):return
 	if _travel144!=null and (_travel144.active or is_instance_valid(_travel144.panel)):return
 	if is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	_update_chunks()
@@ -912,7 +915,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _tick_stamina(delta: float) -> void:
 	var before: Dictionary = _stamina
-	_stamina = MountedStatus154.stamina(player,_gauges,_stamina,delta,road_surface_contains94(player.global_position))
+	_stamina = MountedStatus154.stamina(player,_gauges,_stamina,delta,road_surface_contains94(player.global_position),Garden212.multiplier(SaveData.world_garden212,SaveData.horse_collection.selected))
 	if WorldStamina.just_tired(before, _stamina):
 		_toast(tr("WORLD_HORSE_TIRED"))
 		_hoof_player.stream = _pant
@@ -1186,6 +1189,7 @@ func _open_npc(data:Dictionary)->void:
 	else:
 		_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests)
 	_hud.add_child(_npc_dialog)
+	if garden212!=null:garden212.attach(_npc_dialog,data)
 	if _npc_dialog is NpcDialog:_npc_dialog.contracts_requested165.connect(func():
 		_close_npc();player.cancel_input();player.set_physics_process(false)
 		var contracts:=RepeatContractsPanel165.new();_npc_dialog=contracts;_hud.add_child(contracts);contracts.closed.connect(_close_npc))

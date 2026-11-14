@@ -27,10 +27,10 @@ static func new_state(power:float=0.65)->Dictionary:
  return {"value":max_for(power),"max":max_for(power),"forced_left":0.0}
 
 ## gait: current WorldGait; moving: the horse is actually covering ground.
-static func tick(state:Dictionary,gait:int,moving:bool,delta:float,on_road:bool=false)->Dictionary:
+static func tick(state:Dictionary,gait:int,moving:bool,delta:float,on_road:bool=false,nutrition_mult:float=1.0)->Dictionary:
  var out:Dictionary=state.duplicate()
  var v:float=float(out.value)
- var drain_mult:float=ROAD_DRAIN_MULT if on_road else 1.0
+ var drain_mult:float=(ROAD_DRAIN_MULT if on_road else 1.0)*clampf(nutrition_mult,.85,1.)
  if moving and gait==WorldGait.GALOPE:v-=DRAIN_GALOPE/ENDURANCE_MULT*delta*drain_mult
  elif moving and gait==WorldGait.TROTE:v-=DRAIN_TROTE/ENDURANCE_MULT*delta*drain_mult
  elif moving:v+=REGEN_PASO*delta

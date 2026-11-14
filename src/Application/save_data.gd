@@ -44,6 +44,7 @@ var repeat_contract165:Dictionary=ProgressionEconomy165.new_contract()
 var country_ledger146:Dictionary={} # Separate future-country progress; no entry enabled yet.
 var world_cousins140:Dictionary={} # Four-town journal, separate additive V3 state.
 var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
+var world_garden212:Dictionary=Garden212.fresh()
 var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
@@ -94,6 +95,7 @@ func save_progress() -> bool:
 	config.set_value("world", "position", world_position)
 	config.set_value("world", "quests", world_quests)
 	config.set_value("world","flora138",world_flora138)
+	config.set_value("world","garden212",world_garden212)
 	config.set_value("world","roaming139",world_roaming139)
 	config.set_value("world","cousins140",world_cousins140)
 	config.set_value("world","places144",world_places144)
@@ -141,6 +143,7 @@ func load_progress() -> void:
 	world_position = Vector2(0, 160)
 	world_quests.clear()
 	world_flora138.clear()
+	world_garden212=Garden212.fresh()
 	world_roaming139.clear()
 	world_cousins140.clear()
 	world_places144.clear();siesta_rest166=0.;repeat_contract165=ProgressionEconomy165.new_contract()
@@ -208,6 +211,10 @@ func load_progress() -> void:
 			if WorldEdits.valid_op(op):world_edits.append(op)
 	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
+	var garden_raw:Variant=config.get_value("world","garden212",{})
+	if not garden_raw is Dictionary or (not garden_raw.is_empty() and garden_raw.get("version",0)!=Garden212.VERSION):
+		_load_valid=false;return
+	world_garden212=Garden212.clean(garden_raw)
 	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
 	world_cousins140=VillageCousins140.clean(config.get_value("world","cousins140",{}),world_seed)
 	world_places144=WorldPlaces144.clean(config.get_value("world","places144",{}),world_seed,world_generator_version)
@@ -356,7 +363,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
@@ -682,3 +689,16 @@ func claim_cup195()->Dictionary:
 	if save_progress():return granted
 	horse_collection.restore(before)
 	return {"ok":false,"reason":"save_failed"}
+
+func garden_action212(action_:String,horse:String="",anchors:Dictionary={})->bool:
+	if trial_session_active:return false
+	if action_=="feed" and not horse_collection.horses.any(func(h):return h.id==horse):return false
+	var next:=Garden212.action(world_garden212,action_,horse)
+	if next.is_empty():return false
+	if action_=="introduce" and not anchors.is_empty():
+		if not ["home","plot","sample"].all(func(k):return anchors.get(k) is Vector2 and anchors[k].is_finite()):return false
+		next.anchors=anchors.duplicate(true)
+	var before:Dictionary=world_garden212
+	world_garden212=next
+	if save_progress():return true
+	world_garden212=before;return false
