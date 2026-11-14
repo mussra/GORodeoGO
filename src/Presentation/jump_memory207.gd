@@ -1,4 +1,5 @@
 extends Node2D
+const BUSH208=preload("res://art/world/cartoon/bush1.png")
 const POINTS=[Vector2(350,300),Vector2(870,300),Vector2(350,510),Vector2(870,510)]
 const COLORS=[Color("ff8074"),Color("81c9ff"),Color("ffdf78"),Color("a8e792")]
 var model:=JumpMemory207.new()
@@ -21,7 +22,8 @@ var paused207:bool=false
 var map_view:Control
 func _ready():
  RanchMusic.play_context("gameplay")
- for point in POINTS:WorldFence.segment(self,point-Vector2(75,0),point+Vector2(75,0),true,true)
+ for i in POINTS.size():
+  var fence:=MemoryFence208.new();fence.index=i;fence.position=POINTS[i];add_child(fence)
  player=load("res://src/Presentation/memory_rider207.gd").new();player.position=Vector2(150,405);add_child(player)
  player.jump_started.connect(func():jump_from=player.position;jump_valid=true)
  player.jump_finished.connect(_landed)
@@ -74,7 +76,7 @@ func _landed():
  jump_valid=false
  for i in POINTS.size():
   var point:Vector2=POINTS[i]
-  if Geometry2D.segment_intersects_segment(jump_from,player.position,point-Vector2(75,0),point+Vector2(75,0))!=null:
+  if Geometry2D.segment_intersects_segment(jump_from,player.position,point-MemoryFence208.half_axis(i),point+MemoryFence208.half_axis(i))!=null:
    var state:String=model.land(i);sound.play("lose" if state=="failed" else "win" if state in ["passed","won"] else "capture")
    if state!="ride":player.set_physics_process(false);player.velocity=Vector2.ZERO
    _refresh();return
@@ -98,9 +100,13 @@ func _unhandled_input(event:InputEvent):
 func _draw():
  draw_rect(Rect2(0,0,1280,720),Color("426443"))
  draw_style_box(RanchTheme.box(Color("d4b780"),Color("f3deaa"),30),Rect2(45,178,1185,425))
+ # Existing ranch decoration outside jump approaches. No new generated art.
+ for at in [Vector2(85,225),Vector2(1180,250),Vector2(85,560),Vector2(1180,560)]:
+  AntIcons188.draw_texture_fit(self,BUSH208,Rect2(at-Vector2(28,35),Vector2(56,45)))
  for i in POINTS.size():
   var p:Vector2=POINTS[i]
   draw_circle(p,95.,Color(COLORS[i],.48 if light==i else .09))
   draw_arc(p,91.,0,TAU,48,COLORS[i] if light==i else Color(COLORS[i],.4),7. if light==i else 2.,true)
-  draw_style_box(RanchTheme.box(COLORS[i] if light==i else Color("102d35"),COLORS[i],8),Rect2(p+Vector2(-23,-72),Vector2(46,42)))
-  draw_string(ThemeDB.fallback_font,p+Vector2(-9,-41),str(i+1),HORIZONTAL_ALIGNMENT_LEFT,-1,30,Color("102d35") if light==i else Color("fff8e8"))
+  var sign_offset:Vector2=Vector2(62,-30) if MemoryFence208.VERTICAL[i] else Vector2(0,-92)
+  draw_style_box(RanchTheme.box(COLORS[i] if light==i else Color("102d35"),COLORS[i],8),Rect2(p+sign_offset-Vector2(23,20),Vector2(46,42)))
+  draw_string(ThemeDB.fallback_font,p+sign_offset+Vector2(-9,11),str(i+1),HORIZONTAL_ALIGNMENT_LEFT,-1,30,Color("102d35") if light==i else Color("fff8e8"))

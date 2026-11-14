@@ -84,8 +84,9 @@ func test_each_fence_reachable_automatically_in_both_directions():
   for direction in [-1.,1.]:
    scene.model.sequence.assign([index]);scene.model.begin_input();scene._refresh()
    scene.player.cancel_input();scene.player._jump_cooldown=0.
-   scene.player.position=scene.POINTS[index]-Vector2(0,direction*115.)
-   var a:String="move_up" if direction<0 else "move_down"
+   var axis:Vector2=MemoryFence208.normal(index)*direction
+   scene.player.position=scene.POINTS[index]-axis*115.
+   var a:String=("move_up" if axis.y<0 else "move_down") if absf(axis.y)>.5 else ("move_left" if axis.x<0 else "move_right")
    Input.action_press(a);await wait_seconds(1.5);Input.action_release(a)
    assert_eq(scene.model.state,"passed","fence %d direction %s"%[index,direction])
 func test_menu_entry_does_not_cover_other_modes():

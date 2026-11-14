@@ -6,6 +6,7 @@ func _draw():
  draw_string(ThemeDB.fallback_font,Vector2(10,20),"PISTA · 4 VALLAS",HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff8e8"))
  for i in session.POINTS.size():
   var p:Vector2=Vector2(10,28)+session.POINTS[i]/Vector2(1280,720)*(size-Vector2(20,30))
-  draw_line(p-Vector2(9,0),p+Vector2(9,0),session.COLORS[i],4.)
+  var axis:Vector2=MemoryFence208.half_axis(i).normalized()*9.
+  draw_line(p-axis,p+axis,session.COLORS[i],4.)
  var rider:Vector2=Vector2(10,28)+session.player.position/Vector2(1280,720)*(size-Vector2(20,30))
  draw_circle(rider,4.,Color.WHITE)
