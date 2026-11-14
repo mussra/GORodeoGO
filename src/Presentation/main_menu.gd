@@ -137,6 +137,11 @@ func _build_menu() -> void:
 			if SaveData.debug_mode:
 				var panel=load("res://src/Presentation/trial_panel.gd").new();add_child(panel))
 	_settings_button=Button.new();_settings_button.text=tr("UI_035");_settings_button.position=Vector2(1000,70);_settings_button.size=Vector2(210,48);_settings_button.pressed.connect(_show_settings);_hero.add_child(_settings_button)
+	var race_button:=Button.new();race_button.name="RaceEntry190";race_button.text="Carreras · prueba";race_button.position=Vector2(590,70);race_button.size=Vector2(270,48);_hero.add_child(race_button)
+	race_button.pressed.connect(func():
+		if _transitioning:return
+		_transitioning=true
+		get_tree().change_scene_to_file("res://src/Presentation/race190.tscn"))
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)

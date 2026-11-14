@@ -1,0 +1,88 @@
+class_name RaceRider190
+extends "res://src/Presentation/world_player.gd"
+## Race-specific rules only. Movement/player art, lasso and dodge are shared.
+var race:Node2D
+var ai:bool=false
+var racer_index:int=0
+var racer_name:String="Tú"
+var tint:Color=Color("7de1cc")
+var next_gate:int=1
+var previous_position:Vector2
+var finish_time:float=-1.
+var slow_left:float=0.
+var protected_left:float=0.
+var attack_cooldown:float=0.
+var attack_think:float=.8
+var base_pace:float=260.
+var lane:float=0.
+var tether_from:Node2D
+var passed:int=0
+func _ready()->void:
+ super._ready()
+ collision_layer=0;collision_mask=HorseJump.FENCE_LAYER
+ max_speed=base_pace;acceleration=900.
+ dodge_available=true;dodge_recharge_seconds=2.5
+ dodge.can_start=func()->bool:return race.running and finish_time<0. and _jump_time<=0.
+ lasso.throw_guard=func()->bool:return race.running and finish_time<0. and _jump_time<=0. and attack_cooldown<=0. and not lasso.is_in_flight()
+ lasso.can_capture=func()->bool:return race.running
+ lasso.prey_provider=func()->Array:return race.targets_for(self)
+ lasso.lasso_released.connect(func():attack_cooldown=3.)
+ lasso.prey_captured.connect(func(target):target.tether_from=self)
+ lasso.capture_area_visual_radius=58.
+ if ai:set_process_input(false)
+func _input(event:InputEvent)->void:
+ if not ai and race.running and finish_time<0.:super._input(event)
+func _physics_process(delta:float)->void:
+ if not race.running or finish_time>=0.:return
+ slow_left=maxf(0.,slow_left-delta);protected_left=maxf(0.,protected_left-delta);attack_cooldown=maxf(0.,attack_cooldown-delta)
+ max_speed=base_pace*(.75 if slow_left>0. else 1.)
+ if not ai:super._physics_process(delta)
+ else:
+  _jump_cooldown=maxf(0.,_jump_cooldown-delta)
+  if _jump_time>0.:HorseJumpMotion.process(self,delta);return
+  if can_jump and velocity.length()>60. and HorseJumpMotion.try_ahead(self):return
+  dodge.cooldown=maxf(0.,dodge.cooldown-delta)
+  dodge.fade_trail(delta)
+  if not dodge.step_path(max_speed,delta) and not dodge.step_coast(max_speed,delta) and not dodge.step_dash(max_speed,delta):
+   var progress:Dictionary=race.course.project(position)
+   var ahead:float=progress.s+130.
+   var goal:Vector2=race.course.at(ahead)+race.course.tangent(ahead).orthogonal()*race.course.ai_lane(progress.s,lane,can_jump)
+   var wish:Vector2=(goal-position).normalized()
+   velocity=velocity.move_toward(wish*max_speed,acceleration*delta);move_and_slide()
+  gait=WorldGait.GALOPE;_update_animation(delta);_think(delta)
+ queue_redraw()
+func _think(delta:float)->void:
+ attack_think-=delta
+ if attack_think>0.:return
+ attack_think=.35+float(racer_index)*.11
+ # Evasion reacts to an already airborne rope, not future input or future landings.
+ for opponent in race.riders:
+  if opponent==self or not opponent.lasso.is_in_flight():continue
+  var flight=opponent.lasso._flight_line
+  if is_instance_valid(flight) and position.distance_to(flight.landing)<100. and dodge.cooldown<=0.:
+   var side:Vector2=race.course.tangent(race.course.project(position).s).orthogonal()
+   var projection:Dictionary=race.course.project(position)
+   var offset:float=(position-projection.point).dot(side)
+   dodge.request_dash(side*(-1. if offset>0. else 1.));break
+ if attack_cooldown>0. or lasso.is_in_flight() or dodge.remaining>0.:return
+ var candidates:Array=race.targets_for(self)
+ if candidates.is_empty():return
+ var target:Node2D=candidates[0]
+ # Use the normal shared charge/release, inheritance and fixed flight time.
+ lasso.aim_direction=(target.position-position).normalized()
+ lasso._start_charging();lasso._charge_distance=position.distance_to(target.position)
+ lasso._release_throw()
+func try_capture(landing:Vector2)->bool:
+ if not race.running or finish_time>=0. or protected_left>0. or position.distance_to(landing)>58.:return false
+ slow_left=1.2;protected_left=3.2
+ race.notice_hit(self)
+ return true
+func _draw()->void:
+ if dodge==null:return
+ super._draw()
+ draw_arc(Vector2(0,-4),27.,0,TAU,32,tint,3.,true)
+ if slow_left>0.:
+  LassoRopeStyle.draw_loop(self,Vector2(0,-26))
+ elif protected_left>0.:
+  draw_arc(Vector2(0,-32),37.,0,TAU,32,Color(tint,.5),2.,true)
+ draw_string(ThemeDB.fallback_font,Vector2(-34,-125),racer_name,HORIZONTAL_ALIGNMENT_LEFT,-1,20,tint)
