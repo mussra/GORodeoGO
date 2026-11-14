@@ -92,9 +92,24 @@ func test_each_fence_reachable_automatically_in_both_directions():
 func test_menu_entry_does_not_cover_other_modes():
  GameState.brand_intro_played=true
  scene=load("res://src/Presentation/main_menu.tscn").instantiate();add_child(scene);await wait_frames(2)
- var entry=scene._hero.get_node("MemoryEntry207")
+ scene._show_games213()
+ var entry=scene._games213.canvas.get_node("Navigate_memory")
  for extent in [Vector2(960,540),Vector2(1280,720),Vector2(1600,720)]:
   scene.size=extent;scene._layout()
-  for name in ["RaceEntry190","DuelEntry193","JoustEntry196"]:
-   assert_false(entry.get_global_rect().intersects(scene._hero.get_node(name).get_global_rect()))
+  for name in ["Navigate_race","Navigate_duel","Navigate_joust"]:
+   assert_false(entry.get_global_rect().intersects(scene._games213.canvas.get_node(name).get_global_rect()))
   assert_false(entry.get_global_rect().intersects(scene.quit_button.get_global_rect()))
+func test_new_horse_memory_name_is_in_screen_pause_and_main_menu():
+ await make_scene()
+ assert_true(scene.status.text.begins_with("HÍPICA DE MEMORIA"))
+ var found:=false
+ for child in scene.pause_panel.get_children():
+  if child is Label and child.text=="HÍPICA DE MEMORIA · PAUSA":found=true
+ assert_true(found)
+ var menu_source:=FileAccess.get_file_as_string("res://src/Presentation/main_menu.gd")
+ assert_true(menu_source.contains('"title":"Hípica de memoria"'))
+ assert_false(menu_source.contains("Salto de memoria"))
+ var locale:=TranslationServer.get_locale();TranslationServer.set_locale("es")
+ assert_eq(tr("UI_003"),"RODEO DE TOROS · NIVELES")
+ assert_eq(tr("UI_008"),"RODEO DE TOROS · ELIGE NIVEL")
+ TranslationServer.set_locale(locale)

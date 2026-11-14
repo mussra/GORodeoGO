@@ -37,6 +37,7 @@ func run():
  SaveData.world_garden212=Garden212.tick(SaveData.world_garden212,900.,0.)
  garden.open();garden.act("harvest");await shot("cosecha");garden.act("feed");await shot("alimento")
  garden.close()
+ world._open_navigation();await shot("menu");world._navigation_selected("debug213");await shot("debug");world._close_navigation()
  for map_ in [world._chunk_pending,world._chunk_built]:
   for key in map_:world._discard_builder(map_[key])
  world.free();DirAccess.remove_absolute(SaveData.save_path);get_tree().quit()

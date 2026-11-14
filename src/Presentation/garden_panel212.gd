@@ -13,7 +13,7 @@ func _ready():
 func rebuild():
  for child in get_children():child.queue_free()
  var state:Dictionary=SaveData.world_garden212
- var title:=Label.new();title.text="HORTELANO · Huerto de Lucía";title.position=Vector2(24,18);add_child(title);TextFit181.fixed(title,Vector2(712,42),26,22)
+ var title:=Label.new();title.text="Lucía · Hortelana";title.position=Vector2(24,18);add_child(title);TextFit181.fixed(title,Vector2(712,42),26,22)
  var portrait:=TextureRect.new();portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.texture=garden.GARDENER[garden.pose_name];portrait.position=Vector2(24,82);portrait.size=Vector2(120,150);add_child(portrait)
  if state.discovered:
   var crop:=TextureRect.new();crop.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;crop.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;crop.texture=garden.CARROTS[4];crop.position=Vector2(48,250);crop.size=Vector2(72,78);add_child(crop)

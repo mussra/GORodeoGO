@@ -14,7 +14,7 @@ msgid "UI_002"
 msgstr "JUGAR   >   NIVEL %02d"
 
 msgid "UI_003"
-msgstr "NIVELES · AVANZA UNO A UNO"
+msgstr "RODEO DE TOROS · NIVELES"
 
 msgid "UI_004"
 msgstr "EQUIPO"
@@ -29,7 +29,7 @@ msgid "UI_007"
 msgstr "SALIR"
 
 msgid "UI_008"
-msgstr "ELIGE TU SIGUIENTE RETO"
+msgstr "RODEO DE TOROS · ELIGE NIVEL"
 
 msgid "UI_009"
 msgstr "VOLVER"

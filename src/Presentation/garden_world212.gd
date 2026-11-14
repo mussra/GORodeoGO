@@ -1,6 +1,7 @@
 class_name GardenWorld212
 extends Node
 const CARROTS=[preload("res://art/garden212/carrot-0.png"),preload("res://art/garden212/carrot-1.png"),preload("res://art/garden212/carrot-2.png"),preload("res://art/garden212/carrot-3.png"),preload("res://art/garden212/carrot-4.png")]
+var town_id:String=Garden212.BASE_TOWN_ID
 var world:Node2D
 var home:Vector2
 var plot:Vector2
@@ -16,7 +17,7 @@ var notice:String=""
 var gardener:Sprite2D
 var pose_seconds:float=0.
 var pose_name:String="idle"
-const GARDENER={"idle":preload("res://art/garden212/gardener-idle.png"),"walk":preload("res://art/garden212/gardener-walk.png"),"water":preload("res://art/garden212/gardener-water.png"),"plant":preload("res://art/garden212/gardener-plant.png"),"harvest":preload("res://art/garden212/gardener-harvest.png")}
+const GARDENER={"idle":preload("res://art/garden212/lucia-idle.png"),"walk":preload("res://art/garden212/lucia-walk.png"),"water":preload("res://art/garden212/lucia-water.png"),"plant":preload("res://art/garden212/lucia-plant.png"),"harvest":preload("res://art/garden212/lucia-harvest.png")}
 func _ready():
  world=get_parent();home=world._npcs98()[1].position
  plot=clear_point(home+Vector2(-190,160))
@@ -29,7 +30,7 @@ func _ready():
   var leaves:=Sprite2D.new();leaves.texture=CARROTS[1] if spot==plot else CARROTS[3];leaves.position=spot;leaves.scale=Vector2.ONE*.55;marker.add_child(leaves)
  description=Label.new();description.position=plot+Vector2(-125,-65);description.add_theme_font_size_override("font_size",18);description.text="Huerto de Lucía · piloto";description.modulate=Color("fff1cd");marker.add_child(description)
  var label:=Label.new();label.position=sample+Vector2(-115,-55);label.add_theme_font_size_override("font_size",18);label.text="Zanahoria silvestre";label.modulate=Color("fff1cd");marker.add_child(label)
- gardener=Sprite2D.new();gardener.name="Hortelano212";gardener.position=plot+Vector2(150,25);world.add_child(gardener);set_pose("idle")
+ gardener=Sprite2D.new();gardener.name="Lucia213";gardener.position=plot+Vector2(150,25);world.add_child(gardener);set_pose("idle")
  button=Button.new();button.position=Vector2(475,565);button.size=Vector2(330,56);QuestButtonStyle.apply(button);world._hud.add_child(button);button.pressed.connect(open)
  direction_label=Label.new();direction_label.position=Vector2(235,55);direction_label.size=Vector2(770,54);direction_label.mouse_filter=Control.MOUSE_FILTER_IGNORE;direction_label.add_theme_font_size_override("font_size",20);world._hud.add_child(direction_label);ToastStack.backdrop(direction_label)
 func clear_point(base:Vector2)->Vector2:
@@ -73,7 +74,7 @@ func close():
 func act(action_:String):
  if not can_act(action_):notice="Acércate al lugar indicado para esta acción.";panel.rebuild();return
  if not SaveData.garden_action212(action_,SaveData.horse_collection.selected):notice="No se pudo guardar. No se ha consumido ni concedido nada.";panel.rebuild();return
- notice={"introduce":"El hortelano te espera junto a la parcela.","accept":"Busca una muestra silvestre; la parcela queda reservada.","sample":"Ya tienes la semilla. Vuelve a tu parcela.","plant":"Sembrada. Ahora riega y cuida.","water":"Cuidada. Explora a caballo y vuelve.","harvest":"Tres zanahorias y una semilla guardadas.","feed":"Zanahoria consumida; alimento activo."}.get(action_,"")
+ notice={"introduce":"Lucía te espera junto a la parcela.","accept":"Busca una muestra silvestre; la parcela queda reservada.","sample":"Ya tienes la semilla. Vuelve a tu parcela.","plant":"Sembrada. Ahora riega y cuida.","water":"Cuidada. Explora a caballo y vuelve.","harvest":"Tres zanahorias y una semilla guardadas.","feed":"Zanahoria consumida; alimento activo."}.get(action_,"")
  pose_seconds=2.;set_pose({"plant":"plant","water":"water","harvest":"harvest","sample":"harvest"}.get(action_,"idle"))
  panel.rebuild();marker.queue_redraw()
 func _process(delta:float):
@@ -100,12 +101,12 @@ func _process(delta:float):
  direction_label.visible=active and state.stage!="locked"
  direction_label.text="Huerto · "+location_hint()+(" · alimento: %ds"%ceili(state.food.left) if state.food.left>0. else "")
  button.visible=active and state.stage!="locked" and (world.player.position.distance_to(plot)<150. or (state.stage=="search" and world.player.position.distance_to(sample)<130.))
- button.text="Recoger zanahoria silvestre" if state.stage=="search" and world.player.position.distance_to(sample)<130. else "Hablar con el hortelano"
+ button.text="Recoger zanahoria silvestre" if state.stage=="search" and world.player.position.distance_to(sample)<130. else "Hablar con Lucía"
  if state.stage!=last_stage:last_stage=state.stage;marker.queue_redraw()
 func _draw_plot(_canvas:Node2D):
  if SaveData.world_garden212.stage=="locked":return
  marker.draw_style_box(RanchTheme.box(Color("755134"),Color("b39461"),5),Rect2(plot-Vector2(125,40),Vector2(250,95)))
- marker.draw_string(ThemeDB.fallback_font,plot+Vector2(95,65),"Hortelano",HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff1cd"))
+ marker.draw_string(ThemeDB.fallback_font,plot+Vector2(95,65),"Lucía",HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff1cd"))
  for i in 4:marker.draw_line(plot+Vector2(-108,-20+i*22),plot+Vector2(108,-20+i*22),Color("4d3527"),4.)
  if SaveData.world_garden212.stage=="search":
   marker.draw_arc(sample,42.,0,TAU,48,Color("f2b55d"),3.,true)

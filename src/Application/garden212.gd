@@ -1,16 +1,19 @@
 class_name Garden212
 extends RefCounted
 const VERSION:=1
+const BASE_TOWN_ID:="home"
+const NPC_NAME:="Lucía"
 const GROW_DISTANCE:=900.0
 const FOOD_SECONDS:=120.0
 const DRAIN_MULT:=0.85
 static func fresh()->Dictionary:
- return {"version":VERSION,"anchors":{},"stage":"locked","seeds":0,"crops":0,"watered":false,"distance":0.0,"discovered":false,"harvests":0,"food":{"horse":"","left":0.0}}
+ return {"version":VERSION,"town_id":BASE_TOWN_ID,"anchors":{},"stage":"locked","seeds":0,"crops":0,"watered":false,"distance":0.0,"discovered":false,"harvests":0,"food":{"horse":"","left":0.0}}
 static func clean(raw:Variant)->Dictionary:
  if not raw is Dictionary or raw.get("version",0)!=VERSION:return fresh()
  var out:=fresh()
  if raw.get("stage","") not in ["locked","intro","search","empty","growing","ripe"]:return out
  out.stage=raw.stage
+ if raw.get("town_id",BASE_TOWN_ID) is String:out.town_id=raw.get("town_id",BASE_TOWN_ID)
  var anchors:Variant=raw.get("anchors",{})
  if anchors is Dictionary and ["home","plot","sample"].all(func(k):return anchors.get(k) is Vector2 and anchors[k].is_finite()):out.anchors=anchors.duplicate(true)
  for key in ["seeds","crops","harvests"]:
@@ -61,8 +64,8 @@ static func multiplier(state:Dictionary,horse:String)->float:
  return DRAIN_MULT if state.food.left>0. and state.food.horse==horse else 1.0
 static func summary(state:Dictionary)->String:
  match state.stage:
-  "locked":return "La florista puede presentarte al hortelano de su parcela."
-  "intro":return "Soy el hortelano. ¿Cuidamos esta parcela? Trae una zanahoria silvestre para conservar sus semillas y aprender a cultivarla."
+  "locked":return "La florista puede presentarte a Lucía, la hortelana de su parcela."
+  "intro":return "Soy Lucía. ¿Cuidamos este huerto? Trae una zanahoria silvestre para conservar sus semillas y aprender a cultivarla."
   "search":return "Busca la muestra silvestre marcada cerca de la floristería."
   "empty":return "Parcela libre. Conservas %d semilla(s) y %d zanahoria(s)."%[state.seeds,state.crops]
   "growing":return "Riega la parcela para empezar." if not state.watered else "Brote cuidado · %d%%. Explora a caballo y vuelve; no se marchita."%int(state.distance/GROW_DISTANCE*100.)

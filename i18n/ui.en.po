@@ -14,7 +14,7 @@ msgid "UI_002"
 msgstr "PLAY   >   LEVEL %02d"
 
 msgid "UI_003"
-msgstr "LEVELS · ONE AT A TIME"
+msgstr "BULL RODEO · LEVELS"
 
 msgid "UI_004"
 msgstr "EQUIPMENT"
@@ -29,7 +29,7 @@ msgid "UI_007"
 msgstr "QUIT"
 
 msgid "UI_008"
-msgstr "CHOOSE YOUR NEXT CHALLENGE"
+msgstr "BULL RODEO · CHOOSE LEVEL"
 
 msgid "UI_009"
 msgstr "BACK"

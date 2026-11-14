@@ -27,6 +27,8 @@ func test_cycle_discovers_property_keeps_seed_and_cannot_duplicate_sample():
  s=Garden212.action(s,"plant");assert_eq(s.stage,"growing");assert_eq(s.seeds,0)
 func test_sanitization_and_missing_field_are_additive():
  assert_eq(Garden212.clean(null),Garden212.fresh())
+ var legacy:=Garden212.fresh();legacy.erase("town_id");assert_eq(Garden212.clean(legacy).town_id,"home")
+ assert_true(Garden212.summary({"stage":"intro"}).begins_with("Soy Lucía"))
  assert_eq(Garden212.clean({"version":99}),Garden212.fresh())
  var s:=Garden212.fresh();s.distance=INF;s.food.left=NAN
  var clean:=Garden212.clean(s);assert_eq(clean.distance,0.);assert_eq(clean.food.left,0.)
@@ -53,6 +55,11 @@ func test_florist_offers_garden_and_real_world_cycle_saves():
  var cover=get_tree().root.get_node_or_null("FrontierTransition")
  if cover!=null:cover.free()
  world.visible=true;world.set_process(false);world.player.set_physics_process(true)
+ world._open_navigation()
+ assert_eq(world._navigation.entries.map(func(e):return e.id),["exit","debug213"])
+ world._navigation_selected("debug213");assert_true(get_tree().paused)
+ assert_eq(world._navigation.title,"FRONTERA · DEBUG");assert_eq(world._navigation.entries.size(),4)
+ world._close_navigation();assert_false(get_tree().paused)
  var garden:GardenWorld212=world.garden212;garden.set_process(false)
  world.player.position=garden.home;world._open_npc(world._npcs98()[1])
  var found:Button
@@ -98,7 +105,7 @@ func test_food_save_failure_never_spends_crop_or_changes_horse():
 func test_anchors_survive_roundtrip_and_all_ten_art_crops_are_transparent():
  var s:=Garden212.fresh();s.anchors={"home":Vector2(1,2),"plot":Vector2(3,4),"sample":Vector2(5,6)}
  assert_eq(Garden212.clean(s).anchors,s.anchors)
- for path in ["carrot-0","carrot-1","carrot-2","carrot-3","carrot-4","gardener-idle","gardener-walk","gardener-water","gardener-plant","gardener-harvest"]:
+ for path in ["carrot-0","carrot-1","carrot-2","carrot-3","carrot-4","gardener-idle","gardener-walk","gardener-water","gardener-plant","gardener-harvest","lucia-idle","lucia-walk","lucia-water","lucia-plant","lucia-harvest"]:
   var tex:Texture2D=load("res://art/garden212/"+path+".png");var image:=tex.get_image()
   if image.is_compressed():image.decompress()
   assert_lt(image.get_pixel(0,0).a,.1,path+": transparent corner")

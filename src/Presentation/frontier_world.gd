@@ -1031,7 +1031,8 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox, no crea ni sustituye partidas"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado ni ritual"},{"id":"country_saved152","title":"País guardado","hint":"Progreso separado · sin ritual"},{"id":"editor","title":"Editor","hint":"Coloca elementos del mundo"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	if GameState.trial_tools_enabled():_navigation.entries.append({"id":"debug213","title":"Herramientas DEBUG","hint":"Editor / diseño / maquetas de país"})
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
@@ -1039,6 +1040,7 @@ func _navigation_selected(id:String)->void:
 	_close_navigation()
 	match id:
 		"map":_toggle_map()
+		"debug213":_open_debug213()
 		"modular_preview":_open_modular_preview93()
 		"country146":_open_isolated_preview146(CountryPreview146.new())
 		"country_saved152":_start_country152()
@@ -1496,3 +1498,9 @@ func _country_source_landing152(point_:Vector2)->Vector2:
 	for i in bodies.size():
 		if is_instance_valid(bodies[i]):bodies[i].disable_mode=modes[i]
 	return result
+
+func _open_debug213()->void:
+	if not GameState.trial_tools_enabled():return
+	_open_navigation();_navigation.queue_free();_navigation=NavigationSheet.new();_navigation.title="FRONTERA · DEBUG"
+	_navigation.entries=[{"id":"editor","title":"Editor","hint":"Autoría del mundo"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox aislado"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado"},{"id":"country_saved152","title":"País guardado","hint":"Prueba con registro separado"}]
+	_navigation.selected.connect(_navigation_selected);_navigation.closed.connect(_close_navigation);_hud.add_child(_navigation)

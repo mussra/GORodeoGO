@@ -19,12 +19,12 @@ func test_mounted_skills_are_vertical_and_inside_shared_animated_hero()->void:
 func test_entry_buttons_use_ant_art()->void:
  var m=menu();await wait_frames(2)
  assert_eq(m._world_button.get_meta("entry_art189"),"frontier")
- assert_eq(m._missions.get_meta("entry_art189"),"levels")
+ assert_eq(m._play.get_meta("entry_art189"),"levels")
  assert_eq(m._world_button.icon,MenuEntryArt189.texture("frontier"))
- assert_eq(m._missions.icon,MenuEntryArt189.texture("levels"))
+ assert_eq(m._play.icon,MenuEntryArt189.texture("levels"))
  assert_gte(m._world_button.size.y,64.)
- assert_gte(m._missions.size.y,60.)
- assert_true(Rect2(m._missions.position,m._missions.size).end.y<m._caption.position.y)
+ assert_gte(m._play.size.y,60.)
+ assert_true(Rect2(m._play.position,m._play.size).end.y<m._caption.position.y)
 func test_badges_still_open_their_own_explanations()->void:
  var m=menu();await wait_frames(2)
  for badge in [m._jump_badge,m._dodge_badge]:
@@ -39,7 +39,9 @@ func test_levels_navigation_and_responsive_layout_still_work()->void:
   m.size=extent;m._layout()
   assert_lte(m._skill_column189.get_global_rect().end.x,extent.x)
   assert_lte(m._skill_column189.get_global_rect().end.y,extent.y)
- m._missions.pressed.emit();await wait_frames(1)
+ m._play.pressed.emit();await wait_frames(1)
+ assert_true(is_instance_valid(m._games213))
+ m._games213.canvas.get_node("Navigate_bulls").pressed.emit();await wait_frames(1)
  assert_true(m._drawer.visible)
  assert_eq(m.level_grid.get_child_count(),LevelCatalog.MAX_LEVEL)
  m._hide_levels();assert_false(m._drawer.visible)

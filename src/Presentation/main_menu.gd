@@ -21,7 +21,15 @@ var _bull: AnimatedSprite2D
 var _intro: Tween
 var _elapsed: float = 0.0
 var _transitioning: bool = false
+var _games213:NavigationSheet
 var _next_level: int = 1
+const GAMES213=[
+ {"id":"bulls","title":"Rodeo de toros","hint":"40 niveles · toros y corrales"},
+ {"id":"race","title":"Carreras","hint":"Circuito / Copa · piloto"},
+ {"id":"duel","title":"Duelo de lazos","hint":"Captura a tu rival"},
+ {"id":"joust","title":"Justa con lazos","hint":"Cruce a caballo y lazo"},
+ {"id":"memory","title":"Hípica de memoria","hint":"Mira, recuerda y salta"}]
+const ROUTES213={"race":"res://src/Presentation/race190.tscn","duel":"res://src/Presentation/duel193.tscn","joust":"res://src/Presentation/joust196.tscn","memory":"res://src/Presentation/jump_memory207.tscn"}
 
 func _ready() -> void:
 	MenuInputGuard.install(self)
@@ -94,20 +102,20 @@ func _build_menu() -> void:
 	desc.name = "Description"
 	_hero.add_child(desc)
 	_play = Button.new()
-	_play.text = tr("UI_002") % _next_level
+	_play.text = "JUEGOS"
 	_play.add_theme_font_size_override("font_size",23)
 	_play.add_theme_font_override("font",preload("res://art/ui/fonts/RodeoDisplay.ttf"))
 	_play.add_theme_color_override("font_color",Color("10252d"))
 	_play.add_theme_stylebox_override("normal",RanchTheme.box(Color("8de8cf"),Color("b3f6df"),8))
 	_play.add_theme_stylebox_override("hover",RanchTheme.box(Color("c3ffe9"),Color("ffffff"),8))
-	_play.pressed.connect(_on_level_selected.bind(_next_level))
+	_play.pressed.connect(_show_games213)
 	_hero.add_child(_play)
 	_missions = Button.new()
-	_missions.text = tr("UI_003")
+	_missions.text = tr("UI_003");_missions.hide()
 	_missions.add_theme_font_size_override("font_size",16)
 	_missions.pressed.connect(_show_levels)
 	_hero.add_child(_missions)
-	_caption = _label("%02d / %02d COMPLETADOS     ·     RODEO + CORRALES" % [SaveData.highest_level_completed,LevelCatalog.MAX_LEVEL],14,Color("85a9ad"))
+	_caption = _label("%02d / %02d COMPLETADOS     ·     RODEO DE TOROS" % [SaveData.highest_level_completed,LevelCatalog.MAX_LEVEL],14,Color("85a9ad"))
 	_hero.add_child(_caption)
 	_equipment_button=Button.new()
 	_equipment_button.text=tr("UI_004")
@@ -127,36 +135,7 @@ func _build_menu() -> void:
 	_equipment_panel.visible=false
 	add_child(_equipment_panel)
 	_equipment_panel.closed.connect(_refresh_points_caption)
-	if bool(ProjectSettings.get_setting("rancho/trial_tools",false)):
-		var mode:=Button.new();mode.text=tr("MODE_DEBUG") if SaveData.debug_mode else tr("MODE_NORMAL");mode.position=Vector2(650,625);mode.size=Vector2(550,48);_hero.add_child(mode)
-		mode.pressed.connect(func():
-			if SaveData.switch_mode(not SaveData.debug_mode):get_tree().reload_current_scene())
-		var trial:=Button.new();trial.text=tr("DEBUG_TOOLS");trial.position=Vector2(40,625);trial.size=Vector2(560,48);_hero.add_child(trial)
-		trial.visible=SaveData.debug_mode
-		trial.pressed.connect(func():
-			if SaveData.debug_mode:
-				var panel=load("res://src/Presentation/trial_panel.gd").new();add_child(panel))
 	_settings_button=Button.new();_settings_button.text=tr("UI_035");_settings_button.position=Vector2(1000,70);_settings_button.size=Vector2(210,48);_settings_button.pressed.connect(_show_settings);_hero.add_child(_settings_button)
-	var race_button:=Button.new();race_button.name="RaceEntry190";race_button.text="Carreras · prueba";race_button.position=Vector2(590,70);race_button.size=Vector2(270,48);_hero.add_child(race_button)
-	race_button.pressed.connect(func():
-		if _transitioning:return
-		_transitioning=true
-		get_tree().change_scene_to_file("res://src/Presentation/race190.tscn"))
-	var duel_button:=Button.new();duel_button.name="DuelEntry193";duel_button.text="Duelo de lazos";duel_button.position=Vector2(590,16);duel_button.size=Vector2(250,48);_hero.add_child(duel_button)
-	duel_button.pressed.connect(func():
-		if _transitioning:return
-		_transitioning=true
-		get_tree().change_scene_to_file("res://src/Presentation/duel193.tscn"))
-	var joust_button:=Button.new();joust_button.name="JoustEntry196";joust_button.text="Justa con lazos";joust_button.position=Vector2(850,16);joust_button.size=Vector2(260,48);_hero.add_child(joust_button)
-	joust_button.pressed.connect(func():
-		if _transitioning:return
-		_transitioning=true
-		get_tree().change_scene_to_file("res://src/Presentation/joust196.tscn"))
-	var memory_button:=Button.new();memory_button.name="MemoryEntry207";memory_button.text="Salto de memoria";memory_button.position=Vector2(590,126);memory_button.size=Vector2(270,48);_hero.add_child(memory_button)
-	memory_button.pressed.connect(func():
-		if _transitioning:return
-		_transitioning=true
-		get_tree().change_scene_to_file("res://src/Presentation/jump_memory207.tscn"))
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
@@ -220,6 +199,7 @@ func _layout() -> void:
 	_hero.get_node("Description").position = Vector2(70,310)
 	_play.position = Vector2(68,411)
 	_play.size = Vector2(418,70)
+	MenuEntryArt189.apply(_play,"levels")
 	_world_button.position = Vector2(68,493)
 	_world_button.size = Vector2(418,64)
 	_world_button.add_theme_font_size_override("font_size",22)
@@ -227,8 +207,8 @@ func _layout() -> void:
 	_missions.size = Vector2(270,60)
 	_missions.add_theme_font_size_override("font_size",15)
 	_missions.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	_equipment_button.position=Vector2(350,569)
-	_equipment_button.size=Vector2(136,60)
+	_equipment_button.position=Vector2(68,569)
+	_equipment_button.size=Vector2(418,60)
 	_caption.position = Vector2(70,634)
 	_hero.get_node("Rider").position = Vector2(912,355)
 	_hero.get_node("Rider").scale = Vector2.ONE
@@ -271,7 +251,7 @@ func _show_levels() -> void:
 	if next.focus_mode!=Control.FOCUS_NONE and not next.disabled:next.grab_focus()
 func _hide_levels() -> void:
 	_drawer.hide()
-	_missions.grab_focus()
+	_show_games213()
 func _on_level_selected(number: int) -> void:
 	if _transitioning or not LevelProgression.is_unlocked(number, SaveData.effective_progress()): return
 	_transitioning = true
@@ -279,7 +259,8 @@ func _on_level_selected(number: int) -> void:
 	get_tree().change_scene_to_file("res://src/Presentation/level_0.tscn")
 func _on_quit_pressed()->void:GameState.confirm_exit()
 func navigate_back()->void:
-	if is_instance_valid(_drawer) and _drawer.visible:_hide_levels()
+	if is_instance_valid(_games213):_games213.queue_free();_games213=null
+	elif is_instance_valid(_drawer) and _drawer.visible:_hide_levels()
 	else:GameState.confirm_exit()
 
 func _refresh_points_caption()->void:
@@ -298,9 +279,10 @@ func _show_equipment()->void:
 	_equipment_panel.show()
 
 func _show_settings()->void:
-	var panel:=Control.new();panel.set_meta("back_closes",true);panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
+	var panel:=Control.new();panel.name="Settings213";panel.set_meta("back_closes",true);panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
 	var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.add_child(bg)
-	var scroll:=ScrollContainer.new();scroll.position=Vector2(60,40);scroll.size=Vector2(1160,640);panel.add_child(scroll)
+	var content:=Control.new();var k:=minf(size.x/1280.,size.y/720.);content.scale=Vector2.ONE*k;content.position=(size-Vector2(1280,720)*k)*.5;panel.add_child(content)
+	var scroll:=ScrollContainer.new();scroll.position=Vector2(60,40);scroll.size=Vector2(1160,640);content.add_child(scroll)
 	var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(700,0);box.add_theme_constant_override("separation",14);scroll.add_child(box)
 	var title:=Label.new();title.text=tr("UI_035");title.add_theme_font_size_override("font_size",30);box.add_child(title)
 	var language:=Label.new();language.text=tr("UI_036");box.add_child(language)
@@ -308,7 +290,34 @@ func _show_settings()->void:
 	for text in [tr("UI_037"),"Español","English"]:pick.add_item(text)
 	pick.selected=["auto","es","en"].find(Localization.choice)
 	var note:=Label.new();note.text=tr("UI_040");box.add_child(note)
+	if GameState.trial_tools_enabled():
+		var debug:=Button.new();debug.text="Herramientas DEBUG";debug.custom_minimum_size.y=56;box.add_child(debug);debug.pressed.connect(_show_debug213)
 	var close:=Button.new();close.text=tr("UI_009");close.custom_minimum_size.y=52;box.add_child(close);close.pressed.connect(panel.queue_free)
 	pick.item_selected.connect(func(i:int):
 		if Localization.set_choice(["auto","es","en"][i]):get_tree().reload_current_scene()
 		else:note.text=tr("UI_041"))
+
+func _show_games213()->void:
+	if is_instance_valid(_games213):return
+	_games213=NavigationSheet.new();_games213.title="JUEGOS";_games213.entries=GAMES213.duplicate(true)
+	_games213.tree_exited.connect(_guard_recheck213);_games213.selected.connect(_choose_game213);_games213.closed.connect(func():_games213=null);add_child(_games213)
+func _choose_game213(id:String)->void:
+	_games213=null
+	if id=="bulls":_show_levels();return
+	if ROUTES213.has(id):_launch213(ROUTES213[id])
+func _launch213(path:String)->void:
+	if _transitioning:return
+	_transitioning=true;get_tree().change_scene_to_file(path)
+func _show_debug213()->void:
+	if not GameState.trial_tools_enabled():return
+	var panel:=NavigationSheet.new();panel.title="DEBUG · herramientas separadas"
+	panel.entries=[{"id":"mode","title":"Cambiar modo","hint":"Actual: "+("DEBUG" if SaveData.debug_mode else "normal")},{"id":"tools","title":"Caballos y niveles","hint":"Solo en modo DEBUG"}]
+	panel.selected.connect(func(id:String):
+		if id=="mode":
+			if SaveData.switch_mode(not SaveData.debug_mode):get_tree().reload_current_scene()
+		elif id=="tools" and SaveData.debug_mode:add_child(load("res://src/Presentation/trial_panel.gd").new()))
+	add_child(panel)
+
+func _guard_recheck213()->void:
+	for child in get_children():
+		if child is MenuInputGuard:child._mark()

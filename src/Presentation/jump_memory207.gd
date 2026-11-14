@@ -41,7 +41,7 @@ func _ready():
  _button("Pausa",Vector2(1120,16),_pause).size.x=140
  map_view=load("res://src/Presentation/memory_map207.gd").new();map_view.session=self;map_view.position=Vector2(1040,102);map_view.size=Vector2(220,112);hud.add_child(map_view)
  pause_panel=Panel.new();pause_panel.position=Vector2(430,255);pause_panel.size=Vector2(420,180);pause_panel.process_mode=Node.PROCESS_MODE_ALWAYS;hud.add_child(pause_panel)
- var title:=Label.new();title.text="SALTO DE MEMORIA · PAUSA";title.position=Vector2(20,20);title.add_theme_font_size_override("font_size",24);pause_panel.add_child(title)
+ var title:=Label.new();title.text="HÍPICA DE MEMORIA · PAUSA";title.position=Vector2(20,20);title.add_theme_font_size_override("font_size",24);pause_panel.add_child(title)
  var resume:=Button.new();resume.text="Continuar";resume.position=Vector2(70,90);resume.size=Vector2(280,58);pause_panel.add_child(resume);resume.pressed.connect(_resume);pause_panel.hide()
  _refresh()
 func _button(text:String,at:Vector2,call:Callable)->Button:
@@ -82,7 +82,7 @@ func _landed():
    _refresh();return
 func _refresh():
  var phase:String={"ready":"Mira, recuerda y salta","show":"OBSERVA · memoriza el orden","ride":"TU TURNO · salto %d de %d"%[model.cursor+1,model.sequence.size()],"failed":"Orden incorrecto · vuelve a intentarlo","passed":"¡Secuencia completada!","won":"¡Seis obstáculos recordados!"}.get(model.state,"")
- status.text="SALTO DE MEMORIA · ronda %d/%d\n%s"%[maxi(1,model.sequence.size()),JumpMemory207.GOAL,phase]
+ status.text="HÍPICA DE MEMORIA · ronda %d/%d\n%s"%[maxi(1,model.sequence.size()),JumpMemory207.GOAL,phase]
  hint.text="Joystick izquierdo para cabalgar. Acércate de frente a la valla: el caballo salta solo."
  if model.state=="show":hint.text="Mira qué número se ilumina. Después repite los saltos sin pistas."
  if model.state=="ready":hint.text="Cuatro vallas con color y número. Primero mira; después salta en el mismo orden."

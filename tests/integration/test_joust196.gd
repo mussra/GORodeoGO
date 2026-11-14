@@ -87,7 +87,8 @@ func test_native_steer_aim_flight_and_held_finger_reset_between_passes():
 func test_menu_entries_do_not_cover_each_other_or_quit_at_supported_sizes():
  GameState.brand_intro_played=true
  var menu=load("res://src/Presentation/main_menu.tscn").instantiate();add_child(menu);await wait_physics_frames(2)
- var first=menu._hero.get_node("DuelEntry193");var second=menu._hero.get_node("JoustEntry196")
+ menu._show_games213()
+ var first=menu._games213.canvas.get_node("Navigate_duel");var second=menu._games213.canvas.get_node("Navigate_joust")
  for extent in [Vector2(960,540),Vector2(1280,720),Vector2(1600,720)]:
   menu.size=extent;menu._layout()
   assert_false(first.get_global_rect().intersects(second.get_global_rect()))
