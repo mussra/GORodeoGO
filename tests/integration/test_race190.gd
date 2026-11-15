@@ -180,10 +180,12 @@ func test_native_touch_map_pauses_without_aim_and_back_only_closes_map()->void:
  start();var map:RaceMap191=race.map_view
  var point:Vector2=map.get_global_rect().get_center()
  touch(3,point,true);await wait_frames(2)
+ assert_false(map.expanded,"Map gestures toggle on release, not press")
+ touch(3,point,false);await wait_frames(2)
  assert_true(map.expanded);assert_true(get_tree().paused)
  assert_false(race.player.lasso.is_charging())
  var elapsed:float=race.elapsed;await wait_frames(3);assert_eq(race.elapsed,elapsed)
- touch(3,point,false);race.navigate_back();await wait_frames(2)
+ race.navigate_back();await wait_frames(2)
  assert_false(map.expanded);assert_false(get_tree().paused);assert_false(race.pause_panel.visible)
  assert_false(race.player.lasso.is_in_flight())
 func test_story_dialog_is_shared_bounded_and_has_no_progress_effect()->void:
@@ -200,14 +202,14 @@ func test_story_dialog_is_shared_bounded_and_has_no_progress_effect()->void:
  assert_false(is_instance_valid(race.story_dialog))
  assert_eq(var_to_str(SaveData.horse_collection.horses),before)
  assert_false(FileAccess.file_exists(SaveData.save_path))
-func test_ai_evasion_not_gated_by_attack_think_timer()->void:
+func test_ai_does_not_react_to_opponent_flight()->void:
  start()
  for rider in race.riders:rider.set_physics_process(false)
  var bot:RaceRider190=race.riders[1];var player:RaceRider190=race.player
  player.velocity=Vector2.ZERO;player.position=bot.position-Vector2(100,0)
  player.lasso.aim_direction=Vector2.RIGHT;player.lasso._start_charging();player.lasso._charge_distance=100.;player.lasso._release_throw()
  bot.set_physics_process(true);bot.attack_think=.6;bot._evade()
- assert_gt(bot.dodge.remaining,0.,"Existing flight can be evaded without waiting for next attack decision")
+ assert_eq(bot.dodge.remaining,0.,"AI sprint is planned; flight does not trigger a reactive dodge")
  assert_almost_eq(bot.attack_think,.6,.001)
 func test_ai_leads_target_but_keeps_shared_inherited_flight()->void:
  start()

@@ -102,3 +102,17 @@ func test_pink239_append_roundtrip_breeding_editor_and_hats():
  assert_eq(save.horse_collection.find("trial_a").traits.coat,20);assert_eq(save.horse_collection.find("trial_a").traits.spots,20)
  assert_true(save.hat_designs235.has(hat));assert_true(save.sell_market_horse("trial_a"));save.load_progress();assert_true(save.hat_designs235.has(hat))
  save.free();DirAccess.remove_absolute("user://pink239-tests.cfg")
+
+func test_pink239_does_not_reroll_seeded_wild_horses():
+ var map238=load("res://tests/unit/world_map238_fixture.gd")
+ var herd238=load("res://tests/unit/world_herd238_fixture.gd")
+ var town238=load("res://tests/unit/herd_town238_fixture.gd")
+ for seed_ in [7781,752026]:
+  for cx in range(-8,9):
+   for cy in range(-3,4):
+    var old:Dictionary=map238.generate_legacy(seed_,cx,cy);var now_:Dictionary=WorldMap.generate_legacy(seed_,cx,cy)
+    assert_eq(now_,old,"Appending pink must not change a seeded chunk")
+    if not old.herd.is_empty():assert_eq(WorldHerd.members(old.herd,seed_,cx,cy,false),herd238.members(old.herd,seed_,cx,cy,false))
+ for coat in 20:
+  assert_eq(HerdTown217.near_colors(coat),town238.near_colors(coat))
+  for variant in 30:assert_eq(WorldHerd.contrasting_spots(coat,variant),herd238.contrasting_spots(coat,variant))

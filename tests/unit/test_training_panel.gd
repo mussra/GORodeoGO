@@ -1,4 +1,10 @@
 extends GutTest
+var valid239:bool
+var trial239:bool
+func before_each():
+ valid239=SaveData._load_valid;trial239=SaveData.trial_session_active;SaveData._load_valid=true;SaveData.trial_session_active=false
+func after_each():
+ SaveData._load_valid=valid239;SaveData.trial_session_active=trial239
 func test_reopen_loads_pair_and_mount_button_equips_saved_learner()->void:
  var before:Dictionary=SaveData.horse_collection.export_state();var path:String=SaveData.save_path
  SaveData.save_path="user://qa-training-panel.dat";SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.horse_collection.add_trial_parents()

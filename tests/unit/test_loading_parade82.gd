@@ -15,7 +15,7 @@ func test_drift_bounds_and_slowing():
  assert_lt(LoadingParade.drift_x(18)+LoadingParade.RUN_SPEED*LoadingParade.FADE,1000.0)
 func test_cosmetics_use_only_side_and_no_saved_state():
  var source=FileAccess.get_file_as_string("res://src/Presentation/loading_parade.gd")
- assert_false(source.contains("SaveData"))
+ assert_false(source.contains("SaveData.save_progress"));assert_false(source.contains("SaveData.world_seed="));assert_true(source.contains("SaveData.horse_collection.find"))
  assert_false(source.contains("WorldMap"))
  assert_false(source.contains('"down"'))
  assert_true(source.contains("RandomNumberGenerator.new()"))

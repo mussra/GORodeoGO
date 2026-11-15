@@ -9,7 +9,8 @@ func _build_menu() -> void:
 	add_child(backdrop)
 	move_child(backdrop,0)
 	_hero.get_node("Rider").hide()
-	_hero.get_node("Bull").hide()
+	var bull:=_hero.get_node_or_null("Bull")
+	if bull!=null:bull.hide()
 	_portrait = TextureRect.new()
 	_portrait.texture = load("res://art/ui/cartoon_hero.png")
 	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -27,7 +28,7 @@ func _build_menu() -> void:
 	logo.add_theme_constant_override("outline_size",14)
 	logo.rotation = -.05
 	_hero.get_node("Description").hide()
-	_play.text = "¡A CABALGAR!\nNIVEL %02d  >" % _next_level
+	_play.text = "JUEGOS"
 	_missions.text = "MAPA DE NIVELES"
 	for button in [_play,_missions,quit_button]:
 		button.add_theme_color_override("font_color",Color("253746"))
@@ -43,7 +44,7 @@ func _build_menu() -> void:
 	_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hero.add_child(_card)
 	_hero.move_child(_card,0)
-	_caption.text = "TU PROGRESO\n%02d / 20 RETOS" % SaveData.highest_level_completed
+	_caption.text = "TU PROGRESO\n%02d / %02d RETOS\n%d PUNTOS" % [SaveData.highest_level_completed,LevelCatalog.MAX_LEVEL,SaveData.equipment_points]
 	_caption.add_theme_font_size_override("font_size",18)
 	_caption.add_theme_color_override("font_color",Color("304756"))
 	get_node("Footer").add_theme_color_override("font_color",Color("455966"))
@@ -72,6 +73,12 @@ func _layout() -> void:
 	_hero.get_node("Logo").position = Vector2(40,116)
 	_play.position = Vector2(928,426)
 	_play.size = Vector2(306,106)
+	_world_button.position=Vector2(928,545)
+	_world_button.size=Vector2(306,64)
+	_equipment_button.position=Vector2(928,619)
+	_equipment_button.size=Vector2(306,58)
+	_equipment_caption.position=Vector2(42,600)
+	_equipment_caption.add_theme_color_override("font_color",Color("304756"))
 	_missions.position = Vector2(938,327)
 	_missions.size = Vector2(286,70)
 	_card.position = Vector2(42,455)
@@ -81,3 +88,7 @@ func _animate_intro() -> void:
 	# The shared homogeneous fade (super) covers the portrait too: no separate
 	# delayed pop, everything appears at once (Ant 22:50).
 	super._animate_intro()
+
+func _refresh_points_caption()->void:
+	super._refresh_points_caption()
+	if is_instance_valid(_caption):_caption.text="TU PROGRESO\n%02d / %02d RETOS\n%d PUNTOS"%[SaveData.highest_level_completed,LevelCatalog.MAX_LEVEL,SaveData.equipment_points]

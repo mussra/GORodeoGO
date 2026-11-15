@@ -1,4 +1,8 @@
 extends GutTest
+var generator_before239:int
+func before_each():
+ generator_before239=SaveData.world_generator_version;SaveData.world_generator_version=3
+func after_each():SaveData.world_generator_version=generator_before239
 func test_four_distinct_clues_journal_and_unknown_suggestions_in_any_order():
  for order in [["home","east138","west140","east140"],["east140","home","west140","east138"]]:
   var state:=VillageCousins140.fresh(752026,[],FloristJourney138.fresh([]))

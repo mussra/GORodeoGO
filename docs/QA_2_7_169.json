@@ -1,0 +1,125 @@
+{
+  "version": "2.7.169",
+  "version_code": 428,
+  "branch": "feat/open-world-test-20261107",
+  "apk_sha256": "e81545a36bd64124809d5a5601bc74023d6604ee356b910dbf5b1a71787a7958",
+  "apk_bytes": 84103535,
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "unit": {
+    "chunks": [
+      {
+        "Scripts": 35,
+        "Tests": 171,
+        "Asserts": 9814
+      },
+      {
+        "Scripts": 35,
+        "Tests": 158,
+        "Asserts": 156000
+      },
+      {
+        "Scripts": 35,
+        "Tests": 178,
+        "Asserts": 1473385
+      },
+      {
+        "Scripts": 35,
+        "Tests": 171,
+        "Asserts": 872678
+      },
+      {
+        "Scripts": 31,
+        "Tests": 128,
+        "Asserts": 87202
+      }
+    ],
+    "total": {
+      "Scripts": 171,
+      "Tests": 806,
+      "Asserts": 2599079
+    }
+  },
+  "integration": {
+    "game_modes_menus": {
+      "scripts": 15,
+      "tests": 99,
+      "assertions": 2499,
+      "environment": "window, synthesized native touch"
+    },
+    "world_save_isolation": {
+      "scripts": 10,
+      "tests": 36,
+      "assertions": 496,
+      "environment": "window"
+    },
+    "previous_selected_safety": {
+      "scripts": 28,
+      "tests": 127,
+      "assertions": 1419,
+      "environment": "12 scripts window, remaining headless",
+      "overlaps_other_groups": true
+    }
+  },
+  "performance": {
+    "environment": "Desktop Linux, Godot 4.7.2, software-rendered window; not Android hardware",
+    "modes": [
+      {
+        "frame_max_ms": 37.471,
+        "frame_p50_ms": 32.109,
+        "frame_p95_ms": 34.828,
+        "instantiate_ms": 297.073,
+        "mode": "race",
+        "node_count": 220.0,
+        "static_memory_bytes": 69992553.0
+      },
+      {
+        "frame_max_ms": 26.885,
+        "frame_p50_ms": 19.979,
+        "frame_p95_ms": 21.943,
+        "instantiate_ms": 64.962,
+        "mode": "duel",
+        "node_count": 52.0,
+        "static_memory_bytes": 68579325.0
+      },
+      {
+        "frame_max_ms": 24.763,
+        "frame_p50_ms": 20.089,
+        "frame_p95_ms": 22.146,
+        "instantiate_ms": 68.346,
+        "mode": "joust",
+        "node_count": 56.0,
+        "static_memory_bytes": 69025619.0
+      },
+      {
+        "frame_max_ms": 28.0,
+        "frame_p50_ms": 20.779,
+        "frame_p95_ms": 24.245,
+        "instantiate_ms": 64.328,
+        "mode": "memory",
+        "node_count": 58.0,
+        "static_memory_bytes": 69069695.0
+      }
+    ]
+  },
+  "world_load": {
+    "ready_ms": 1228.484,
+    "nine_chunks_ms": 9174.321,
+    "process_frames": 163,
+    "environment": "Linux software renderer, current working source; legacy load benchmark"
+  },
+  "limits": [
+    "No physical Android install, touch, battery, GPU, thermal or upgrade test",
+    "Not all 138 integration scripts completed; broad exploratory chunks timed out and are not passes",
+    "UI test fixtures updated for current gestures, palette counts and isolated save roots",
+    "Shutdown warnings: selected safety suite retained 7 CanvasItems, 10 ObjectDB objects, 2 resources; not proven to leak during gameplay",
+    "Performance numbers are short desktop software-rendered samples, not device FPS or a no-regression comparison"
+  ],
+  "compatibility": [
+    "Original color IDs 0..19 unchanged; new flat bubblegum pink ID20",
+    "Eye IDs remain 20 rainbow and 21 galaxy",
+    "Editor and hat swatch20 remains rainbow, swatch21 maps to flat pink20",
+    "Historical wild palette widths frozen at20; seeded reference test covers238 chunks, original spot/near-color selection",
+    "World generator version and progress rules unchanged"
+  ]
+}

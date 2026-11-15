@@ -1,4 +1,8 @@
 extends GutTest
+var generator239:int
+func before_each():
+ generator239=SaveData.world_generator_version;SaveData.world_generator_version=3
+func after_each():SaveData.world_generator_version=generator239
 func test_identity_is_seeded_persisted_and_has_only_two_patterns_plus_plain():
  var a:=TownIdentity215.fresh(752026);assert_eq(a,TownIdentity215.fresh(752026));assert_ne(a,TownIdentity215.fresh(952026))
  var names:Array=[]

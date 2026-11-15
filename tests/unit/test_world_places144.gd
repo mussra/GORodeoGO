@@ -1,4 +1,8 @@
 extends GutTest
+var generator_before239:int
+func before_each():
+ generator_before239=SaveData.world_generator_version;SaveData.world_generator_version=3
+func after_each():SaveData.world_generator_version=generator_before239
 func test_only_proximity_or_recorded_conversation_makes_site_available():
  var candidates:Array=[{"id":"ranch","name":"Rancho","pos":Vector2(0,160)},{"id":"east138","name":"Este","pos":Vector2(9000,470)}]
  var state:=WorldPlaces144.fresh(123,3)

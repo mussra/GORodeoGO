@@ -1,0 +1,41 @@
+{
+  "environment": "Desktop Linux, Godot 4.7.2, software-rendered window; not Android hardware",
+  "modes": [
+    {
+      "frame_max_ms": 37.471,
+      "frame_p50_ms": 32.109,
+      "frame_p95_ms": 34.828,
+      "instantiate_ms": 297.073,
+      "mode": "race",
+      "node_count": 220.0,
+      "static_memory_bytes": 69992553.0
+    },
+    {
+      "frame_max_ms": 26.885,
+      "frame_p50_ms": 19.979,
+      "frame_p95_ms": 21.943,
+      "instantiate_ms": 64.962,
+      "mode": "duel",
+      "node_count": 52.0,
+      "static_memory_bytes": 68579325.0
+    },
+    {
+      "frame_max_ms": 24.763,
+      "frame_p50_ms": 20.089,
+      "frame_p95_ms": 22.146,
+      "instantiate_ms": 68.346,
+      "mode": "joust",
+      "node_count": 56.0,
+      "static_memory_bytes": 69025619.0
+    },
+    {
+      "frame_max_ms": 28.0,
+      "frame_p50_ms": 20.779,
+      "frame_p95_ms": 24.245,
+      "instantiate_ms": 64.328,
+      "mode": "memory",
+      "node_count": 58.0,
+      "static_memory_bytes": 69069695.0
+    }
+  ]
+}

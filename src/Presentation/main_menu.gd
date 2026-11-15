@@ -300,6 +300,7 @@ func _show_settings()->void:
 func _show_games213()->void:
 	if is_instance_valid(_games213):return
 	_games213=NavigationSheet.new();_games213.title="JUEGOS";_games213.entries=GAMES213.duplicate(true)
+	_games213.access_note239="Carreras, Duelo, Justa e Hípica: disponibles desde el inicio.\nRodeo: completa el nivel anterior. Copa: entra en Carreras y sigue los objetivos.\nModo DEBUG: niveles de Rodeo abiertos, con progreso separado." if SaveData.debug_mode else "Carreras, Duelo, Justa e Hípica: disponibles desde el inicio.\nRodeo: completa el nivel anterior.\nCopa: entra en Carreras y sigue los objetivos en orden."
 	_games213.tree_exited.connect(_guard_recheck213);_games213.selected.connect(_choose_game213);_games213.closed.connect(func():_games213=null);add_child(_games213)
 func _choose_game213(id:String)->void:
 	_games213=null

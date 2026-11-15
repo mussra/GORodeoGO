@@ -51,13 +51,13 @@ static func colored(members_:Array,state:Dictionary,cx:int,cy:int,captured:Array
  # sole town trait, nor modify a captured sibling to introduce variation.
  if mutable.size()>=2 and mutable.all(func(i):return int(out[i].traits.coat)==int(first.coat) and int(out[i].traits.pattern)==int(first.pattern) and int(out[i].traits.spots)==int(first.spots)):
   var traits:Dictionary=out[mutable[-1]].traits
-  for variant in HorseAppearance.COLORS.size():
+  for variant in 20: # Preserve seeded historical appearances.
    var spot:int=WorldHerd.contrasting_spots(int(traits.coat),variant)
    if spot!=int(traits.spots):traits.spots=spot;break
  return out
 static func near_colors(index:int)->Array[int]:
  var base:=Color(HorseAppearance.COLORS[index]);var choices:Array[int]=[]
- for i in HorseAppearance.COLORS.size():
+ for i in 20: # Preserve seeded historical appearances.
   if i!=index:choices.append(i)
  choices.sort_custom(func(a:int,b:int):return Vector3(Color(HorseAppearance.COLORS[a]).r-base.r,Color(HorseAppearance.COLORS[a]).g-base.g,Color(HorseAppearance.COLORS[a]).b-base.b).length_squared()<Vector3(Color(HorseAppearance.COLORS[b]).r-base.r,Color(HorseAppearance.COLORS[b]).g-base.g,Color(HorseAppearance.COLORS[b]).b-base.b).length_squared())
  return choices.slice(0,3)

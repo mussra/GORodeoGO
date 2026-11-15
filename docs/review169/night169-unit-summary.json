@@ -1,0 +1,34 @@
+{
+  "chunks": [
+    {
+      "Scripts": 35,
+      "Tests": 171,
+      "Asserts": 9814
+    },
+    {
+      "Scripts": 35,
+      "Tests": 158,
+      "Asserts": 156000
+    },
+    {
+      "Scripts": 35,
+      "Tests": 178,
+      "Asserts": 1473385
+    },
+    {
+      "Scripts": 35,
+      "Tests": 171,
+      "Asserts": 872678
+    },
+    {
+      "Scripts": 31,
+      "Tests": 128,
+      "Asserts": 87202
+    }
+  ],
+  "total": {
+    "Scripts": 171,
+    "Tests": 806,
+    "Asserts": 2599079
+  }
+}

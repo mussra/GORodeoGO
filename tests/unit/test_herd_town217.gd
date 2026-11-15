@@ -10,7 +10,8 @@ func snapshot219():
 func restore219():
  for key in saved219:SaveData.set(key,saved219[key])
  SaveData.horse_collection.restore(collection219)
-func before_each():snapshot219()
+func before_each():
+ snapshot219();SaveData.world_generator_version=3;SaveData.world_seed=752026;SaveData.world_cousins140={};SaveData.world_flora138={};SaveData.world_herd_town217={};SaveData.world_garden212=Garden212.fresh()
 func after_each():restore219()
 func test_new_policy_includes_seen_roaming_origins_and_keeps_stats():
  var towns:=VillageCousins140.fresh(752026,[],FloristJourney138.fresh([]))

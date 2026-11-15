@@ -42,7 +42,7 @@ static func escape_speed(panic:float,chase:float)->float:
 static func contrasting_spots(coat:int,variant:int)->int:
  var base:=Color(HorseAppearance.COLORS[coat])
  var choices:Array[int]=[]
- for i in HorseAppearance.COLORS.size():
+ for i in 20: # Historical seeded palette, independent of appended editor colors.
   var color:=Color(HorseAppearance.COLORS[i])
   if Vector3(base.r-color.r,base.g-color.g,base.b-color.b).length()>=.48:choices.append(i)
  return choices[posmod(variant,choices.size())]

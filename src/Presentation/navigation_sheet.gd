@@ -4,6 +4,7 @@ signal selected(id:String)
 signal closed
 var title:String="Menú"
 var entries:Array=[]
+var access_note239:String=""
 var canvas:Control
 func _ready()->void:
  process_mode=Node.PROCESS_MODE_ALWAYS;MenuInputGuard.install(self)
@@ -12,6 +13,8 @@ func _ready()->void:
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(layout);layout()
  MenuNavigation.header(canvas,title,func():closed.emit();queue_free())
  MenuNavigation.cards(canvas,entries,func(id:String):selected.emit(id);queue_free())
+ if not access_note239.is_empty():
+  var note:=Label.new();note.name="GameAccess239";note.text=access_note239;note.position=Vector2(40,565);note.mouse_filter=Control.MOUSE_FILTER_IGNORE;canvas.add_child(note);TextFit181.fixed(note,Vector2(1200,110),24,21,3)
  MenuNavigation.reveal(canvas)
 func layout()->void:
  var k:float=minf(size.x/1280,size.y/720);canvas.scale=Vector2.ONE*k;canvas.position=(size-Vector2(1280,720)*k)/2
