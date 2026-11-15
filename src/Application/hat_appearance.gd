@@ -73,7 +73,9 @@ static func surface_color(settings:Dictionary,p:Vector2)->Color:
   elif finish==2:ink=HorseAppearance.natural_spot(point)
   elif finish==3:ink=p.x<.35
   elif finish==4:ink=p.y>.75
-  elif finish>=20:ink=HorseAppearance.genetic_mark(Vector2(28.8+p.x*96.,p.y*100.8),finish-8)
+  elif finish>=20:
+   if finish==20:base=base.lerp(HorsePatternMap.center_color239(base),HorsePatternMap.center239(Vector2(28.8+p.x*96.,p.y*100.8)))
+   ink=HorseAppearance.genetic_mark(Vector2(28.8+p.x*96.,p.y*100.8),finish-8)
   else:ink=HorseAppearance.genetic_mark(point,finish)
   if ink:
    var light:float=base.get_luminance()

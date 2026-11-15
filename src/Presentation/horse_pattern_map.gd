@@ -27,3 +27,12 @@ static func color(traits:Dictionary)->Color:
  var index:=HorseCollection.spots_index(traits)
  if index>=0:return Color(HorseAppearance.COLORS[index])
  return Color("975936") if int(traits.get("pattern",0))==10 else (Color("273440") if int(traits.get("pattern",0))==11 or int(traits.get("pattern",0))>=12 else Color("f4edd8"))
+
+static func center239(p:Vector2)->float:
+ coverage(p,12)
+ var u:float=clampf((p.x-28.8)/96.0,0.,.999)
+ var v:float=clampf(p.y/100.8,0.,.999)
+ return wild_image238.get_pixel(int(u*512),int(v*512)).g
+static func center_color239(base:Color)->Color:
+ # A darker warm center derived from the chosen base, not a third hereditary color.
+ return Color(base.r*.76,base.g*.61,base.b*.48,base.a)

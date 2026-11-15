@@ -194,6 +194,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
     var point:Vector2=body_point(uv,x,y,bob) if int(t.pattern) not in [3,4] else Vector2(x,y-bob)
     var px:float=float(x)*96.0/image.get_width() if anim=="foal" else point.x
     var py:float=float(y)*96.0/image.get_height() if anim=="foal" else point.y
+    if int(t.pattern)==12:color=color.lerp(HorsePatternMap.center_color239(color),HorsePatternMap.center239(Vector2(px,py)))
     match int(t.pattern):
      1:
       if anim=="walk_diag_down" and uv==null:mark=(Vector2(px,py)-Vector2(32,51)).length()<7 or (Vector2(px,py)-Vector2(58,61)).length()<6

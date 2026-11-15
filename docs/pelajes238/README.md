@@ -29,3 +29,9 @@ Ant confirma que se refería al color de base: Guepardo y Tigre usan Crema, como
 ## Guepardo, 15 noviembre 2026, 19:37
 
 Se precisa la máscara de Guepardo con puntos sólidos circulares simples sobre base Crema, sin anillos ni huecos. Se ajustan tamaño y circularidad para que se lean en la comparación. Solo cambia el segundo segmento del atlas compartido de máscaras; los otros cinco patrones permanecen iguales. Imagen cercana con el animal real en `guepardo-puntos-redondos-comparacion.png`. Cambio preparado en la rama y documentado, sin generar otro APK. El APK publicado 2.7.168 no incluye este ajuste posterior de circularidad/tamaño.
+
+## Leopardo con relleno, 15 noviembre 2026, 19:50
+
+A petición de Ant, rosetas más gruesas, irregulares y abiertas con centro cálido más oscuro. El canal rojo del primer segmento del atlas dibuja el borde y el verde el relleno. El relleno deriva de la base elegida (RGB × 0,76/0,61/0,48), conservando todas las bases y tintas, incluido arcoíris suave. Compartido por retrato, poses del mundo, potrillo y sombrero; no añade genes ni cambia IDs de guardados. Los otros cinco segmentos, incluido Guepardo redondo, se conservan byte por byte.
+
+`leopardo-relleno-comparacion239.png` compara el retrato anterior Crema con el ajuste Dorado y el fotograma enviado por Ant. Dorado es solo un ejemplo para aproximar el vídeo, no sustituye automáticamente la base de caballos guardados ni fuerza una paleta. No se reproduce la textura de purpurina. Cambio local en rama, sin APK ni publicación. El APK 2.7.168 no incluye este ajuste.

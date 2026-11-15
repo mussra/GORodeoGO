@@ -60,3 +60,19 @@ func test_six_shapes_all_views_drink_foal_protect_non_coat_regions():
 func test_new_default_black_ink_matches_unlocked_hat():
  var t:Dictionary={"coat":0,"pattern":12,"mane":1,"finish":"normal"}
  assert_eq(HorsePatternMap.color(t),Color("273440"));assert_eq(HatAppearance.decode(HatDesigns235.from_horse({"traits":t})).spots,0)
+
+func test_leopard239_filled_centers_and_palette():
+ var cream:=Color(HorseAppearance.COLORS[12]);var brown:=HorsePatternMap.center_color239(cream)
+ assert_lt(brown.r,cream.r);assert_lt(brown.g,cream.g);assert_lt(brown.b,cream.b)
+ assert_gt(brown.r,brown.b)
+ var centers:int=0;var outside:int=0
+ for y in range(0,100,2):
+  for x in range(29,125,2):
+   var p:=Vector2(x,y)
+   if HorsePatternMap.center239(p)>.9 and HorsePatternMap.coverage(p,12)<.1:
+    centers+=1
+    assert_eq(HatAppearance.surface_color({"coat":12,"finish":20,"spots":0},Vector2((x-28.8)/96.0,y/100.8)),cream.lerp(brown,HorsePatternMap.center239(p)))
+   if HorsePatternMap.center239(p)<.01:outside+=1
+ assert_gt(centers,30);assert_gt(outside,100)
+ for i in 20:
+  var base:=Color(HorseAppearance.COLORS[i]);assert_eq(HorsePatternMap.center_color239(base).a,base.a)
