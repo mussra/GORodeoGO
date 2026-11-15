@@ -21,3 +21,7 @@ La cría copia estilo y color de cada rasgo desde el progenitor elegido. No aña
 Los sombreros anteriores v1/v2 y acabados 13/14 se conservan. Los nuevos patrones usan 20..25 dentro del formato de sombrero; v3 permite la base/tinta arcoíris. El armario sigue guardando el diseño para siempre una vez tenido el caballo, incluso tras venderlo.
 
 Imágenes de propuesta y comparación no prueban Android físico ni aparición aleatoria de cada combinación. Las recetas de Instinto aún no existen: elegir una paleta natural no desbloquea habilidades en esta versión.
+
+## Ajuste de paleta natural, 15 noviembre 2026, 16:32
+
+Ant confirma que se refería al color de base: Guepardo y Tigre usan Crema, como Leopardo, manteniendo respectivamente puntos y rayas. Las láminas naturales se han regenerado. Es una selección de ejemplo, no una restricción de colores ni un cambio de caballos existentes. El APK 2.7.168 ya permite estas combinaciones; no requiere 2.7.169.
