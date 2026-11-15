@@ -1,0 +1,47 @@
+{
+  "race_hud222": {
+    "code": 0,
+    "seconds": 9.5,
+    "summary": "Totals\n------\nScripts               1\nTests                 1\nPassing Tests         1\nAsserts              14\nTime              1.255s\n\n\n---- All tests passed! ----\n\n"
+  },
+  "race_stop219": {
+    "code": 0,
+    "seconds": 10.7,
+    "summary": "Totals\n------\nScripts               1\nTests                 3\nPassing Tests         3\nAsserts             512\nTime              2.401s\n\n\n---- All tests passed! ----\n\n"
+  },
+  "mode_text203": {
+    "code": 0,
+    "seconds": 9.7,
+    "summary": "Totals\n------\nDeprecated            2\n\nScripts               1\nTests                 2\nPassing Tests         2\nAsserts              21\nTime              1.387s\n\n\n---- All tests passed! ----\n\nWARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  "race190": {
+    "code": 1,
+    "seconds": 25.1,
+    "summary": "Totals\n------\nDeprecated           31\n\nScripts               1\nTests                25\nPassing Tests        23\nFailing Tests         2\nAsserts           1299/1306\nTime              16.438s\n\n\n---- 2 failing tests ----\n\n"
+  },
+  "race_cup194": {
+    "code": 0,
+    "seconds": 9.9,
+    "summary": "Totals\n------\nScripts               1\nTests                 7\nPassing Tests         7\nAsserts              31\nTime              1.588s\n\n\n---- All tests passed! ----\n\nWARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  "race_recovery197": {
+    "code": 0,
+    "seconds": 15.4,
+    "summary": "Totals\n------\nScripts               1\nTests                 7\nPassing Tests         7\nAsserts              26\nTime              7.074s\n\n\n---- All tests passed! ----\n\n"
+  },
+  "running_repress204": {
+    "code": 0,
+    "seconds": 11.7,
+    "summary": "Totals\n------\nDeprecated            1\n\nScripts               1\nTests                 8\nPassing Tests         8\nAsserts              34\nTime              3.404s\n\n\n---- All tests passed! ----\n\nWARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  "prestart_aim198": {
+    "code": 0,
+    "seconds": 11.0,
+    "summary": "Totals\n------\nScripts               1\nTests                 5\nPassing Tests         5\nAsserts              39\nTime              2.688s\n\n\n---- All tests passed! ----\n\nWARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).\n   at: cleanup (core/object/object.cpp:2536)\n"
+  },
+  "map_release209": {
+    "code": 0,
+    "seconds": 15.7,
+    "summary": "Totals\n------\nScripts               1\nTests                 7\nPassing Tests         7\nAsserts              89\nTime              7.011s\n\n\n---- All tests passed! ----\n\n"
+  }
+}

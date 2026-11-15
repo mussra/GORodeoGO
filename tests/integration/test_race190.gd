@@ -174,7 +174,7 @@ func test_actual_map_geometry_fits_every_course_with_corridor()->void:
    for point in race.course.points:
     var pixel:Vector2=race.map_view.point(point,g)
     var margin:float=RaceCourse190.WIDTH*.5*g.scale
-    assert_true(Rect2(Vector2(18,36),race.map_view.size-Vector2(36,72)).grow(-margin).has_point(pixel))
+    assert_true(race.map_view.content_rect222().grow(-margin).has_point(pixel))
  race.map_view.expanded=false;race.map_view.layout()
 func test_native_touch_map_pauses_without_aim_and_back_only_closes_map()->void:
  start();var map:RaceMap191=race.map_view

@@ -11,12 +11,14 @@ func layout()->void:
  if expanded:
   set_anchors_and_offsets_preset(Control.PRESET_CENTER);offset_left=-370.;offset_right=370.;offset_top=-230.;offset_bottom=230.
  else:
-  set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);offset_left=-254.;offset_right=-16.;offset_top=122.;offset_bottom=324.
+  set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);offset_left=-230.;offset_right=-16.;offset_top=84.;offset_bottom=242.
+func content_rect222()->Rect2:
+ return Rect2(Vector2(18,36),size-Vector2(36,72)) if expanded else Rect2(Vector2(12,14),size-Vector2(24,28))
 func geometry()->Dictionary:
  var bounds:=Rect2(race.course.points[0],Vector2.ZERO)
  for p in race.course.points:bounds=bounds.expand(p)
  bounds=bounds.grow(RaceCourse190.WIDTH*.5+24.)
- var area:=Rect2(Vector2(18,36),size-Vector2(36,72))
+ var area:=content_rect222()
  var k:float=minf(area.size.x/bounds.size.x,area.size.y/bounds.size.y)
  return {"origin":area.get_center()-bounds.get_center()*k,"scale":k}
 func point(p:Vector2,g:Dictionary)->Vector2:return g.origin+p*g.scale
@@ -49,8 +51,10 @@ func _draw()->void:
   if rider==race.player:
    var heading:Vector2=rider.velocity.normalized() if rider.velocity.length()>5. else race.course.tangent(rider.route_s)
    draw_colored_polygon(PackedVector2Array([p+heading*10.,p+heading*4.+heading.orthogonal()*4.,p+heading*4.-heading.orthogonal()*4.]),rider.tint)
- draw_string(ThemeDB.fallback_font,Vector2(14,26),"MAPA · "+("TOCA PARA CERRAR" if expanded else "TOCA +"),HORIZONTAL_ALIGNMENT_LEFT,-1,18,Color("fff1cd"))
- draw_string(ThemeDB.fallback_font,Vector2(14,size.y-13),"Meta | Puerta ○ Valla ━",HORIZONTAL_ALIGNMENT_LEFT,-1,17,Color("fff8e8"))
+ if expanded:
+  draw_string(ThemeDB.fallback_font,Vector2(14,26),"MAPA · TOCA PARA CERRAR",HORIZONTAL_ALIGNMENT_LEFT,-1,18,Color("fff1cd"))
+  draw_string(ThemeDB.fallback_font,Vector2(14,size.y-13),"Meta | Puerta ○ Valla ━",HORIZONTAL_ALIGNMENT_LEFT,-1,17,Color("fff8e8"))
+ else:draw_string(ThemeDB.fallback_font,Vector2(size.x-25,25),"+",HORIZONTAL_ALIGNMENT_LEFT,-1,22,Color("fff1cd"))
 func toggle()->void:
  expanded=not expanded
  if expanded:race.player.cancel_input();get_tree().paused=true

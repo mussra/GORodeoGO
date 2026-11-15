@@ -40,7 +40,7 @@ func _live_tow_level(number:int)->void:
 			if not candidates.is_empty():
 				var bull:Node=candidates[0]
 				target=bull.global_position
-				if target.distance_to(level.player.global_position)<level.player.max_throw_distance-15:
+				if target.distance_to(level.player.global_position)<level.player.max_throw_distance-15 and level.player.lasso.throw_guard.call():
 					level.player.lasso.resolve_capture(target)
 					captured_once=captured_once or bull.controller.is_held()
 			else:target=Vector2(0,-100)

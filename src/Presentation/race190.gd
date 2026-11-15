@@ -63,23 +63,22 @@ func _ready()->void:
  _build_selector()
  if RaceCourse190.start_selected:selector.hide();RaceCourse190.start_selected=false
  info.text="CARRERAS CON LAZO · elige un circuito"
- guidance.text="Vallas con paso lateral · el salto depende de tu caballo"
- toasts.push("Vallas: salta si tu caballo sabe; si no, pasa por el hueco lateral.",4.)
+ guidance.text="";guidance.hide()
 func _build_hud()->void:
  var layer:=CanvasLayer.new();layer.layer=20;add_child(layer)
  hud=Control.new();hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);hud.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.theme=RanchTheme.create();layer.add_child(hud)
- var top:=Panel.new();top.mouse_filter=Control.MOUSE_FILTER_IGNORE;top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE);top.offset_bottom=96.;hud.add_child(top)
- info=Label.new();info.position=Vector2(18,6);info.add_theme_font_size_override("font_size",26);hud.add_child(info)
- guidance=Label.new();guidance.add_theme_font_size_override("font_size",24);guidance.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;guidance.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE);guidance.offset_top=-76.;guidance.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;guidance.offset_bottom=-8.;ToastStack.backdrop(guidance);hud.add_child(guidance)
+ var top:=Panel.new();top.mouse_filter=Control.MOUSE_FILTER_IGNORE;top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE);top.offset_bottom=64.;hud.add_child(top)
+ info=Label.new();info.position=Vector2(18,8);info.add_theme_font_size_override("font_size",26);hud.add_child(info)
+ guidance=Label.new();guidance.add_theme_font_size_override("font_size",24);guidance.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;guidance.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE);guidance.offset_top=-66.;guidance.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;guidance.offset_bottom=-12.;guidance.anchor_left=.3;guidance.anchor_right=.7;ToastStack.backdrop(guidance);hud.add_child(guidance)
  pause_button=_button(hud,"Pausa",Vector2.ZERO,func():_pause())
  pause_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT);pause_button.offset_left=-125.;pause_button.offset_top=12.;pause_button.offset_right=-15.;pause_button.offset_bottom=56.
  map_view=RaceMap191.new();map_view.race=self;map_view.z_index=20;map_view.process_mode=Node.PROCESS_MODE_ALWAYS;hud.add_child(map_view);map_view.layout()
- telemetry=_label(hud,"",Vector2(18,122),24)
- standings=_label(hud,"",Vector2(18,214),24)
+ telemetry=_label(hud,"",Vector2(18,84),22)
+ standings=_label(hud,"",Vector2(18,214),24);standings.hide()
  ToastStack.backdrop(telemetry);ToastStack.backdrop(standings)
  standings.add_theme_color_override("font_color",Color("d9ead9"))
  progress_bar=ProgressBar.new();progress_bar.show_percentage=false;progress_bar.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.add_child(progress_bar)
- progress_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE);progress_bar.offset_left=18.;progress_bar.offset_top=96.;progress_bar.offset_right=-18.;progress_bar.offset_bottom=102.
+ progress_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE);progress_bar.offset_left=18.;progress_bar.offset_top=64.;progress_bar.offset_right=-18.;progress_bar.offset_bottom=70.
  progress_bar.add_theme_stylebox_override("fill",RanchTheme.box(Color("8be3ba"),Color("8be3ba"),3))
  progress_bar.add_theme_stylebox_override("background",RanchTheme.box(Color("2d4947"),Color("2d4947"),3))
  sprint_gauge206=RadialGauge.new();sprint_gauge206.name="SprintGauge206";sprint_gauge206.skill="stamina";hud.add_child(sprint_gauge206)
@@ -89,6 +88,7 @@ func _build_hud()->void:
  toasts=ToastStack.new();toasts.font_size203=24;toasts.top_offset=414;hud.add_child(toasts)
  pause_panel=_panel(Vector2(560,275));pause_panel.process_mode=Node.PROCESS_MODE_ALWAYS;pause_panel.hide()
  _label(pause_panel,"PAUSA · CARRERAS",Vector2(28,20),25)
+ _label(pause_panel,"Izquierda: mover · derecha: lazo\nRayo: sprint · vallas: salto o hueco",Vector2(28,198),19)
  _button(pause_panel,"Continuar",Vector2(28,75),func():get_tree().paused=false;pause_panel.hide())
  _button(pause_panel,"Reintentar",Vector2(28,137),_retry)
  _button(pause_panel,"Menú",Vector2(300,137),_menu)
@@ -107,7 +107,7 @@ func _physics_process(delta:float)->void:
  if is_instance_valid(selector) and selector.visible:return
  if countdown>0.:
   countdown=maxf(0.,countdown-delta)
-  if countdown<=0.:running=true;RanchMusic.play_context("race");toasts.push("¡Ya! Sigue las puertas en orden · una vuelta",3.)
+  if countdown<=0.:running=true;RanchMusic.play_context("race");toasts.push("¡Ya!",1.)
  if running:elapsed+=delta
  for rider in riders:
   var unclipped:Vector2=rider.position
@@ -130,18 +130,16 @@ func _physics_process(delta:float)->void:
  var order:Array=riders.duplicate();order.sort_custom(_ahead);race_order=order
  var rank:int=order.find(player)+1
  progress_bar.value=course.route_score(player.position,player.next_gate,player.route_s)/course.length*100.
- telemetry.text="%d m/s · %d%% del circuito\nLazo %s"%[roundi(player.velocity.length()/10.),roundi(progress_bar.value),"EN VUELO" if player.lasso.is_in_flight() else "APUNTANDO" if player.lasso.is_charging() else "LISTO" if player.attack_cooldown<=0. else "%.1fs"%player.attack_cooldown]
- standings.text=""
- for i in order.size():standings.text+="%d  %s%s\n"%[i+1,order[i].racer_name," ◀" if order[i]==player else ""]
+ telemetry.text="Lazo: "+("en vuelo" if player.lasso.is_in_flight() else "apuntando" if player.lasso.is_charging() else "listo" if player.attack_cooldown<=0. else "%.1f s"%player.attack_cooldown)
  # Gradual zoom, never rotate the world or change control directions.
  var target_zoom:float=.64 if player.velocity.length()>230. else .7
  camera.zoom=camera.zoom.lerp(Vector2.ONE*target_zoom,minf(1.,delta*2.))
- info.text="CARRERAS · LAZO     %d/4     1 vuelta · %02d:%02d\nPuerta %d/%d · caballos igualados · sin daño"%[rank,int(elapsed)/60,int(elapsed)%60,mini(player.next_gate,16),16]
- if results.visible:guidance.text="Carrera terminada · otra carrera o menú"
- elif countdown>0.:guidance.text="PREPARADOS · %d · puedes apuntar; suelta después de salir"%ceili(countdown)
- elif player.slow_left>0.:guidance.text="ENLAZADO · PARADO · %.1fs"%player.slow_left
- elif player.attack_cooldown>0.:guidance.text="Lazo %.1fs · levanta y apoya: sprint · sigue la puerta brillante"%player.attack_cooldown
- else:guidance.text="Mueve izquierda · apunta/suelta derecha: lazo · levanta y apoya: sprint"
+ info.text="%d/4    %02d:%02d"%[rank,int(elapsed)/60,int(elapsed)%60]
+ if results.visible:guidance.text="Meta"
+ elif countdown>0.:guidance.text=""
+ elif player.slow_left>0.:guidance.text="Parado %.1f s"%player.slow_left
+ else:guidance.text=""
+ guidance.visible=not guidance.text.is_empty()
  map_view.queue_redraw();queue_redraw()
 func _ahead(a:RaceRider190,b:RaceRider190)->bool:
  if a.finish_time>=0. and b.finish_time>=0.:return a.finish_time<b.finish_time
@@ -159,7 +157,7 @@ func targets_for(attacker:RaceRider190)->Array:
 func notice_hit(target:RaceRider190)->void:
  hit_count+=1
  if target==player:received194+=1
- if target==player:toasts.push("Te han enlazado: parado 1 segundo, sin daño. Luego tienes protección.",2.)
+ if target==player:toasts.clear() # Compact live status below replaces the long toast.
 func _finish()->void:
  var cup_run:bool=RaceCupSession194.active
  _announced=true;running=false;toasts.clear()

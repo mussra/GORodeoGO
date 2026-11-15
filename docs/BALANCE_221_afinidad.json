@@ -1,0 +1,68 @@
+[
+  {
+    "actual_local_coat_pct": 61.0966319165998,
+    "actual_local_pattern_pct": 72.7145148356055,
+    "baseline_mean_hold_seconds": 2.01249121118429,
+    "baseline_mean_lasso_multiplier": 1.07492983159583,
+    "baseline_two_plus_pct": 2.7766639935846,
+    "coat_rate": 0.6,
+    "equipped": {
+      "coat": 16,
+      "mane": 0,
+      "pattern": 6
+    },
+    "local_mean_hold_seconds": 1.5845572935387,
+    "local_mean_lasso_multiplier": 1.37484963913392,
+    "local_two_plus_pct": 52.0449077786688,
+    "no_bonus_cap_change": true,
+    "pattern_rate": 0.7,
+    "radius": 1000,
+    "sample_herds": 2500,
+    "sample_horses": 9976,
+    "town": "Pueblo Estrella Lavanda"
+  },
+  {
+    "actual_local_coat_pct": 41.9105854049719,
+    "actual_local_pattern_pct": 54.4206094627105,
+    "baseline_mean_hold_seconds": 2.01249121118429,
+    "baseline_mean_lasso_multiplier": 1.07492983159583,
+    "baseline_two_plus_pct": 2.7766639935846,
+    "coat_rate": 0.4,
+    "equipped": {
+      "coat": 16,
+      "mane": 0,
+      "pattern": 6
+    },
+    "local_mean_hold_seconds": 1.70698850145794,
+    "local_mean_lasso_multiplier": 1.28114975942261,
+    "local_two_plus_pct": 30.9943865276664,
+    "no_bonus_cap_change": true,
+    "pattern_rate": 0.5,
+    "radius": 1000,
+    "sample_herds": 2500,
+    "sample_horses": 9976,
+    "town": "Pueblo Estrella Lavanda"
+  },
+  {
+    "actual_local_coat_pct": 32.0569366479551,
+    "actual_local_pattern_pct": 40.4570970328789,
+    "baseline_mean_hold_seconds": 2.01249121118429,
+    "baseline_mean_lasso_multiplier": 1.07492983159583,
+    "baseline_two_plus_pct": 2.7766639935846,
+    "coat_rate": 0.3,
+    "equipped": {
+      "coat": 16,
+      "mane": 0,
+      "pattern": 6
+    },
+    "local_mean_hold_seconds": 1.79133615177381,
+    "local_mean_lasso_multiplier": 1.22160685645549,
+    "local_two_plus_pct": 20.6595829991981,
+    "no_bonus_cap_change": true,
+    "pattern_rate": 0.35,
+    "radius": 1000,
+    "sample_herds": 2500,
+    "sample_horses": 9976,
+    "town": "Pueblo Estrella Lavanda"
+  }
+]
