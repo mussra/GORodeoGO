@@ -96,7 +96,7 @@ func _think(delta:float)->void:
  if attack_think>0.:return
  attack_think=.35+float(racer_index)*.11
  if attack_cooldown>0. or lasso.is_in_flight() or dodge.remaining>0.:return
- var candidates:Array=race.targets_for(self)
+ var candidates:Array=_attack_candidates()
  if candidates.is_empty():return
  var target:Node2D=candidates[0]
  # Use the normal shared charge/release, inheritance and fixed flight time.
@@ -104,6 +104,7 @@ func _think(delta:float)->void:
  lasso.aim_direction=aim.normalized()
  lasso._start_charging();lasso._charge_distance=minf(aim.length(),lasso.max_throw_distance)
  lasso._release_throw()
+func _attack_candidates()->Array:return race.targets_for(self)
 func try_capture(landing:Vector2)->bool:
  if not race.running or finish_time>=0. or protected_left>0. or position.distance_to(landing)>58.:return false
  slow_left=LASSO_STOP_SECONDS219;protected_left=3.2
@@ -113,7 +114,7 @@ func try_capture(landing:Vector2)->bool:
 func _draw()->void:
  if dodge==null:return
  super._draw()
- draw_arc(Vector2(0,-4),27.,0,TAU,32,tint,3.,true)
+ if ai:draw_arc(Vector2(0,-4),27.,0,TAU,32,tint,3.,true)
  if slow_left>0.:
   LassoRopeStyle.draw_loop(self,Vector2(0,-26))
  elif protected_left>0.:

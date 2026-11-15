@@ -158,6 +158,7 @@ var _active_capture_count: int = 0
 var _max_captures: int = 1
 
 func _ready() -> void:
+	PlayerMarker223.install(self,Vector2(0,33))
 	collision_mask|=64
 	drink=HorseDrink.new(self)
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, HatAppearance.art_root(SaveData.hat_color), PixelLabTrial.unreplaced_rider_animations(ANIM_NAMES))

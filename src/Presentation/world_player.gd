@@ -66,6 +66,7 @@ var _sprite_swap: SpriteSwap
 var lasso: LassoController = null
 
 func _ready() -> void:
+	PlayerMarker223.install(self,Vector2.ZERO)
 	collision_mask|=64|128
 	drink=HorseDrink.new(self)
 	collision_mask|=HorseJump.FENCE_LAYER

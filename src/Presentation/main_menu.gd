@@ -24,11 +24,11 @@ var _transitioning: bool = false
 var _games213:NavigationSheet
 var _next_level: int = 1
 const GAMES213=[
- {"id":"bulls","title":"Rodeo de toros","hint":"40 niveles · toros y corrales"},
- {"id":"race","title":"Carreras","hint":"Circuito / Copa · piloto"},
- {"id":"duel","title":"Duelo de lazos","hint":"Captura a tu rival"},
- {"id":"joust","title":"Justa con lazos","hint":"Cruce a caballo y lazo"},
- {"id":"memory","title":"Hípica de memoria","hint":"Mira, recuerda y salta"}]
+ {"id":"bulls","icon223":"res://art/ui/game_bulls223.png","title":"Rodeo de toros","hint":"40 niveles · toros y corrales"},
+ {"id":"race","icon223":"res://art/ui/game_race223.png","title":"Carreras","hint":"Circuito / Copa · piloto"},
+ {"id":"duel","icon223":"res://art/ui/game_duel223.png","title":"Duelo de lazos","hint":"Captura a tu rival"},
+ {"id":"joust","icon223":"res://art/ui/game_joust223.png","title":"Justa con lazos","hint":"Cruce a caballo y lazo"},
+ {"id":"memory","icon223":"res://art/ui/game_memory223.png","title":"Hípica de memoria","hint":"Mira, recuerda y salta"}]
 const ROUTES213={"race":"res://src/Presentation/race190.tscn","duel":"res://src/Presentation/duel193.tscn","joust":"res://src/Presentation/joust196.tscn","memory":"res://src/Presentation/jump_memory207.tscn"}
 
 func _ready() -> void:

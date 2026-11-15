@@ -1,0 +1,44 @@
+{
+  "version": "2.7.160",
+  "version_code": 419,
+  "directed": {
+    "scripts": 15,
+    "cases": 77,
+    "passed": 77,
+    "asserts": 991,
+    "android_physical": false,
+    "shutdown_warnings": "16 CanvasItem orphans, 21 ObjectDB instances, 2 resources still in use at shutdown"
+  },
+  "new_cases": {
+    "duel": 8,
+    "identity_and_separator": 2,
+    "menu_icons": 1
+  },
+  "baseline_duel_2_7_156": {
+    "cases": 8,
+    "passed": 5,
+    "failed": 3,
+    "failed_coverage": [
+      "exact landing beyond thrower distance",
+      "actual flight then thrower retreat, both sides",
+      "same hit radius beyond thrower distance"
+    ]
+  },
+  "legacy_checks": {
+    "race190": "23/25, same map press-vs-release and old AI reflex expectation as baseline",
+    "frontier_touch": "2/4, baseline 1/4, old touch harness and button-zone assumptions",
+    "frontier_dodge": "not rerun in this final group; earlier current and baseline both 2/3"
+  },
+  "visuals": {
+    "size": "960x540",
+    "reviewed": [
+      "Juegos",
+      "Duelo",
+      "Justa",
+      "Carreras",
+      "Hipica de memoria",
+      "Rodeo"
+    ]
+  },
+  "regate_claim": "Touch double-press, trace and release passes, including next round and wide viewport while aiming with second finger. Reported inability not reproduced; no fix claimed for that symptom."
+}

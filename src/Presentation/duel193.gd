@@ -73,7 +73,7 @@ func _refresh()->void:
  guidance.text="PREPARADOS · %d"%ceili(countdown) if countdown>0. else "Mueve izquierda · apunta y suelta derecha · doble toque al mover: regate"
 func targets_for(attacker:Node2D)->Array:
  var opponent:Node2D=riders[1] if attacker==riders[0] else riders[0]
- return [opponent] if running and attacker.position.distance_to(opponent.position)<=220. else []
+ return [opponent] if running else [] # Resolve by the actual landing circle, not the moving thrower distance.
 func capture_landed(target:Node2D)->void:
  if not running:return
  var winner:int=1 if target==riders[0] else 0

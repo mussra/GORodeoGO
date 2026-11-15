@@ -6,6 +6,8 @@ var end_wait:float=0.
 func _ready()->void:
  RaceCupSession194.active=false
  super._ready()
+ var barrier:=StaticBody2D.new();barrier.name="LaneDivider223";barrier.collision_layer=HorseJump.FENCE_LAYER;barrier.collision_mask=0
+ var shape:=CollisionShape2D.new();var rectangle:=RectangleShape2D.new();rectangle.size=Vector2(1120,12);shape.shape=rectangle;barrier.add_child(shape);add_child(barrier)
  ModeText203.apply(info,28);ModeText203.apply(guidance,26)
  guidance.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;guidance.offset_top=-84.
  sprint_gauge206=RadialGauge.new();sprint_gauge206.name="SprintGauge206";sprint_gauge206.skill="stamina";hud.add_child(sprint_gauge206)
@@ -48,7 +50,12 @@ func _refresh()->void:
 func _draw()->void:
  super._draw()
  draw_rect(Rect2(-520,-165,1040,330),Color("c8aa78"),false,4.)
- for x in range(-480,481,60):draw_line(Vector2(x,0),Vector2(x+28,0),Color("f2dda8"),2.)
+ draw_rect(Rect2(-540,-6,1080,12),Color("593d26"))
+ draw_line(Vector2(-540,-4),Vector2(540,-4),Color("e4b66f"),3.)
+ draw_line(Vector2(-540,4),Vector2(540,4),Color("a66d39"),3.)
+ for x in range(-540,541,60):
+  draw_rect(Rect2(x-4,-11,8,22),Color("583c26"))
+  draw_line(Vector2(x-2,-10),Vector2(x-2,9),Color("e9c082"),2.)
  for side in [-1.,1.]:
   var center:=Vector2(side*375.,-190.)
   draw_line(center,center+Vector2(-side*48.,0),Color("ffe9b5"),4.)

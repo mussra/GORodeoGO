@@ -35,3 +35,8 @@ func try_capture(landing:Vector2)->bool:
  if not race.running or position.distance_to(landing)>58.:return false
  race.capture_landed(self)
  return true
+
+func _attack_candidates()->Array:
+ # Launch range limits the AI's decision, never whether an already landed loop hits.
+ var opponent:Node2D=race.riders[1] if self==race.riders[0] else race.riders[0]
+ return race.targets_for(self) if position.distance_to(opponent.position)<=lasso.max_throw_distance else []
