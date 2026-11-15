@@ -9,7 +9,8 @@ var tint:Color=Color("7de1cc")
 var next_gate:int=1
 var previous_position:Vector2
 var finish_time:float=-1.
-var slow_left:float=0.
+const LASSO_STOP_SECONDS219:float=1.
+var slow_left:float=0. # Race lasso stop timer; retained name for shared rope visuals.
 var protected_left:float=0.
 var attack_cooldown:float=0.
 var attack_think:float=.8
@@ -32,10 +33,10 @@ func _ready()->void:
  collision_layer=0;collision_mask=HorseJump.FENCE_LAYER
  max_speed=base_pace;acceleration=900.
  dodge_available=true;dodge_recharge_seconds=2.5
- dodge.can_start=func()->bool:return race.running and finish_time<0. and _jump_time<=0.
- lasso.throw_guard=func()->bool:return _aim_allowed198() and finish_time<0. and _jump_time<=0. and attack_cooldown<=0. and not lasso.is_in_flight()
+ dodge.can_start=func()->bool:return race.running and finish_time<0. and slow_left<=0. and _jump_time<=0.
+ lasso.throw_guard=func()->bool:return _aim_allowed198() and finish_time<0. and slow_left<=0. and _jump_time<=0. and attack_cooldown<=0. and not lasso.is_in_flight()
  lasso.launch_guard=func()->bool:return race.running
- lasso.aim_hold_guard=func()->bool:return _aim_allowed198() and finish_time<0. and _jump_time<=0.
+ lasso.aim_hold_guard=func()->bool:return _aim_allowed198() and finish_time<0. and slow_left<=0. and _jump_time<=0.
  lasso.can_capture=func()->bool:return race.running
  lasso.prey_provider=func()->Array:return race.targets_for(self)
  lasso.lasso_released.connect(func():attack_cooldown=3.)
@@ -44,14 +45,21 @@ func _ready()->void:
  sprint_plan204=5.5+float(racer_index)*1.3
  if ai:set_process_input(false)
 func _input(event:InputEvent)->void:
- if not ai and _aim_allowed198() and finish_time<0.:super._input(event)
+ if not ai and _aim_allowed198() and finish_time<0. and slow_left<=0.:super._input(event)
 func _physics_process(delta:float)->void:
  if not race.running or finish_time>=0.:
   if not ai and _aim_allowed198():lasso.process_throw_input(delta)
   return
- slow_left=maxf(0.,slow_left-delta);protected_left=maxf(0.,protected_left-delta);attack_cooldown=maxf(0.,attack_cooldown-delta)
+ protected_left=maxf(0.,protected_left-delta);attack_cooldown=maxf(0.,attack_cooldown-delta)
+ if slow_left>0.:
+  slow_left=maxf(0.,slow_left-delta)
+  if slow_left<.000001:slow_left=0.
+  velocity=Vector2.ZERO
+  dodge.cooldown=maxf(0.,dodge.cooldown-delta);dodge.fade_trail(delta)
+  _update_animation(delta);queue_redraw()
+  return # Full stopped physics step, including the step that expires the timer.
  crossing_slow=maxf(0.,crossing_slow-delta);crossing_protected=maxf(0.,crossing_protected-delta)
- max_speed=base_pace*minf(.75 if slow_left>0. else 1.,.72 if crossing_slow>0. else 1.)
+ max_speed=base_pace*(.72 if crossing_slow>0. else 1.)
  if not ai:super._physics_process(delta)
  else:
   _ai_bypass=maxf(0.,_ai_bypass-delta)
@@ -98,7 +106,8 @@ func _think(delta:float)->void:
  lasso._release_throw()
 func try_capture(landing:Vector2)->bool:
  if not race.running or finish_time>=0. or protected_left>0. or position.distance_to(landing)>58.:return false
- slow_left=1.2;protected_left=3.2
+ slow_left=LASSO_STOP_SECONDS219;protected_left=3.2
+ velocity=Vector2.ZERO;dodge.cancel();lasso.cancel_input()
  race.notice_hit(self)
  return true
 func _draw()->void:
@@ -113,7 +122,7 @@ func _draw()->void:
 
 ## Same traced regate and same cooldown as a player drawing forward. No catch-up.
 func _boost197()->void:
- if dodge.cooldown>0. or dodge.remaining>0. or _jump_time>0.:return
+ if slow_left>0. or dodge.cooldown>0. or dodge.remaining>0. or _jump_time>0.:return
  var projection:Dictionary=race.course.route_project(position,route_s)
  for fence in race.course.fences:
   if fposmod(fence-projection.s,race.course.length)<360.:return

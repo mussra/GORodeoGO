@@ -77,4 +77,9 @@ static func explanation(towns:Dictionary,id:String)->String:
  var spot:String=HorseCollection.COATS[int(look.get("spot_index",1))].to_lower()
  var plural:Dictionary={"negro":"negras","blanco":"blancas","dorado":"doradas","azul":"azules","verde":"verdes","rojo":"rojas","violeta":"violetas","turquesa":"turquesas","rosa":"rosas","naranja":"naranjas","castaño":"castañas","gris":"grises","crema":"crema","cobre":"cobre","lima":"lima","marino":"marinas","lavanda":"lavanda","coral":"coral","celeste":"celestes","ciruela":"ciruela"}
  var pattern:String="el muro liso "+base if int(look.pattern)==0 else ("las estrellas " if int(look.pattern)==6 else "las manchas de jirafa ")+str(plural.get(spot,spot))+" sobre "+base
- return "Aquí ves "+pattern+". Cerca hay caballos parecidos, con distintos colores y dibujos en cada manada. Las zonas ya exploradas conservan sus caballos."
+ return "Aquí ves "+pattern+". Los caballos salvajes de por aquí suelen parecerse al pueblo, pero en cada manada hay distintos colores y dibujos."
+
+static func dialogue220(places:Dictionary,towns:Dictionary,id:String)->String:
+ if places.get("teach217","")==id:return explanation(towns,id)
+ if places.get("teach_far220","")==id:return "Si quieres caballos diferentes, aléjate de los pueblos."
+ return VillageCousins140.clue(id)

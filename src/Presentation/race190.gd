@@ -139,7 +139,7 @@ func _physics_process(delta:float)->void:
  info.text="CARRERAS · LAZO     %d/4     1 vuelta · %02d:%02d\nPuerta %d/%d · caballos igualados · sin daño"%[rank,int(elapsed)/60,int(elapsed)%60,mini(player.next_gate,16),16]
  if results.visible:guidance.text="Carrera terminada · otra carrera o menú"
  elif countdown>0.:guidance.text="PREPARADOS · %d · puedes apuntar; suelta después de salir"%ceili(countdown)
- elif player.slow_left>0.:guidance.text="ENLAZADO · sigues moviéndote · %.1fs"%player.slow_left
+ elif player.slow_left>0.:guidance.text="ENLAZADO · PARADO · %.1fs"%player.slow_left
  elif player.attack_cooldown>0.:guidance.text="Lazo %.1fs · levanta y apoya: sprint · sigue la puerta brillante"%player.attack_cooldown
  else:guidance.text="Mueve izquierda · apunta/suelta derecha: lazo · levanta y apoya: sprint"
  map_view.queue_redraw();queue_redraw()
@@ -159,7 +159,7 @@ func targets_for(attacker:RaceRider190)->Array:
 func notice_hit(target:RaceRider190)->void:
  hit_count+=1
  if target==player:received194+=1
- if target==player:toasts.push("Te han enlazado: freno breve, sin daño. Luego tienes protección.",2.)
+ if target==player:toasts.push("Te han enlazado: parado 1 segundo, sin daño. Luego tienes protección.",2.)
 func _finish()->void:
  var cup_run:bool=RaceCupSession194.active
  _announced=true;running=false;toasts.clear()

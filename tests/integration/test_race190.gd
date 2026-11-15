@@ -37,13 +37,13 @@ func test_keyboard_movement_and_ai_progress_without_teleport()->void:
 func test_temporal_lasso_has_no_damage_stun_or_capture_slot()->void:
  start();var target:RaceRider190=race.riders[1]
  assert_true(target.try_capture(target.position))
- assert_eq(target.slow_left,1.2)
+ assert_eq(target.slow_left,1.)
  assert_eq(target.protected_left,3.2)
  assert_eq(target._stun_time_remaining,0.)
  assert_eq(target.lasso._active_capture_count,0)
  assert_false(target.try_capture(target.position))
  target.slow_left=0.;target.protected_left=1.
- assert_false(target.try_capture(target.position),"Protection outlasts the brief slowdown")
+ assert_false(target.try_capture(target.position),"Protection outlasts the one-second stop")
  target.protected_left=0.
  assert_true(target.try_capture(target.position))
 func test_outside_landing_misses_and_spatial_dodge_evades()->void:

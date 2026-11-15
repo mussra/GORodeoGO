@@ -73,3 +73,31 @@ func test_distant_herds_do_not_write_unchanged_genetics_and_bad_eyes_are_rejecte
  assert_true(HerdTown217.valid(SaveData.world_herd_town217,752026))
  SaveData.world_herd_town217.herds["1,1"][0].eyes=HorseCollection.EYES.size()
  assert_false(HerdTown217.valid(SaveData.world_herd_town217,752026))
+
+func test_explanation_names_actual_pattern_and_only_describes_local_wild_horses():
+ var towns:=VillageCousins140.fresh(752026,[],FloristJourney138.fresh([]))
+ for id in VillageCousins140.IDS:
+  var text:String=HerdTown217.explanation(towns,id)
+  assert_true(text.contains("caballos salvajes"));assert_true(text.contains("cada manada"))
+  assert_false(text.to_lower().contains("explorad"));assert_false(text.to_lower().contains("antes"))
+func test_second_and_third_visited_towns_have_separate_persistent_messages():
+ var towns:=VillageCousins140.fresh(752026,[],FloristJourney138.fresh([]));var places:=WorldPlaces144.fresh(752026,3)
+ var sites:=WorldPlaces144.sites(752026,3,towns)
+ assert_true(WorldPlaces144.visit(places,sites[1].pos,sites));assert_eq(places.teach217,sites[1].id);assert_eq(places.teach_far220,"")
+ assert_true(HerdTown217.dialogue220(places,towns,sites[1].id).contains("caballos salvajes"))
+ assert_true(WorldPlaces144.visit(places,sites[2].pos,sites));assert_eq(places.teach_far220,sites[2].id)
+ assert_eq(HerdTown217.dialogue220(places,towns,sites[2].id),"Si quieres caballos diferentes, aléjate de los pueblos.")
+ assert_ne(places.teach217,places.teach_far220);assert_eq(WorldPlaces144.clean(places,752026,3),places)
+ var prior:=places.duplicate(true);prior.erase("teach_far220")
+ assert_eq(WorldPlaces144.clean(prior,752026,3).teach_far220,sites[2].id)
+func test_far_from_all_towns_keeps_unbiased_original_random_population():
+ var towns:=VillageCousins140.fresh(752026,[],FloristJourney138.fresh([]))
+ var state:=HerdTown217.fresh(752026,towns,[],{},[]);var colors:Dictionary={};var patterns:Dictionary={};var count:int=0
+ for cy in range(8,14):
+  for cx in range(-5,6):
+   var base:Dictionary=WorldMap.generate(752026,cx,cy).get("herd",{})
+   if base.is_empty():continue
+   var before:=WorldHerd.members(base,752026,cx,cy,false);var after:=HerdTown217.colored(before,state,cx,cy)
+   assert_eq(after,before,"Beyond all town influence the original generator is unchanged")
+   for horse in after:colors[horse.traits.coat]=true;patterns[horse.traits.pattern]=true;count+=1
+ assert_gt(count,20);assert_gt(colors.size(),5);assert_gt(patterns.size(),3)

@@ -13,7 +13,7 @@ func test_four_real_interactions_journal_persistence_and_no_duplicate():
   var p:=VillageCousins140.point(SaveData.world_cousins140,id)
   world.player.position=p;world._open_cousin140(id)
   assert_true(is_instance_valid(world._npc_dialog));assert_true(SaveData.world_cousins140.known.has(id))
-  var expected:String=HerdTown217.explanation(SaveData.world_cousins140,id) if SaveData.world_places144.get("teach217","")==id else VillageCousins140.clue(id)
+  var expected:String=HerdTown217.dialogue220(SaveData.world_places144,SaveData.world_cousins140,id)
   assert_true(world._npc_dialog.body.text.contains(expected),"second visited town explains its actual pattern; other towns keep their clue")
   world._close_npc();world._open_cousin140(id);world._close_npc()
  assert_eq(SaveData.world_cousins140.known.size(),4)
