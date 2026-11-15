@@ -1,0 +1,54 @@
+{
+  "version": "2.7.161",
+  "version_code": 420,
+  "new_integration_cases": 16,
+  "directed_integration": {
+    "scripts": 18,
+    "cases": 93,
+    "passed": 93,
+    "asserts": 1113
+  },
+  "unit": {
+    "scripts": 2,
+    "cases": 20,
+    "passed": 19,
+    "failed": 1,
+    "failure": "Existing wild-horse leash bound test at 610.4248 >610.01; unchanged by this patch and also fails in earlier baseline."
+  },
+  "baseline_2_7_160_reproduction": {
+    "cases": 14,
+    "passed": 9,
+    "failed": 5,
+    "failures": [
+      "pause with lost release keeps direction and speed260",
+      "pointer leaves screen keeps direction and speed260",
+      "player disabled and reenabled with lost release keeps direction and speed260",
+      "pig pinned at town wall",
+      "pig pinned at fence"
+    ]
+  },
+  "world_integration": {
+    "touch_recovery": true,
+    "pig_flees_then_captured": true,
+    "mission": "farmer_pigs accepted in test",
+    "save": "isolated test profile, not user save"
+  },
+  "visual_check": {
+    "size": "960x540",
+    "inspected": [
+      "movement before edge",
+      "stopped after edge",
+      "pig beside wall",
+      "pig 225 units along wall after1s",
+      "pig captured, inventory0to1"
+    ]
+  },
+  "caveats": [
+    "No physical Android validation",
+    "Reported exact gesture and installed APK version remain unconfirmed",
+    "No change to pig capture quest/contract eligibility; capture works with eligibility in integrated test",
+    "Resource shutdown warnings:12 CanvasItem RIDs,17 ObjectDB instances,2 resources in use",
+    "No full285-script suite rerun",
+    "No inactivity timer; legitimate long holds and drawn-regate edge extension retained"
+  ]
+}

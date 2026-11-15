@@ -6,6 +6,7 @@ const DRAG_DISTANCE:=12.0
 var dispatching209:bool=false
 var game:Node
 var touches:Dictionary={}
+var cancel_generation224:int=0
 var sticks:Array[VirtualJoystick]=[]
 var controls209:Array[Control]=[]
 static func install(scene:Node)->void:
@@ -57,6 +58,7 @@ func _input(event:InputEvent)->void:
  if event is InputEventScreenTouch:
   if event.pressed:
    if not _can_begin():return
+   if touches.has(event.index):_cancel_touches224()
    var ui:=_ui_at(game,event.position)
    touches[event.index]={"press":event.duplicate(),"ui":ui,"play":not ui,"offset":Vector2.ZERO,"last":event.position}
    if ui:get_viewport().set_input_as_handled()
@@ -64,14 +66,16 @@ func _input(event:InputEvent)->void:
    var state:Dictionary=touches[event.index];touches.erase(event.index)
    get_viewport().set_input_as_handled()
    if event.canceled:
-    game.player.cancel_input()
-    if state.play:_send(event,state.offset,true)
+    _cancel_touches224()
     return
    if state.play:_send(event,state.offset,true)
    elif _can_begin() and event.position.distance_to(state.press.position)<DRAG_DISTANCE:
     _send(state.press,Vector2.ZERO,false);_send(event,Vector2.ZERO,false)
  elif event is InputEventScreenDrag and touches.has(event.index):
   var state:Dictionary=touches[event.index];state.last=event.position
+  # Drawing deliberately extends a trace at the screen edge. Ordinary holds do not.
+  if not get_viewport().get_visible_rect().grow(-2.).has_point(event.position) and not game.player.dodge.drawing:
+   _cancel_touches224();get_viewport().set_input_as_handled();return
   get_viewport().set_input_as_handled()
   if not state.play and event.position.distance_to(state.press.position)>=DRAG_DISTANCE:
    state.play=true
@@ -83,9 +87,9 @@ func _filters(_node:Node,out:Array)->void:
    out.append([control,control.mouse_filter]);control.mouse_filter=Control.MOUSE_FILTER_IGNORE
 func _send(event:InputEvent,offset:Vector2,bypass:bool)->void:
  # Deferral avoids recursively feeding the native input pipeline in its callback.
- _dispatch.call_deferred(event.duplicate(),offset,bypass)
-func _dispatch(event:InputEvent,offset:Vector2,bypass:bool)->void:
- if not is_inside_tree():return
+ _dispatch.call_deferred(event.duplicate(),offset,bypass,cancel_generation224)
+func _dispatch(event:InputEvent,offset:Vector2,bypass:bool,generation:int)->void:
+ if not is_inside_tree() or generation!=cancel_generation224:return
  event.set_meta("routed209",true);event.set_meta("riding209",bypass);event.position+=offset
  var filters:Array=[]
  var modes:Array=[]
@@ -104,12 +108,15 @@ func _dispatch(event:InputEvent,offset:Vector2,bypass:bool)->void:
   if is_instance_valid(saved[0]):saved[0].mouse_filter=saved[1]
  for saved in modes:
   if is_instance_valid(saved[0]):saved[0].process_mode=saved[1]
+func _cancel_touches224()->void:
+ # Do not synthesize a release: release commits aim/drawn regate. Cancel first,
+ # then use the native resize reset to clear touch IDs, action strengths and art.
+ cancel_generation224+=1
+ touches.clear()
+ if is_instance_valid(game) and is_instance_valid(game.get("player")):game.player.cancel_input()
+ for stick in sticks:
+  if is_instance_valid(stick):stick.notification(Control.NOTIFICATION_RESIZED)
+func _process(_delta:float)->void:
+ if not touches.is_empty() and not _can_begin():_cancel_touches224()
 func _notification(what:int)->void:
- if what==NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(game):
-  if is_instance_valid(game.get("player")):game.player.cancel_input()
-  for index in touches:
-   var state:Dictionary=touches[index]
-   if state.play:
-    var release:=InputEventScreenTouch.new();release.index=index;release.position=state.last;release.pressed=false;release.canceled=true
-    _send(release,state.offset,true)
-  touches.clear()
+ if what in [NOTIFICATION_APPLICATION_FOCUS_OUT,NOTIFICATION_WM_WINDOW_FOCUS_OUT,NOTIFICATION_APPLICATION_PAUSED] and is_instance_valid(game):_cancel_touches224()

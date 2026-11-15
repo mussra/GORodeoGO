@@ -73,14 +73,32 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 	if roped:
 		var chase_time:float=float(state.get("rope_run",0.0))
 		away=away.rotated(sin(chase_time*2.6+home.x*.01)*.7)
-	var target: Vector2 = position + away.normalized() * speed * delta
-	if not roped:target=WorldEscapeMotion.bounded_step(position,home,from,target-position,WorldPigs.FLEE_LEASH)
-	if WorldFence.crosses(self,target):target=position
+	var wanted:Vector2=away.normalized()*speed*delta
+	var target:Vector2=_flee_step224(from,wanted)
 	_escape_left95=.2 # Genuine flee motion may cross the road.
-	target=get_parent().to_local(WorldWildRoads94.terrain_step(self,global_position,get_parent().to_global(target))) if road_provider94.is_valid() else target
 	movement=(target-position).normalized()
 	position = target
 	flip_h = movement.x < 0.0
+
+## Keep the same home leash and solid walls. If the direct step is blocked,
+## take a legal tangent instead of running forever into the same wall.
+func _flee_step224(threat:Vector2,wanted:Vector2)->Vector2:
+	var direct:Vector2=_legal_flee_step224(threat,wanted)
+	if direct.distance_to(position)>=wanted.length()*.8:return direct
+	var best:Vector2=direct
+	var score:float=-INF
+	for angle in [PI/4,-PI/4,PI/2,-PI/2,3*PI/4,-3*PI/4,PI]:
+		var candidate:Vector2=_legal_flee_step224(threat,wanted.rotated(angle))
+		if candidate.distance_to(position)<wanted.length()*.5:continue
+		var value:float=candidate.distance_squared_to(threat)
+		if value>score:best=candidate;score=value
+	return best
+func _legal_flee_step224(threat:Vector2,wanted:Vector2)->Vector2:
+	var target:Vector2=position+wanted
+	if not roped:target=WorldEscapeMotion.bounded_step(position,home,threat,wanted,WorldPigs.FLEE_LEASH)
+	if WorldFence.crosses(self,target):return position
+	if road_provider94.is_valid():target=get_parent().to_local(WorldWildRoads94.terrain_step(self,global_position,get_parent().to_global(target)))
+	return target
 
 func face_towards(point: Vector2) -> void:
 	flip_h = point.x < position.x
