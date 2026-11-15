@@ -8,12 +8,29 @@ func _ready():
  z_index=-6
  ridges=WorldTerrain103.ridges_for_chunk(seed,chunk)
  for item in ridges:
-  var body=WorldPhysics.add_box(self,item.box);body.collision_layer=128;body.collision_mask=0;body.add_to_group("world_mountain103")
+  var body:StaticBody2D
+  if item.has("town227"):
+   body=WorldPhysics.add_box(self,Rect2(Vector2.ZERO,Vector2((item.b as Vector2).distance_to(item.a),TownEnclosures227.THICKNESS)))
+   body.position=(item.a+item.b)*.5;body.rotation=(item.b-item.a).angle()
+   for end in [item.a,item.b]:
+    var cap:=StaticBody2D.new();cap.position=end;cap.collision_layer=128;cap.collision_mask=0;cap.add_to_group("world_mountain103")
+    var collision:=CollisionShape2D.new();var circle:=CircleShape2D.new();circle.radius=TownEnclosures227.THICKNESS*.5;collision.shape=circle;cap.add_child(collision);add_child(cap)
+  else:body=WorldPhysics.add_box(self,item.box)
+  body.collision_layer=128;body.collision_mask=0;body.add_to_group("world_mountain103")
  queue_redraw()
 func _draw():
  var gates:Dictionary={}
  texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
  for item in ridges:
+  if item.has("town227"):
+   var look227:=TownIdentity215.look(SaveData.world_cousins140,item.town227)
+   var a:Vector2=item.a;var b:Vector2=item.b;var normal:Vector2=(b-a).normalized().orthogonal()*TownEnclosures227.THICKNESS*.5
+   var polygon:=PackedVector2Array([a+normal,b+normal,b-normal,a-normal]);var uv:=PackedVector2Array()
+   for point in polygon:uv.append(point/128.)
+   draw_polyline(PackedVector2Array([a,b]),Color("514537"),TownEnclosures227.THICKNESS+8.,true)
+   draw_polygon(polygon,PackedColorArray([Color.WHITE]),uv,TownPaint215.texture(look227))
+   draw_line(a+normal,b+normal,Color("f3dfb3"),6.,true);draw_line(a-normal,b-normal,Color("6e5b45"),5.,true)
+   continue
   var id:String=TownIdentity215.nearest(SaveData.world_cousins140,item.port)
   var look:=TownIdentity215.look(SaveData.world_cousins140,id)
   var parts:PackedStringArray=str(item.id).split("_")

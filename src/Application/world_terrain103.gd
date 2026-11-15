@@ -26,6 +26,7 @@ static func trunk(seed:int,region:int)->Array:
  var row:int=4+rng.randi_range(-3,3)
  return [Vector2i(start,4),Vector2i(start+8,4),Vector2i(start+8,row),Vector2i(start+24,row),Vector2i(start+24,4),Vector2i(start+REGION_CELLS,4)]
 static func graph_for_chunk(seed:int,c:Vector2i)->Dictionary:
+ if SaveData.world_generator_version>=4:return TownEnclosures227.graph(seed,c)
  var graph:Dictionary={}
  var bounds:Rect2=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.).grow(160.)
  var first:int=floori((bounds.position.x-ORIGIN.x)/(REGION_CELLS*CELL))
@@ -55,6 +56,7 @@ static func ridge(seed:int,region:int,band:int=0)->Dictionary:
  ridge_cache106[key]=result
  return result
 static func ridges_for_chunk(seed:int,c:Vector2i)->Array:
+ if SaveData.world_generator_version>=4:return TownEnclosures227.ridges(seed,c)
  var out:Array=[];var bounds:Rect2=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.)
  var region:int=floori((bounds.position.x-ORIGIN.x)/(REGION_CELLS*CELL))
  var band:int=floori((bounds.position.y-ORIGIN.y-4*CELL)/RIDGE_BAND)
@@ -66,6 +68,7 @@ static func ridges_for_chunk(seed:int,c:Vector2i)->Array:
     if clipped.has_area():out.append({"id":data.id,"box":clipped,"port":data.port})
  return out
 static func blocked(seed:int,p:Vector2,margin:float=0.)->bool:
+ if SaveData.world_generator_version>=4:return TownEnclosures227.blocked(seed,p,margin)
  var region:int=floori((p.x-ORIGIN.x)/(REGION_CELLS*CELL))
  var band:int=floori((p.y-ORIGIN.y-4*CELL)/RIDGE_BAND)
  for index in range(region-1,region+2):

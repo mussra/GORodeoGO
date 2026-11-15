@@ -191,7 +191,7 @@ func load_progress() -> void:
 	var wseed:Variant=config.get_value("world","seed",0)
 	if typeof(wseed)==TYPE_INT and wseed>0:world_seed=wseed
 	var generator:Variant=config.get_value("world","generator_version",1)
-	if typeof(generator)!=TYPE_INT or generator not in [1,2,3]:
+	if typeof(generator)!=TYPE_INT or generator not in [1,2,3,4]:
 		_load_valid=false;return
 	world_generator_version=generator
 	for pair in [["discovered",world_discovered],["tamed",world_tamed],["pigs",world_pigs]]:
@@ -491,7 +491,7 @@ func set_horse_emblem(id:String,config:Dictionary)->bool:
 func ensure_world_seed() -> int:
 	if world_seed == 0:
 		world_seed = int(randi()) + 1
-		world_generator_version=3
+		world_generator_version=4
 		world_position=ModularWorldLayout93.world(WorldTerrain103.plan(world_seed).doors.ranch)+Vector2(0,70)
 		save_progress()
 	return world_seed

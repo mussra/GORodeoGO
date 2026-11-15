@@ -19,6 +19,7 @@ static func fresh(seed_:int,discovered:Array,flora:Dictionary)->Dictionary:
  var east:int=maxi(int(flora.get("region",1))+1,ceili(float(right+2)/5.))
  var home:Vector2=FloristJourney138.home_door(seed_)
  var doors:Dictionary={"home":home,"east138":FloristJourney138.door(flora),"west140":Vector2(west*5120.+320.,358.),"east140":Vector2(east*5120.+320.,358.)}
+ if SaveData.world_generator_version>=4:doors=TownEnclosures227.doors(seed_)
  return {"version":1,"seed":seed_,"doors":doors,"known":{},"arrivals":{},"towns215":TownIdentity215.fresh(seed_),"hint215":"","revealed215":{}}
 static func clean(raw:Variant,seed_:int)->Dictionary:
  if not raw is Dictionary or raw.get("version",0)!=1 or raw.get("seed",0)!=seed_:return {}

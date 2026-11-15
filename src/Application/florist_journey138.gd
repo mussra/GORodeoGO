@@ -11,7 +11,7 @@ static func fresh(discovered:Array)->Dictionary:
   if pair.size()!=2 or not pair[0].is_valid_int():continue
   var c:Vector2i=Vector2i(int(pair[0]),0)
   last=maxi(last,c.x)
- return {"version":VERSION,"region":maxi(1,floori(float(last+3)/5.)+1),"quests":{},"fields":{}}
+ return {"version":VERSION,"region":2 if SaveData.world_generator_version>=4 else maxi(1,floori(float(last+3)/5.)+1),"quests":{},"fields":{}}
 static func clean(raw:Variant)->Dictionary:
  if not raw is Dictionary or raw.get("version",0)!=VERSION:return {}
  if not raw.get("region") is int or raw.region<1 or raw.region>100000:return {}
@@ -47,8 +47,12 @@ static func field_rect(state:Dictionary,species:String,planted:bool=false,seed_:
  if planted:
   var home:Vector2=home_door(seed_)
   return Rect2(home+Vector2(-720. if species=="red" else -370.,510.),Vector2(280,220))
+ if SaveData.world_generator_version>=4:
+  var plan:Dictionary=TownEnclosures227.plans(SaveData.world_seed).east138
+  return Rect2(Vector2(plan.center.x-1024.,plan.bounds.position.y-1500. if species=="red" else plan.bounds.end.y+500.),Vector2(2048,1024))
  return Rect2(Vector2(int(state.get("region",1))*5120.,-1170. if species=="red" else 1150.),Vector2(2048,1024))
 static func sample_point(state:Dictionary,species:String)->Vector2:
+ if SaveData.world_generator_version>=4:return field_rect(state,species).get_center()
  return Vector2(int(state.get("region",1))*5120.+465.,-850. if species=="red" else 1650.)
 static func descriptors(state:Dictionary,seed_:int)->Array:
  if state.is_empty():return []
@@ -94,11 +98,20 @@ static func on_lane(state:Dictionary,p:Vector2,margin:float=0.)->bool:
 
 static func lanes(state:Dictionary)->Array:
  var out:Array=[lane(state)]
+ if SaveData.world_generator_version>=4:
+  var plan:Dictionary=TownEnclosures227.plans(SaveData.world_seed).east138
+  for species in SPECIES:
+   var point:Vector2=sample_point(state,species);var outside_x:float=plan.bounds.end.x+300.
+   out.append(PackedVector2Array([plan.gate,Vector2(plan.gate.x,plan.bounds.end.y+300.),Vector2(outside_x,plan.bounds.end.y+300.),Vector2(outside_x,point.y),point]))
+  return out
  for species in SPECIES:
   var point:Vector2=sample_point(state,species)
   out.append(PackedVector2Array([Vector2(point.x,470),point]))
  return out
 static func route_from_home(state:Dictionary,seed_:int)->PackedVector2Array:
+ if SaveData.world_generator_version>=4:
+  var plans:Dictionary=TownEnclosures227.plans(seed_);var out:PackedVector2Array=plans.home.road.duplicate()
+  var east_road:PackedVector2Array=plans.east138.road.duplicate();east_road.reverse();out.append_array(east_road);out.append(door(state));return out
  var out:=PackedVector2Array()
  var branch:Array=WorldTerrain103.plan(seed_).branches.florist.duplicate();branch.reverse()
  for cell in branch:out.append(ModularWorldLayout93.world(cell))

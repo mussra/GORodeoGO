@@ -151,6 +151,8 @@ func _ready() -> void:
 		_flora_layer138=FlowerExpansion138.new();_flora_layer138.name="FlowerExpansion138";_flora_layer138.z_index=-1;add_child(_flora_layer138)
 	if SaveData.ensure_cousins140():
 		_cousin_layer140=CousinLayer140.new();add_child(_cousin_layer140)
+	if SaveData.world_generator_version>=4:
+		var towns227:=TownLayer227.new();towns227.seed=SaveData.world_seed;add_child(towns227)
 	SaveData.ensure_herd_town217()
 	_travel144=SiestaTravel144.new();add_child(_travel144)
 	_setup_goat_prototype()

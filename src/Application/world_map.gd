@@ -27,7 +27,9 @@ static func generate(seed:int,cx:int,cy:int)->Dictionary:
  var chunk:Dictionary=generate_legacy(seed,cx,cy)
  if SaveData.world_generator_version>=3:
   for key in ["herd","pigs"]:
-   if chunk.has(key) and not chunk[key].is_empty():chunk[key].pos=WorldTerrain103.clear_spawn(seed,chunk[key].pos)
+   if chunk.has(key) and not chunk[key].is_empty():
+    if SaveData.world_generator_version>=4 and TownEnclosures227.inside(seed,chunk[key].pos,180.):chunk[key]={}
+    else:chunk[key].pos=WorldTerrain103.clear_spawn(seed,chunk[key].pos)
  return chunk
 
 static func generate_legacy(seed:int,cx:int,cy:int)->Dictionary:

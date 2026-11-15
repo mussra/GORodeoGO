@@ -301,8 +301,7 @@ func _draw_terrain() -> void:
    var bucket:Vector2i=Vector2i((r.position/3.).floor())
    if not lod_buckets106.has(bucket):lod_buckets106[bucket]=true;_terrain.draw_rect(Rect2(Vector2(bucket)*3.,Vector2.ONE*maxf(3.,cell)),Color("3f7a45"))
    if SaveData.world_generator_version>=3:
-    for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
-     var box:Rect2=ridge.box;_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),Vector2(maxf(1.,box.size.x/1024.*cell),maxf(1.,box.size.y/1024.*cell))),Color(TownIdentity215.look(SaveData.world_cousins140,TownIdentity215.nearest(SaveData.world_cousins140,ridge.port)).base))
+    _draw_walls227(c,mins,cell,origin)
    _draw_fields138(c,mins,cell,origin)
    continue
   # cartoon ground tile with a soft rim
@@ -406,9 +405,9 @@ func _draw_markers108()->void:
 func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
  if WorldNominal98.enabled():
   if SaveData.world_generator_version>=3:
-   for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
-    var box:Rect2=ridge.box
-    _terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),box.size/cell_size159()*cell),Color(TownIdentity215.look(SaveData.world_cousins140,TownIdentity215.nearest(SaveData.world_cousins140,ridge.port)).base))
+   _draw_walls227(c,mins,cell,origin)
+  if SaveData.world_generator_version>=4:
+   for road in TownEnclosures227.roads_in_chunk(SaveData.world_seed,c):_terrain.draw_line(_to_map(road.a,mins,cell,origin),_to_map(road.b,mins,cell,origin),Color("a5825a"),maxf(1.,cell*.04),true)
   var graph=WorldNominal98.graph_for_chunk(SaveData.world_seed,c,SaveData.world_generator_version)
   for tile in graph:
    var p=ModularWorldLayout93.world(tile)
@@ -523,3 +522,11 @@ func _town_visible215(id:String)->bool:
  if SaveData.world_cousins140.get("hint215","")==id:return true
  var point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin-_map_geometry.area.position)
  return Rect2(Vector2(22,22),_clip106.size-Vector2(44,44)).has_point(point)
+
+func _draw_walls227(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
+ for ridge in WorldTerrain103.ridges_for_chunk(SaveData.world_seed,c):
+  var look:=TownIdentity215.look(SaveData.world_cousins140,str(ridge.get("town227",TownIdentity215.nearest(SaveData.world_cousins140,ridge.port))))
+  if ridge.has("town227"):
+   _terrain.draw_line(_to_map(ridge.a,mins,cell,origin),_to_map(ridge.b,mins,cell,origin),Color(look.base),maxf(1.,TownEnclosures227.THICKNESS/1024.*cell),true)
+  else:
+   var box:Rect2=ridge.box;_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),Vector2(maxf(1.,box.size.x/1024.*cell),maxf(1.,box.size.y/1024.*cell))),Color(look.base))

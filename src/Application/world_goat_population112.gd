@@ -14,6 +14,7 @@ static func members(seed_:int,c:Vector2i,version:int,surface:WorldRoadSurface94=
  for i in count:
   for attempt in 20:
    var point:Vector2=center+Vector2.from_angle(rng.randf()*TAU)*rng.randf_range(30,95)
+   if version>=4 and TownEnclosures227.inside(seed_,point,100.):continue
    if WorldTerrain103.blocked(seed_,point,45.):continue
    if surface.contains(point,45.):continue
    out.append({"pos":point,"id":"goat:v3:%d:%d,%d:%d"%[seed_,c.x,c.y,i]});break

@@ -1,0 +1,54 @@
+{
+  "version": "2.7.164",
+  "version_code": 423,
+  "package": "com.example.rancho.review",
+  "apk_bytes": 83564560,
+  "sha256": "6f594f2fe04bd30cee1199727317456b1fae2b274322289cc3e3abaed6da2bb9",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "integration": {
+    "scripts": 21,
+    "tests": 107,
+    "passing": 107,
+    "assertions": 1203
+  },
+  "unit_policy_identity_geometry": {
+    "scripts": 3,
+    "tests": 32,
+    "passing": 32,
+    "assertions": 12609
+  },
+  "geometry": {
+    "towns_sampled": 80,
+    "shapes": 6,
+    "gate_width": 320,
+    "wall_thickness": 72,
+    "new_generator": 4,
+    "automatic_migration": false
+  },
+  "physical_android_test": false,
+  "shutdown_warnings": {
+    "CanvasItem": 6,
+    "ObjectDB": 9,
+    "resources": 2
+  },
+  "visual": [
+    "towns227-home-overview-960.png",
+    "towns227-east138-overview-960.png",
+    "towns227-west140-overview-960.png",
+    "towns227-east140-overview-960.png",
+    "towns227-home-gate-960.png",
+    "towns227-map-960.png"
+  ],
+  "preserved": [
+    "older generator worlds",
+    "collection",
+    "garden gameplay",
+    "mastery",
+    "main"
+  ],
+  "pending": [
+    "Equipment icon redesign",
+    "loading parade proportions",
+    "general text review approval"
+  ]
+}

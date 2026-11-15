@@ -25,6 +25,7 @@ static func graph_for_chunk(seed:int,c:Vector2i,version:int=2)->Dictionary:
  return out
 static func keep_decor(d:Dictionary,surface:WorldRoadSurface94)->bool:
  if d.get("edited",false):return true # owner edits are not silently removed
+ if SaveData.world_generator_version>=4 and TownEnclosures227.inside(SaveData.world_seed,d.pos,90.):return false
  if surface.contains(d.pos,45.):return false
  # Reserve actual building footprints/doors, independent of chunk boundaries.
  for door in doors().values():
