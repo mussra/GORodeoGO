@@ -2,8 +2,8 @@
   "version": "2.7.169",
   "version_code": 428,
   "branch": "feat/open-world-test-20261107",
-  "apk_sha256": "e81545a36bd64124809d5a5601bc74023d6604ee356b910dbf5b1a71787a7958",
-  "apk_bytes": 84103535,
+  "apk_sha256": "67f621504a84b37f48471cccaf426acba2516148ac7535035dd6d4fb546d9b27",
+  "apk_bytes": 79172205,
   "package": "com.example.rancho.review",
   "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
   "unit": {
@@ -121,5 +121,6 @@
     "Editor and hat swatch20 remains rainbow, swatch21 maps to flat pink20",
     "Historical wild palette widths frozen at20; seeded reference test covers238 chunks, original spot/near-color selection",
     "World generator version and progress rules unchanged"
-  ]
+  ],
+  "apk_excludes_docs_tests_tools": true
 }
