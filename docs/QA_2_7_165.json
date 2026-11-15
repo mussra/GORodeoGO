@@ -1,0 +1,41 @@
+{
+  "version": "2.7.165",
+  "version_code": 424,
+  "package": "com.example.rancho.review",
+  "apk_bytes": 83573012,
+  "sha256": "fdba980073c4b17f99856b395c27936ca03d430c3c6ca3c4707d905203598fd0",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "integration": {
+    "scripts": 26,
+    "tests": 119,
+    "passing": 119,
+    "assertions": 1335
+  },
+  "directed_ui_tests": {
+    "tests": 12,
+    "passing": 12,
+    "assertions": 132
+  },
+  "physical_android_test": false,
+  "shutdown_warnings": {
+    "CanvasItem": 14,
+    "ObjectDB": 19,
+    "resources": 2
+  },
+  "visual": [
+    "equipment229-icons-960.png",
+    "loading228-proportions-960.png"
+  ],
+  "preserved": [
+    "equipment prices",
+    "equipment reach and prerequisites",
+    "collection",
+    "V4 towns",
+    "garden gameplay",
+    "mastery",
+    "main"
+  ],
+  "pending": [
+    "general text and icon changes outside Equipment require review"
+  ]
+}

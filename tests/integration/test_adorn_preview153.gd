@@ -22,7 +22,7 @@ func test_equipment_has_live_adorn_shop_entry_without_a_purchase():
  panel=EquipmentPanel.new();add_child(panel);await get_tree().process_frame
  var button:Button
  for child in panel._canvas.get_children():
-  if child is Button and child.text=="Adornos de oro y plata":button=child
+  if child is Button and child.get_meta("entry229","")=="adorn":button=child
  assert_not_null(button)
  if button==null:return
  button.pressed.emit();await get_tree().process_frame

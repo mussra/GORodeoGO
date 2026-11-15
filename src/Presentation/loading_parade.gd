@@ -12,20 +12,27 @@ var prepared:bool=false
 signal preparation_finished
 const RUN_SPEED:float=230.0
 const FADE:float=.5
+const MOUNT_SCALE228:float=WorldActorScale.HORSE*1.5
+const FLOOR228:float=490.
 func actor(kind:String,sizing:float)->AnimatedSprite2D:
  var frames=SpriteFrames.new();frames.add_animation("side");frames.set_animation_speed("side",9)
  var traits={"coat":rng.randi_range(0,19),"pattern":rng.randi_range(0,11),"mane":rng.randi_range(0,4),"eyes":0,"finish":"normal"}
+ var record:Dictionary={}
+ if kind=="rider":
+  record=SaveData.horse_collection.find(SaveData.horse_collection.selected).duplicate(true)
+  if not record.is_empty():traits=record.traits.duplicate(true)
  var start=Time.get_ticks_usec()
  for i in 9:
   var texture:Texture2D
-  if kind in ["rider","horse"]:texture=PixelLabTrial.pose_texture(kind,"side",i,traits)
+  if kind in ["rider","horse"]:texture=PixelLabTrial.pose_texture(kind,"side",i,traits,record)
   else:texture=load("res://art/experimental/pixellab/%s/side/frame_%02d.png"%[kind,i])
   frames.add_frame("side",texture)
   if Time.get_ticks_usec()-start>8000:
    await get_tree().process_frame;start=Time.get_ticks_usec()
  var sprite=AnimatedSprite2D.new();sprite.sprite_frames=frames;sprite.scale=Vector2.ONE*sizing
+ sprite.set_meta("traits228",traits.duplicate(true))
  sprite.play("side");sprite.speed_scale=.52 if kind=="rider" else 1.0;sprite.visible=false
- if kind in ["pig","goat","horse"]:
+ if kind in ["pig","goat","horse","rider"]:
   var feet:Array=[]
   for i in 9:
    var image=frames.get_frame_texture("side",i).get_image()
@@ -36,21 +43,22 @@ func actor(kind:String,sizing:float)->AnimatedSprite2D:
      if image.get_pixel(x,y).a>.15:bottom=maxi(bottom,y)
    feet.append(bottom)
   var reference:float=feet[0]
-  sprite.frame_changed.connect(func():sprite.offset.y=reference-float(feet[sprite.frame]))
+  sprite.offset.y=frames.get_frame_texture("side",0).get_height()*.5-reference
+  sprite.frame_changed.connect(func():sprite.offset.y=frames.get_frame_texture("side",sprite.frame).get_height()*.5-float(feet[sprite.frame]))
  add_child(sprite);return sprite
 func _ready():
  prepare.call_deferred()
 func prepare():
  rng.randomize()
- rider=await actor("rider",1.55)
- var lineup=[["pig",.68],["goat",.74],["farmer",1.0],["horse",1.4]]
+ rider=await actor("rider",MOUNT_SCALE228)
+ var lineup=[["pig",.68],["goat",.74],["farmer",1.0],["horse",MOUNT_SCALE228]]
  for i in range(3,0,-1):
   var j=rng.randi_range(0,i);var tmp=lineup[i];lineup[i]=lineup[j];lineup[j]=tmp
  var delay=0.0
  for data in lineup:
   var figure:Node2D
   if data[0]=="farmer":
-   figure=Sprite2D.new();figure.visible=false;figure.texture=load("res://art/npc/farmer.png");figure.scale=Vector2.ONE*(154.0/1536.0);add_child(figure)
+   figure=Sprite2D.new();figure.visible=false;figure.texture=load("res://art/npc/farmer.png");NpcScale214.apply(figure,figure.texture,NpcScale214.ADULT*WorldActorScale.HORSE);add_child(figure)
   else:
    figure=await actor(data[0],data[1]);figure.flip_h=true
   actors.append({"sprite":figure,"delay":delay,"kind":data[0]});delay+=rng.randf_range(2.4,3.1)
@@ -78,14 +86,14 @@ func _process(delta:float):
  rider.visible=true
  age+=delta
  var t=fposmod(age,cycle)
- rider.position=Vector2(drift_x(age if ready_age<0 else ready_age),345)
+ rider.position=Vector2(drift_x(age if ready_age<0 else ready_age),FLOOR228)
  for a in actors:
   var local=fposmod(t-a.delay,cycle)
   a.sprite.visible=local<7.8
   if not a.sprite.visible:continue
-  a.sprite.position=Vector2(lerpf(1420,-140,local/7.8),465 if a.kind=="horse" else 462)
+  a.sprite.position=Vector2(lerpf(1420,-140,local/7.8),FLOOR228)
   if a.kind=="farmer":
-   a.sprite.position.y=433+sin(local*8.0)*2.0;a.sprite.rotation=sin(local*4.0)*.018
+   a.sprite.rotation=sin(local*4.0)*.018
  if ready_age>=0:
   var exit_time=age-ready_age
   rider.speed_scale=1.05

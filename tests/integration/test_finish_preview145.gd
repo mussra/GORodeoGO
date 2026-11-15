@@ -22,11 +22,11 @@ func test_equipment_has_preview_entry_without_a_purchase():
  panel=EquipmentPanel.new();add_child(panel);await get_tree().process_frame
  var button:Button
  for child in panel._canvas.get_children():
-  if child is Button and child.text=="Acabados · Vista previa":button=child
+  if child is Button and child.get_meta("entry229","")=="finish":button=child
  assert_not_null(button)
  if button==null:return
  button.pressed.emit();await get_tree().process_frame
  var preview:Control
  for child in panel.get_children():
-  if child is FinishPreview145:preview=child
+  if child is FinishShop168:preview=child
  assert_not_null(preview)
