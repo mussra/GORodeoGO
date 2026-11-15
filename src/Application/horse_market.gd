@@ -7,7 +7,7 @@ const BUY_PRICES=[250,600,1400,3200,7000]
 const SELL_PERCENT=40
 static func tier(h:Dictionary)->int:
  var t:Dictionary=h.traits
- var score:int=COAT_SCORES[int(t.coat)]+PATTERN_SCORES[int(t.pattern)]
+ var score:int=COAT_SCORES[int(t.coat)]+PATTERN_SCORES[mini(int(t.pattern),11)]
  if int(t.mane)==5:score+=2
  var eyes:int=HorseCollection.eye_index(t)
  if eyes>=20:score+=2

@@ -108,7 +108,7 @@ static func shape_point(q:Vector2,pattern:int)->bool:
  if pattern==8:return absf(q.x)*.8+absf(q.y)<1.12
  return absf(q.x)<1.0 and absf(q.y)<.85
 static func genetic_mark(p:Vector2,pattern:int)->bool:
- if pattern in [9,10,11]:return HorsePatternMap.coverage(p,pattern)>.5
+ if pattern>=9 and pattern<=17:return HorsePatternMap.coverage(p,pattern)>.5
  for item in nearby_spots(p):
   var q:Vector2=(p-Vector2(item.x,item.y)).rotated(item.w)/item.z
   if q.length_squared()>3.5:continue
@@ -176,6 +176,7 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
    if maxf(m.r,m.g)<0.02:continue
    var old:Color=image.get_pixel(x,y);var shade:float=clampf(maxf(old.r,maxf(old.g,old.b))*255.0/205.0,0.25,1.18)
    var color:Color=Color(COLORS[int(t.coat)])
+   if t.get("coat_style238","")=="rainbow":color=soft_rainbow(clampf((float(y)/image.get_height()-.06)/.9,0.,1.) if anim=="foal" else clampf((body_point(uv,x,y,bob).y/100.8-.06)/.9,0.,1.))
    if m.g>m.r:
     if int(t.mane)==5:
      var tpos:float
@@ -200,14 +201,14 @@ static func texture(source:Texture2D,anim:String,frame:int,t:Dictionary,mask_ove
      2:mark=natural_spot(Vector2(px,py)) if uv==null else false
      3:mark=false # semantic coverage below, never fixed screen rectangle
      4:mark=py>77
-     5,6,7,8,9,10,11:mark=genetic_mark(Vector2(px,py),int(t.pattern))
+     5,6,7,8,9,10,11,12,13,14,15,16,17:mark=genetic_mark(Vector2(px,py),int(t.pattern))
     if anim=="foal" and int(t.pattern)==1:
      var dist:float=minf((Vector2(px,py)-Vector2(30,60)).length()-8.0,(Vector2(px,py)-Vector2(58,68)).length()-6.0)
      color=color.lerp(Color("f4edd8"),1.0-smoothstep(-.9,.9,dist))
-    elif int(t.pattern)==3 and rear!=null:color=color.lerp(HorsePatternMap.color(t),rear.get_pixel(x,y).r)
-    elif int(t.pattern)==2 and uv!=null:color=color.lerp(HorsePatternMap.color(t),natural_spot_coverage(Vector2(px,py)))
-    elif int(t.pattern) in [9,10,11]:color=color.lerp(HorsePatternMap.color(t),HorsePatternMap.coverage(Vector2(px,py),int(t.pattern)))
-    elif mark:color=HorsePatternMap.color(t)
+    elif int(t.pattern)==3 and rear!=null:color=color.lerp(HorsePatternMap.color_at238(t,Vector2(px,py)),rear.get_pixel(x,y).r)
+    elif int(t.pattern)==2 and uv!=null:color=color.lerp(HorsePatternMap.color_at238(t,Vector2(px,py)),natural_spot_coverage(Vector2(px,py)))
+    elif int(t.pattern)>=9 and int(t.pattern)<=17:color=color.lerp(HorsePatternMap.color_at238(t,Vector2(px,py)),HorsePatternMap.coverage(Vector2(px,py),int(t.pattern)))
+    elif mark:color=HorsePatternMap.color_at238(t,Vector2(px,py))
    if t.get("finish","")=="galaxy":color=HorseGalaxyLook.color_at(body_point(uv,x,y,bob),look)
    if anim=="foal":
     shade=clampf(maxf(old.r,maxf(old.g,old.b))*(1.0 if m.g>m.r else 1.10),0.12,1.0)

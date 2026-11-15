@@ -18,6 +18,7 @@ static func material_for(traits:Dictionary,hat:String="original")->ShaderMateria
  m.set_shader_parameter("galaxy_palette_preview",traits.get("finish","")=="galaxy")
  m.set_shader_parameter("original_horse",traits.get("finish","normal")=="original")
  m.set_shader_parameter("coat_color",Color(HorseAppearance.COLORS[int(traits.get("coat",10))]))
+ m.set_shader_parameter("wild238",HorsePatternMap.WILD238);m.set_shader_parameter("coat_rainbow238",traits.get("coat_style238","")=="rainbow");m.set_shader_parameter("spots_rainbow238",traits.get("spots_style238","")=="rainbow")
  var mane:int=int(traits.get("mane",1));m.set_shader_parameter("mane_color",Color("33302e") if mane==0 else Color(HorseAppearance.MANES[mini(mane,4)]));m.set_shader_parameter("rainbow",mane==5)
  m.set_shader_parameter("pattern",int(traits.get("pattern",0)));m.set_shader_parameter("cow_map",HorsePatternMap.COW);m.set_shader_parameter("giraffe_map",HorsePatternMap.GIRAFFE);m.set_shader_parameter("zebra_map",HorsePatternMap.ZEBRA);m.set_shader_parameter("spot_color",HorsePatternMap.color(traits) if HorseCollection.spots_index(traits)>=0 or int(traits.get("pattern",0))>=10 else Color(.96,.93,.85))
  m.set_shader_parameter("separate_hat_mask",true);m.set_shader_parameter("hat_mask",preload("res://art/hat_masks_v10/hat-portrait.png"));m.set_shader_parameter("original_hat",true);m.set_shader_parameter("hat_color",Color("415c81") if hat=="blue" else Color("c8b994"))

@@ -2,7 +2,7 @@ class_name HorseAtlas
 extends RefCounted
 ## Browse families first. Only a bounded color slice is built, never the full product.
 static func signature(t:Dictionary)->String:
- return "%d/%d/%d/%d/%d/%d/%s/%s"%[int(t.coat),int(t.pattern),int(t.mane),HorseCollection.eye_index(t),HorseCollection.legs_index(t),HorseCollection.spots_index(t),str(t.get("finish","normal")),str(t.get("emblem",{}))]
+ return "%d/%d/%d/%d/%d/%d/%s/%s/%s/%s"%[int(t.coat),int(t.pattern),int(t.mane),HorseCollection.eye_index(t),HorseCollection.legs_index(t),HorseCollection.spots_index(t),str(t.get("finish","normal")),str(t.get("emblem",{})),str(t.get("coat_style238","flat")),str(t.get("spots_style238","flat"))]
 static func owned(t:Dictionary,horses:Array)->Dictionary:
  var key:=signature(t)
  for horse in horses:

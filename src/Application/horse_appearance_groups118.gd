@@ -7,7 +7,7 @@ static func key(h:Dictionary)->String:
  if HorseEmblem.valid(t.get("emblem")):
   emblem=t.emblem.duplicate(true);emblem.sort()
  var look:Dictionary=HorseGalaxyLook.state(h)
- return JSON.stringify([int(t.coat),int(t.pattern),int(t.mane),HorseCollection.eye_index(t),t.has("eyes"),HorseCollection.legs_index(t),HorseCollection.spots_index(t),str(t.get("finish","normal")),emblem,str(h.get("stage","adult")),str(h.get("species","horse")),str(h.get("unicorn_variant","")),look.get("percent",0),look.get("master",false)])
+ return JSON.stringify([int(t.coat),int(t.pattern),int(t.mane),HorseCollection.eye_index(t),t.has("eyes"),HorseCollection.legs_index(t),HorseCollection.spots_index(t),str(t.get("finish","normal")),str(t.get("coat_style238","flat")),str(t.get("spots_style238","flat")),emblem,str(h.get("stage","adult")),str(h.get("species","horse")),str(h.get("unicorn_variant","")),look.get("percent",0),look.get("master",false)])
 static func groups(horses:Array)->Array[Dictionary]:
  var out:Array[Dictionary]=[];var by_key:Dictionary={}
  for h in horses:

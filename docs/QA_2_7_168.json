@@ -1,0 +1,51 @@
+{
+  "version": "2.7.168",
+  "version_code": 427,
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "apk_bytes": 83931430,
+  "apk_sha256": "0ff2eb4a676a19f303d77def3976c60c2a98e427fc43c5895f98ba04d0352254",
+  "integration": {
+    "scripts": 28,
+    "passed": 127,
+    "total": 127,
+    "assertions": 1419
+  },
+  "unit": {
+    "scripts": 18,
+    "passed": 78,
+    "total": 78,
+    "assertions": 109862
+  },
+  "new_patterns": {
+    "12": "Leopardo",
+    "13": "Guepardo",
+    "14": "Tigre",
+    "15": "Jaguar",
+    "16": "Hiena",
+    "17": "Cebra de montaña"
+  },
+  "preserved_pattern_ids": "0..11",
+  "style_fields": [
+    "coat_style238",
+    "spots_style238"
+  ],
+  "style_default": "flat",
+  "new_style": "rainbow",
+  "protected_pixel_tests": {
+    "nominal_views": 5,
+    "covers_eight_directions_with_mirroring": true,
+    "rider_and_wild_frames": 90,
+    "drink_patterns": 6,
+    "drink_poses": 2,
+    "both_gradient_positions": true
+  },
+  "matrix_combinations_per_pattern": 441,
+  "matrix_total_combinations": 2646,
+  "physical_android_tested": false,
+  "full_repository_unit_suite": false,
+  "shutdown_warnings": "Integration batch 0: 25 CanvasItem RIDs, 28 ObjectDB instances, 2 retained resources; batch 2: 2 ObjectDB instances. No test failures.",
+  "instinct_implemented": false,
+  "old_world_generators_unchanged": true,
+  "atlas_all_random_occurrences_certified": false
+}

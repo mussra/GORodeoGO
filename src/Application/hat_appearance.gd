@@ -6,6 +6,7 @@ static func sanitize(value:Variant)->String:
  if typeof(value)!=TYPE_STRING:return "original"
  if OPTIONS.has(value):return value
  var parts:PackedStringArray=value.split(":")
+ if parts.size()==5 and parts[0]=="hat" and parts[1]=="v3" and parts[2].is_valid_int() and parts[3].is_valid_int() and parts[4].is_valid_int() and int(parts[2])>=0 and int(parts[2])<=20 and (int(parts[3]) in range(12) or int(parts[3]) in [13,14] or int(parts[3]) in range(20,26)) and int(parts[4])>=0 and int(parts[4])<=20:return value
  if parts.size()==5 and parts[0]=="hat" and parts[1]=="v2" and parts[2].is_valid_int() and parts[3].is_valid_int() and parts[4].is_valid_int() and int(parts[2])>=0 and int(parts[2])<20 and int(parts[3])>=0 and int(parts[3])<15 and int(parts[4])>=0 and int(parts[4])<20:return value
  if parts.size()==4 and parts[0]=="hat" and parts[1]=="v1" and parts[2].is_valid_int() and parts[3].is_valid_int() and int(parts[2])>=0 and int(parts[2])<HorseAppearance.COLORS.size() and int(parts[3])>=0 and int(parts[3])<15:return value
  return "original"
@@ -53,6 +54,8 @@ static func apply_classic(frames:SpriteFrames,value:Variant)->void:
 static func encode(coat:int,finish:int)->String:return "hat:v1:%d:%d"%[clampi(coat,0,19),clampi(finish,0,14)]
 static func decode(value:String)->Dictionary:
  var id:String=sanitize(value)
+ if id.begins_with("hat:v3:"):
+  var p=id.split(":");return {"coat":int(p[2]),"finish":int(p[3]),"spots":int(p[4])}
  if id.begins_with("hat:v2:"):
   var p=id.split(":");return {"coat":int(p[2]),"finish":int(p[3]),"spots":int(p[4])}
  if id.begins_with("hat:v1:"):
@@ -60,7 +63,7 @@ static func decode(value:String)->Dictionary:
  return {"coat":-1,"finish":0,"legacy":id}
 static func surface_color(settings:Dictionary,p:Vector2)->Color:
  var coat:int=int(settings.get("coat",-1));var finish:int=int(settings.get("finish",0))
- var base:Color=Color(HorseAppearance.COLORS[coat]) if coat>=0 else (Color("415c81") if settings.get("legacy","")=="blue" else Color("c8b994"))
+ var base:Color=(HorseAppearance.soft_rainbow(p.y) if coat==20 else Color(HorseAppearance.COLORS[coat])) if coat>=0 else (Color("415c81") if settings.get("legacy","")=="blue" else Color("c8b994"))
  if finish==13:return HorseAppearance.rainbow_color113(p.y)
  if finish==14:return HorseAppearance.galaxy_color(p*Vector2(64,80))
  if finish>0:
@@ -70,10 +73,16 @@ static func surface_color(settings:Dictionary,p:Vector2)->Color:
   elif finish==2:ink=HorseAppearance.natural_spot(point)
   elif finish==3:ink=p.x<.35
   elif finish==4:ink=p.y>.75
+  elif finish>=20:ink=HorseAppearance.genetic_mark(Vector2(28.8+p.x*96.,p.y*100.8),finish-8)
   else:ink=HorseAppearance.genetic_mark(point,finish)
   if ink:
    var light:float=base.get_luminance()
-   return Color(HorseAppearance.COLORS[int(settings.get("spots",0 if light>.4 else 1))])
+   var ink_id:int=int(settings.get("spots",0 if light>.4 else 1))
+   return HorseAppearance.soft_rainbow(p.y) if ink_id==20 else Color(HorseAppearance.COLORS[ink_id])
  return base
 
 static func encode235(coat:int,finish:int,spots:int)->String:return "hat:v2:%d:%d:%d"%[clampi(coat,0,19),clampi(finish,0,14),clampi(spots,0,19)]
+
+static func encode238(coat:int,finish:int,spots:int)->String:
+ if coat<20 and spots<20 and finish<20:return encode235(coat,finish,spots)
+ return "hat:v3:%d:%d:%d"%[coat,finish,spots]

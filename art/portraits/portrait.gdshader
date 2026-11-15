@@ -42,6 +42,9 @@ uniform bool original_horse = true;
 uniform bool original_hat = true;
 uniform bool rainbow = false;
 uniform int pattern = 0;
+uniform bool coat_rainbow238=false;
+uniform bool spots_rainbow238=false;
+uniform sampler2D wild238: filter_linear;
 uniform sampler2D cow_map: repeat_enable, filter_nearest;
 uniform sampler2D giraffe_map: repeat_enable, filter_nearest;
 uniform sampler2D zebra_map: repeat_enable, filter_nearest;
@@ -175,11 +178,14 @@ void fragment(){
  if(!original_horse){
   vec3 c=coat_color.rgb;
   vec2 p=UV*vec2(800.,840.)+vec2(240.,0.);
+  vec3 ink238=spots_rainbow238?soft_rainbow((UV.y-.06)/.9):spot_color.rgb;
+  if(coat_rainbow238)c=soft_rainbow((UV.y-.06)/.9);
   bool mark=(pattern==1 && (distance(p,vec2(465.,550.))<45. || distance(p,vec2(850.,570.))<42.)) || (pattern==2 && fract(p.x/65.)<.35 && fract(p.y/70.)<.35) || (pattern==3 && p.x<535.+sin(p.y*.045)*16. && p.y>540.+sin(p.x*.06)*22.);
-  if(pattern==2)c=mix(c,spot_color.rgb,natural_spots(p*.12));
-  else if(pattern>=5)c=mix(c,spot_color.rgb,genetic_pattern(p*.12,pattern));
+  if(pattern>=12 && pattern<=17)c=mix(c,ink238,texture(wild238,vec2((float(pattern-12)+UV.x)/6.,UV.y)).r);
+  else if(pattern==2)c=mix(c,ink238,natural_spots(p*.12));
+  else if(pattern>=5)c=mix(c,ink238,genetic_pattern(p*.12,pattern));
   else if(pattern==4)c=mix(c,vec3(.96,.93,.85),texture(light_legs_mask,UV).r);
-  else if(mark)c=spot_color.rgb;
+  else if(mark)c=ink238;
   if(galaxy){
    vec3 galaxy_rgb=galaxy_color(p*.12);
    // Turn down chroma and local contrast, never darken the base into saturation.
