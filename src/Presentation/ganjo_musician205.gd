@@ -6,7 +6,7 @@ const ART_PATH:String="res://art/npc/ganjo_musician205.tres"
 var art_ready:bool=false
 func _ready()->void:
  name="GanjoMusician205"
- z_index=5
+ z_index=0 # Same feet-based Y sorting as riders, never a fixed foreground layer.
  var sprite:=AnimatedSprite2D.new();sprite.name="Artist";add_child(sprite)
  sprite.texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
  var frames:SpriteFrames=null

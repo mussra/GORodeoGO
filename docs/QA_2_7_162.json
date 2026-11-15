@@ -1,0 +1,37 @@
+{
+  "version": "2.7.162",
+  "version_code": 421,
+  "package": "com.example.rancho.review",
+  "apk_bytes": 83551760,
+  "sha256": "7da5a9f164baad72244436db4264e14d465f472b29338d844fdac0d5154a0f2c",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "integration": {
+    "scripts": 20,
+    "tests": 102,
+    "passing": 102,
+    "assertions": 1147,
+    "new_tests": 9,
+    "new_assertions": 34
+  },
+  "visual": [
+    "board225-farmer-960.png",
+    "board225-both-960.png",
+    "board225-progress-960.png",
+    "musician225-rider-front-960.png",
+    "musician225-musician-front-960.png"
+  ],
+  "physical_android_test": false,
+  "shutdown_warnings": {
+    "CanvasItem": 11,
+    "ObjectDB": 16,
+    "resources": 2
+  },
+  "unchanged": [
+    "town layout",
+    "herd affinity",
+    "captured collection",
+    "garden",
+    "mastery",
+    "main"
+  ]
+}

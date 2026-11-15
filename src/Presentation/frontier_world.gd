@@ -931,6 +931,8 @@ func _refresh_missions() -> void:
 	for q in SaveData.world_quests.values():
 		if q.status=="active":counts.encargo+=1
 		elif q.status=="done":counts.done+=1
+	if SaveData.repeat_contract165.active:counts.encargo+=1
+	elif SaveData.repeat_contract165.ready:counts.done+=1
 	_missions_label.text = tr("WORLD_MISSIONS") % [counts.get("offered", 0) + counts.get("encargo", 0), counts.get("done", 0)]
 
 func _home() -> void:
@@ -1069,44 +1071,54 @@ func _toggle_map() -> void:
 	if controls!=null:controls.visible=not _map_overlay.expanded and not _edit_mode
 	_map_overlay.queue_redraw()
 
+func _board_route225(target:String)->String:
+	var choices:Array=[]
+	if target=="pig":choices=_lasso_pigs()
+	elif target=="goat" and is_instance_valid(_prototype_goats):choices=_prototype_goats.get_children()
+	var nearest:Node2D
+	var distance:float=INF
+	for candidate in choices:
+		if not is_instance_valid(candidate) or candidate.is_queued_for_deletion():continue
+		var d:float=player.global_position.distance_to(candidate.global_position)
+		if d<distance:nearest=candidate;distance=d
+	if nearest!=null:return "%s · %d m"%[arrow_to(player.global_position,nearest.global_position),int(distance/8.)]
+	return "Busca en la zona explorada"
 func _open_board() -> void:
-	if is_instance_valid(_board_panel):
-		_board_panel.queue_free()
-	var encargo: String = WorldMissions.current_encargo()
-	if encargo.is_empty():
-		encargo = WorldMissions.assign_encargo(SaveData.world_seed)
-	_board_panel = Panel.new()
-	_board_panel.position = Vector2(390, 200)
-	_board_panel.size = Vector2(500, 240)
-	_board_panel.z_index = 50
-	DetailCard179.style_panel(_board_panel)
-	_hud.add_child(_board_panel)
-	var title := Label.new()
-	title.text = tr("WORLD_BOARD")
-	title.position = Vector2(20, 14)
-	title.add_theme_font_size_override("font_size", 22)
-	_board_panel.add_child(title)
-	var body := Label.new()
-	body.position = Vector2(20, 56)
-	body.size = Vector2(460, 110)
-	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	body.add_theme_font_size_override("font_size", 18)
-	DetailCard179.reading_surface(body)
-	_board_panel.add_child(body)
-	if encargo.is_empty():
-		body.text = tr("WORLD_BOARD_NONE")
-	else:
-		var c: Vector2i = WorldMissions.herd_chunk(encargo)
-		var herd: Dictionary = WorldMap.generate(SaveData.world_seed, c.x, c.y).get("herd", {})
-		var target: Vector2 = herd.get("pos", Vector2.ZERO)
-		body.text = tr("WORLD_BOARD_ACTIVE") % [arrow_to(player.position, target), int(player.position.distance_to(target) / 8.0)]
-	var close := Button.new()
-	close.text = tr("WORLD_CLOSE")
-	close.position = Vector2(190, 180)
-	close.size = Vector2(120, 42)
-	close.pressed.connect(func(): _board_panel.queue_free())
-	QuestButtonStyle.apply(close)
-	_board_panel.add_child(close)
+	if is_instance_valid(_board_panel):_board_panel.queue_free()
+	var encargo:String=WorldMissions.current_encargo()
+	var has_quest:bool=SaveData.repeat_contract165.active or SaveData.repeat_contract165.ready
+	for id in NpcQuests.QUESTS:
+		var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
+		if state.status=="active" or (state.status=="done" and not state.get("thanked",false)):has_quest=true
+	if encargo.is_empty() and not has_quest:encargo=WorldMissions.assign_encargo(SaveData.world_seed)
+	_refresh_missions();_refresh_quest_hud()
+	_board_panel=Panel.new();_board_panel.position=Vector2(300,105);_board_panel.size=Vector2(680,500);_board_panel.z_index=120;DetailCard179.style_panel(_board_panel);_hud.add_child(_board_panel)
+	var title:=Label.new();title.text=tr("WORLD_BOARD");title.position=Vector2(24,18);title.add_theme_font_size_override("font_size",24);_board_panel.add_child(title)
+	var scroll:=ScrollContainer.new();scroll.name="BoardScroll225";scroll.position=Vector2(24,65);scroll.size=Vector2(632,350);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;_board_panel.add_child(scroll)
+	var rows:=VBoxContainer.new();rows.size_flags_horizontal=Control.SIZE_EXPAND_FILL;rows.add_theme_constant_override("separation",10);scroll.add_child(rows)
+	for id in NpcQuests.QUESTS:
+		var q:Dictionary=NpcQuests.QUESTS[id];var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
+		if state.status!="active" and not (state.status=="done" and not state.get("thanked",false)):continue
+		var route:String="Ver Encargos"
+		if state.status=="done" and q.npc in ["farmer","florist"]:route="Habla con el granjero" if q.npc=="farmer" else "Habla con la florista"
+		elif q.kind=="capture_animal":route=_board_route225(q.target)
+		elif q.kind=="collect_flower":route="Busca el aura de la flor en el mapa"
+		_board_card225(rows,str(q.active),route,int(state.count),int(q.goal),state.status=="done",str(q.target))
+	var contract:Dictionary=SaveData.repeat_contract165
+	if contract.active or contract.ready:
+		var target:String=ProgressionEconomy165.target(contract)
+		_board_card225(rows,"Captura cinco "+("cerdos" if target=="pig" else "cabras"),"Vuelve al granjero · 400 puntos" if contract.ready else _board_route225(target),contract.events.size(),5,contract.ready,target)
+	if not encargo.is_empty():
+		var c:Vector2i=WorldMissions.herd_chunk(encargo);var herd:Dictionary=WorldMap.generate(SaveData.world_seed,c.x,c.y).get("herd",{});var target:Vector2=herd.get("pos",Vector2.ZERO)
+		_board_card225(rows,"Domar manada salvaje","%s · %d m"%[arrow_to(player.position,target),int(player.position.distance_to(target)/8.)])
+	if rows.get_child_count()==0:_board_card225(rows,tr("WORLD_BOARD_NONE"),"")
+	var close:=Button.new();close.text=tr("WORLD_CLOSE");close.position=Vector2(240,435);close.size=Vector2(200,44);QuestButtonStyle.apply(close);close.pressed.connect(func():_board_panel.queue_free());_board_panel.add_child(close)
+func _board_card225(rows:VBoxContainer,title:String,route:String,count:int=-1,goal:int=0,done:bool=false,target:String="")->void:
+	var row:=HBoxContainer.new();row.add_theme_constant_override("separation",12);rows.add_child(row)
+	if target in ["pig","goat"]:
+		var icon:=TextureRect.new();icon.texture=load("res://art/world/pigs/pink/frame_00.png") if target=="pig" else load("res://art/world/goats/left/frame_00.png")
+		icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;icon.custom_minimum_size=Vector2(76,76);icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;icon.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(icon)
+	var card:=DetailCard179.new();card.size_flags_horizontal=Control.SIZE_EXPAND_FILL;card.setup(title,"",route,count,goal,done);row.add_child(card)
 
 # Compatibility name for existing callers. All map behavior lives in one shared component.
 class DiscoveryMap extends WorldDiscoveryMap159:
@@ -1214,7 +1226,7 @@ func _open_npc(data:Dictionary)->void:
 func _close_npc()->void:
 	if is_instance_valid(_npc_dialog):_npc_dialog.queue_free()
 	if is_instance_valid(_npc_block):_npc_block.queue_free()
-	_npc_dialog=null;player.set_physics_process(true);_refresh_quest_hud()
+	_npc_dialog=null;player.set_physics_process(true);_refresh_quest_hud();_refresh_missions()
 func _quest_event(kind:String,target:String,event_id:String)->void:
 	for id in NpcQuests.record(SaveData.world_quests,kind,target,event_id):
 		var q:Dictionary=NpcQuests.QUESTS[id];var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
