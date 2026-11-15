@@ -12,14 +12,13 @@ func restore219():
  SaveData.horse_collection.restore(collection219)
 func before_each():snapshot219()
 func after_each():restore219()
-func test_new_policy_excludes_seen_roaming_and_captured_origins_and_keeps_stats():
+func test_new_policy_includes_seen_roaming_origins_and_keeps_stats():
  var towns:=VillageCousins140.fresh(752026,[],FloristJourney138.fresh([]))
  var state:=HerdTown217.fresh(752026,towns,["1,0"],{"horses":{"a":{"origin":Vector2i(2,0)}}},["herd_3,0#1"])
- for x in [1,2,3]:assert_false(HerdTown217.eligible(state,x,0))
+ for x in [1,2,3]:assert_true(HerdTown217.eligible(state,x,0))
  assert_true(HerdTown217.eligible(state,4,0));assert_true(HerdTown217.valid(state,752026))
  var base:Dictionary={"pos":towns.doors.home,"traits":{"coat":0,"pattern":0,"mane":0,"eyes":0,"finish":"normal"},"temperament":.8,"stats":{"speed":280.,"power":.7,"handling":1000.}}
  var before:=WorldHerd.members(base,752026,4,0,false);var after:=HerdTown217.colored(before,state,4,0)
- assert_eq(HerdTown217.colored(before,state,1,0),before)
  assert_eq(after,HerdTown217.colored(before,state,4,0));assert_eq(before.size(),after.size())
  var looks:Dictionary={}
  for i in after.size():

@@ -1,0 +1,41 @@
+{
+  "version": "2.7.163",
+  "version_code": 422,
+  "package": "com.example.rancho.review",
+  "apk_bytes": 83551833,
+  "sha256": "cf887b508953aaf06fe2f3d2f06a0cbe549cd6be04a285e383c8d9491d9c37da",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "integration": {
+    "scripts": 21,
+    "tests": 104,
+    "passing": 104,
+    "assertions": 1166
+  },
+  "town_policy_and_identity": {
+    "scripts": 2,
+    "tests": 18,
+    "passing": 18,
+    "assertions": 6616
+  },
+  "physical_android_test": false,
+  "shutdown_warnings": {
+    "CanvasItem": 9,
+    "ObjectDB": 12,
+    "resources": 2
+  },
+  "visual": [
+    "herd226-before-960.png",
+    "herd226-after-960.png"
+  ],
+  "policy": "Every wild individual within the existing 3000-unit town influence has nearest town coat OR pattern; revised lazily when a herd is loaded, including discovered and roaming origin herds. Captured IDs excluded individually. No changes beyond influence.",
+  "preserved": [
+    "captured collection",
+    "IDs",
+    "positions",
+    "stats",
+    "town layout",
+    "garden",
+    "mastery",
+    "main"
+  ]
+}

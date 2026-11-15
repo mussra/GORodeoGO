@@ -1438,6 +1438,7 @@ func _resume_roaming139()->void:
 				var key:=WorldHerdPositions139.live_key(origin,row.index)
 				if is_instance_valid(_herd_horses.get(key)) and not _herd_horses[key].is_queued_for_deletion():continue
 				var base:Dictionary=WorldMap.generate(SaveData.world_seed,origin.x,origin.y).get("herd",{})
+				if not SaveData.prepare_herd217(base,origin.x,origin.y):continue
 				var members:Array=WorldHerd.members(base,SaveData.world_seed,origin.x,origin.y)
 				if row.index>=members.size():continue
 				var member:Dictionary=members[row.index].duplicate(true);member.pos=row.pos

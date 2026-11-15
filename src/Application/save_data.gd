@@ -720,16 +720,20 @@ func relocate_garden214(anchors:Dictionary)->bool:
 
 func ensure_herd_town217()->bool:
 	if world_generator_version<3 or world_cousins140.is_empty():return false
-	if not world_herd_town217.is_empty():return true
-	world_herd_town217=HerdTown217.fresh(world_seed,world_cousins140,world_discovered,world_roaming139,world_tamed)
+	if world_herd_town217.get("version",0)==HerdTown217.VERSION:return true
+	var before:=world_herd_town217.duplicate(true)
+	world_herd_town217=HerdTown217.fresh(world_seed,world_cousins140,world_discovered,world_roaming139,world_tamed) if before.is_empty() else HerdTown217.upgraded226(before)
 	if save_progress():return true
-	world_herd_town217={};return false
+	world_herd_town217=before;return false
 func prepare_herd217(base:Dictionary,cx:int,cy:int)->bool:
 	if base.is_empty() or not HerdTown217.eligible(world_herd_town217,cx,cy):return true
-	if HerdTown217.influence(world_herd_town217.towns,base.pos).total<=0.:return true
 	var key:=WorldMap.chunk_key(cx,cy)
-	if world_herd_town217.herds.has(key):return true
-	var members_:Array=HerdTown217.colored(WorldHerd.members(base,world_seed,cx,cy,false),world_herd_town217,cx,cy)
+	if world_herd_town217.get("revised226",{}).has(key):return true
+	var members_:Array=WorldHerd.members(base,world_seed,cx,cy)
+	if not members_.any(func(h):return HerdTown217.influence(world_herd_town217.towns,h.pos).total>0.):return true
+	var before:=world_herd_town217.duplicate(true)
+	members_=HerdTown217.colored(members_,world_herd_town217,cx,cy,world_tamed)
 	world_herd_town217.herds[key]=members_.map(func(h):return h.traits.duplicate(true))
+	world_herd_town217.revised226[key]=true
 	if save_progress():return true
-	world_herd_town217.herds.erase(key);return false
+	world_herd_town217=before;return false
