@@ -35,3 +35,7 @@ Se precisa la máscara de Guepardo con puntos sólidos circulares simples sobre 
 A petición de Ant, rosetas más gruesas, irregulares y abiertas con centro cálido más oscuro. El canal rojo del primer segmento del atlas dibuja el borde y el verde el relleno. El relleno deriva de la base elegida (RGB × 0,76/0,61/0,48), conservando todas las bases y tintas, incluido arcoíris suave. Compartido por retrato, poses del mundo, potrillo y sombrero; no añade genes ni cambia IDs de guardados. Los otros cinco segmentos, incluido Guepardo redondo, se conservan byte por byte.
 
 `leopardo-relleno-comparacion239.png` compara el retrato anterior Crema con el ajuste Dorado y el fotograma enviado por Ant. Dorado es solo un ejemplo para aproximar el vídeo, no sustituye automáticamente la base de caballos guardados ni fuerza una paleta. No se reproduce la textura de purpurina. Cambio local en rama, sin APK ni publicación. El APK 2.7.168 no incluye este ajuste.
+
+## Paleta de bases, 15 noviembre 2026, 19:58
+
+`paleta-pelajes239.png`: los 20 colores exactos de HorseAppearance.COLORS con los nombres de HorseCollection.COATS, más el degradado Arcoíris suave exportado del motor. `leopardo-varias-bases239.png`: seis retratos actuales del motor con el Leopardo relleno sobre Crema, Dorado, Blanco, Cobre, Azul y Arcoíris suave. La tinta es Negro en todos ellos. Son documentación visual; no generan otro APK.
