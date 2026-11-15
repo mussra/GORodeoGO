@@ -1,11 +1,15 @@
 class_name HorseCollection
 extends RefCounted
 ## Isolated trial collection. Provisional stats; no economy, sex or parent consumption.
-const COATS=["Negro","Blanco","Dorado","Azul","Verde","Rojo","Violeta","Turquesa","Rosa","Naranja","Castaño","Gris","Crema","Cobre","Lima","Marino","Lavanda","Coral","Celeste","Ciruela"]
+const COATS=["Negro","Blanco","Dorado","Azul","Verde","Rojo","Violeta","Turquesa","Rosa","Naranja","Castaño","Gris","Crema","Cobre","Lima","Marino","Lavanda","Coral","Celeste","Ciruela","Rosa chicle claro"]
 const PATTERNS=["Liso","Parches","Moteado","Trasera blanca","Patas claras","Corazones","Estrellas","Triángulos","Rombos","Cebra","Jirafa","Vaca","Leopardo","Guepardo","Tigre","Jaguar","Hiena","Cebra de montaña"]
 const MANES=["Negra","Blanca","Dorada","Azul","Roja","Arcoíris"]
 const RARITIES=["Común","Poco frecuente","Raro","Ultra raro","Legendario"]
-const EYES=COATS+["Arcoíris","Galaxy"]
+const EYES=["Negro", "Blanco", "Dorado", "Azul", "Verde", "Rojo", "Violeta", "Turquesa", "Rosa", "Naranja", "Castaño", "Gris", "Crema", "Cobre", "Lima", "Marino", "Lavanda", "Coral", "Celeste", "Ciruela", "Arcoíris", "Galaxy"]
+# UI and hat swatches keep historical 20=rainbow; new flat color uses swatch 21.
+static func color_swatches239()->Array:return COATS.slice(0,20)+["Arcoíris suave"]+COATS.slice(20)
+static func swatch239(base:int)->int:return base+1 if base>=20 else base
+static func base239(swatch:int)->int:return swatch-1 if swatch>20 else swatch
 static func spots_index(t:Dictionary)->int:return int(t.get("spots",-1))
 static func legs_index(t:Dictionary)->int:return int(t.get("legs",-1))
 static func eye_index(t:Dictionary)->int:return int(t.get("eyes",10))
@@ -56,7 +60,7 @@ func valid_traits(v:Variant)->bool:
  if v.has("spots") and (typeof(v.spots)!=TYPE_INT or v.spots< -1 or v.spots>=COATS.size()):return false
  if v.has("legs") and (typeof(v.legs)!=TYPE_INT or v.legs< -1 or v.legs>=COATS.size()):return false
  if v.has("eyes") and (typeof(v.eyes)!=TYPE_INT or v.eyes<0 or v.eyes>=EYES.size()):return false
- return v.coat>=0 and v.coat<20 and v.pattern>=0 and v.pattern<PATTERNS.size() and v.mane>=0 and v.mane<6 and v.get("finish","normal") in ["normal","original","galaxy"]
+ return v.coat>=0 and v.coat<COATS.size() and v.pattern>=0 and v.pattern<PATTERNS.size() and v.mane>=0 and v.mane<6 and v.get("finish","normal") in ["normal","original","galaxy"]
 func preview(a:String,b:String,choices:Dictionary)->Dictionary:
  if a==b or find(a).is_empty() or find(b).is_empty() or not is_adult(a) or not is_adult(b):return {}
  var t:Dictionary={"finish":"galaxy" if find(a).traits.get("finish","")=="galaxy" and find(b).traits.get("finish","")=="galaxy" else "normal"}

@@ -39,3 +39,9 @@ A petición de Ant, rosetas más gruesas, irregulares y abiertas con centro cál
 ## Paleta de bases, 15 noviembre 2026, 19:58
 
 `paleta-pelajes239.png`: los 20 colores exactos de HorseAppearance.COLORS con los nombres de HorseCollection.COATS, más el degradado Arcoíris suave exportado del motor. `leopardo-varias-bases239.png`: seis retratos actuales del motor con el Leopardo relleno sobre Crema, Dorado, Blanco, Cobre, Azul y Arcoíris suave. La tinta es Negro en todos ellos. Son documentación visual; no generan otro APK.
+
+## Ambos rosas, 15 noviembre 2026, 20:17
+
+Ant confirma conservar Rosa y añadir Rosa chicle claro (#f5a8cf). Nueva base plana 20, añadida al final sin reasignar 0..19. Ojos mantiene sus 22 IDs históricos (20 Arcoíris, 21 Galaxy), sin añadir colores de ojos. Editor y sombreros conservan el selector histórico 20 Arcoíris suave, y reservan selector 21 para la nueva base plana 20. Los estilos guardados siguen siendo campos independientes. Sombreros v1/v2 no cambian; v3 conserva su 20 arcoíris y añade 21 chicle. El valor de mercado del chicle usa la misma puntuación que Rosa, sin cambiar precios anteriores. No se cambia el generador de mundos ni sus identidades, ni se rehacen ofertas deterministas existentes.
+
+Paleta actualizada: `paleta-pelajes-chicle239.png` (21 bases + Arcoíris suave). Ejemplo real del motor en `leopardo-dos-rosas239.png`. Disponible en rama/editor/atlas/cría; sin APK nuevo ni publicación.

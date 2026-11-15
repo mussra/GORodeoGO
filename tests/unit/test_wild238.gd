@@ -76,3 +76,29 @@ func test_leopard239_filled_centers_and_palette():
  assert_gt(centers,30);assert_gt(outside,100)
  for i in 20:
   var base:=Color(HorseAppearance.COLORS[i]);assert_eq(HorsePatternMap.center_color239(base).a,base.a)
+
+func test_pink239_append_roundtrip_breeding_editor_and_hats():
+ assert_eq(HorseCollection.COATS[8],"Rosa");assert_eq(HorseAppearance.COLORS[8],"d45f9d")
+ assert_eq(HorseCollection.COATS[20],"Rosa chicle claro");assert_eq(HorseAppearance.COLORS[20],"f5a8cf")
+ assert_eq(HorseCollection.EYES[20],"Arcoíris");assert_eq(HorseCollection.EYES[21],"Galaxy")
+ var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents();var before:Dictionary=c.export_state()
+ var restored:=HorseCollection.new();assert_true(restored.restore(before));assert_eq(restored.export_state(),before)
+ c.find("trial_a").traits={"coat":20,"pattern":12,"spots":20,"legs":20,"mane":1,"eyes":20,"finish":"normal"}
+ assert_true(c.valid_traits(c.find("trial_a").traits))
+ for kind in ["rider","horse"]:
+  for view in ["side","down","up","diag_down","diag_up"]:
+   assert_gt(PixelLabTrial.pose_texture(kind,view,0,c.find("trial_a").traits).get_width(),0)
+ assert_eq(HorsePortrait.material_for(c.find("trial_a").traits).get_shader_parameter("coat_color"),Color("f5a8cf"))
+ var child:Dictionary=c.breed("trial_a","trial_b",{"coat":0,"pattern":0,"spots":0,"legs":0})
+ assert_eq(child.traits.coat,20);assert_eq(child.traits.spots,20);assert_eq(child.traits.legs,20)
+ assert_true(restored.restore(c.export_state()));assert_eq(restored.find(child.id).traits,child.traits)
+ var hat:=HatDesigns235.from_horse(c.find("trial_a"));assert_eq(hat,"hat:v3:21:20:21");assert_eq(HatAppearance.sanitize(hat),hat)
+ assert_eq(HatAppearance.surface_color({"coat":21,"finish":0},Vector2(.4,.4)),Color("f5a8cf"))
+ assert_eq(HatAppearance.surface_color({"coat":20,"finish":0},Vector2(.4,.4)),HorseAppearance.soft_rainbow(.4))
+ var save=load("res://src/Application/save_data.gd").new();save.save_path="user://pink239-tests.cfg";save.debug_mode=true;save.horse_collection=c
+ assert_true(save.set_horse_pattern_color("trial_a","coat",21));assert_eq(c.find("trial_a").traits.coat,20);assert_eq(c.find("trial_a").traits.coat_style238,"flat")
+ assert_true(save.set_horse_pattern_color("trial_a","coat",20));assert_eq(c.find("trial_a").traits.coat_style238,"rainbow")
+ assert_true(save.set_horse_pattern_color("trial_a","coat",21));assert_true(save.set_horse_pattern_color("trial_a","spots",21));save.load_progress()
+ assert_eq(save.horse_collection.find("trial_a").traits.coat,20);assert_eq(save.horse_collection.find("trial_a").traits.spots,20)
+ assert_true(save.hat_designs235.has(hat));assert_true(save.sell_market_horse("trial_a"));save.load_progress();assert_true(save.hat_designs235.has(hat))
+ save.free();DirAccess.remove_absolute("user://pink239-tests.cfg")

@@ -3,7 +3,7 @@ func test_optional_traits_validate_and_old_saves_restore()->void:
  var c:=HorseCollection.new();c.seed_trial();assert_true(c.restore(c.export_state()))
  assert_eq(HorseCollection.legs_index(c.horses[0].traits),-1)
  for key in ["legs","spots"]:
-  var t:Dictionary={"coat":10,"pattern":0,"mane":0};t[key]=19;assert_true(c.valid_traits(t));t[key]=20;assert_false(c.valid_traits(t));t[key]=-2;assert_false(c.valid_traits(t));t[key]="2";assert_false(c.valid_traits(t))
+  var t:Dictionary={"coat":10,"pattern":0,"mane":0};t[key]=19;assert_true(c.valid_traits(t));t[key]=HorseCollection.COATS.size();assert_false(c.valid_traits(t));t[key]=-2;assert_false(c.valid_traits(t));t[key]="2";assert_false(c.valid_traits(t))
 func test_breeding_inherits_new_channels_and_roundtrips()->void:
  var c:=HorseCollection.new();c.seed_trial();c.add_trial_parents()
  c.find("trial_a").traits.merge({"legs":0,"spots":3},true);c.find("trial_b").traits.merge({"legs":3,"spots":8,"pattern":11},true)

@@ -231,7 +231,7 @@ func detail_view()->void:
  if can_edit:
   var name_edit:=LineEdit.new();name_edit.text=h.name;name_edit.max_length=60;name_edit.position=Vector2(35,600);name_edit.size=Vector2(210,48);content.add_child(name_edit)
   button(tr("UI_108"),Vector2(255,600),func():SaveData.rename_horse(h.id,name_edit.text);refresh(),170)
-  var fields:Array=[["coat","Pelaje",HorseCollection.COATS+["Arcoíris suave"],20 if t.get("coat_style238","")=="rainbow" else int(t.coat)],["pattern","Tipo de manchas",HorseCollection.PATTERNS,int(t.pattern)],["spots","Color de manchas",["Original"]+HorseCollection.COATS+["Arcoíris suave"],21 if t.get("spots_style238","")=="rainbow" else HorseCollection.spots_index(t)+1],["legs","Patas bajas",["Original"]+HorseCollection.COATS,HorseCollection.legs_index(t)+1]]
+  var fields:Array=[["coat","Pelaje",HorseCollection.color_swatches239(),20 if t.get("coat_style238","")=="rainbow" else HorseCollection.swatch239(int(t.coat))],["pattern","Tipo de manchas",HorseCollection.PATTERNS,int(t.pattern)],["spots","Color de manchas",["Original"]+HorseCollection.color_swatches239(),21 if t.get("spots_style238","")=="rainbow" else HorseCollection.swatch239(HorseCollection.spots_index(t))+1],["legs","Patas bajas",["Original"]+HorseCollection.COATS,HorseCollection.legs_index(t)+1]]
   for spec in fields:
    var pick:=OptionButton.new();pick.custom_minimum_size.y=48
    for value in spec[2]:pick.add_item(str(spec[1])+": "+str(value))

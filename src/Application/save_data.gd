@@ -470,7 +470,7 @@ func set_horse_pattern_color(id:String,key:String,value:int)->bool:
 	var traits:Dictionary=horse.traits.duplicate(true)
 	if key in ["coat","spots"]:
 		traits[key+"_style238"]="rainbow" if value==20 else "flat"
-		if value!=20:traits[key]=value
+		if value!=20:traits[key]=HorseCollection.base239(value)
 	else:traits[key]=value
 	if traits.get("finish","")=="original":traits["finish"]="normal"
 	if not horse_collection.valid_traits(traits):return false

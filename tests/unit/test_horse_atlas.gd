@@ -2,7 +2,7 @@ extends GutTest
 func test_bounded_variants_and_extra_traits_have_exact_ownership()->void:
  var base:Dictionary={"coat":10,"pattern":1,"mane":2,"eyes":0,"finish":"normal"}
  var variants:Array=HorseAtlas.variants(base,{},[])
- assert_gt(variants.size(),1);assert_lte(variants.size(),21)
+ assert_gt(variants.size(),1);assert_lte(variants.size(),HorseCollection.COATS.size()+1)
  var t:Dictionary=variants[1].horse.traits.duplicate(true)
  var horses:Array=[{"id":"mine","traits":t}]
  assert_true(HorseAtlas.variants(base,{},horses)[0].owned)

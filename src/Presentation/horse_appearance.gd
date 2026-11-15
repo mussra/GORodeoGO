@@ -1,6 +1,6 @@
 class_name HorseAppearance
 extends RefCounted
-const COLORS=["273440","e9e2d3","dda92c","246bc5","398c54","bd3e3e","8550ad","27a6a0","d45f9d","e07730","975936","8b96a0","e3c388","bb6d45","9db543","334b84","a192d1","dc7972","72b7de","774c77"]
+const COLORS=["273440","e9e2d3","dda92c","246bc5","398c54","bd3e3e","8550ad","27a6a0","d45f9d","e07730","975936","8b96a0","e3c388","bb6d45","9db543","334b84","a192d1","dc7972","72b7de","774c77","f5a8cf"]
 const MANES=["222c37","fff3d3","f0ba2e","347ef0","e04c52"]
 const FOAL_EYES=preload("res://art/foal/eyes.png")
 static var cache:Dictionary={}
