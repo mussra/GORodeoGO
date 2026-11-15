@@ -9,6 +9,7 @@ static var cache:Dictionary={}
 static func branch_flip231(seed_:int)->bool:
  return posmod(hash("town-branches231-%d"%seed_),2)==1
 static func doors(seed_:int)->Dictionary:
+ if SaveData.world_generator_version>=6:return TownNetwork234.doors(seed_)
  if SaveData.world_generator_version>=5:
   var flip:float=-1. if branch_flip231(seed_) else 1.
   return {"home":FloristJourney138.home_door(seed_),"east138":Vector2(10560,358),"west140":Vector2(10560,358-10240.*flip),"east140":Vector2(10560,358+10240.*flip)}
@@ -33,8 +34,9 @@ static func plans(seed_:int)->Dictionary:
  var order:Array[int]=[0,1,2,3,4,5]
  for i in range(order.size()-1,0,-1):
   var j:int=rng.randi_range(0,i);var hold:int=order[i];order[i]=order[j];order[j]=hold
- for index in VillageCousins140.IDS.size():
-  var id:String=VillageCousins140.IDS[index];var required:Rect2=contents(seed_,id);var center:Vector2=required.get_center();var shape:int=order[index]
+ var ids:Array=doors(seed_).keys()
+ for index in ids.size():
+  var id:String=ids[index];var required:Rect2=contents(seed_,id);var center:Vector2=required.get_center();var shape:int=posmod(hash("town-shape236-%d-%s"%[seed_,id]),6) if SaveData.world_generator_version>=6 else order[index%order.size()]
   var unit:PackedVector2Array=normalized(shape);var half:Vector2=required.size*.5+Vector2(190,190)
   if shape in [3,4]:half=Vector2.ONE*maxf(half.x,half.y)
   var polygon:=PackedVector2Array();var scale_:float=1.
@@ -80,10 +82,14 @@ static func plans(seed_:int)->Dictionary:
   var approach:=PackedVector2Array([doors(seed_)[id]+Vector2(0,160),Vector2(gate.x,doors(seed_)[id].y+160)])
   if id=="home":approach=PackedVector2Array([Vector2(1600,470),Vector2(1740,470),Vector2(1740,1330),Vector2(gate.x,1330)])
   approach.append(gate-outward*110.);approach.append(gate+outward*130.)
-  if SaveData.world_generator_version>=5 and id in ["west140","east140"]:
+  if SaveData.world_generator_version>=6:pass
+  elif SaveData.world_generator_version>=5 and id in ["west140","east140"]:
    approach.append(Vector2(gate.x,bounds.end.y+300.));approach.append(Vector2(15500.,bounds.end.y+300.));approach.append(Vector2(15500.,TRUNK_Y))
   else:approach.append(Vector2(gate.x,TRUNK_Y))
   result[id]={"id":id,"shape":shape,"shape_name":SHAPES[shape],"polygon":polygon,"segments":segments,"gate":gate,"posts":posts,"outward":outward,"center":center,"bounds":bounds,"contents":required,"road":approach}
+ if SaveData.world_generator_version>=6:
+  var network_roads:=TownNetwork234.roads(seed_,result)
+  for id in result:result[id]["network_roads234"]=network_roads if id=="home" else []
  cache[cache_key]=result
  return result
 static func blocked(seed_:int,p:Vector2,margin:float=0.)->bool:
@@ -109,6 +115,7 @@ static func ridges(seed_:int,c:Vector2i)->Array:
    out.append({"id":plan.id,"town227":plan.id,"a":segment.a,"b":segment.b,"box":box,"port":plan.gate})
  return out
 static func graph(seed_:int,c:Vector2i)->Dictionary:
+ if SaveData.world_generator_version>=6:return {}
  var all:Dictionary={};var bounds:Rect2=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.).grow(160.)
  var row:int=roundi((TRUNK_Y-ModularWorldLayout93.ORIGIN.y)/80.)
  var first:int=floori((bounds.position.x-ModularWorldLayout93.ORIGIN.x)/80.)-2;var last:int=ceili((bounds.end.x-ModularWorldLayout93.ORIGIN.x)/80.)+2
@@ -128,8 +135,10 @@ static func access_contains(seed_:int,p:Vector2,margin:float=0.)->bool:
 
 static func roads_in_chunk(seed_:int,c:Vector2i)->Array:
  var out:Array=[];var bounds:=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.)
- for plan in plans(seed_).values():
-  var road:PackedVector2Array=plan.road
+ var routes:Array=[]
+ for plan in plans(seed_).values():routes.append(plan.road)
+ if SaveData.world_generator_version>=6:routes.append_array(TownNetwork234.roads(seed_,plans(seed_)))
+ for road in routes:
   for i in road.size()-1:
    var a:Vector2=road[i];var b:Vector2=road[i+1];var delta:Vector2=b-a;var low:float=0.;var high:float=1.;var valid:bool=true
    for axis in 2:
@@ -142,12 +151,12 @@ static func roads_in_chunk(seed_:int,c:Vector2i)->Array:
  return out
 
 static func cousin_ids231()->Array[String]:
- return ["west140"] if SaveData.world_generator_version>=5 else VillageCousins140.IDS
+ return [] if SaveData.world_generator_version>=6 else ["west140"] if SaveData.world_generator_version>=5 else VillageCousins140.IDS
 static func cousin_lane231(state:Dictionary,id:String)->PackedVector2Array:
  var goal:=VillageCousins140.point(state,id)
  if SaveData.world_generator_version>=5:return PackedVector2Array([state.doors[id]+Vector2(0,160),goal])
  return PackedVector2Array([Vector2(goal.x,470),goal])
 static func role231(id:String)->String:
- return {"home":"Granjero y Lucía", "east138":"Florista", "west140":"Cuidador de caballos", "east140":"Guarnicionero"}.get(id,"")
+ return TownNetwork234.role_text(SaveData.world_seed,id) if SaveData.world_generator_version>=6 else {"home":"Granjero y Lucía", "east138":"Florista", "west140":"Cuidador de caballos", "east140":"Guarnicionero"}.get(id,"")
 static func links231()->Array:
  return [["home","east138"],["east138","west140"],["east138","east140"]]

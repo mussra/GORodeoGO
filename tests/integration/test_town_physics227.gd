@@ -1,8 +1,8 @@
 extends "res://tests/integration/test_herd_migration226.gd"
-func test_new_world_uses_v5_and_keeps_v3_saved_worlds_on_their_generator():
+func test_new_world_uses_v6_and_keeps_v3_saved_worlds_on_their_generator():
  SaveData.world_cousins140={};SaveData.world_flora138={};SaveData.world_herd_town217={};SaveData.country_ledger146={};SaveData.world_places144={};SaveData.world_discovered=[];SaveData.world_tamed=[];SaveData.world_roaming139={}
- SaveData.world_seed=0;assert_gt(SaveData.ensure_world_seed(),0);assert_eq(SaveData.world_generator_version,5)
- assert_true(SaveData.save_progress());SaveData.load_progress();assert_true(SaveData._load_valid);assert_eq(SaveData.world_generator_version,5)
+ SaveData.world_seed=0;assert_gt(SaveData.ensure_world_seed(),0);assert_eq(SaveData.world_generator_version,6)
+ assert_true(SaveData.save_progress());SaveData.load_progress();assert_true(SaveData._load_valid);assert_eq(SaveData.world_generator_version,6)
  SaveData.world_generator_version=3;assert_true(SaveData.save_progress());SaveData.load_progress();assert_true(SaveData._load_valid);assert_eq(SaveData.world_generator_version,3)
 func test_actual_player_crosses_gate_but_cannot_cross_visible_wall_in_v4():
  SaveData.world_generator_version=4;SaveData.world_cousins140={};SaveData.world_flora138={};SaveData.world_herd_town217={};SaveData.world_discovered=[];SaveData.world_tamed=[];SaveData.world_garden212=Garden212.fresh()

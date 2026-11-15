@@ -26,9 +26,10 @@ static func clean(raw:Variant,seed_:int)->Dictionary:
  if not raw.get("doors") is Dictionary:return {}
  var out:Dictionary={"version":1,"seed":seed_,"doors":{},"known":{},"arrivals":{}}
  out["towns215"]=TownIdentity215.clean(raw.get("towns215",{}),seed_)
- out["hint215"]=str(raw.get("hint215","")) if raw.get("hint215","") in IDS else ""
+ out["hint215"]=str(raw.get("hint215","")) if raw.get("hint215","") in TownIdentity215.ids234(seed_) else ""
  out["revealed215"]={}
- for id in IDS:
+ for id in (raw.doors.keys() if SaveData.world_generator_version>=6 else TownIdentity215.ids234(seed_)):
+  if SaveData.world_generator_version>=6 and TownNetwork234.node_for(seed_,id).is_empty():return {}
   if raw.get("revealed215",{}) is Dictionary and raw.get("revealed215",{}).get(id,false)==true:out.revealed215[id]=true
   var p:Variant=raw.doors.get(id)
   if not p is Vector2 or not p.is_finite():return {}

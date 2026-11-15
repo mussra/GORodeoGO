@@ -20,6 +20,7 @@ var normal_mode_path:String=NORMAL_SAVE_PATH
 var debug_mode_path:String=DEBUG_SAVE_PATH
 var horse_collection:HorseCollection = HorseCollection.new()
 var hat_color: String = "original"
+var hat_designs235:Dictionary={}
 var highest_level_completed: int = 0
 var equipment_points: int = 0
 var equipment_owned: Array[String] = []
@@ -86,6 +87,8 @@ func save_progress() -> bool:
 	config.set_value("meta", "version", SAVE_VERSION)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
 	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
+	var next_hat_designs235:=HatDesigns235.collect(hat_designs235,horse_collection)
+	config.set_value("appearance","hat_designs235",next_hat_designs235)
 	config.set_value("appearance", "hat_color", hat_color)
 	if horse_collection.horses.is_empty():horse_collection.seed_trial()
 	config.set_value("horses_trial", "state", horse_collection.export_state())
@@ -122,6 +125,7 @@ func save_progress() -> bool:
 	if err != OK:
 		push_error("SaveData: could not save progress (error %d)." % err)
 		return false
+	hat_designs235=next_hat_designs235
 	return true
 
 static func load_source_path(current:String,legacy:String)->String:
@@ -134,6 +138,7 @@ func load_progress() -> void:
 	horse_collection=HorseCollection.new()
 	horse_collection.seed_trial()
 	hat_color = "original"
+	hat_designs235={}
 	equipment_points = 0
 	equipment_owned.clear()
 	equipment_equipped.clear()
@@ -171,6 +176,9 @@ func load_progress() -> void:
 		_load_valid=false
 		return
 	hat_color = HatAppearance.sanitize(config.get_value("appearance", "hat_color", "original"))
+	hat_designs235=HatDesigns235.collect(HatDesigns235.clean(config.get_value("appearance","hat_designs235",{})),horse_collection)
+	# Keep old equipped cosmetics on load, without granting every catalogue item.
+	if hat_color.begins_with("hat:"):hat_designs235[hat_color]=true
 	highest_level_completed = LevelProgression.sanitize_highest_completed(
 		config.get_value("progress", "highest_level_completed", 0)
 	)
@@ -191,7 +199,7 @@ func load_progress() -> void:
 	var wseed:Variant=config.get_value("world","seed",0)
 	if typeof(wseed)==TYPE_INT and wseed>0:world_seed=wseed
 	var generator:Variant=config.get_value("world","generator_version",1)
-	if typeof(generator)!=TYPE_INT or generator not in [1,2,3,4,5]:
+	if typeof(generator)!=TYPE_INT or generator not in [1,2,3,4,5,6]:
 		_load_valid=false;return
 	world_generator_version=generator
 	for pair in [["discovered",world_discovered],["tamed",world_tamed],["pigs",world_pigs]]:
@@ -313,6 +321,7 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 ## Cosmetic selection is independent of points and functional equipment.
 func select_hat(value:String)->bool:
 	if HatAppearance.sanitize(value)!=value:return false
+	if value.begins_with("hat:") and not HatDesigns235.collect(hat_designs235,horse_collection).has(value):return false
 	var before:String=hat_color
 	hat_color=value
 	if save_progress():return true
@@ -368,7 +377,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
@@ -437,6 +446,7 @@ func buy_market_horse(offer:Dictionary)->bool:
 func sell_market_horse(id:String)->bool:
 	if not HorseMarket.can_sell(horse_collection,id):return false
 	var price:int=HorseMarket.sell_price(horse_collection.find(id));var before:Dictionary=horse_collection.export_state();var points:int=equipment_points
+	hat_designs235=HatDesigns235.collect(hat_designs235,horse_collection)
 	if not HorseMarket.sell(horse_collection,id):return false
 	equipment_points+=price
 	if save_progress():return true
@@ -491,7 +501,7 @@ func set_horse_emblem(id:String,config:Dictionary)->bool:
 func ensure_world_seed() -> int:
 	if world_seed == 0:
 		world_seed = int(randi()) + 1
-		world_generator_version=5
+		world_generator_version=6
 		world_position=ModularWorldLayout93.world(WorldTerrain103.plan(world_seed).doors.ranch)+Vector2(0,70)
 		save_progress()
 	return world_seed

@@ -331,11 +331,11 @@ func _draw_fields138(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
    for p in polygon:screen.append(_to_map(p,mins,cell,origin))
    if screen.size()>=3:_terrain.draw_colored_polygon(screen,Color("b37a72") if field.species=="red" else Color("7e7b93"))
 
- for points in FloristJourney138.lanes(SaveData.world_flora138):
+ for points in ([] if SaveData.world_generator_version>=6 else FloristJourney138.lanes(SaveData.world_flora138)):
   for segment in Geometry2D.intersect_polyline_with_polygon(points,clip):
    for i in segment.size()-1:_terrain.draw_line(_to_map(segment[i],mins,cell,origin),_to_map(segment[i+1],mins,cell,origin),Color("bb9460"),maxf(1.,cell*.03))
  if not SaveData.world_cousins140.is_empty():
-  for id in VillageCousins140.IDS:
+  for id in TownEnclosures227.cousin_ids231():
    var cousin:Vector2=VillageCousins140.point(SaveData.world_cousins140,id)
    var lane:=PackedVector2Array([Vector2(cousin.x,470),cousin])
    for segment in Geometry2D.intersect_polyline_with_polygon(lane,clip):

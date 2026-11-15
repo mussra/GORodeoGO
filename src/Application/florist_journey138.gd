@@ -55,6 +55,7 @@ static func sample_point(state:Dictionary,species:String)->Vector2:
  if SaveData.world_generator_version>=4:return field_rect(state,species).get_center()
  return Vector2(int(state.get("region",1))*5120.+465.,-850. if species=="red" else 1650.)
 static func descriptors(state:Dictionary,seed_:int)->Array:
+ if SaveData.world_generator_version>=6:return []
  if state.is_empty():return []
  var out:Array=[]
  for species in SPECIES:
@@ -97,6 +98,7 @@ static func on_lane(state:Dictionary,p:Vector2,margin:float=0.)->bool:
  return false
 
 static func lanes(state:Dictionary)->Array:
+ if SaveData.world_generator_version>=6:return []
  var out:Array=[lane(state)]
  if SaveData.world_generator_version>=4:
   var plan:Dictionary=TownEnclosures227.plans(SaveData.world_seed).east138

@@ -1,0 +1,74 @@
+{
+  "version": "2.7.167",
+  "version_code": 426,
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "apk_bytes": 83615763,
+  "apk_sha256": "ea99a7ddc362c708c1ce70d848d42214e61b8dcc166d10c64b0680b65b016c7a",
+  "integration": {
+    "scripts": 28,
+    "passed": 127,
+    "total": 127,
+    "assertions": 1419
+  },
+  "unit": {
+    "scripts": 10,
+    "passed": 67,
+    "total": 67,
+    "assertions": 103141
+  },
+  "final_smoke": {
+    "scripts": 2,
+    "passed": 8,
+    "total": 8,
+    "assertions": 84
+  },
+  "new_world_generator": 6,
+  "legacy_generators_preserved": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "recommendation_horizon_generations": 3,
+  "territory_generation": "unbounded seeded coordinate cells, active 5x5 window plus finite referral tree",
+  "infinite_village_test": {
+    "cell": [
+      30,
+      40
+    ],
+    "position": [
+      370530,
+      493829
+    ]
+  },
+  "debug_only_full_network": true,
+  "eta": {
+    "step_seconds": 0.25,
+    "planning_range_percent": 20,
+    "empirically_calibrated": false,
+    "distance_units": "game units, not meters",
+    "slow_example": "2:00-3:10",
+    "fast_example": "1:30-2:30"
+  },
+  "physical_android_tested": false,
+  "shutdown_warnings": {
+    "CanvasItem": 7,
+    "ObjectDB": 12,
+    "resources": 2
+  },
+  "hat_design_retained_after_sale_and_reload": true,
+  "screenshots": [
+    "routes237-trial_a-960.png",
+    "routes237-trial_b-960.png",
+    "routes237-network-752026-960.png",
+    "routes237-network-752027-960.png",
+    "routes237-network-752028-960.png",
+    "routes237-far-village-960.png",
+    "routes237-debug-in-game-960.png",
+    "hats235-unlocked-960.png",
+    "hats235-locked-960.png",
+    "hats235-after-sale-960.png"
+  ]
+}

@@ -68,6 +68,9 @@ var _pigs_label: Label
 var _edit_mode: bool = false
 var garden212:GardenWorld212
 var _stamina: Dictionary = {}
+var _mounted_id237:String=""
+var _mounted_look237:int=0
+var _energy_by_horse237:Dictionary={}
 var _note_dialog106:MapNoteDialog106
 var _map_notes159:MapNotesController159
 var _flower_nodes105:Dictionary={}
@@ -124,6 +127,7 @@ func _ready() -> void:
 	add_child(base)
 	player = PlayerScript.new()
 	player.position = SaveData.world_position
+	if SaveData.world_generator_version>=6:TownNetwork234.ensure_near(SaveData.world_seed,player.position)
 	add_child(player)
 	_marker = DrawNode.new()
 	_marker.draw_fn = _draw_rider_marker
@@ -147,13 +151,14 @@ func _ready() -> void:
 		test_zone.name = "test_zone"
 		add_child(test_zone)
 	_build_hud()
-	if SaveData.ensure_flora138():
+	if SaveData.ensure_flora138() and SaveData.world_generator_version<6:
 		_flora_layer138=FlowerExpansion138.new();_flora_layer138.name="FlowerExpansion138";_flora_layer138.z_index=-1;add_child(_flora_layer138)
-	if SaveData.ensure_cousins140():
+	if SaveData.ensure_cousins140() and SaveData.world_generator_version<6:
 		_cousin_layer140=CousinLayer140.new();add_child(_cousin_layer140)
 	if SaveData.world_generator_version>=4:
 		var towns227:=TownLayer227.new();towns227.seed=SaveData.world_seed;add_child(towns227)
-	if SaveData.world_generator_version>=5:add_child(TownServices231.new())
+	if SaveData.world_generator_version==5:add_child(TownServices231.new())
+	if SaveData.world_generator_version>=6:add_child(TownLayer234.new())
 	SaveData.ensure_herd_town217()
 	_travel144=SiestaTravel144.new();add_child(_travel144)
 	_setup_goat_prototype()
@@ -180,6 +185,9 @@ func _physics_process(delta:float)->void:
 	_tick_goats(delta)
 
 func _process(delta: float) -> void:
+	if SaveData.world_generator_version>=6 and is_instance_valid(player):
+		TownNetwork234.ensure_near(SaveData.world_seed,player.position)
+		_sync_mount237()
 	if garden212!=null and is_instance_valid(garden212.panel):return
 	if _travel144!=null and (_travel144.active or is_instance_valid(_travel144.panel)):return
 	if is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
@@ -1181,7 +1189,7 @@ func _setup_npcs()->void:
 			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
 	_npc_button=Button.new();_npc_button.position=Vector2(475,566);_npc_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_npc_button);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
 	_npc_button.pressed.connect(func():_open_npc(_nearest_npc105()))
-	var journal_button:=Button.new();journal_button.name="CousinJournal180";journal_button.text="Loco" if SaveData.world_generator_version>=5 else "Primos";QuestButtonStyle.apply(journal_button);journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
+	var journal_button:=Button.new();journal_button.name="CousinJournal180";journal_button.text="Pueblos" if SaveData.world_generator_version>=6 else "Loco" if SaveData.world_generator_version>=5 else "Primos";QuestButtonStyle.apply(journal_button);journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.debug_mode if SaveData.world_generator_version>=6 else SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(902,4);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
 	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(652,56);_quest_panel.size=Vector2(610,490);_quest_panel.visible=false;DetailCard179.style_panel(_quest_panel);_hud.add_child(_quest_panel)
@@ -1199,13 +1207,14 @@ func _setup_npcs()->void:
 	_flower_button=Button.new();_flower_button.position=Vector2(475,500);_flower_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_flower_button);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)
 func _open_npc(data:Dictionary)->void:
+	if data.has("town234"):_open_town234(data);return
 	if data.has("service231"):_open_service231(str(data.service231));return
 	if data.has("cousin140"):_open_cousin140(str(data.cousin140));return
 	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>155.0:return
 	_refresh_quest_hud()
 	player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
 	_npc_block=Control.new();_npc_block.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_npc_block.mouse_filter=Control.MOUSE_FILTER_STOP;_hud.add_child(_npc_block)
-	var expanded138:bool=SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty() and (data.id=="florist_east138" or (data.id=="florist" and RegionalVillages123.all_done(SaveData.world_quests,data)))
+	var expanded138:bool=SaveData.world_generator_version>=3 and SaveData.world_generator_version<6 and not SaveData.world_flora138.is_empty() and (data.id=="florist_east138" or (data.id=="florist" and RegionalVillages123.all_done(SaveData.world_quests,data)))
 	if expanded138:
 		var dialog:=FloristDialog138.new();dialog.setup_journey(data.id=="florist_east138");dialog.journey_action.connect(_journey_action138);_npc_dialog=dialog
 	else:
@@ -1256,7 +1265,7 @@ func _tick_npcs()->void:
 	_npc_button.visible=player.position.distance_to(nearest.position)<155.0
 	_npc_button.text="Hablar con "+str(nearest.name).to_lower()
 	_tick_flowers105()
-	_tick_flora138()
+	if SaveData.world_generator_version<6:_tick_flora138()
 	for id in NpcQuests.activate_triggers(SaveData.world_quests,player.position):
 		_toast(NpcQuests.QUESTS[id].text);SaveData.save_world_state(player.position)
 	_refresh_quest_hud()
@@ -1296,6 +1305,12 @@ func _get_surface98()->WorldRoadSurface94:
 	return _road_surface94
 
 func _npcs98()->Array:
+	if SaveData.world_generator_version<6:return _legacy_npcs234()
+	var entries:Array=[]
+	for node in TownNetwork234.nodes(SaveData.world_seed).values():
+		for role in node.roles:entries.append({"id":"town234:"+node.id+":"+role,"town234":node.id,"role234":role,"name":TownNetwork234.npc_name(node.id,role),"position":TownNetwork234.point(SaveData.world_seed,node.id,role),"quests":[]})
+	return entries
+func _legacy_npcs234()->Array:
 	var data:Array=NpcQuests.NPCS.duplicate(true)
 	if SaveData.world_generator_version>=3:
 		for npc in data:npc["regional_close123"]=true
@@ -1303,10 +1318,10 @@ func _npcs98()->Array:
 		data[0].position=WorldNominal98.home()+Vector2(100,10)
 		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)+Vector2(110,-20)
 	else:data[1].position=WorldFloristShop.FLORIST_FEET
-	if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista de "+TownIdentity215.title(SaveData.world_cousins140,"east138"),"position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
+	if SaveData.world_generator_version>=3 and SaveData.world_generator_version<6 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista de "+TownIdentity215.title(SaveData.world_cousins140,"east138"),"position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
 	if SaveData.world_generator_version>=3 and not SaveData.world_cousins140.is_empty():
 		for id in TownEnclosures227.cousin_ids231():data.append({"id":"cousin140:"+id,"name":"Loco del pueblo","position":VillageCousins140.point(SaveData.world_cousins140,id),"cousin140":id,"quests":[]})
-	if SaveData.world_generator_version>=5:
+	if SaveData.world_generator_version==5:
 		for id in ["west140","east140"]:data.append({"id":"service231:"+id,"name":TownEnclosures227.role231(id),"position":SaveData.world_cousins140.doors[id]+Vector2(110,32),"service231":id,"quests":[]})
 	return data
 
@@ -1461,6 +1476,7 @@ func _open_cousin140(id:String)->void:
 	var dialog:=CousinDialog140.new();dialog.world_position215=player.position;dialog.setup(id,SaveData.world_cousins140,VillageCousins140.surprised(SaveData.horse_collection.find(SaveData.horse_collection.selected)));_hud.add_child(dialog);_npc_dialog=dialog
 	dialog.closed.connect(_close_npc);dialog.journal_requested.connect(_show_journal140)
 func _show_journal140()->void:
+	if SaveData.world_generator_version>=6:_open_network234();return
 	if SaveData.world_cousins140.is_empty() or is_instance_valid(_journal140):return
 	player.cancel_input();player.set_physics_process(false)
 	_journal140=Panel.new();_journal140.position=Vector2(250,110);_journal140.size=Vector2(780,550);_journal140.z_index=150;_journal140.add_theme_stylebox_override("panel",RanchTheme.box(RanchTheme.INK,Color("6d9b94"),12));_hud.add_child(_journal140)
@@ -1542,3 +1558,38 @@ func _open_service231(id:String)->void:
 			var horses:=HorsePanel.new();_hud.add_child(horses);_npc_dialog=horses
 			horses.visibility_changed.connect(func():
 				if not horses.visible:_close_npc()))
+
+func _open_town234(data:Dictionary):
+	_sync_mount237()
+	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>180.:return
+	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false)
+	var dialog:=TownDialog234.new();dialog.town=data.town234;dialog.role=data.role234;dialog.energy237=_stamina.duplicate(true);_hud.add_child(dialog);_npc_dialog=dialog
+	dialog.closed.connect(_close_npc)
+	dialog.recommend_requested.connect(func(target:String):
+		var next:=SaveData.world_cousins140.duplicate(true);next.revealed215[target]=true;next.known[data.town234]=true;next.hint215=target
+		if SaveData.commit_cousins140(next,player.position):_toast("Destino: "+TownIdentity215.title(next,target)+" · marcado en el minimapa")
+		else:_toast("No se pudo guardar el destino")
+		_close_npc())
+	dialog.service_requested.connect(func(role:String,town:String):
+		_close_npc()
+		if town=="home" and role in ["farmer","florist"]:
+			for original in _legacy_npcs234():
+				if original.id==role:_open_npc(original);return
+		elif role=="saddler":_open_service231("east140");return
+		elif role=="farmer":_open_service231("west140");return
+		else:_toast(""+TownNetwork234.NAMES[role]+": nuevas misiones de oficio aún no incluidas en esta prueba"))
+func _open_network234():
+	if not SaveData.debug_mode:return
+	if is_instance_valid(_npc_dialog):return
+	player.cancel_input();player.set_physics_process(false)
+	var map:=TownMap234.new();map.show_all=true;_hud.add_child(map);_npc_dialog=map;map.closed.connect(_close_npc)
+
+func _sync_mount237():
+	var id:String=SaveData.horse_collection.selected;var horse:Dictionary=SaveData.horse_collection.find(id)
+	var signature:int=hash(str([id,horse.get("traits",{}),horse.get("stats",{}),SaveData.hat_color]))
+	if signature==_mounted_look237:return
+	if id!=_mounted_id237:
+		if not _mounted_id237.is_empty():_energy_by_horse237[_mounted_id237]=_stamina.duplicate(true)
+		_stamina=_energy_by_horse237.get(id,WorldStamina.new_state(HorseStats.read(horse).power)).duplicate(true)
+		_mounted_id237=id
+	_mounted_look237=signature;player.refresh_mount237()

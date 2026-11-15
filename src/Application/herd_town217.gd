@@ -14,7 +14,7 @@ static func eligible(state:Dictionary,_cx:int,_cy:int)->bool:
  return state.get("version",0)==VERSION
 static func influence(towns:Dictionary,point:Vector2)->Dictionary:
  var rows:Array=[];var total:float=0.;var strength:float=0.
- for id in VillageCousins140.IDS:
+ for id in towns.get("doors",{}):
   if not towns.get("doors",{}).has(id):continue
   var distance:float=(towns.doors[id] as Vector2).distance_to(point)
   var weight:float=clampf((3000.-distance)/2000.,0.,1.)

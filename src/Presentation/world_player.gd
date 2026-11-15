@@ -101,7 +101,13 @@ func _ready() -> void:
 	feet.shape = fr
 	feet.position = Vector2(0, -2)
 	add_child(feet)
-	var placeholder := Polygon2D.new()
+	refresh_mount237()
+
+var _mount_placeholder237:Polygon2D
+func refresh_mount237():
+	if _sprite_swap!=null and is_instance_valid(_sprite_swap._sprite):_sprite_swap._sprite.queue_free()
+	if is_instance_valid(_mount_placeholder237):_mount_placeholder237.queue_free()
+	var placeholder := Polygon2D.new();_mount_placeholder237=placeholder
 	placeholder.polygon = PackedVector2Array([Vector2(-20, -14), Vector2(20, -14), Vector2(20, 14), Vector2(-20, 14)])
 	placeholder.color = Color("c8b994")
 	add_child(placeholder)

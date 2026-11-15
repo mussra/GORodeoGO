@@ -16,6 +16,7 @@ static func texture(look:Dictionary)->Texture2D:
    for x in 128:
     var weight:float=0.
     if int(look.pattern)==10:weight=giraffe.get_pixel(x,y).r
+    elif int(look.pattern)==9:weight=1. if HorseAppearance.genetic_mark(Vector2(x,y)*.5,9) else 0.
     elif int(look.pattern)==6:
      for center in [Vector2(32,32),Vector2(96,96)]:
       if HorseAppearance.shape_point((Vector2(x,y)-center)/20.,6):weight=1.
@@ -58,7 +59,7 @@ static func icon(node:CanvasItem,rect:Rect2,look:Dictionary):
   if int(look.pattern)==6:
    star(node,wall_box.get_center(),minf(wall_box.size.x,wall_box.size.y)*.47,Color("30283f"))
    star(node,wall_box.get_center(),minf(wall_box.size.x,wall_box.size.y)*.38,spot)
-  if int(look.pattern)==10:node.draw_texture_rect_region(texture(look),wall_box,Rect2(0,0,48,64))
+  if int(look.pattern) in [9,10]:node.draw_texture_rect_region(texture(look),wall_box,Rect2(0,0,48,64))
   node.draw_line(wall_box.position,wall_box.position+Vector2(wall_box.size.x,0),Color("f4dfb5"),maxf(1.,unit.y*3.))
  for x in [22,48]:
   var p:Vector2=at+Vector2(x,13)*unit

@@ -148,6 +148,7 @@ func _make_gardens(parent:Node2D,door:Vector2)->void:
    for y in 3:flowers.flowers.append({"pos":rect.position+Vector2(18+x*27,24+y*25),"height":24.,"type":("blue1" if side<0 else "sun1") if parent==gardens else ("red1" if side<0 else "violet")})
   parent.add_child(flowers)
 static func reserve(state:Dictionary,pos:Vector2)->bool:
+ if SaveData.world_generator_version>=6:return false
  if state.is_empty():return false
  var door:Vector2=FloristJourney138.door(state)
  for species in FloristJourney138.SPECIES:

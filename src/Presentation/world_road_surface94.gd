@@ -20,6 +20,10 @@ func _init(world_seed:int=0,is_modular:bool=false,is_dark:bool=false,is_nominal:
  else:
   for lane in WorldPaths.access_lanes(seed):lanes.append(ContinuousRoadArt.rounded(lane,32.))
 func contains(point:Vector2,margin:float=0.)->bool:
+ if nominal and version>=6:
+  for road in TownNetwork234.roads(seed,TownEnclosures227.plans(seed)):
+   for i in road.size()-1:
+    if point.distance_to(Geometry2D.get_closest_point_to_segment(point,road[i],road[i+1]))<=22.+margin:return true
  if nominal and version>=4 and TownEnclosures227.access_contains(seed,point,margin):return true
  if SaveData.world_garden212.stage!="locked" and not SaveData.world_garden212.anchors.is_empty() and Garden212.on_lane214(point,SaveData.world_garden212.anchors.plot,margin):return true
  if nominal and version>=3 and not SaveData.world_cousins140.is_empty():
@@ -27,7 +31,7 @@ func contains(point:Vector2,margin:float=0.)->bool:
    var lane:=TownEnclosures227.cousin_lane231(SaveData.world_cousins140,id)
    for i in lane.size()-1:
     if point.distance_to(Geometry2D.get_closest_point_to_segment(point,lane[i],lane[i+1]))<=18.+margin:return true
- if nominal and version>=3 and not SaveData.world_flora138.is_empty() and FloristJourney138.on_lane(SaveData.world_flora138,point,margin):return true
+ if nominal and version>=3 and version<6 and not SaveData.world_flora138.is_empty() and FloristJourney138.on_lane(SaveData.world_flora138,point,margin):return true
  if not modular:return _legacy_contains(point,margin)
  if _contains(point):return true
  if margin>0:

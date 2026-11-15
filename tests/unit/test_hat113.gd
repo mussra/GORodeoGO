@@ -5,7 +5,9 @@ func test_all_colors_patterns_legacy_validation_and_save():
   for finish in [0,1,2,3,4,5,6,7,8,9,10,11,13,14]:
    var id:String=HatAppearance.encode(color,finish);assert_eq(HatAppearance.sanitize(id),id)
    assert_eq(HatAppearance.decode(id).coat,color);assert_eq(HatAppearance.decode(id).finish,finish)
- assert_true(save.select_hat(HatAppearance.encode(3,13)));save.load_progress();assert_eq(save.hat_color,HatAppearance.encode(3,13))
+ save.horse_collection.seed_trial();save.horse_collection.horses[0].traits={"coat":3,"pattern":6,"spots":3,"mane":1,"finish":"normal"}
+ assert_false(save.select_hat(HatAppearance.encode(3,13)),"Unowned legacy catalogue combination is no longer free")
+ assert_true(save.select_hat(HatAppearance.encode235(3,6,3)));save.load_progress();assert_eq(save.hat_color,HatAppearance.encode235(3,6,3))
  assert_eq(HatAppearance.sanitize("hat:v1:20:0"),"original");assert_eq(HatAppearance.sanitize("hat:v1:1:99"),"original")
  save.free();DirAccess.remove_absolute("user://hat113.dat")
 func test_tint_only_changes_mask_and_shared_colors_patterns():
