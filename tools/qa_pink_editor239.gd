@@ -19,8 +19,8 @@ func run():
  get_viewport().get_texture().get_image().save_png("/downloads/pink239-integrated.png")
  for child in get_children():child.queue_free()
  await get_tree().process_frame
- SaveData.horse_collection.find("trial_a").traits={"coat":20,"pattern":12,"spots":20,"mane":1,"finish":"normal","coat_style238":"flat","spots_style238":"flat"};SaveData.horse_collection.selected="trial_a";SaveData.save_progress()
- var panel:=HatPanel.new();add_child(panel);await get_tree().process_frame;panel._color.select(22);panel._finish.select(12);panel._ink.select(21);panel._update_preview()
+ SaveData.horse_collection.find("trial_a").traits={"coat":20,"pattern":12,"spots":0,"mane":1,"finish":"normal","coat_style238":"flat","spots_style238":"flat"};SaveData.horse_collection.selected="trial_a";SaveData.save_progress()
+ var panel:=HatPanel.new();add_child(panel);await get_tree().process_frame;panel._color.select(22);panel._finish.select(12);panel._ink.select(0);panel._update_preview()
  for i in 3:await get_tree().process_frame
  await RenderingServer.frame_post_draw
  get_viewport().get_texture().get_image().save_png("/downloads/pink239-hat.png")
