@@ -20,7 +20,7 @@ func _draw():
    for plank in 5:
     var x:float=leaf.position.x+plank*20.;draw_line(Vector2(x,leaf.position.y+4),Vector2(x,leaf.end.y-4),Color("573d2b"),2.)
   var at:Vector2=plan.gate+plan.outward*140.+Vector2(130,-30)
-  var label:String=TownIdentity215.title(SaveData.world_cousins140,plan.id)
+  var label:String=TownIdentity215.title(SaveData.world_cousins140,plan.id)+(" · "+TownEnclosures227.role231(plan.id) if SaveData.world_generator_version>=5 else "")
   var width:float=font.get_string_size(label,HORIZONTAL_ALIGNMENT_LEFT,-1,23).x+36.
   draw_line(at+Vector2(0,8),at+Vector2(0,75),Color("725138"),10.)
   draw_style_box(RanchTheme.box(Color("4e3827"),Color("dab66d"),6),Rect2(at-Vector2(18,31),Vector2(width,49)))

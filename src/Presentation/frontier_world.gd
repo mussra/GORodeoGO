@@ -153,6 +153,7 @@ func _ready() -> void:
 		_cousin_layer140=CousinLayer140.new();add_child(_cousin_layer140)
 	if SaveData.world_generator_version>=4:
 		var towns227:=TownLayer227.new();towns227.seed=SaveData.world_seed;add_child(towns227)
+	if SaveData.world_generator_version>=5:add_child(TownServices231.new())
 	SaveData.ensure_herd_town217()
 	_travel144=SiestaTravel144.new();add_child(_travel144)
 	_setup_goat_prototype()
@@ -1180,7 +1181,7 @@ func _setup_npcs()->void:
 			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
 	_npc_button=Button.new();_npc_button.position=Vector2(475,566);_npc_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_npc_button);_npc_button.text="Hablar con granjero";_npc_button.visible=false;_hud.add_child(_npc_button)
 	_npc_button.pressed.connect(func():_open_npc(_nearest_npc105()))
-	var journal_button:=Button.new();journal_button.name="CousinJournal180";journal_button.text="Primos";QuestButtonStyle.apply(journal_button);journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
+	var journal_button:=Button.new();journal_button.name="CousinJournal180";journal_button.text="Loco" if SaveData.world_generator_version>=5 else "Primos";QuestButtonStyle.apply(journal_button);journal_button.position=Vector2(780,4);journal_button.size=Vector2(110,42);journal_button.visible=SaveData.world_generator_version>=3;_hud.add_child(journal_button);journal_button.pressed.connect(_show_journal140)
 	_quest_toggle=Button.new();_quest_toggle.text="Encargos ▸";_quest_toggle.position=Vector2(902,4);_quest_toggle.size=Vector2(180,42);_hud.add_child(_quest_toggle)
 	QuestButtonStyle.apply(_quest_toggle)
 	_quest_panel=PanelContainer.new();_quest_panel.position=Vector2(652,56);_quest_panel.size=Vector2(610,490);_quest_panel.visible=false;DetailCard179.style_panel(_quest_panel);_hud.add_child(_quest_panel)
@@ -1198,6 +1199,7 @@ func _setup_npcs()->void:
 	_flower_button=Button.new();_flower_button.position=Vector2(475,500);_flower_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_flower_button);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)
 func _open_npc(data:Dictionary)->void:
+	if data.has("service231"):_open_service231(str(data.service231));return
 	if data.has("cousin140"):_open_cousin140(str(data.cousin140));return
 	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>155.0:return
 	_refresh_quest_hud()
@@ -1303,7 +1305,9 @@ func _npcs98()->Array:
 	else:data[1].position=WorldFloristShop.FLORIST_FEET
 	if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista de "+TownIdentity215.title(SaveData.world_cousins140,"east138"),"position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
 	if SaveData.world_generator_version>=3 and not SaveData.world_cousins140.is_empty():
-		for id in VillageCousins140.IDS:data.append({"id":"cousin140:"+id,"name":"Loco del pueblo","position":VillageCousins140.point(SaveData.world_cousins140,id),"cousin140":id,"quests":[]})
+		for id in TownEnclosures227.cousin_ids231():data.append({"id":"cousin140:"+id,"name":"Loco del pueblo","position":VillageCousins140.point(SaveData.world_cousins140,id),"cousin140":id,"quests":[]})
+	if SaveData.world_generator_version>=5:
+		for id in ["west140","east140"]:data.append({"id":"service231:"+id,"name":TownEnclosures227.role231(id),"position":SaveData.world_cousins140.doors[id]+Vector2(110,32),"service231":id,"quests":[]})
 	return data
 
 func mountain_step103(a:Vector2,b:Vector2)->Vector2:
@@ -1463,10 +1467,10 @@ func _show_journal140()->void:
 	var scroll:=ScrollContainer.new();scroll.position=Vector2(24,24);scroll.size=Vector2(732,430);_journal140.add_child(scroll)
 	DetailCard179.style_panel(_journal140)
 	var entries179:=VBoxContainer.new();entries179.custom_minimum_size.x=700;entries179.size_flags_horizontal=Control.SIZE_EXPAND_FILL;entries179.add_theme_constant_override("separation",12);scroll.add_child(entries179)
-	var known179:=DetailCard179.new();known179.setup("Diario de primos","Primos conocidos · %d/4"%SaveData.world_cousins140.known.size());entries179.add_child(known179)
-	for id179 in VillageCousins140.IDS:
+	var known179:=DetailCard179.new();known179.setup("Diario del loco" if SaveData.world_generator_version>=5 else "Diario de primos","Loco conocido · %d/1"%SaveData.world_cousins140.known.size() if SaveData.world_generator_version>=5 else "Primos conocidos · %d/4"%SaveData.world_cousins140.known.size());entries179.add_child(known179)
+	for id179 in TownEnclosures227.cousin_ids231():
 		if SaveData.world_cousins140.known.get(id179,false):
-			var card179:=DetailCard179.new();card179.setup(str(VillageCousins140.LABELS[id179]),VillageCousins140.clue(id179));entries179.add_child(card179)
+			var card179:=DetailCard179.new();card179.setup(TownIdentity215.title(SaveData.world_cousins140,id179) if SaveData.world_generator_version>=5 else str(VillageCousins140.LABELS[id179]),VillageCousins140.clue(id179));entries179.add_child(card179)
 	var back:=Button.new();back.text="Cerrar diario";back.position=Vector2(230,475);back.size=Vector2(320,52);QuestButtonStyle.apply(back);_journal140.add_child(back);back.pressed.connect(func():_journal140.queue_free();_journal140=null;player.set_physics_process(not is_instance_valid(_npc_dialog)))
 
 func _start_country152(resume:bool=false)->bool:
@@ -1524,3 +1528,17 @@ func _open_debug213()->void:
 	_open_navigation();_navigation.queue_free();_navigation=NavigationSheet.new();_navigation.title="FRONTERA · DEBUG"
 	_navigation.entries=[{"id":"editor","title":"Editor","hint":"Autoría del mundo"},{"id":"modular_preview","title":"Vista de diseño","hint":"Sandbox aislado"},{"id":"country146","title":"País nuevo","hint":"Maqueta sin guardado"},{"id":"country_saved152","title":"País guardado","hint":"Prueba con registro separado"}]
 	_navigation.selected.connect(_navigation_selected);_navigation.closed.connect(_close_navigation);_hud.add_child(_navigation)
+
+func _open_service231(id:String)->void:
+	if is_instance_valid(_npc_dialog):return
+	player.cancel_input();player.set_physics_process(false)
+	var panel:=TownServicePanel231.new();panel.town_id=id;_hud.add_child(panel);_npc_dialog=panel
+	panel.closed.connect(_close_npc)
+	panel.open_requested.connect(func():
+		_close_npc();player.cancel_input();player.set_physics_process(false)
+		if id=="east140":
+			var equipment:=EquipmentPanel.new();_hud.add_child(equipment);_npc_dialog=equipment;equipment.closed.connect(_close_npc)
+		else:
+			var horses:=HorsePanel.new();_hud.add_child(horses);_npc_dialog=horses
+			horses.visibility_changed.connect(func():
+				if not horses.visible:_close_npc()))

@@ -64,6 +64,11 @@ static func rounded(points:PackedVector2Array,width:float)->PackedVector2Array:
    var t=j/12.;out.append(a.lerp(p,t).lerp(p.lerp(b,t),t))
  out.append(points[-1]);return out
 static func access(node:CanvasItem,points:PackedVector2Array,width:float=32,junctions:Array=[]):
+ if WorldNominal98.enabled():
+  var host:Node=node
+  while host!=null:
+   if host.has_method("_get_surface98"):return
+   host=host.get_parent()
  # The derivative corner tile bends around a grid cell, not an arbitrary doorway.
  # The same strip follows a tangent fillet to keep existing access coordinates.
  ribbon(node,rounded(points,width),width,junctions)

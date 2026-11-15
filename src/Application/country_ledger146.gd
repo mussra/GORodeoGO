@@ -9,7 +9,7 @@ static func fresh(seed_:int,generator:int)->Dictionary:
 # legally stand closer than the conservative 18px travel margin. Reload still
 # validates the real shared player shape against physics before activation.
 static func valid(raw:Variant,seed_:int,generator:int)->bool:
- if seed_<=0 or generator not in [1,2,3,4]:return false
+ if seed_<=0 or generator not in [1,2,3,4,5]:return false
  if not raw is Dictionary or raw.get("version",0) not in [1,VERSION] or raw.get("origin_seed",0)!=seed_ or raw.get("origin_generator",0)!=generator:return false
  if not raw.get("maps") is Dictionary or not raw.get("links") is Dictionary or raw.get("active","") not in ["frontier",CountryRoute146.ID]:return false
  for id in raw.maps:

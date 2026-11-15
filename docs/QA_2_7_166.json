@@ -1,0 +1,42 @@
+{
+  "version": "2.7.166",
+  "version_code": 425,
+  "integration": {
+    "passed": 123,
+    "total": 123,
+    "assertions": 1373,
+    "scripts": 27
+  },
+  "unit": {
+    "passed": 53,
+    "total": 53,
+    "assertions": 13473,
+    "scripts": 5
+  },
+  "visual_review": [
+    "roads230-gallery-before-960.png",
+    "roads230-gallery-after-960.png",
+    "roads230-world-after-960.png",
+    "towns231-west140-overview-960.png",
+    "towns231-east140-overview-960.png",
+    "towns231-guarnicionero-panel-960.png"
+  ],
+  "physical_android_tested": false,
+  "new_missions_applied": false,
+  "new_world_generator": 5,
+  "legacy_generators_preserved": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "shutdown_warnings": {
+    "CanvasItem": 7,
+    "ObjectDB": 10,
+    "resources": 2
+  },
+  "apk_bytes": 83586009,
+  "apk_sha256": "6ef8da553b057013e80cef79a55881d48fecb3d9f3f70c0b75967c0aff06de9f",
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb"
+}

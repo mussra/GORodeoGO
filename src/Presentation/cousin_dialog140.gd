@@ -17,9 +17,10 @@ func setup(id:String,state_:Dictionary,surprise:bool):
  DetailCard179.style_panel(self)
  DetailCard179.reading_surface(body)
  TextFit181.fixed(body,body.size,21,18,9)
- _button("¿Y tus primos?",Vector2(24,365),_hint215)
+ if SaveData.world_generator_version<5:_button("¿Y tus primos?",Vector2(24,365),_hint215)
+ else:_button("Tu pueblo",Vector2(24,365),func():body.text="Soy el único loco de estos pueblos. Aquí cuidamos caballos. Sigue los caminos y los carteles para encontrar los demás oficios.")
  _button("Repetir la pista",Vector2(385,365),func():body.text=HerdTown217.dialogue220(SaveData.world_places144,SaveData.world_cousins140,town))
- _button("Diario de primos",Vector2(24,435),func():journal_requested.emit())
+ _button("Diario del loco" if SaveData.world_generator_version>=5 else "Diario de primos",Vector2(24,435),func():journal_requested.emit())
  _button("Seguir explorando",Vector2(385,435),func():closed.emit())
 func _button(text:String,at:Vector2,action:Callable):
  var b:=Button.new();b.text=text;b.position=at;b.size=Vector2(330,52);QuestButtonStyle.apply(b);add_child(b);b.pressed.connect(action)

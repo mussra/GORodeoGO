@@ -24,7 +24,7 @@ static func sites(seed_:int,generator:int,cousins:Dictionary)->Array[Dictionary]
   for id in VillageCousins140.IDS:
    if id=="home":continue # Same home village, no duplicate travel button.
    var point:Vector2=VillageCousins140.point(cousins,id)
-   out.append({"id":id,"name":TownIdentity215.title(cousins,id),"pos":Vector2(point.x+130.,470.)})
+   out.append({"id":id,"name":TownIdentity215.title(cousins,id),"pos":point+Vector2(130,0) if generator>=5 else Vector2(point.x+130.,470.)})
  return out
 static func visit(state:Dictionary,position_:Vector2,candidates:Array,known_cousins:Dictionary={})->bool:
  var changed:bool=false

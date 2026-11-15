@@ -48,6 +48,7 @@ static func hear(state:Dictionary,id:String)->bool:
  if state.get("hint215","")==id:state.hint215=""
  return true
 static func next_unknown(state:Dictionary,from_id:String)->String:
+ if SaveData.world_generator_version>=5:return ""
  var nearest:float=INF;var choice:String=""
  if from_id not in IDS:return choice
  for id in IDS:
@@ -56,6 +57,7 @@ static func next_unknown(state:Dictionary,from_id:String)->String:
   if distance<nearest:nearest=distance;choice=id
  return choice
 static func cousin_hint(state:Dictionary,from_id:String)->String:
+ if SaveData.world_generator_version>=5:return "Soy el único loco de estos pueblos. Sigue los caminos y los carteles para encontrar los demás oficios."
  var target:String=next_unknown(state,from_id)
  if target.is_empty():return "Ya conoces a todos mis primos de estos cuatro pueblos. No conozco otro por aquí."
  var side:String=direction(point(state,from_id),point(state,target))
