@@ -36,6 +36,8 @@ func _process(delta:float):
  var world:Node=_find_world242(get_tree().current_scene)
  if world!=null:
   label.text+='\nFrontera: %d chunks · %d cola | mapa %d rebuilds | flores mapa 0'%[world._chunks.size(),world._build_queue.size(),world._map_overlay.terrain_rebuilds]
+ if world!=null and world.get('_camera_controls243')!=null:
+  label.text+='\nCámara %.0f%% · LOD flores decorativas %s'%[world._camera_controls243.factor*100.,'normal' if world._camera_controls243.factor>=.99 else 'resumido']
  label.text+='\nCPU/GPU del sistema: N/D · contadores del motor, no %% de uso GPU'
  var viewport:Vector2=get_viewport().get_visible_rect().size
  var k:float=clampf(minf(viewport.x/1280.,viewport.y/720.),.65,1.4)

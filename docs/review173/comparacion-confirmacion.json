@@ -1,0 +1,186 @@
+{
+  "site_0_zoom_0.75_run_1": {
+    "chunks": 9,
+    "draw_calls_p95": 282.0,
+    "frame": {
+      "max_ms": 43.454,
+      "mean_ms": 22.6019333333333,
+      "n": 60,
+      "p50_ms": 21.92,
+      "p95_ms": 25.227
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 108.199226379395,
+    "memory_start_mb": 108.194271087646,
+    "nodes_end": 400.0,
+    "nodes_start": 400.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.039,
+        "mean_ms": 0.0330983606557377,
+        "n": 61,
+        "p50_ms": 0.033,
+        "p95_ms": 0.034
+      },
+      "npcs": {
+        "max_ms": 0.186,
+        "mean_ms": 0.149213114754098,
+        "n": 61,
+        "p50_ms": 0.145,
+        "p95_ms": 0.176
+      },
+      "quest_hud": {
+        "max_ms": 0.067,
+        "mean_ms": 0.036,
+        "n": 61,
+        "p50_ms": 0.035,
+        "p95_ms": 0.037
+      },
+      "world_process": {
+        "max_ms": 0.92,
+        "mean_ms": 0.60627868852459,
+        "n": 61,
+        "p50_ms": 0.592,
+        "p95_ms": 0.71
+      }
+    }
+  },
+  "site_0_zoom_1.0_run_0": {
+    "chunks": 9,
+    "draw_calls_p95": 275.0,
+    "frame": {
+      "max_ms": 47.53,
+      "mean_ms": 22.58475,
+      "n": 60,
+      "p50_ms": 21.9,
+      "p95_ms": 24.454
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 108.192832946777,
+    "memory_start_mb": 108.190498352051,
+    "nodes_end": 400.0,
+    "nodes_start": 400.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.051,
+        "mean_ms": 0.0337049180327869,
+        "n": 61,
+        "p50_ms": 0.033,
+        "p95_ms": 0.038
+      },
+      "npcs": {
+        "max_ms": 0.214,
+        "mean_ms": 0.146868852459016,
+        "n": 61,
+        "p50_ms": 0.144,
+        "p95_ms": 0.158
+      },
+      "quest_hud": {
+        "max_ms": 0.063,
+        "mean_ms": 0.0355737704918033,
+        "n": 61,
+        "p50_ms": 0.035,
+        "p95_ms": 0.037
+      },
+      "world_process": {
+        "max_ms": 0.939,
+        "mean_ms": 0.605688524590164,
+        "n": 61,
+        "p50_ms": 0.588,
+        "p95_ms": 0.704
+      }
+    }
+  },
+  "site_2_zoom_0.75_run_3": {
+    "chunks": 9,
+    "draw_calls_p95": 294.0,
+    "frame": {
+      "max_ms": 57.354,
+      "mean_ms": 30.0518166666667,
+      "n": 60,
+      "p50_ms": 29.175,
+      "p95_ms": 33.121
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 109.219947814941,
+    "memory_start_mb": 109.214992523193,
+    "nodes_end": 427.0,
+    "nodes_start": 427.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.044,
+        "mean_ms": 0.0318524590163935,
+        "n": 61,
+        "p50_ms": 0.031,
+        "p95_ms": 0.035
+      },
+      "npcs": {
+        "max_ms": 0.197,
+        "mean_ms": 0.155622950819672,
+        "n": 61,
+        "p50_ms": 0.153,
+        "p95_ms": 0.172
+      },
+      "quest_hud": {
+        "max_ms": 0.052,
+        "mean_ms": 0.0362950819672131,
+        "n": 61,
+        "p50_ms": 0.036,
+        "p95_ms": 0.04
+      },
+      "world_process": {
+        "max_ms": 1.126,
+        "mean_ms": 0.845344262295082,
+        "n": 61,
+        "p50_ms": 0.884,
+        "p95_ms": 0.999
+      }
+    }
+  },
+  "site_2_zoom_1.0_run_2": {
+    "chunks": 9,
+    "draw_calls_p95": 297.0,
+    "frame": {
+      "max_ms": 57.659,
+      "mean_ms": 30.5685833333333,
+      "n": 60,
+      "p50_ms": 29.431,
+      "p95_ms": 35.926
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 109.214775085449,
+    "memory_start_mb": 109.230144500732,
+    "nodes_end": 427.0,
+    "nodes_start": 427.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.041,
+        "mean_ms": 0.0317540983606557,
+        "n": 61,
+        "p50_ms": 0.031,
+        "p95_ms": 0.034
+      },
+      "npcs": {
+        "max_ms": 0.216,
+        "mean_ms": 0.155639344262295,
+        "n": 61,
+        "p50_ms": 0.151,
+        "p95_ms": 0.189
+      },
+      "quest_hud": {
+        "max_ms": 0.046,
+        "mean_ms": 0.0358852459016393,
+        "n": 61,
+        "p50_ms": 0.035,
+        "p95_ms": 0.038
+      },
+      "world_process": {
+        "max_ms": 1.174,
+        "mean_ms": 0.823573770491803,
+        "n": 61,
+        "p50_ms": 0.864,
+        "p95_ms": 1.061
+      }
+    }
+  }
+}

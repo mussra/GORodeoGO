@@ -88,3 +88,27 @@ Ideas propuestas, no aprobadas como contenido final:
 - Herrero: misiones de materiales y herramientas, sin fijar precios/recompensas aún.
 
 Por decidir: nombres e ilustraciones, diálogos definitivos, cantidad final de objetivos, premios y si algunos encargos se repiten. El prototipo no implica aprobaciones de arte o economía.
+
+## Juanito, guarnicionero: fabricar y mejorar equipo (16 noviembre 2026)
+
+Antonio propone que el guarnicionero ayude a crear mejores equipos, como la fusta, y pide otros equipamientos. Se une al trabajo de equipo/personalización y tienda de complementos. Propuesta para su OK: no está implementada en 2.7.173 y no modifica puntos, catálogo ni reglas.
+
+La fusta básica y mejorada ya figuran en el catálogo candidato con 1.000/2.000 puntos y trazos de 260/420 unidades. Se toman como referencia de precios, no como economía definitiva ni recompensa aprobada.
+
+| Equipo | Fabricar | Mejorar (coste adicional) | Efecto propuesto |
+| --- | ---: | ---: | --- |
+| Fusta | 1.000 puntos | 2.000 puntos | Trazo de regate 260 -> 420 unidades; sin más velocidad. Mantener lo que ya posea el jugador. |
+| Montura de viaje | 800 | 1.600 | Reduce gasto de resistencia al correr 5% -> 10%. No aumenta velocidad máxima. |
+| Riendas de precisión | 600 | 1.200 | Reduce tiempo de recarga del regate 5% -> 10%; no cambia el gesto ni el alcance. |
+| Estribos de equilibrio | 700 | 1.400 | Reduce duración del aturdimiento tras golpe 5% -> 10%; el golpe sigue soltando las capturas. |
+| Herraduras de camino | 900 | 1.800 | Reduce penalización de terreno difícil 10% -> 20%; no elimina obstáculos ni colisiones. |
+| Alforjas | 500 | 1.000 | Añade 2 -> 4 huecos a un futuro inventario de recolección. Bloqueadas hasta que exista un inventario con límite definido. |
+| Sombrero y manta de montura | 300 cada uno | 600 por variante elaborada | Solo apariencia, sin ventaja de juego. Permite gastar puntos sin alterar el equilibrio. |
+
+Se evitan espuelas con ventaja de velocidad para no duplicar la fusta ni premiar un uso agresivo. El equipo no concede Serenidad genética ni sustituye la crianza.
+
+Reglas propuestas: un objeto por ranura, sin apilar copias; compra única que después se equipa sin pagar; mejora requiere la versión básica; precio total y diferencia de efecto visibles antes de confirmar; sin dinero real, desgaste ni reparaciones periódicas. Las reducciones se limitan al 10% por efecto y no se suman entre objetos del mismo efecto. Los objetos ya obtenidos se conservan, sin recomprarlos al trasladar la tienda a Juanito. La fusta no debe retirar un regate ya desbloqueado.
+
+Primera entrega sugerida si Antonio da su OK: Juanito con fusta, montura, riendas y estribos; cosméticos después, alforjas cuando exista inventario. Los precios y porcentajes son valores de prueba pendientes de aprobar y ajustar jugando, no compromisos de implementación.
+
+Fuentes: WhatsApp 16nov 21:18 "El guarnicionero te puede ayudar a crear mejores equipos como la fusta" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzMwNDc4OTdGRUQ3NjkxNzFCNzlGRTZBNDI3QzIzNwA=`) y 21:19 "Y añade otros equipamientos como la fusta" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQ0FEQjdFOEU5MTU2MTMwQzBFRTdCMUY2RTZCNjJFRQA=`). Para este bloque se mantiene revisión previa de la economía.

@@ -1,0 +1,108 @@
+{
+  "version": "2.7.173",
+  "version_code": 432,
+  "base": "032156de712987174b644d311108ab752d121faf",
+  "branch": "feat/open-world-test-20261107",
+  "controls": {
+    "steps": [
+      1,
+      0.85,
+      0.75
+    ],
+    "reset": "Tap the percentage",
+    "scope": "Mundo Libre/Frontera",
+    "gesture": "HUD buttons only, no pinch recognizer",
+    "preference_file": "user://world_camera243.cfg",
+    "ultrawide": "Minimum >= max(viewport width,height)/1848, clamped .75..1, to preserve loaded-chunk coverage",
+    "lod": "Only noncolliding decorative world_decor flower nodes hidden below .99. Collectible flowers, trees, colliders and simulation untouched."
+  },
+  "tests": {
+    "scripts": 24,
+    "passed": 158,
+    "total": 158,
+    "assertions": 7273,
+    "touch": "Synthetic native joystick hold plus camera tap, reset without move/lasso, same world wall contact at 100/75, existing touch loss cases re-run",
+    "limits": [
+      "Not tested on physical Android.",
+      "Camera changes do not fix previously reported long-session stall or Rodeo 20."
+    ]
+  },
+  "performance": {
+    "environment": "Godot 4.7.2, Linux llvmpipe Vulkan mobile renderer, 1280x720, V6 seed752026, 400 discovered chunks, OSD off during frame batches, OSD on for separate screenshot checks",
+    "method": "150 frames per batch; 1x/0.75x/1x/0.75x at 4 sites after streaming/warmup. Separate 60-frame confirmation.",
+    "sites": [
+      {
+        "site": 0,
+        "normal_mean_ms": 22.4104033333333,
+        "overview_mean_ms": 22.50822666666665,
+        "normal_calls": 275.0,
+        "overview_calls": 282.0,
+        "nodes_normal_overview": [
+          400.0,
+          400.0
+        ],
+        "active_chunks_normal_overview": [
+          9,
+          9
+        ]
+      },
+      {
+        "site": 1,
+        "normal_mean_ms": 22.257446666666652,
+        "overview_mean_ms": 22.527936666666648,
+        "normal_calls": 275.0,
+        "overview_calls": 277.0,
+        "nodes_normal_overview": [
+          521.0,
+          521.0
+        ],
+        "active_chunks_normal_overview": [
+          12,
+          12
+        ]
+      },
+      {
+        "site": 2,
+        "normal_mean_ms": 29.95356,
+        "overview_mean_ms": 29.596153333333348,
+        "normal_calls": 297.0,
+        "overview_calls": 294.0,
+        "nodes_normal_overview": [
+          427.0,
+          427.0
+        ],
+        "active_chunks_normal_overview": [
+          9,
+          9
+        ]
+      },
+      {
+        "site": 3,
+        "normal_mean_ms": 26.43415,
+        "overview_mean_ms": 26.26141333333335,
+        "normal_calls": 306.0,
+        "overview_calls": 309.0,
+        "nodes_normal_overview": [
+          475.0,
+          475.0
+        ],
+        "active_chunks_normal_overview": [
+          9,
+          9
+        ]
+      }
+    ],
+    "interpretation": "No consistent slowdown in sampled cases; small variations within observed noise. Draw calls are not literally identical: -3 to +7. This is not a universal zero-cost or phone-FPS guarantee. Active chunk counts can differ by route history, not zoom; same within each pair.",
+    "raw": "review173/comparacion-cuatro-sitios.json",
+    "osd": "OSD snapshots use a 0.5s frame window; engine process monitor can retain a previous PNG-capture stall and is not the frame-batch mean."
+  },
+  "apk": {
+    "sha256": "dea500c31b303975d123d2568200043e34b3ea4385e82d10518a78a58b82b100",
+    "bytes": 82688844,
+    "package": "com.example.rancho.review",
+    "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+    "same_save_format": true,
+    "store_publication": false
+  },
+  "future_equipment": "docs/IDEAS_FUTURAS.md. Design proposal only, no economy or equipment implementation."
+}

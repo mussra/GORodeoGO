@@ -52,6 +52,7 @@ const CHUNK_LOOKAHEAD_SECONDS := 3.0
 var _chunk_pending: Dictionary = {}  # key -> builder en curso (fuera del árbol)
 var _chunk_built: Dictionary = {}    # key -> builder terminado (caché fuera del árbol)
 var _build_queue: Array = []         # keys pendientes, lo más cercano primero
+var _camera_controls243:WorldCamera243
 var _hud: CanvasLayer
 var _audio: RanchAudio
 var aim_joystick: VirtualJoystick  # named like the levels so JoystickAppearance.apply works
@@ -1002,6 +1003,7 @@ func _build_hud() -> void:
 	# arena minimap, the small map is ALWAYS there; closing only collapses it.
 	_map_overlay.visible = true
 	_hud.add_child(_map_overlay)
+	_camera_controls243=WorldCamera243.new();_camera_controls243.world=self;_camera_controls243.camera=get_viewport().get_camera_2d();_hud.add_child(_camera_controls243)
 	_map_notes159=MapNotesController159.new();add_child(_map_notes159)
 	# Same TouchControls scene as the levels (Ant 18:17: "No una copia") — one
 	# shared system; the world only adjusts layer and the bounded aim zone.
