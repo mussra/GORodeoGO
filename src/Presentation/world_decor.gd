@@ -137,10 +137,13 @@ static func clear_spawn121(actor:CharacterBody2D)->bool:
 	return false
 
 func _ready() -> void:
+	add_to_group("arrival_decor244")
 	if kind=="flower":
 		add_to_group("overview_decor243")
 		var camera:=get_viewport().get_camera_2d()
 		visible=camera==null or camera.zoom.x>=.99
+	var overview_camera:=get_viewport().get_camera_2d()
+	if overview_camera!=null and overview_camera.zoom.x<.7:visible=false
 	scale = Vector2.ONE * size_scale
 	queue_redraw()
 

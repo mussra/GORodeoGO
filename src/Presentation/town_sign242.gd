@@ -17,6 +17,7 @@ func _process(delta:float):
  if clock<.25:return
  clock=0.
  if not is_instance_valid(world) or not is_instance_valid(world.player):hide();return
+ if world.get("_arrival244")!=null and world._arrival244.active:hide();return
  if world._loading_world or world._map_overlay.expanded or is_instance_valid(world._navigation):hide();return
  var best:Dictionary={};var distance:float=900.
  for plan in TownEnclosures227.plans(SaveData.world_seed).values():

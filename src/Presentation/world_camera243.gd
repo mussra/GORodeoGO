@@ -9,6 +9,7 @@ var minus:Button
 var reset:Button
 var plus:Button
 var factor:float=1.
+var arrival_active244:bool=false
 func _ready()->void:
  name='WorldCamera243';add_theme_constant_override('separation',6)
  mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -30,6 +31,7 @@ static func minimum_for(extent:Vector2)->float:
  # 3x3 active chunks guarantee >=1024 units to every edge. Keep 100 units spare.
  return clampf(maxf(.75,maxf(extent.x,extent.y)/1848.),.75,1.)
 func step(direction:int)->void:
+ if arrival_active244 and world.get("_arrival244")!=null:world._arrival244.finish(false)
  var target:float=factor
  if direction<0:
   for i in range(STEPS.size()-1,-1,-1):
@@ -40,6 +42,7 @@ func step(direction:int)->void:
  set_factor(target)
 func set_factor(value:float,persist:bool=true)->void:
  factor=clampf(value,minimum_for(get_viewport_rect().size),1.)
+ if arrival_active244 and world!=null and world.get("_arrival244")!=null:world._arrival244.finish(false)
  if is_instance_valid(camera):camera.zoom=Vector2.ONE*factor
  # Only tiny, non-colliding decorative flowers disappear in overview. Collectible
  # quest flowers use another renderer and remain visible and interactive.
