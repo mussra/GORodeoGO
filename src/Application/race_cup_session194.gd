@@ -10,7 +10,7 @@ static var last_notice:String=""
 static var started_path:String=""
 static func path()->String:
  if not path_override.is_empty():return path_override
- return "user://cup-debug194.cfg" if SaveData.debug_mode else "user://cup-normal194.cfg"
+ return "user://cup-debug-progress240.cfg" if SaveData.debug_mode else "user://cup-normal-progress240.cfg"
 static func load_state()->Dictionary:
  if SaveData.trial_session_active:return {"ok":false,"reason":"trial_session"}
  return RaceCupStore194.read_state(path())

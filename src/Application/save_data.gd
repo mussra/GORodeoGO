@@ -12,8 +12,8 @@ const LEGACY_2_SAVE_PATH: String = "user://save.dat"
 const SAVE_PATH: String = "user://save-genetics-v3.dat"
 const SAVE_VERSION: int = 3  ## bump when the file layout changes, to allow migrations
 
-const NORMAL_SAVE_PATH:String="user://save-normal-v4.dat"
-const DEBUG_SAVE_PATH:String="user://save-debug-v4.dat"
+const NORMAL_SAVE_PATH:String="user://save-normal-progress240.dat"
+const DEBUG_SAVE_PATH:String="user://save-debug-progress240.dat"
 var _load_valid:bool=true
 var debug_mode:bool=false
 var normal_mode_path:String=NORMAL_SAVE_PATH
@@ -21,6 +21,10 @@ var debug_mode_path:String=DEBUG_SAVE_PATH
 var horse_collection:HorseCollection = HorseCollection.new()
 var hat_color: String = "original"
 var hat_designs235:Dictionary={}
+var rodeo_intro240:bool=false
+var victories240:Dictionary=ModeVictories240.fresh()
+var _issued240:int=0
+var pending_victory240:Dictionary={}
 var highest_level_completed: int = 0
 var equipment_points: int = 0
 var equipment_owned: Array[String] = []
@@ -85,6 +89,8 @@ func save_progress() -> bool:
 	if trial_session_active:return true # in-memory selections only, never touch real save
 	var config := ConfigFile.new()
 	config.set_value("meta", "version", SAVE_VERSION)
+	config.set_value("progress","victories240",victories240)
+	config.set_value("progress","rodeo_intro240",rodeo_intro240)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
 	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
 	var next_hat_designs235:=HatDesigns235.collect(hat_designs235,horse_collection)
@@ -148,6 +154,8 @@ func load_progress() -> void:
 	world_discovered.clear()
 	world_tamed.clear()
 	world_position = Vector2(0, 160)
+	rodeo_intro240=false
+	victories240=ModeVictories240.fresh();_issued240=0;pending_victory240.clear()
 	world_quests.clear()
 	world_flora138.clear()
 	world_garden212=Garden212.fresh()
@@ -162,7 +170,7 @@ func load_progress() -> void:
 	world_edits.clear()
 	var config := ConfigFile.new()
 	var source_path:String=load_source_path(save_path,LEGACY_2_SAVE_PATH) if save_path==SAVE_PATH else save_path
-	if save_path==NORMAL_SAVE_PATH and not FileAccess.file_exists(save_path):source_path=load_source_path(SAVE_PATH,LEGACY_2_SAVE_PATH)
+	if save_path=="user://save-normal-v4.dat" and not FileAccess.file_exists(save_path):source_path=load_source_path(SAVE_PATH,LEGACY_2_SAVE_PATH) # legacy-only fallback, never for fresh progress240
 	var err: Error = config.load(source_path)
 	if err != OK:
 		_load_valid=not FileAccess.file_exists(source_path)
@@ -219,6 +227,11 @@ func load_progress() -> void:
 	if typeof(we)==TYPE_ARRAY:
 		for op in we:
 			if WorldEdits.valid_op(op):world_edits.append(op)
+	rodeo_intro240=config.get_value("progress","rodeo_intro240",false)==true
+	var victory_raw:Variant=config.get_value("progress","victories240",ModeVictories240.fresh())
+	if not ModeVictories240.valid(victory_raw):
+		_load_valid=false;return
+	victories240=victory_raw.duplicate(true);_issued240=victories240.last;pending_victory240.clear()
 	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
 	var garden_raw:Variant=config.get_value("world","garden212",{})
@@ -302,6 +315,9 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 	if not apply_legacy_points_credit(EquipmentCatalog.REWARDS):return 0
 	var reward:int=ProgressionEconomy165.victory_points(level_number,highest_level_completed)
 	var before_horses:Dictionary=horse_collection.export_state()
+	var before_victories:Dictionary=victories240.duplicate(true)
+	_issued240=maxi(_issued240,victories240.last)+1
+	ModeVictories240.record(victories240,"bulls",_issued240)
 	var before_highest:int=highest_level_completed
 	var before_points:int=equipment_points
 	GalaxyKeys173.migrate(horse_collection,highest_level_completed)
@@ -314,6 +330,7 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 	HorseMastery.record(horse_collection,mounted_horse_id,level_number)
 	if save_progress():return reward
 	horse_collection.restore(before_horses)
+	victories240=before_victories
 	highest_level_completed=before_highest
 	equipment_points=before_points
 	return 0
@@ -377,7 +394,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
@@ -708,7 +725,11 @@ func claim_cup195()->Dictionary:
 	var before:=horse_collection.export_state()
 	var granted:=CupRewards195.claim(horse_collection)
 	if not granted.ok or granted.already:return granted
+	var before_victories:Dictionary=victories240.duplicate(true)
+	var ticket:=victory_ticket240("cup")
+	ModeVictories240.record(victories240,"cup",ticket.sequence)
 	if save_progress():return granted
+	victories240=before_victories
 	horse_collection.restore(before)
 	return {"ok":false,"reason":"save_failed"}
 
@@ -751,3 +772,27 @@ func prepare_herd217(base:Dictionary,cx:int,cy:int)->bool:
 	world_herd_town217.revised226[key]=true
 	if save_progress():return true
 	world_herd_town217=before;return false
+
+## A ticket belongs to one completed run and one storage context, never a UI refresh.
+func victory_ticket240(mode:String)->Dictionary:
+	_issued240=maxi(_issued240,int(victories240.last))+1
+	return {"mode":mode,"sequence":_issued240,"debug":debug_mode,"trial":trial_session_active}
+func record_mode_victory240(ticket:Dictionary,course:int=-1)->bool:
+	if trial_session_active or ticket.get("trial",true) or ticket.get("debug")!=debug_mode:return false
+	if not pending_victory240.is_empty() and pending_victory240.ticket!=ticket:return false
+	var before:=victories240.duplicate(true)
+	if not ModeVictories240.record(victories240,str(ticket.get("mode","")),int(ticket.get("sequence",0)),course):return false
+	if save_progress():pending_victory240.clear();return true
+	victories240=before;pending_victory240={"ticket":ticket.duplicate(true),"course":course};return false
+func retry_victory240()->bool:
+	if pending_victory240.is_empty():return true
+	return record_mode_victory240(pending_victory240.ticket,pending_victory240.course)
+
+func mode_open240(mode:String)->bool:
+	return ModeAccess240.open(mode,highest_level_completed,world_places144,world_quests,rodeo_intro240,victories240.wins,debug_mode) and pending_victory240.is_empty()
+func accept_rodeo240()->bool:
+	if not ModeAccess240.rodeo_offered(world_quests):return false
+	var before:bool=rodeo_intro240
+	rodeo_intro240=true
+	if save_progress():return true
+	rodeo_intro240=before;return false

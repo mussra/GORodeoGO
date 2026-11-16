@@ -3,6 +3,8 @@ var body:Label
 var play:Button
 var goal:Dictionary={}
 func _ready()->void:
+ if not SaveData.mode_open240("cup"):
+  get_tree().call_deferred("change_scene_to_file","res://src/Presentation/main_menu.tscn");return
  RaceCupSession194.active=false
  theme=RanchTheme.create();set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  var panel:=Panel.new();panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER);panel.position=Vector2(-480,-280);panel.size=Vector2(960,560);add_child(panel)

@@ -2,6 +2,7 @@ extends Node2D
 const BUSH208=preload("res://art/world/cartoon/bush1.png")
 const POINTS=[Vector2(350,300),Vector2(870,300),Vector2(350,510),Vector2(870,510)]
 const COLORS=[Color("ff8074"),Color("81c9ff"),Color("ffdf78"),Color("a8e792")]
+var victory_ticket240:Dictionary={}
 var model:=JumpMemory207.new()
 var player:CharacterBody2D
 var aim_joystick:VirtualJoystick
@@ -21,6 +22,9 @@ var jump_valid:bool=false
 var paused207:bool=false
 var map_view:Control
 func _ready():
+ if not SaveData.mode_open240("memory"):
+  get_tree().call_deferred("change_scene_to_file","res://src/Presentation/main_menu.tscn");return
+ victory_ticket240=SaveData.victory_ticket240("memory")
  RanchMusic.play_context("gameplay")
  for i in POINTS.size():
   var fence:=MemoryFence208.new();fence.index=i;fence.position=POINTS[i];add_child(fence)
@@ -47,9 +51,10 @@ func _ready():
 func _button(text:String,at:Vector2,call:Callable)->Button:
  var button:=Button.new();button.text=text;button.position=at;button.size=Vector2(260,58);hud.add_child(button);button.pressed.connect(call);return button
 func _action():
+ if not SaveData.pending_victory240.is_empty():status.text="Victoria sin guardar. Ve a Coronas para reintentar.";return
  if model.state=="ready":model.next_round()
  elif model.state=="passed":model.next_round()
- elif model.state=="won":model=JumpMemory207.new();model.next_round()
+ elif model.state=="won":victory_ticket240=SaveData.victory_ticket240("memory");model=JumpMemory207.new();model.next_round()
  else:model.repeat()
  _start_show()
 func _repeat():
@@ -78,11 +83,13 @@ func _landed():
   var point:Vector2=POINTS[i]
   if Geometry2D.segment_intersects_segment(jump_from,player.position,point-MemoryFence208.half_axis(i),point+MemoryFence208.half_axis(i))!=null:
    var state:String=model.land(i);sound.play("lose" if state=="failed" else "win" if state in ["passed","won"] else "capture")
+   if state=="won":SaveData.record_mode_victory240(victory_ticket240)
    if state!="ride":player.set_physics_process(false);player.velocity=Vector2.ZERO
    _refresh();return
 func _refresh():
  var phase:String={"ready":"Mira, recuerda y salta","show":"OBSERVA · memoriza el orden","ride":"TU TURNO · salto %d de %d"%[model.cursor+1,model.sequence.size()],"failed":"Orden incorrecto · vuelve a intentarlo","passed":"¡Secuencia completada!","won":"¡Seis obstáculos recordados!"}.get(model.state,"")
  status.text="HÍPICA DE MEMORIA · ronda %d/%d\n%s"%[maxi(1,model.sequence.size()),JumpMemory207.GOAL,phase]
+ if not SaveData.pending_victory240.is_empty():status.text+="\nVictoria no guardada: reintenta en Coronas antes de cerrar."
  hint.text="Joystick izquierdo para cabalgar. Acércate de frente a la valla: el caballo salta solo."
  if model.state=="show":hint.text="Mira qué número se ilumina. Después repite los saltos sin pistas."
  if model.state=="ready":hint.text="Cuatro vallas con color y número. Primero mira; después salta en el mismo orden."

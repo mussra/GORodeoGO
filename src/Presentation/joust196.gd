@@ -63,3 +63,5 @@ func _draw()->void:
   draw_line(center+Vector2(-side*48.,0),center+Vector2(-side*34.,11),Color("ffe9b5"),4.)
 
 func prestart_aim198()->bool:return countdown>0. and not result.visible
+
+func victory_mode240()->String:return "joust"

@@ -56,6 +56,8 @@ var _link_overlay: PenLinkOverlay
 var _pen_released: Array = []  # bool per pen index — a pen's bulls are released at most once
 
 func _ready() -> void:
+	if not SaveData.mode_open240("bulls") and not SaveData.trial_session_active:
+		get_tree().call_deferred("change_scene_to_file","res://src/Presentation/main_menu.tscn");return
 	JoystickAppearance.apply(self)
 	RanchMusic.set_paused(false)
 	RanchMusic.set_enabled(GameState.sound_enabled)

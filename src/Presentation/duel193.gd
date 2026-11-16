@@ -1,5 +1,6 @@
 extends Node2D
-## Isolated best-of-three. No save, economy, rewards or horse mutation.
+## Best-of-three with persisted victory facts, no new economy or horse mutation.
+func victory_mode240()->String:return "duel"
 var course:=RaceCourse190.new()
 var riders:Array[DuelRider193]=[]
 var player:DuelRider193
@@ -21,6 +22,8 @@ var hud:Control
 var aim_joystick:VirtualJoystick
 var controls:CanvasLayer
 func _ready()->void:
+ if not SaveData.mode_open240(victory_mode240()):
+  get_tree().call_deferred("change_scene_to_file","res://src/Presentation/main_menu.tscn");return
  process_physics_priority=50
  RanchMusic.play_context("duel")
  for index in 2:
@@ -79,7 +82,11 @@ func capture_landed(target:Node2D)->void:
  var winner:int=1 if target==riders[0] else 0
  if not pending.has(winner):pending.append(winner)
  if capture_frame<0:capture_frame=Engine.get_physics_frames()
+var victory_ticket240:Dictionary={}
+func _enter_tree()->void:
+ victory_ticket240=SaveData.victory_ticket240(victory_mode240())
 func _resolve_round()->void:
+ if finished:return
  running=false;capture_frame=-1
  for rider in riders:rider.cancel_input()
  _clear_actions()
@@ -96,6 +103,9 @@ func _resolve_round()->void:
  if finished:title="¡Has ganado el duelo!" if scores[0]>=2 else "Luna gana el duelo"
  result_text.text=title+"\n\nTú %d - %d Luna\nSin premios ni cambios en tus caballos."%[scores[0],scores[1]]
  next_button.text="Volver a la copa" if cup_done else "Repetir duelo" if finished else "Repetir manga" if pending.size()==2 else "Siguiente manga"
+ if finished and scores[0]>=2 and not SaveData.record_mode_victory240(victory_ticket240):result_text.text+="\nVictoria no guardada. Reintenta en Coronas."
+ if finished and scores[0]>=2 and SaveData.pending_victory240.is_empty():
+  result_text.text+="\n"+("Hípica disponible en Juegos." if victory_mode240()=="joust" else "Justa y Copa disponibles en Juegos.")
  result.show();_refresh()
 func _clear_actions()->void:
  for action in ["move_left","move_right","move_up","move_down","aim_left","aim_right","aim_up","aim_down","throw_lasso"]:Input.action_release(action)

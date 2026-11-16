@@ -1048,7 +1048,11 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"}]
+	_navigation.entries=[{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"},{"id":"crowns240","title":"Coronas y victorias","hint":"Logros conseguidos y pendientes"}]
+	if ModeAccess240.rodeo_offered(SaveData.world_quests) and not SaveData.mode_open240("bulls"):
+		_navigation.entries.append({"id":"rodeo240","title":"Misión: Rodeo de toros","hint":"Acepta el encargo y supera el primer nivel de Rodeo."})
+	elif SaveData.mode_open240("bulls") and not SaveData.mode_open240("race"):
+		_navigation.entries.append({"id":"rodeo240","title":"Misión: abre las carreras","hint":ModeAccess240.requirement("race")})
 	if GameState.trial_tools_enabled():_navigation.entries.append({"id":"debug213","title":"Herramientas DEBUG","hint":"Editor / diseño / maquetas de país"})
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
@@ -1056,6 +1060,14 @@ func _open_navigation()->void:
 func _navigation_selected(id:String)->void:
 	_close_navigation()
 	match id:
+		"crowns240":
+			var screen:=ModeCrowns240.new();screen.process_mode=Node.PROCESS_MODE_ALWAYS
+			get_tree().paused=true
+			screen.tree_exited.connect(func():get_tree().paused=_navigation_was_paused)
+			_hud.add_child(screen)
+		"rodeo240":
+			if SaveData.mode_open240("bulls") or SaveData.accept_rodeo240():_menu()
+			else:_toast("No se ha guardado la misión. Reintenta.")
 		"map":_toggle_map()
 		"debug213":_open_debug213()
 		"modular_preview":_open_modular_preview93()
@@ -1249,6 +1261,9 @@ func _quest_event(kind:String,target:String,event_id:String)->void:
 func _refresh_quest_hud()->void:
 	if is_instance_valid(_quest_label):
 		_quest_label.text=NpcQuests.hud_text(SaveData.world_quests)+"\n"+RepeatContractsPanel165.summary()
+		if not SaveData.mode_open240("bulls"):
+			_quest_label.text+="\n"+("Misión de Rodeo disponible en Menú de Frontera." if ModeAccess240.rodeo_offered(SaveData.world_quests) else "Para descubrir Rodeo: ayuda al granjero con tres cerdos.")
+		elif not SaveData.mode_open240("race"):_quest_label.text+="\n"+ModeAccess240.requirement("race")
 		if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():_quest_label.text+="\n"+FloristJourney138.hud(SaveData.world_flora138)
 	if is_instance_valid(_quest_details179):_quest_details179.update_states(SaveData.world_quests,SaveData.repeat_contract165,SaveData.world_flora138 if SaveData.world_generator_version>=3 else {})
 	if not is_instance_valid(_flower_strip105):return

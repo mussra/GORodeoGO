@@ -108,7 +108,10 @@ func _build_menu() -> void:
 	_play.add_theme_color_override("font_color",Color("10252d"))
 	_play.add_theme_stylebox_override("normal",RanchTheme.box(Color("8de8cf"),Color("b3f6df"),8))
 	_play.add_theme_stylebox_override("hover",RanchTheme.box(Color("c3ffe9"),Color("ffffff"),8))
-	_play.pressed.connect(_show_games213)
+	_play.text="ENTRAR EN FRONTERA" if not SaveData.mode_open240("bulls") else "JUEGOS"
+	_play.pressed.connect(func():
+		if not SaveData.mode_open240("bulls"):_world_button.pressed.emit()
+		else:_show_games213())
 	_hero.add_child(_play)
 	_missions = Button.new()
 	_missions.text = tr("UI_003");_missions.hide()
@@ -242,6 +245,7 @@ func _process(delta: float) -> void:
 		_bull.position.y = sin(_elapsed*2+.8)*2
 
 func _show_levels() -> void:
+	if not SaveData.mode_open240("bulls"):_show_games213();return
 	_drawer.show()
 	_drawer.modulate.a = 0
 	create_tween().tween_property(_drawer,"modulate:a",1.0,.22)
@@ -253,6 +257,7 @@ func _hide_levels() -> void:
 	_drawer.hide()
 	_show_games213()
 func _on_level_selected(number: int) -> void:
+	if not SaveData.mode_open240("bulls"):return
 	if _transitioning or not LevelProgression.is_unlocked(number, SaveData.effective_progress()): return
 	_transitioning = true
 	GameState.selected_level = number
@@ -300,10 +305,19 @@ func _show_settings()->void:
 func _show_games213()->void:
 	if is_instance_valid(_games213):return
 	_games213=NavigationSheet.new();_games213.title="JUEGOS";_games213.entries=GAMES213.duplicate(true)
-	_games213.access_note239="Carreras, Duelo, Justa e Hípica: disponibles desde el inicio.\nRodeo: completa el nivel anterior. Copa: entra en Carreras y sigue los objetivos.\nModo DEBUG: niveles de Rodeo abiertos, con progreso separado." if SaveData.debug_mode else "Carreras, Duelo, Justa e Hípica: disponibles desde el inicio.\nRodeo: completa el nivel anterior.\nCopa: entra en Carreras y sigue los objetivos en orden."
+	for entry in _games213.entries:
+		if not SaveData.mode_open240(entry.id):
+			entry.erase("icon223");entry.hint=ModeAccess240.card_requirement(entry.id)
+	_games213.entries.append({"id":"crowns240","title":"Coronas y victorias","hint":"Tus resultados · tipos de corona"})
+	var next240:String="Todos los modos disponibles. Completa tus coronas."
+	for mode in ["bulls","race","duel","joust","memory"]:
+		if not SaveData.mode_open240(mode):next240="Siguiente paso: "+ModeAccess240.requirement(mode);break
+	_games213.access_note239=next240+"\nParámetros de progresión en prueba. Coronas y victorias: sexta tarjeta."
 	_games213.tree_exited.connect(_guard_recheck213);_games213.selected.connect(_choose_game213);_games213.closed.connect(func():_games213=null);add_child(_games213)
 func _choose_game213(id:String)->void:
 	_games213=null
+	if id=="crowns240":add_child(ModeCrowns240.new());return
+	if not SaveData.mode_open240(id):_show_games213();return
 	if id=="bulls":_show_levels();return
 	if ROUTES213.has(id):_launch213(ROUTES213[id])
 func _launch213(path:String)->void:

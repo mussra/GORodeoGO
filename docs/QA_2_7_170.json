@@ -1,0 +1,45 @@
+{
+  "version": "2.7.170",
+  "branch": "feat/open-world-test-20261107",
+  "godot": "4.7.2",
+  "tests": {
+    "scripts": 10,
+    "tests": 56,
+    "passed": 56,
+    "assertions": 545,
+    "script_paths": [
+      "res://tests/unit/test_mode_progress240.gd",
+      "res://tests/integration/test_mode_progress240.gd",
+      "res://tests/unit/test_race_cup194.gd",
+      "res://tests/unit/test_save_data.gd",
+      "res://tests/unit/test_world_places144.gd",
+      "res://tests/unit/test_race_course190.gd",
+      "res://tests/unit/test_npc_quests75.gd",
+      "res://tests/unit/test_level_progression.gd",
+      "res://tests/unit/test_race_cup_store194.gd",
+      "res://tests/integration/test_mode_hooks240.gd"
+    ]
+  },
+  "visual": [
+    "juegos240.png",
+    "coronas240-obtenidas.png"
+  ],
+  "android_device_tested": false,
+  "full_historical_integration_suite_rerun": false,
+  "parameters": {
+    "rodeo_offer": "farmer_pigs done then accept",
+    "rodeo_level": 1,
+    "villages_excluding_home": 2,
+    "race_wins_for_duel": 2,
+    "duel_wins_for_joust_and_cup": 1,
+    "joust_wins_for_memory": 1,
+    "crown_wins": 1,
+    "cup_crown_objectives": 32
+  },
+  "old_save_policy": "Fresh progress240 normal/debug and cup paths; old files preserved, no fallback/migration",
+  "apk_bytes": 79197326,
+  "apk_sha256": "02639cd9f6cd7032ffa22f6a3f8b249470fee77db635900e480dd4fd9bcc2e6e",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "version_code": 429,
+  "package": "com.example.rancho.review"
+}

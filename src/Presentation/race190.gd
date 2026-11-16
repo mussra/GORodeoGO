@@ -34,6 +34,8 @@ var pause_button:Button
 var result_text:Label
 var _announced:bool=false
 func _ready()->void:
+ if not SaveData.mode_open240("race"):
+  get_tree().call_deferred("change_scene_to_file","res://src/Presentation/main_menu.tscn");return
  process_physics_priority=50
  RanchMusic.stop_context()
  var musician205:=GanjoMusician205.new();musician205.position=GanjoMusician205.beside_race205(course);add_child(musician205)
@@ -158,7 +160,11 @@ func notice_hit(target:RaceRider190)->void:
  hit_count+=1
  if target==player:received194+=1
  if target==player:toasts.clear() # Compact live status below replaces the long toast.
+var victory_ticket240:Dictionary={}
+func _enter_tree()->void:
+ victory_ticket240=SaveData.victory_ticket240("race")
 func _finish()->void:
+ if _announced:return
  var cup_run:bool=RaceCupSession194.active
  _announced=true;running=false;toasts.clear()
  for rider in riders:rider.cancel_input()
@@ -171,11 +177,14 @@ func _finish()->void:
   for child in results.get_children():
    if child is Button:child.hide()
   _button(results,"Volver a la copa",Vector2(195,310),func():get_tree().change_scene_to_file("res://src/Presentation/race_cup194.tscn"))
+ if order[0]==player and not SaveData.record_mode_victory240(victory_ticket240,course.variant):lines+="\nVictoria no guardada. Reintenta en Coronas."
  result_text.text=lines
  result_text.add_theme_font_size_override("font_size",26)
  _label(results,"Prototipo · sin premios ni cambios en tus caballos.",Vector2(28,268),17)
  results.show()
- if order[0]==player:_winner_story()
+ if order[0]==player:
+  _winner_story()
+  if SaveData.pending_victory240.is_empty() and SaveData.mode_open240("duel"):result_text.text+="\nDuelo disponible en Juegos."
 func _pause()->void:
  if results.visible or selector.visible:return
  player.cancel_input();get_tree().paused=true;pause_panel.show()
