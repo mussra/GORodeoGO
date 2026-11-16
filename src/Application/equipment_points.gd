@@ -19,6 +19,7 @@ func reward_completed_level(level:int,result_id:String,rewards:Dictionary)->int:
 func can_buy(item_id:String,catalog:Dictionary)->bool:
 	if owned.has(item_id) or not catalog.has(item_id):return false
 	var item:Dictionary=catalog[item_id]
+	if item.get("blocked",false):return false
 	var price:Variant=item.get("price",-1)
 	return typeof(price)==TYPE_INT and price>=0 and balance>=price and (not item.has("requires") or owned.has(item["requires"]))
 

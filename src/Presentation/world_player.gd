@@ -34,6 +34,45 @@ const STUN_SECONDS: float = 2.0
 var stun_resistance_multiplier: float = 1.0
 var _stun_time_remaining: float = 0.0
 
+## Espuelas (Juanito, Ant 16-nov 21:46): brief +10% burst bought with stamina.
+## One temporary speed at a time: no stacking with sprint or other boosts.
+var _equipment_signature243:String=""
+var spurs_world_enabled243:bool=false
+signal spurs_changed
+var spur_boost_left: float = 0.0
+var spur_cooldown_left: float = 0.0
+var stamina_state243:Dictionary={} # live mounted energy dictionary, bound by MountedStatus154
+var stamina_forced243: bool = false  # breather after emptying, fed by MountedStatus154.stamina
+var stamina_ratio243: float = 1.0  # last known stamina ratio, fed by MountedStatus154.stamina
+var _spur_boost_value: float = 0.10
+
+## Guards (approved proposal): only while willingly riding; never without
+## enough stamina, exhausted, stunned, jumping or drawing/executing a dodge.
+func try_activate_spurs() -> bool:
+	var item: Dictionary = EquipmentEffects.spurs()
+	if not spurs_world_enabled243 or gait_cap<WorldGait.GALOPE or not is_physics_processing() or movement_wish().length()<0.1:return false
+	if item.is_empty() or spur_cooldown_left > 0.0 or spur_boost_left > 0.0: return false
+	if _stun_time_remaining > 0.0 or _jump_time > 0.0: return false
+	if dodge != null and (dodge.drawing or dodge.remaining > 0.0 or dodge.coast_remaining>0.0 or not dodge.path.is_empty()): return false
+	if stamina_forced243: return false
+	var cost: float = float(item.get("spur_stamina_cost", 0.15))
+	if stamina_state243.is_empty() or stamina_ratio243 < cost: return false
+	_spur_boost_value = float(item.get("spur_boost", 0.10))
+	stamina_state243.value=maxf(0.0,float(stamina_state243.value)-cost*float(stamina_state243.max))
+	stamina_ratio243=WorldStamina.ratio(stamina_state243)
+	if float(stamina_state243.value)<=0.0:stamina_state243.forced_left=WorldStamina.FORCE_PASO_SECONDS
+	gait_cap=WorldStamina.cap_gait(stamina_state243,WorldGait.GALOPE)
+	if drink!=null:drink.stop()
+	spur_boost_left = float(item.get("spur_seconds", 1.0))
+	spur_cooldown_left = float(item.get("spur_cooldown", 8.0))
+	spurs_changed.emit()
+	return true
+
+func spur_cooldown_ratio() -> float:
+	var item: Dictionary = EquipmentEffects.spurs()
+	var total: float = float(item.get("spur_cooldown", 8.0))
+	return clampf(spur_cooldown_left / maxf(0.01, total), 0.0, 1.0)
+
 ## The dodge lives in the shared DodgeController; these forwards keep the
 ## world's HUD, trail drawing and the edge cue working with the corral names.
 const DRAW_EDGE_DWELL: float = DodgeController.DRAW_EDGE_DWELL
@@ -125,6 +164,8 @@ func refresh_mount237():
 	if _sprite_swap.has_sprite():
 		WorldActorScale.rider(_sprite_swap._sprite)
 		_sprite_swap._sprite.offset.y-=44.0/_sprite_swap._sprite.scale.y  # visual hooves share physics/y-sort origin
+		JuanitoCosmetics243.apply(_sprite_swap._frames)
+	_equipment_signature243=str(SaveData.equipment_equipped)
 	_sprite_swap.play("idle")
 
 func stun(duration: float = STUN_SECONDS) -> void:
@@ -132,7 +173,7 @@ func stun(duration: float = STUN_SECONDS) -> void:
 	if _jump_time>0:HorseJumpMotion.finish(self,true)
 	if _stun_time_remaining <= 0.0:
 		stunned.emit()
-	_stun_time_remaining = maxf(_stun_time_remaining, duration * stun_resistance_multiplier)
+	_stun_time_remaining = maxf(_stun_time_remaining, duration * stun_resistance_multiplier * (EquipmentEffects.stun_multiplier() if spurs_world_enabled243 else 1.0))
 	modulate = Color(1.0, 0.5, 0.5, 1.0)  # no stun art in the world yet: corral's red-tint fallback
 	dodge.cancel()
 	lasso.cancel_input()  # cancel held aim, but let an already thrown rope land
@@ -156,6 +197,13 @@ func _physics_process(delta: float) -> void:
 	step_shared_movement(delta)
 
 func step_shared_movement(delta:float)->void:
+	var signature:String=str(SaveData.equipment_equipped)
+	if signature!=_equipment_signature243:
+		_equipment_signature243=signature
+		refresh_mount237()
+	spur_boost_left=maxf(0.0,spur_boost_left-delta)
+	spur_cooldown_left=maxf(0.0,spur_cooldown_left-delta)
+	if _jump_time>0.0 or _stun_time_remaining>0.0 or dodge.drawing or dodge.remaining>0.0 or dodge.coast_remaining>0.0:spur_boost_left=0.0
 	if drink.step(delta,Input.get_vector("move_left","move_right","move_up","move_down")):return
 	_jump_cooldown=maxf(0,_jump_cooldown-delta)
 	if _jump_time>0:HorseJumpMotion.process(self,delta);return
@@ -185,6 +233,7 @@ func step_shared_movement(delta:float)->void:
 	var wish := movement_wish()
 	gait = mini(WorldGait.update(gait, wish.length()), gait_cap)
 	var gait_speed: float = WorldGait.speed_for(gait, max_speed)
+	if spur_boost_left > 0.0: gait_speed *= 1.0 + _spur_boost_value
 	if wish.length() > 0.1:
 		velocity = velocity.move_toward(wish.normalized() * gait_speed * clampf(wish.length(), 0.0, 1.0), acceleration * delta)
 	else:
@@ -201,6 +250,8 @@ func movement_wish()->Vector2:
 ## Same dodge drawing as the corral rider (DodgeVisuals): trail, bullet-time
 ## preview, recharge bar and dust.
 func _draw() -> void:
+	if spur_boost_left>0.0:
+		draw_arc(Vector2(0,-44),35.0,PI*.65,PI*1.35,16,Color(1.0,.85,.4,.5),2.0,true)
 	DodgeVisuals.draw_trail(self, dodge.skid_trail, dodge.trail_fade, Vector2.ZERO)
 	if dodge.drawing:
 		DodgeVisuals.draw_drawing(self, dodge.preview_points(dodge.draw_points))
@@ -220,6 +271,7 @@ func _update_animation(delta: float) -> void:
 
 func request_jump(direction:Vector2)->bool:return HorseJumpMotion.request(self,direction)
 func cancel_input()->void:
+	spur_boost_left=0.0
 	if drink!=null:drink.stop()
 	if _jump_time>0:HorseJumpMotion.finish(self,true)
 	lasso.cancel_all_actions();dodge.cancel();velocity=Vector2.ZERO

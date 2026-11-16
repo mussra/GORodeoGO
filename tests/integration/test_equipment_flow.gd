@@ -15,7 +15,7 @@ func before_each()->void:
   var value:Variant=SaveData.get(property.name)
   saved230[property.name]=value.duplicate(true) if value is Dictionary or value is Array else value
  collection230=SaveData.horse_collection.export_state().duplicate(true)
- SaveData._load_valid=true;SaveData.trial_session_active=false
+ SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.debug_mode=false;SaveData.rodeo_intro240=true;SaveData.pending_victory240={}
  SaveData.world_cousins140={};SaveData.world_flora138={};SaveData.world_herd_town217={};SaveData.world_places144={};SaveData.country_ledger146={};SaveData.world_roaming139={};SaveData.world_quests={};SaveData.world_garden212=Garden212.fresh();SaveData.world_seed=0;SaveData.world_generator_version=1
  old_path=SaveData.save_path;old_progress=SaveData.highest_level_completed;old_points=SaveData.equipment_points
  old_owned=SaveData.equipment_owned.duplicate();old_equipped=SaveData.equipment_equipped.duplicate();old_marker=SaveData.points_legacy_credit_applied;old_intro=SaveData.dual_lasso_intro_shown
@@ -32,6 +32,7 @@ func test_victory_repeats_purchase_equip_reload_and_player_effect()->void:
  assert_true(SaveData.apply_legacy_points_credit(EquipmentCatalog.REWARDS))
  assert_eq(SaveData.equipment_points,3665)
  GameState.selected_level=1
+ SaveData.pending_victory240={}
  var level=load("res://src/Presentation/level_0.tscn").instantiate();add_child(level)
  await wait_physics_frames(1)
  assert_false(level.player.dodge_available,"points do not auto-equip a fusta")
@@ -56,6 +57,7 @@ func test_victory_repeats_purchase_equip_reload_and_player_effect()->void:
  assert_eq(SaveData.highest_level_completed,10)
  assert_true(SaveData.points_legacy_credit_applied)
  assert_true(SaveData.dual_lasso_intro_shown)
+ SaveData.pending_victory240={}
  level=load("res://src/Presentation/level_0.tscn").instantiate();add_child(level)
  await wait_physics_frames(1)
  assert_true(level.player.dodge_available)

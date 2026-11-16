@@ -319,6 +319,15 @@ func equip_item(item_id:String)->bool:
 	equipment_equipped=before
 	return false
 
+func unequip_cosmetic243(slot:String)->bool:
+	if slot not in ["cosmetic_hat","cosmetic_blanket"]:return false
+	if not equipment_equipped.has(slot):return false
+	var before:Dictionary=equipment_equipped.duplicate()
+	equipment_equipped.erase(slot)
+	if save_progress():return true
+	equipment_equipped=before
+	return false
+
 func equipped_whip_reach()->float:
 	var item_id:String=equipment_equipped.get("whip","")
 	if not equipment_owned.has(item_id) or not EquipmentCatalog.ITEMS.has(item_id):return 0.0

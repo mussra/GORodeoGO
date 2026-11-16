@@ -6,5 +6,5 @@ func test_actions_keep_large_touch_targets_with_icon_above_small_caption():
   if not child is Button:continue
   buttons+=1;assert_eq(child.text,"");assert_true(child.has_node("Caption229"));assert_gte(child.size.y,80.)
   assert_true(child.get_children().any(func(n):return n is EquipmentIcon229));assert_eq(child.get_node("Caption229").get_theme_font_size("font_size"),18)
- assert_eq(buttons,9);assert_eq(panel._buy.size(),2);assert_eq(panel._equip.size(),2)
+ assert_eq(buttons,5);assert_eq(panel._buy.size(),EquipmentCatalog.ORDER.size());assert_eq(panel._equip.size(),EquipmentCatalog.ORDER.size())
  panel.free()

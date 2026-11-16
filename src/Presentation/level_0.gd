@@ -355,7 +355,7 @@ func _apply_unlocked_upgrades() -> void:
 	if GameState.debug_cheats_active():reach=maxf(reach,260.0)
 	var trained_horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
 	player.dodge_available=reach>0 and HorseTraining.knows(trained_horse,"dodge")
-	player.dodge_recharge_seconds=2.5*HorseTraining.recovery(trained_horse,"dodge")
+	player.dodge_recharge_seconds=2.5*HorseTraining.recovery(trained_horse,"dodge")*EquipmentEffects.dodge_recharge_multiplier()
 	player.jump_recovery_multiplier=HorseTraining.recovery(trained_horse,"jump")
 	_mounted_horse_id=SaveData.horse_collection.selected
 	_training_session=HorseTraining.session(SaveData.horse_collection)
@@ -368,7 +368,7 @@ func _apply_unlocked_upgrades() -> void:
 	player.dual_capture_speed_multiplier=horse_stats.power
 	if reach>0:player.dodge_path_limit=reach*horse_stats.dodge
 	player.max_speed *= _upgrades.speed_multiplier
-	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier
+	player.stun_resistance_multiplier *= _upgrades.stun_duration_multiplier*EquipmentEffects.stun_multiplier()
 	player.max_throw_distance *= _upgrades.throw_distance_multiplier
 	_max_simultaneous_captures = maxi(2,_upgrades.max_simultaneous_captures) if GameState.debug_cheats_active() else _upgrades.max_simultaneous_captures
 	player.set_max_captures(_max_simultaneous_captures)

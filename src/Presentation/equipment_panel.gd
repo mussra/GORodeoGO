@@ -7,12 +7,15 @@ var _state:Label
 var _buy:Dictionary={}
 var _equip:Dictionary={}
 var _horses:HorsePanel
+var _confirm:ConfirmationDialog
+var _pending_purchase:String=""
 var _hats:HatPanel
 func _ready()->void:
  MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=50
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  _canvas=Control.new();_canvas.size=Vector2(1280,720);add_child(_canvas)
  _label("EQUIPO",Vector2(40,22),30);_balance=_label("",Vector2(40,72),24)
+ var note:=_label("Juanito · guarnicionero · puntos del juego, sin dinero real",Vector2(640,78),16);note.modulate=Color(1,1,1,.65)
  _card("Volver","back",Vector2(1130,15),Vector2(110,90),func():hide();closed.emit())
  _card("Caballeriza · cría","horse",Vector2(40,125),Vector2(270,145),func():
   if _horses==null:_horses=HorsePanel.new();add_child(_horses)
@@ -22,21 +25,65 @@ func _ready()->void:
   else:_hats.show();_hats.refresh())
  _card("Adornos","adorn",Vector2(660,125),Vector2(270,145),func():add_child(AdornShop169.new()))
  _card("Acabados","finish",Vector2(970,125),Vector2(270,145),func():add_child(FinishShop168.new()))
- for i in 2:
-  var id:String=["whip_basic","whip_long"][i];var item:Dictionary=EquipmentCatalog.ITEMS[id];var x:float=40+i*620
-  var panel:=Panel.new();panel.position=Vector2(x,300);panel.size=Vector2(580,250);DetailCard179.style_panel(panel);_canvas.add_child(panel)
-  var icon:=EquipmentIcon229.new();icon.kind="whip" if i==0 else "long";icon.position=Vector2(x+20,320);icon.size=Vector2(110,110);_canvas.add_child(icon)
-  var title:=_label("Fusta" if i==0 else "Fusta mejorada",Vector2(x+10,442),18);title.size=Vector2(135,60);title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;title.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-  _label("%s puntos"%item.price,Vector2(x+155,318),24)
-  _label("Trazo: %s px"%int(item.reach),Vector2(x+155,356),21)
-  _label("Habilita el regate · sin más velocidad" if i==0 else "Requiere la fusta básica · sin más velocidad",Vector2(x+155,393),17)
-  _buy[id]=_card("Conseguir","buy",Vector2(x+155,450),Vector2(185,82),func():
-   if not SaveData.buy_equipment(id):_state.text=tr("UI_051")
-   refresh())
-  _equip[id]=_card("Equipar","equip",Vector2(x+365,450),Vector2(185,82),func():SaveData.equip_item(id);refresh())
- _state=_label("",Vector2(40,582),21);_state.size=Vector2(1200,60);_state.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
- _label("Precios provisionales · puntos del juego, sin dinero real",Vector2(40,663),17)
+ var scroll:=ScrollContainer.new();scroll.position=Vector2(40,292);scroll.size=Vector2(1200,352);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;_canvas.add_child(scroll)
+ var list:=VBoxContainer.new();list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;list.add_theme_constant_override("separation",8);scroll.add_child(list)
+ for id in EquipmentCatalog.ORDER:
+  if not EquipmentCatalog.ITEMS.has(id):continue
+  list.add_child(_item_row(id))
+ _confirm=ConfirmationDialog.new();_confirm.title="Juanito · confirmar equipo";_confirm.ok_button_text="Fabricar";_confirm.cancel_button_text="Cancelar";add_child(_confirm);_confirm.confirmed.connect(func():
+  var ok:bool=SaveData.buy_equipment(_pending_purchase);refresh()
+  if not ok:_state.text="No se pudo comprar ni guardar; no se han gastado puntos")
+ _state=_label("",Vector2(40,652),21);_state.size=Vector2(1200,60);_state.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ _label("Herraduras: pendiente de terreno difícil · Alforjas: pendiente de inventario limitado",Vector2(40,693),15)
  resized.connect(_layout);_layout();refresh()
+func _item_row(id:String)->Panel:
+ var item:Dictionary=EquipmentCatalog.ITEMS[id]
+ var panel:=Panel.new();panel.custom_minimum_size=Vector2(1170,124);DetailCard179.style_panel(panel)
+ var icon:=EquipmentIcon229.new();icon.kind=str(item.get("icon","whip"));icon.position=Vector2(14,14);icon.size=Vector2(96,96);panel.add_child(icon)
+ _row_label(panel,str(item.name),Vector2(126,10),20)
+ _row_label(panel,_effect_text(id),Vector2(126,42),17)
+ var diff:String=_upgrade_diff_text(id)
+ if not diff.is_empty():_row_label(panel,diff,Vector2(126,66),15)
+ var price_text:String=("Mejora: +%d puntos"%int(item.price)) if item.has("requires") else ("%d puntos"%int(item.price))
+ _row_label(panel,price_text,Vector2(126,92),17)
+ _buy[id]=_row_card(panel,"Conseguir","buy",Vector2(800,20),Vector2(170,84),func():
+  _confirm_purchase(id))
+ _equip[id]=_row_card(panel,"Equipar","equip",Vector2(985,20),Vector2(170,84),func():
+  if item.get("cosmetic",false) and SaveData.equipment_equipped.get(item.slot,"")==id:SaveData.unequip_cosmetic243(item.slot)
+  else:SaveData.equip_item(id)
+  refresh())
+ return panel
+func _row_label(panel:Panel,text:String,pos:Vector2,font:int)->Label:
+ var label:=Label.new();label.text=text;label.position=pos;label.size=Vector2(660,30);label.clip_text=true;label.tooltip_text=text;label.add_theme_font_size_override("font_size",font);panel.add_child(label);return label
+func _row_card(panel:Panel,caption:String,kind:String,pos:Vector2,extent:Vector2,callback:Callable)->Button:
+ var button:=Button.new();button.position=pos;button.size=extent;button.tooltip_text=caption;button.set_meta("entry229",kind);button.pressed.connect(callback);panel.add_child(button);QuestButtonStyle.apply(button)
+ for state in ["normal","hover","pressed","disabled","focus"]:
+  button.add_theme_stylebox_override(state,RanchTheme.box(Color("1b3d49") if state in ["normal","disabled"] else Color("285a68"),Color("478b9a"),12))
+ var icon:=EquipmentIcon229.new();icon.kind=kind;icon.size=Vector2.ONE*minf(60.,extent.y-32.);icon.position=Vector2(6,(extent.y-icon.size.y)*.5);button.add_child(icon)
+ var label:=Label.new();label.name="Caption229";label.text=caption;label.position=Vector2(4,extent.y-28);label.size=Vector2(extent.x-8,25);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.add_theme_font_size_override("font_size",17);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(label)
+ return button
+func _effect_text(id:String)->String:
+ var item:Dictionary=EquipmentCatalog.ITEMS[id]
+ if item.has("reach"):return "Trazo de regate: %d px"%int(item.reach)
+ if item.has("running_drain_mult"):return "Al correr: -%d%% de gasto de resistencia"%int(round((1.0-float(item.running_drain_mult))*100.0))
+ if item.has("dodge_recharge_mult"):return "Regate: recarga -%d%%"%int(round((1.0-float(item.dodge_recharge_mult))*100.0))
+ if item.has("stun_mult"):return "Aturdimiento tras golpe: -%d%%"%int(round((1.0-float(item.stun_mult))*100.0))
+ if item.has("terrain_relief"):return "Esfuerzo fuera de camino: -%d%%"%int(round(float(item.terrain_relief)*100.0))
+ if item.has("spur_boost"):return "+%d%% velocidad %.1f s · recarga %.0f s · -%d%% resistencia"%[int(round(float(item.spur_boost)*100.0)),float(item.spur_seconds),float(item.spur_cooldown),int(round(float(item.spur_stamina_cost)*100.0))]
+ if item.get("blocked",false):return str(item.get("blocked_reason","Pendiente"))
+ return "Solo apariencia, sin ventaja de juego"
+func _upgrade_diff_text(id:String)->String:
+ var item:Dictionary=EquipmentCatalog.ITEMS[id]
+ var base_id:String=str(item.get("requires",""))
+ if base_id.is_empty() or not EquipmentCatalog.ITEMS.has(base_id):return ""
+ if item.has("reach"):return "Básica: 260 px → mejorada: 420 px; sin más velocidad"
+ if item.has("running_drain_mult"):return "Básica: ahorro 5% → mejorada: ahorro 10%"
+ if item.has("dodge_recharge_mult"):return "Básica: recarga -5% → mejorada: recarga -10%"
+ if item.has("stun_mult"):return "Básica: aturdimiento -5% → mejorada: -10%; suelta capturas igual"
+ if item.has("spur_seconds"):return "Básicas: 1 s / 8 s → finas: 1,3 s / 7 s; mismo impulso y coste"
+ if item.get("blocked",false):return "No disponible; no se pueden gastar puntos"
+ return "Variante elaborada del básico; solo apariencia"
+
 func _label(text:String,pos:Vector2,font:int)->Label:
  var label:=Label.new();label.text=text;label.position=pos;label.add_theme_font_size_override("font_size",font);_canvas.add_child(label);return label
 func _card(caption:String,kind:String,pos:Vector2,extent:Vector2,callback:Callable)->Button:
@@ -54,12 +101,24 @@ func refresh()->void:
  _balance.text=tr("UI_055")%SaveData.equipment_points
  var state:EquipmentPoints=SaveData.equipment_state()
  for id in _buy:
-  _buy[id].get_node("Caption229").text="Conseguido" if state.owned.has(id) else "Conseguir"
+  var item:Dictionary=EquipmentCatalog.ITEMS[id]
+  var slot:String=str(item.get("slot",""))
+  var owned:bool=state.owned.has(id)
+  _buy[id].get_node("Caption229").text="Pendiente" if item.get("blocked",false) else ("Conseguido" if owned else ("Mejorar" if item.has("requires") else "Conseguir"))
   MenuInputGuard.set_button_disabled(_buy[id],not state.can_buy(id,EquipmentCatalog.ITEMS))
   _buy[id].modulate=Color(1,1,1,.45) if _buy[id].disabled else Color.WHITE
-  var selected:bool=state.equipped.get("whip","")==id
-  _equip[id].get_node("Caption229").text=tr("UI_061") if selected else tr("UI_059")
-  MenuInputGuard.set_button_disabled(_equip[id],selected or not state.owned.has(id))
+  var selected:bool=state.equipped.get(slot,"")==id
+  _equip[id].get_node("Caption229").text=("Quitar" if item.get("cosmetic",false) else tr("UI_061")) if selected else tr("UI_059")
+  MenuInputGuard.set_button_disabled(_equip[id],(selected and not item.get("cosmetic",false)) or not owned)
   _equip[id].modulate=Color(1,1,1,.45) if _equip[id].disabled else Color.WHITE
- var selected:String=state.equipped.get("whip","")
- _state.text=tr("UI_057")+(tr(EquipmentCatalog.ITEMS[selected]["name"]) if EquipmentCatalog.ITEMS.has(selected) else tr("UI_058"))
+ var selected_whip:String=state.equipped.get("whip","")
+ _state.text=tr("UI_057")+(tr(EquipmentCatalog.ITEMS[selected_whip]["name"]) if EquipmentCatalog.ITEMS.has(selected_whip) else tr("UI_058"))
+
+func _confirm_purchase(id:String)->void:
+ if not SaveData.equipment_state().can_buy(id,EquipmentCatalog.ITEMS):return
+ _pending_purchase=id
+ var item:Dictionary=EquipmentCatalog.ITEMS[id]
+ var basic:String=str(item.get("requires",""))
+ var total:int=int(item.price)+(int(EquipmentCatalog.ITEMS[basic].price) if not basic.is_empty() else 0)
+ _confirm.dialog_text="%s\n%s\n\n%s\nCoste ahora: %d puntos\nCoste total (básico + mejora): %d puntos\nSaldo después: %d puntos\n\nCompra única. Equipar después es gratis. Sin dinero real."%[item.name,_effect_text(id),_upgrade_diff_text(id),int(item.price),total,SaveData.equipment_points-int(item.price)]
+ _confirm.popup_centered(Vector2i(700,340))
