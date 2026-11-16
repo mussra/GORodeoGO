@@ -3,6 +3,7 @@ extends Label
 var world:Node2D
 var clock:float=1.
 func _ready():
+ add_to_group("arrival_sign244")
  mouse_filter=Control.MOUSE_FILTER_IGNORE
  horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  vertical_alignment=VERTICAL_ALIGNMENT_CENTER

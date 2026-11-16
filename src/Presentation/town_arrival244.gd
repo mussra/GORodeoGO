@@ -66,6 +66,8 @@ func begin(candidate:Dictionary)->void:
  plan=candidate;start_zoom=controls.factor;start_offset=camera.offset
  target_zoom=minf(start_zoom,fitted_zoom(plan.bounds,get_viewport().get_visible_rect().size))
  elapsed=0.;active=true;controls.arrival_active244=true
+ for sign_ in get_tree().get_nodes_in_group("arrival_sign244"):
+  if sign_.get_viewport()==get_viewport():sign_.hide()
  preview=load('res://src/Presentation/town_arrival_view244.gd').new();preview.plan=plan;preview.world=world;world.add_child(preview)
  title.text='Vista de llegada · '+TownIdentity215.title(SaveData.world_cousins140,plan.id)
  var extent:Vector2=get_viewport().get_visible_rect().size
