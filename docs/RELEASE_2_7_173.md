@@ -37,6 +37,8 @@ No se da por corregido el atasco tras sesiones largas ni el rendimiento de Rodeo
 
 ## Idea de Juanito, pendiente de OK
 
-`docs/IDEAS_FUTURAS.md` recoge al guarnicionero como fabricante de fusta y otras piezas: montura, riendas, estribos, herraduras, cosméticos y alforjas futuras. Incluye precios y efectos candidatos para revisar. No se implementa equipo, puntos ni economía en esta APK.
+`docs/IDEAS_FUTURAS.md` recoge al guarnicionero como fabricante de fusta y otras piezas: montura, riendas, estribos, herraduras, espuelas con impulso breve y coste de resistencia, cosméticos y alforjas futuras. Incluye precios y efectos candidatos para revisar. No se implementa equipo, puntos ni economía en esta APK.
 
 Capturas y mediciones: `docs/review173`. Resumen técnico: `QA_2_7_173.json`.
+
+Revisión documental posterior a la APK: se añaden las espuelas a la propuesta de Juanito y se sustituye una captura tomada durante la transición por la vista 100% limpia. La APK no cambia.

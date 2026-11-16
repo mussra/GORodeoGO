@@ -105,10 +105,23 @@ La fusta básica y mejorada ya figuran en el catálogo candidato con 1.000/2.000
 | Alforjas | 500 | 1.000 | Añade 2 -> 4 huecos a un futuro inventario de recolección. Bloqueadas hasta que exista un inventario con límite definido. |
 | Sombrero y manta de montura | 300 cada uno | 600 por variante elaborada | Solo apariencia, sin ventaja de juego. Permite gastar puntos sin alterar el equilibrio. |
 
-Se evitan espuelas con ventaja de velocidad para no duplicar la fusta ni premiar un uso agresivo. El equipo no concede Serenidad genética ni sustituye la crianza.
+Las espuelas se añaden por petición posterior de Antonio (21:28), con impulso breve y coste de resistencia, según la propuesta siguiente. El equipo no concede Serenidad genética ni sustituye la crianza.
 
 Reglas propuestas: un objeto por ranura, sin apilar copias; compra única que después se equipa sin pagar; mejora requiere la versión básica; precio total y diferencia de efecto visibles antes de confirmar; sin dinero real, desgaste ni reparaciones periódicas. Las reducciones se limitan al 10% por efecto y no se suman entre objetos del mismo efecto. Los objetos ya obtenidos se conservan, sin recomprarlos al trasladar la tienda a Juanito. La fusta no debe retirar un regate ya desbloqueado.
 
 Primera entrega sugerida si Antonio da su OK: Juanito con fusta, montura, riendas y estribos; cosméticos después, alforjas cuando exista inventario. Los precios y porcentajes son valores de prueba pendientes de aprobar y ajustar jugando, no compromisos de implementación.
 
 Fuentes: WhatsApp 16nov 21:18 "El guarnicionero te puede ayudar a crear mejores equipos como la fusta" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzMwNDc4OTdGRUQ3NjkxNzFCNzlGRTZBNDI3QzIzNwA=`) y 21:19 "Y añade otros equipamientos como la fusta" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQ0FEQjdFOEU5MTU2MTMwQzBFRTdCMUY2RTZCNjJFRQA=`). Para este bloque se mantiene revisión previa de la economía.
+
+
+### Espuelas: impulso breve, no velocidad permanente (21:28)
+
+Antonio pregunta "Espuelas?" (`wamid.HBgLMzQ2MDU5NDg3NzkVAgASGCBBQzkxNkNFOUQzMDBGQzIwNUVFODFFNjFBOThFNkM5MQA=`). Se incorporan a la propuesta, sin implementarlas ni cobrarlas.
+
+- Fabricación candidata: **900 puntos**. Impulso de **+10% de velocidad durante 1 segundo**, recarga de **8 segundos** y coste de **15 puntos porcentuales de resistencia máxima** por uso.
+- Mejora candidata: **1.800 puntos adicionales**. Mantiene +10%, dura **1,3 segundos**, recarga **7 segundos**, mismo coste de resistencia. Sin aumentar la velocidad ordinaria fuera del impulso.
+- Solo al cabalgar voluntariamente: no se activa sin resistencia suficiente, con el caballo agotado, aturdido, saltando o dibujando/ejecutando un regate. No recarga el regate ni se suma al sprint u otros impulsos; prevalece una única velocidad temporal.
+- Un botón explícito mostraría recarga y coste antes de usar; no añadir otro gesto al joystick. Animación breve de señal al caballo, sin golpe ni pérdida de vida.
+- Diferencia clara: fusta amplía el trazo de regate; espuelas dan un arranque corto a cambio de energía. Probar primero fuera de carreras competitivas y ajustar equilibrio antes de llevarlo a todos los modos.
+
+Todos los valores son candidatos para su OK. La APK 2.7.173 no contiene estas mejoras ni una economía nueva.

@@ -10,6 +10,7 @@ func run():
  SaveData.world_seed=752026;SaveData.world_generator_version=6;SaveData.world_position=Vector2(1300,850);SaveData.world_quests={};SaveData.world_discovered=[];SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
  world=load('res://src/Presentation/frontier_world.tscn').instantiate();add_child(world)
  while world._loading_world:await get_tree().process_frame
+ await get_tree().create_timer(.5).timeout
  world.player.set_physics_process(false);world.set_physics_process(false)
  var camera:Camera2D=get_viewport().get_camera_2d();camera.position_smoothing_enabled=false
  for factor in [1.,.85,.75]:
