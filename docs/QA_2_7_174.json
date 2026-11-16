@@ -31,5 +31,11 @@
     "equipped_repeat": "review174/arrival244-equipped-perf.json",
     "environment": "Godot 4.7.2 Vulkan mobile llvmpipe desktop 1280x720",
     "limits": "Not Android certification. p95 varies. No zero-cost guarantee."
+  },
+  "apk": {
+    "sha256": "3fd20f9d216615a0e8b8e8e15ea66ff0bf4717986b8f26569e4690460e4b120d",
+    "bytes": 82718451,
+    "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+    "package": "com.example.rancho.review"
   }
 }
