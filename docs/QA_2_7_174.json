@@ -1,0 +1,35 @@
+{
+  "version": "2.7.174",
+  "version_code": 433,
+  "branch": "feat/open-world-test-20261107",
+  "tests": {
+    "scripts": 35,
+    "total": 224,
+    "passed": 224,
+    "assertions": 17927,
+    "physical_android": false
+  },
+  "panorama": {
+    "out_seconds": 0.65,
+    "hold_seconds": 1,
+    "return_seconds": 0.65,
+    "same_loaded_chunks": true,
+    "seen_scope": [
+      "save_path",
+      "seed",
+      "generator",
+      "town_id"
+    ]
+  },
+  "equipment": {
+    "commit": "cc613c991020c9afd10b37971b66397007084d84",
+    "horseshoes": "blocked until terrain penalty exists",
+    "saddlebags": "deferred until limited inventory exists"
+  },
+  "performance": {
+    "baseline": "review174/arrival244-perf.json",
+    "equipped_repeat": "review174/arrival244-equipped-perf.json",
+    "environment": "Godot 4.7.2 Vulkan mobile llvmpipe desktop 1280x720",
+    "limits": "Not Android certification. p95 varies. No zero-cost guarantee."
+  }
+}
