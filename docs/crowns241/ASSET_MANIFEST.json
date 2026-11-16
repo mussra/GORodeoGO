@@ -1,0 +1,152 @@
+{
+  "source_sha256": "391e945d83a4cba29b428a7d176b10d35cc1bbdf7c1233f7cb12600a299d8ed7",
+  "source_mode": "RGBA",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "transparent_corner": true,
+  "canvas": 512,
+  "margin": 32,
+  "provisional_shape": "U, user prefers closed circular garlands for future update",
+  "icons": [
+    {
+      "mode": "bulls",
+      "source_cell": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        63,
+        24,
+        499,
+        465
+      ],
+      "art_size": [
+        436,
+        441
+      ],
+      "files": [
+        "bulls.png",
+        "bulls_pending.png"
+      ]
+    },
+    {
+      "mode": "race",
+      "source_cell": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        45,
+        24,
+        484,
+        469
+      ],
+      "art_size": [
+        439,
+        445
+      ],
+      "files": [
+        "race.png",
+        "race_pending.png"
+      ]
+    },
+    {
+      "mode": "duel",
+      "source_cell": [
+        1024,
+        0,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        36,
+        22,
+        463,
+        476
+      ],
+      "art_size": [
+        421,
+        448
+      ],
+      "files": [
+        "duel.png",
+        "duel_pending.png"
+      ]
+    },
+    {
+      "mode": "joust",
+      "source_cell": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        54,
+        31,
+        495,
+        474
+      ],
+      "art_size": [
+        441,
+        443
+      ],
+      "files": [
+        "joust.png",
+        "joust_pending.png"
+      ]
+    },
+    {
+      "mode": "memory",
+      "source_cell": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        49,
+        28,
+        484,
+        471
+      ],
+      "art_size": [
+        435,
+        443
+      ],
+      "files": [
+        "memory.png",
+        "memory_pending.png"
+      ]
+    },
+    {
+      "mode": "cup",
+      "source_cell": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        21,
+        16,
+        468,
+        475
+      ],
+      "art_size": [
+        436,
+        448
+      ],
+      "files": [
+        "cup.png",
+        "cup_pending.png"
+      ]
+    }
+  ]
+}

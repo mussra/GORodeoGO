@@ -309,7 +309,9 @@ func equipped_whip_reach()->float:
 	if not equipment_owned.has(item_id) or not EquipmentCatalog.ITEMS.has(item_id):return 0.0
 	return float(EquipmentCatalog.ITEMS[item_id].get("reach",0.0))
 
+var rodeo_saved241:bool=false
 func record_victory(level_number:int,training_session:Dictionary={},mounted_horse_id:String="")->int:
+	rodeo_saved241=false
 	if trial_session_active:return 0 # no temporary victory becomes an acquisition
 	if level_number<1 or level_number>LevelCatalog.MAX_LEVEL:return 0
 	if not apply_legacy_points_credit(EquipmentCatalog.REWARDS):return 0
@@ -328,7 +330,8 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 	FoalGrowth174.advance(horse_collection)
 	HorseTraining.complete(horse_collection,training_session)
 	HorseMastery.record(horse_collection,mounted_horse_id,level_number)
-	if save_progress():return reward
+	if save_progress():
+		rodeo_saved241=true;return reward
 	horse_collection.restore(before_horses)
 	victories240=before_victories
 	highest_level_completed=before_highest

@@ -1,0 +1,43 @@
+{
+  "version": "2.7.171",
+  "version_code": 430,
+  "package": "com.example.rancho.review",
+  "tests": {
+    "scripts": 13,
+    "tests": 69,
+    "passed": 69,
+    "assertions": 677,
+    "paths": [
+      "res://tests/unit/test_mode_progress240.gd",
+      "res://tests/integration/test_mode_progress240.gd",
+      "res://tests/unit/test_race_cup194.gd",
+      "res://tests/unit/test_save_data.gd",
+      "res://tests/unit/test_world_places144.gd",
+      "res://tests/unit/test_race_course190.gd",
+      "res://tests/unit/test_npc_quests75.gd",
+      "res://tests/unit/test_level_progression.gd",
+      "res://tests/unit/test_race_cup_store194.gd",
+      "res://tests/integration/test_mode_hooks240.gd",
+      "res://tests/integration/test_rodeo_save241.gd",
+      "res://tests/unit/test_horse_training.gd",
+      "res://tests/integration/test_chain_touch241.gd"
+    ]
+  },
+  "visual": [
+    "rodeo241-fallo.png",
+    "rodeo241-guardado.png",
+    "coronas241-u.png",
+    "coronas241-round.png",
+    "coronas241-u-small.png",
+    "coronas241-round-small.png"
+  ],
+  "touch": "synthetic screen-touch events in desktop window, not physical Android",
+  "mobile_device_tested": false,
+  "pending_result_survives_force_close": false,
+  "save_paths": "unchanged from 2.7.170",
+  "cleanup_warning": "2 ObjectDB objects retained on exit; not diagnosed as in-game leak",
+  "crown_shape": "U and closed round, interchangeable session-only test selector",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "apk_bytes": 82671726,
+  "apk_sha256": "58f6e85933dbf32d5f577ff1f20015e9d0d1cc04ba092c1afbbc321c3aca6365"
+}

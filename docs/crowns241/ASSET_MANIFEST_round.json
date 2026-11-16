@@ -1,0 +1,152 @@
+{
+  "source_sha256": "0ddfb8305a2cec562c4d9c0ac7204001114e67ffc257132d90c66e34bd91f85b",
+  "source_mode": "RGBA",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "transparent_corner": true,
+  "canvas": 512,
+  "margin": 32,
+  "shape": "round",
+  "icons": [
+    {
+      "mode": "bulls",
+      "source_cell": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        22,
+        6,
+        493,
+        505
+      ],
+      "art_size": [
+        423,
+        448
+      ],
+      "files": [
+        "bulls.png",
+        "bulls_pending.png"
+      ]
+    },
+    {
+      "mode": "race",
+      "source_cell": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        33,
+        6,
+        485,
+        505
+      ],
+      "art_size": [
+        406,
+        448
+      ],
+      "files": [
+        "race.png",
+        "race_pending.png"
+      ]
+    },
+    {
+      "mode": "duel",
+      "source_cell": [
+        1024,
+        0,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        27,
+        12,
+        494,
+        503
+      ],
+      "art_size": [
+        426,
+        448
+      ],
+      "files": [
+        "duel.png",
+        "duel_pending.png"
+      ]
+    },
+    {
+      "mode": "joust",
+      "source_cell": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        29,
+        7,
+        497,
+        485
+      ],
+      "art_size": [
+        439,
+        448
+      ],
+      "files": [
+        "joust.png",
+        "joust_pending.png"
+      ]
+    },
+    {
+      "mode": "memory",
+      "source_cell": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        34,
+        7,
+        492,
+        488
+      ],
+      "art_size": [
+        427,
+        448
+      ],
+      "files": [
+        "memory.png",
+        "memory_pending.png"
+      ]
+    },
+    {
+      "mode": "cup",
+      "source_cell": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "trim_bbox": [
+        36,
+        9,
+        499,
+        486
+      ],
+      "art_size": [
+        435,
+        448
+      ],
+      "files": [
+        "cup.png",
+        "cup_pending.png"
+      ]
+    }
+  ]
+}

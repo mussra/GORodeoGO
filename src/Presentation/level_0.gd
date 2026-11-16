@@ -547,16 +547,38 @@ func _on_bull_returned(returned_bull: Node2D) -> void:
 	if _win_requires_all_bulls and _bulls_returned >= _active_bulls.size():
 		_trigger_win()
 
+var _rodeo_unsaved241:bool=false
 func _trigger_win() -> void:
-	if _game_over:
-		return
-	_game_over = true
+	if _game_over:return
+	_game_over=true
 	_freeze_gameplay()
-	var reward:int=SaveData.record_victory(_level_number,_training_session,_mounted_horse_id)
 	hud.show_win()
-	hud.end_label.text += "\nENSAYO AISLADO: sin premios ni progreso guardado" if SaveData.trial_session_active else "\n+%d puntos · Saldo: %d\nEquipo y precios en prueba" % [reward,SaveData.equipment_points]
-	_show_training_result()
+	_save_win241()
 	_audio.play("win")
+
+func _save_win241()->void:
+	if SaveData.trial_session_active:
+		hud.end_label.text=tr("UI_020")+"\nENSAYO AISLADO: sin premios ni progreso guardado"
+		_show_training_result();return
+	var reward:int=SaveData.record_victory(_level_number,_training_session,_mounted_horse_id)
+	_rodeo_unsaved241=not SaveData.rodeo_saved241
+	if _rodeo_unsaved241:
+		hud.end_label.text="¡Prueba superada!\nNo se ha guardado la victoria.\nReintenta antes de salir o cerrar la aplicación.\nEl progreso anterior sigue protegido."
+		hud.end_label.add_theme_font_size_override("font_size",20)
+		hud.end_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		hud._next_button.hide();hud.quit_button.hide();hud.restart_button.show()
+		hud.restart_button.text="Reintentar guardado"
+		hud.restart_button.position=Vector2(76,200);hud.restart_button.size=Vector2(360,64)
+		return
+	hud.show_win()
+	hud.quit_button.show();hud.restart_button.text="Repetir"
+	hud.restart_button.position=Vector2(40,180);hud.restart_button.size=Vector2(200,50)
+	hud.end_label.add_theme_font_size_override("font_size",20)
+	hud.end_label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	hud.end_label.text="¡Victoria guardada!\n+%d puntos · Saldo: %d"%[reward,SaveData.equipment_points]
+	if SaveData.mode_open240("race"):hud.end_label.text+="\nCarreras disponible en Juegos."
+	else:hud.end_label.text+="\nPara Carreras: visita dos pueblos\nfuera del rancho."
+	_show_training_result()
 
 func _trigger_lose(reason: String) -> void:
 	if _game_over:
@@ -583,6 +605,7 @@ func _freeze_gameplay() -> void:
 	touch_controls.visible = false  # stop joysticks from eating touches meant for the end-game buttons
 
 func _on_next_requested() -> void:
+	if _rodeo_unsaved241:return
 	if not _game_over or _level_number >= LevelCatalog.MAX_LEVEL:
 		return
 	GameState.selected_level = _level_number + 1
@@ -591,6 +614,8 @@ func _on_next_requested() -> void:
 	get_tree().reload_current_scene()
 
 func _on_restart_requested() -> void:
+	if _rodeo_unsaved241:
+		_save_win241();return
 	RanchMusic.set_paused(false)
 	get_tree().paused = false
 	get_tree().reload_current_scene()
@@ -633,6 +658,7 @@ func resume_game() -> void:
 	touch_controls.visible = true
 
 func _on_quit_requested() -> void:
+	if _rodeo_unsaved241:return
 	RanchMusic.set_paused(false)
 	get_tree().paused = false
 	get_tree().change_scene_to_file(GameState.menu_scene)
