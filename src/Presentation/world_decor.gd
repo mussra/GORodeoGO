@@ -166,8 +166,12 @@ func _draw() -> void:
 		"flower":
 			_draw_tex(FLOWER_TEXS[_variant(FLOWER_TEXS.size())], 8.0, FLOWER_H)
 		"cactus":
-			draw_rect(Rect2(-5, -26, 10, 46), Color("3e7d46"))
-			draw_rect(Rect2(-16, -14, 8, 18), Color("3e7d46"))
-			draw_rect(Rect2(-16, -14, 14, 7), Color("3e7d46"))
-			draw_rect(Rect2(8, -20, 8, 16), Color("478a4f"))
-			draw_rect(Rect2(2, -20, 14, 7), Color("478a4f"))
+			# Rounded cartoon silhouette, same position and collision as before.
+			var green:=Color("4d9b55");var light:=Color("77b866")
+			draw_line(Vector2(0,18),Vector2(0,-25),green,12.,true)
+			draw_circle(Vector2(0,-25),6.,green)
+			draw_polyline(PackedVector2Array([Vector2(-2,-7),Vector2(-14,-7),Vector2(-14,-19)]),green,8.,true)
+			draw_circle(Vector2(-14,-19),4.,green)
+			draw_polyline(PackedVector2Array([Vector2(2,-2),Vector2(14,-2),Vector2(14,-14)]),green,8.,true)
+			draw_circle(Vector2(14,-14),4.,green)
+			draw_line(Vector2(-2,12),Vector2(-2,-22),light,2.,true)

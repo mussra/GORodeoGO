@@ -19,6 +19,9 @@ func _ready():
   body.collision_layer=128;body.collision_mask=0;body.add_to_group("world_mountain103")
  queue_redraw()
 func _draw():
+ if SaveData.world_generator_version>=4:
+  texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
+  TownWallArt242.draw(self,seed,chunk);return
  var gates:Dictionary={}
  texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
  for item in ridges:

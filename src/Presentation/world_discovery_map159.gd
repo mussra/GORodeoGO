@@ -44,6 +44,12 @@ var _terrain_signature: int = 0
 var _terrain_valid: bool = false
 var _map_geometry: Dictionary = {}
 var terrain_rebuilds: int = 0
+# Static terrain is rasterized only when invalidated. Retaining 4k draw commands
+# still submits them on every rendered frame; a texture avoids that GPU cost.
+var _terrain_viewport242:SubViewport
+var _terrain_image242:TextureRect
+const CACHE_MARGIN242:float=300.
+var _marker_clock242:float=0.
 
 func _ensure_terrain() -> void:
  if _terrain == null:
@@ -78,10 +84,25 @@ func _ensure_terrain() -> void:
  _terrain_signature = hash([content_signature159(),size,expanded,zoom,pan])
  if _clip106==null:
   _clip106=Control.new();_clip106.mouse_filter=Control.MOUSE_FILTER_IGNORE;_clip106.clip_contents=true;_clip106.show_behind_parent=true;add_child(_clip106)
-  _terrain.reparent(_clip106)
+  _terrain_viewport242=SubViewport.new()
+  _terrain_viewport242.disable_3d=true
+  _terrain_viewport242.transparent_bg=true
+  _terrain_viewport242.world_2d=World2D.new()
+  _terrain_viewport242.render_target_update_mode=SubViewport.UPDATE_DISABLED
+  add_child(_terrain_viewport242)
+  _terrain.reparent(_terrain_viewport242)
+  _terrain.show_behind_parent=false
+  _terrain_image242=TextureRect.new()
+  _terrain_image242.mouse_filter=Control.MOUSE_FILTER_IGNORE
+  _terrain_image242.texture=_terrain_viewport242.get_texture()
+  _clip106.add_child(_terrain_image242)
   _markers108=Control.new();_markers108.mouse_filter=Control.MOUSE_FILTER_IGNORE;_markers108.draw.connect(_draw_markers108);_clip106.add_child(_markers108)
  _clip106.position=area.position;_clip106.size=area.size
  _draw_origin106=_map_geometry.origin;_terrain.position=Vector2.ZERO
+ _terrain_viewport242.size=Vector2i((area.size+Vector2.ONE*CACHE_MARGIN242*2.).ceil())
+ _terrain_image242.position=-Vector2.ONE*CACHE_MARGIN242
+ _terrain_image242.size=Vector2(_terrain_viewport242.size)
+ _terrain_viewport242.render_target_update_mode=SubViewport.UPDATE_ONCE
  terrain_rebuilds += 1
  _terrain.queue_redraw()
  _background106.queue_redraw()
@@ -117,7 +138,9 @@ func _process(delta: float) -> void:
   if _dragging and not _pinch_used108 and not _long_pressed106 and expanded and Time.get_ticks_msec()/1000.-_press_time106>.6 and _last_point106.distance_to(_drag_from)<12.:
    _long_pressed106=true
    world._open_map_note106(_map_point106(_drag_from))
-  queue_redraw()
+  _marker_clock242+=delta
+  if _marker_clock242>=.05:
+   _marker_clock242=0.;queue_redraw()
 
 func _ready() -> void:
  mouse_filter = Control.MOUSE_FILTER_STOP
@@ -191,8 +214,9 @@ func _drag106(point:Vector2)->void:
  var limit:Vector2=((content-_map_geometry.area.size)*.5+Vector2.ONE*12.).max(Vector2.ZERO).max(_note_pan162.abs())
  pan=(_pan_from+point-_drag_from).clamp(-limit,limit)
  _map_geometry.origin=_map_geometry.area.position+(_map_geometry.area.size-content)*.5+pan
- _terrain.position=_map_geometry.origin-_draw_origin106
- if _terrain.position.length()>250.:_ensure_terrain()
+ var offset:Vector2=_map_geometry.origin-_draw_origin106
+ _terrain_image242.position=-Vector2.ONE*CACHE_MARGIN242+offset
+ if offset.length()>250.:_ensure_terrain()
  queue_redraw()
 func _end_drag106(point:Vector2)->void:
  if not _dragging:return
@@ -284,7 +308,7 @@ func _to_map(pos: Vector2, mins: Vector2i, cell: float, origin: Vector2) -> Vect
 func _draw_terrain() -> void:
 
  var area: Rect2 = _map_geometry.area
- _terrain.draw_set_transform(-area.position)
+ _terrain.draw_set_transform(Vector2.ONE*CACHE_MARGIN242-area.position)
  if area.size.x <= 0.0 or area.size.y <= 0.0:return
 
  var data: Dictionary = _map_geometry.data
@@ -324,12 +348,7 @@ func _draw_fields138(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
  if SaveData.world_generator_version<3 or SaveData.world_flora138.is_empty():return
  var box:=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.)
  var clip:=PackedVector2Array([box.position,Vector2(box.end.x,box.position.y),box.end,Vector2(box.position.x,box.end.y)])
- for field in FloristJourney138.descriptors(SaveData.world_flora138,SaveData.world_seed):
-  if not (field.rect as Rect2).grow(150).intersects(box):continue
-  for polygon in Geometry2D.intersect_polygons(FloristJourney138.boundary(field),clip):
-   var screen:=PackedVector2Array()
-   for p in polygon:screen.append(_to_map(p,mins,cell,origin))
-   if screen.size()>=3:_terrain.draw_colored_polygon(screen,Color("b37a72") if field.species=="red" else Color("7e7b93"))
+ # Decorative flower-field polygons intentionally omitted (Ant, 16 Nov).
 
  for points in ([] if SaveData.world_generator_version>=6 else FloristJourney138.lanes(SaveData.world_flora138)):
   for segment in Geometry2D.intersect_polyline_with_polygon(points,clip):
@@ -377,10 +396,6 @@ func _draw_markers108()->void:
    if Rect2(Vector2(12,12),(size-Vector2(24,100 if expanded else 24)).max(Vector2.ZERO)).has_point(point):
     if expanded and str(note.id)==_selected_note162:_markers108.draw_arc(point,15.+sin(_pulse*3.)*2.,0,TAU,32,Color("fff1d2"),3.)
     _markers108.draw_circle(point,8.,Color("f2bc51"));_markers108.draw_circle(point,3.,Color("413126"))
- for flower in flowers159().values():
-  var point:Vector2=_to_map(flower.position,mins,cell,origin)
-  if Rect2(Vector2.ZERO,size).has_point(point):
-   _markers108.draw_circle(point,7.,Color(flower.color,.25));WorldFlowerTarget105.glyph(_markers108,point,4.,flower.color)
  for id in TownIdentity215.known_ids(SaveData.world_cousins140):
   var active:bool=SaveData.world_cousins140.get("hint215","")==id
   var true_point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),mins,cell,origin)
@@ -441,6 +456,7 @@ func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: 
 func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
  var dot: float = maxf(1.6, cell * 0.035)
  for d in chunk.get("decor", []):
+  if d.get("kind","")=="flower":continue
   if SaveData.world_generator_version>=3 and not d.get("edited",false):
    if CousinLayer140.reserved(SaveData.world_cousins140,d.pos) or FlowerExpansion138.reserve(SaveData.world_flora138,d.pos) or FlowerExpansion138.exclude_decor(SaveData.world_flora138,SaveData.world_seed,d):continue
   if WorldNominal98.enabled() and not WorldNominal98.keep_decor(d,world._get_surface98()):continue
@@ -460,7 +476,7 @@ func _draw_decor(chunk: Dictionary, mins: Vector2i, cell: float, origin: Vector2
    "cactus":
     _terrain.draw_rect(Rect2(p - Vector2(dot * 0.5, dot), Vector2(dot, dot * 2.0)), Color("3e7d46"))
    "flower":
-    _terrain.draw_circle(p, dot, Color("e86a8a"))
+    pass # No decorative flower dots on either minimap or expanded map.
 
 func _draw_ranch(r: Rect2) -> void:
  var center:Vector2

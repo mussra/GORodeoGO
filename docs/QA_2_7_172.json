@@ -1,0 +1,54 @@
+{
+  "version": "2.7.172",
+  "version_code": 431,
+  "package": "com.example.rancho.review",
+  "branch": "feat/open-world-test-20261107",
+  "base_commit": "5c08fccb55fde4ed6090bbd131f55ebb9fb07720",
+  "tests": {
+    "scripts": 22,
+    "tests": 139,
+    "passed": 139,
+    "assertions": 7193,
+    "runner": "Godot 4.7.2, windowed Linux, synthetic touch",
+    "notes": [
+      "Two ObjectDB instances reported at test exit.",
+      "Existing running-repress fixture now unlocks progression before testing gesture assertions, then restores debug flag."
+    ]
+  },
+  "performance": {
+    "environment": "Linux, Godot 4.7.2, Vulkan mobile renderer, llvmpipe software rendering, 1280x720, seed 752026, world generator 6, 400 discovered chunks, 9 active chunks, debug OSD off",
+    "before": "review172/perf-antes.json",
+    "after_runs": [
+      "review172/perf-despues-1.json",
+      "review172/perf-despues-2.json"
+    ],
+    "interpretation": "Expanded-map draw calls 4522 to 288; frame mean 65.03ms to 27.95-29.28ms. Desktop synthetic measurement, not Android FPS. Rodeo 20 not materially solved."
+  },
+  "soak": {
+    "seconds": 60,
+    "route": "Synthetic jump to second village, real isolated save calls, then return. Not a complete natural ride.",
+    "nodes": "380 throughout",
+    "save_calls": 20,
+    "save_failures": 0,
+    "max_save_ms": 1.231,
+    "limitations": "No growing node count observed in this short run; longer/mobile-specific stall remains unproven."
+  },
+  "visual": {
+    "reviewed": "Six actual town wall shapes, native joystick under synthetic drag, long town sign, screen-space bullet-time label, shared cactus drawing, T/X/Y roads, map zoom/drag and OSD at 1280x720 and 640x360",
+    "screenshots": "review172/"
+  },
+  "apk": {
+    "file": "Rancho-2.7.172.apk",
+    "sha256": "15ce83da28b6cb3d65f60857d1fdcdef82e9466e86da0e81e0ca3b2ceeab6deb",
+    "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+    "physical_android_tested": false,
+    "docs_tests_tools_excluded": true
+  },
+  "limits": [
+    "No main merge or store publication.",
+    "No save migration or gameplay collection removal.",
+    "Existing world flowers still exist; flower painting is removed only from map.",
+    "CPU main-thread use is available only when Android procfs permits it; whole-system CPU/GPU use is N/D.",
+    "Rodeo level 20 and full mobile progression performance still need device validation."
+  ]
+}

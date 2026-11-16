@@ -84,7 +84,22 @@ func mark_dual_lasso_intro_shown() -> void:
 	dual_lasso_intro_shown = true
 	save_progress()
 
+var save_metrics242:Dictionary={"calls":0,"failures":0,"last_usec":0,"max_usec":0,"last_bytes":0}
 func save_progress() -> bool:
+	var started:int=Time.get_ticks_usec()
+	var actual_write:bool=not trial_session_active
+	var ok:bool=_save_progress242()
+	if actual_write:
+		var elapsed:int=Time.get_ticks_usec()-started
+		save_metrics242.calls+=1;save_metrics242.last_usec=elapsed
+		save_metrics242.max_usec=maxi(save_metrics242.max_usec,elapsed)
+		if not ok:save_metrics242.failures+=1
+		elif FileAccess.file_exists(save_path):
+			var file:=FileAccess.open(save_path,FileAccess.READ)
+			if file!=null:save_metrics242.last_bytes=file.get_length()
+	return ok
+
+func _save_progress242() -> bool:
 	if not _load_valid:return false # retain unreadable source instead of replacing it with defaults
 	if trial_session_active:return true # in-memory selections only, never touch real save
 	var config := ConfigFile.new()

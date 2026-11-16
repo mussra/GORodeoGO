@@ -1,10 +1,19 @@
 class_name DodgeEdgeCue
 extends Node2D
 var player:Node
-func _process(_delta:float)->void:queue_redraw()
+var _shown242:bool=false
+func _process(_delta:float)->void:
+	var drawing:bool=is_instance_valid(player) and player._drawing_dodge
+	if drawing or _shown242:queue_redraw()
+	_shown242=drawing
 func _draw()->void:
-	if not is_instance_valid(player) or not player._drawing_dodge or player._draw_edge_elapsed<=0:return
+	if not is_instance_valid(player) or not player._drawing_dodge:return
 	var view:Vector2=get_viewport_rect().size
+	# Shared screen-space cue, above world sprites and clear of the top HUD.
+	var banner:=Rect2(Vector2(view.x*.5-90.,maxf(145.,view.y*.24)),Vector2(180,34))
+	draw_style_box(RanchTheme.box(Color("102b2bf0"),Color("80e8d4"),6),banner)
+	draw_string(ThemeDB.fallback_font,banner.position+Vector2(30,23),"TIEMPO BALA",HORIZONTAL_ALIGNMENT_LEFT,-1,17,Color("c4fff0"))
+	if player._draw_edge_elapsed<=0:return
 	var at:Vector2=player._last_pointer.clamp(Vector2(22,86),view-Vector2(22,55))
 	var color:=Color("80e8d4") if player._draw_edge_active else Color("e6c68b")
 	draw_circle(at,18,Color(.03,.13,.18,.8))

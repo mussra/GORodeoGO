@@ -157,6 +157,7 @@ func _ready() -> void:
 		_cousin_layer140=CousinLayer140.new();add_child(_cousin_layer140)
 	if SaveData.world_generator_version>=4:
 		var towns227:=TownLayer227.new();towns227.seed=SaveData.world_seed;add_child(towns227)
+		var sign242=load("res://src/Presentation/town_sign242.gd").new();sign242.world=self;_hud.add_child(sign242)
 	if SaveData.world_generator_version==5:add_child(TownServices231.new())
 	if SaveData.world_generator_version>=6:add_child(TownLayer234.new())
 	SaveData.ensure_herd_town217()
@@ -1319,11 +1320,16 @@ func _get_surface98()->WorldRoadSurface94:
 	if _road_surface94==null:road_surface_contains94(Vector2.ZERO)
 	return _road_surface94
 
+var _npc_roster242:Array=[]
+var _npc_roster_key242:String=""
 func _npcs98()->Array:
 	if SaveData.world_generator_version<6:return _legacy_npcs234()
+	var key:String=str([SaveData.world_seed,TownNetwork234.focus.get(SaveData.world_seed,Vector2i.ZERO)])
+	if key==_npc_roster_key242 and not _npc_roster242.is_empty():return _npc_roster242
 	var entries:Array=[]
 	for node in TownNetwork234.nodes(SaveData.world_seed).values():
 		for role in node.roles:entries.append({"id":"town234:"+node.id+":"+role,"town234":node.id,"role234":role,"name":TownNetwork234.npc_name(node.id,role),"position":TownNetwork234.point(SaveData.world_seed,node.id,role),"quests":[]})
+	_npc_roster_key242=key;_npc_roster242=entries
 	return entries
 func _legacy_npcs234()->Array:
 	var data:Array=NpcQuests.NPCS.duplicate(true)
@@ -1349,8 +1355,9 @@ func _refresh_livestock104()->void:
 	if is_instance_valid(_pigs_label):_pigs_label.text=tr("WORLD_PIG_INVENTORY104") % SaveData.pig_inventory104()
 
 func _nearest_npc105()->Dictionary:
-	var best:Dictionary=_npcs98()[0]
-	for data in _npcs98():
+	var roster:Array=_npcs98()
+	var best:Dictionary=roster[0]
+	for data in roster:
 		if player.position.distance_to(data.position)<player.position.distance_to(best.position):best=data
 	return best
 func _tick_flowers105()->void:

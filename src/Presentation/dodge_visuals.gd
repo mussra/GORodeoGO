@@ -18,7 +18,6 @@ static func draw_trail(item: CanvasItem, skid_trail: Array, trail_fade: float, g
 static func draw_drawing(item: CanvasItem, preview: PackedVector2Array) -> void:
 	if preview.size() > 1:
 		draw_flash_path(item, preview, 1.0)
-		item.draw_string(ThemeDB.fallback_font, Vector2(-64, -78), "TIEMPO BALA", HORIZONTAL_ALIGNMENT_LEFT, 150, 15, Color("a7fff0"))
 
 ## Recharge bar over the rider's head.
 static func draw_recharge(item: CanvasItem, anchor: Vector2, recharge: float) -> void:

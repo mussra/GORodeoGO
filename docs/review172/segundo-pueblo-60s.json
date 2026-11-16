@@ -1,0 +1,134 @@
+[
+  {
+    "chunks": 9,
+    "elapsed_sec": 10.008,
+    "flowers": 0,
+    "frame_p50": 22.422,
+    "frame_p95": 26.066,
+    "herds": 0,
+    "memory_mb": 62.5340003967285,
+    "nodes": 380.0,
+    "objects": 2763.0,
+    "pending": 0,
+    "phase": 0,
+    "resources": 415.0,
+    "roaming": 0,
+    "saves": {
+      "calls": 8,
+      "failures": 0,
+      "last_bytes": 12376,
+      "last_usec": 907,
+      "max_usec": 907
+    }
+  },
+  {
+    "chunks": 9,
+    "elapsed_sec": 20.035,
+    "flowers": 0,
+    "frame_p50": 25.684,
+    "frame_p95": 29.166,
+    "herds": 0,
+    "memory_mb": 62.7550582885742,
+    "nodes": 380.0,
+    "objects": 2804.0,
+    "pending": 0,
+    "phase": 1,
+    "resources": 471.0,
+    "roaming": 0,
+    "saves": {
+      "calls": 10,
+      "failures": 0,
+      "last_bytes": 13031,
+      "last_usec": 1231,
+      "max_usec": 1231
+    }
+  },
+  {
+    "chunks": 9,
+    "elapsed_sec": 30.043,
+    "flowers": 0,
+    "frame_p50": 25.594,
+    "frame_p95": 28.316,
+    "herds": 0,
+    "memory_mb": 62.7600250244141,
+    "nodes": 380.0,
+    "objects": 2804.0,
+    "pending": 0,
+    "phase": 2,
+    "resources": 471.0,
+    "roaming": 0,
+    "saves": {
+      "calls": 13,
+      "failures": 0,
+      "last_bytes": 13031,
+      "last_usec": 868,
+      "max_usec": 1231
+    }
+  },
+  {
+    "chunks": 9,
+    "elapsed_sec": 40.056,
+    "flowers": 0,
+    "frame_p50": 25.564,
+    "frame_p95": 28.648,
+    "herds": 0,
+    "memory_mb": 62.7632331848145,
+    "nodes": 380.0,
+    "objects": 2804.0,
+    "pending": 0,
+    "phase": 3,
+    "resources": 471.0,
+    "roaming": 0,
+    "saves": {
+      "calls": 15,
+      "failures": 0,
+      "last_bytes": 13031,
+      "last_usec": 867,
+      "max_usec": 1231
+    }
+  },
+  {
+    "chunks": 9,
+    "elapsed_sec": 50.079,
+    "flowers": 0,
+    "frame_p50": 25.476,
+    "frame_p95": 28.562,
+    "herds": 0,
+    "memory_mb": 62.7682571411133,
+    "nodes": 380.0,
+    "objects": 2804.0,
+    "pending": 0,
+    "phase": 4,
+    "resources": 471.0,
+    "roaming": 0,
+    "saves": {
+      "calls": 18,
+      "failures": 0,
+      "last_bytes": 13031,
+      "last_usec": 835,
+      "max_usec": 1231
+    }
+  },
+  {
+    "chunks": 9,
+    "elapsed_sec": 60.102,
+    "flowers": 0,
+    "frame_p50": 22.583,
+    "frame_p95": 25.966,
+    "herds": 0,
+    "memory_mb": 62.7781257629395,
+    "nodes": 380.0,
+    "objects": 2823.0,
+    "pending": 0,
+    "phase": 5,
+    "resources": 471.0,
+    "roaming": 0,
+    "saves": {
+      "calls": 20,
+      "failures": 0,
+      "last_bytes": 12451,
+      "last_usec": 848,
+      "max_usec": 1231
+    }
+  }
+]

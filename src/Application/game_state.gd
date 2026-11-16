@@ -20,6 +20,7 @@ func debug_cheats_active()->bool:
 
 var _exit_dialog:ConfirmationDialog
 func _ready()->void:
+ var osd:Node=load("res://src/Presentation/performance_osd242.gd").new();osd.name="PerformanceOSD242";add_child.call_deferred(osd)
  process_mode=Node.PROCESS_MODE_ALWAYS
  get_tree().quit_on_go_back=false
  get_tree().auto_accept_quit=false

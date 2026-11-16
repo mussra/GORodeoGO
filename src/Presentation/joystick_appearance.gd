@@ -34,6 +34,10 @@ static func apply(level:Node)->void:
  # Native sticks only consume theme colors. Do not synthesize unused220pxart.
  if needs_textures and not cache.has(key):cache[key]=[texture_for(traits,false),texture_for(traits,true)]
  for v in sticks:
+  v.joystick_size=160.;v.tip_size=48.
+  var knob:=StyleBoxFlat.new();knob.bg_color=Color("ffd66a",.56)
+  knob.border_color=Color("714e25",.8);knob.set_border_width_all(2);knob.set_corner_radius_all(30)
+  v.add_theme_stylebox_override("normal_tip",knob);v.add_theme_stylebox_override("pressed_tip",knob)
   # Native styleboxes support the supplied ring without changing touch mechanics.
   v.add_theme_stylebox_override("normal_joystick",AntIcons188.joystick_ring(false))
   v.add_theme_stylebox_override("pressed_joystick",AntIcons188.joystick_ring(true))

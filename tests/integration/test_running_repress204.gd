@@ -1,7 +1,11 @@
 extends GutTest
 var host:Node
 var rider:Node
+var old_debug242:bool
+func before_each():
+ old_debug242=SaveData.debug_mode;SaveData.debug_mode=true # Test the gesture, not progression gates.
 func after_each():
+ SaveData.debug_mode=old_debug242
  if is_instance_valid(host):host.free()
  for action in ["move_up","move_down","move_left","move_right"]:Input.action_release(action)
  Engine.time_scale=1.;get_tree().paused=false

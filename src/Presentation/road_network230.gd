@@ -86,12 +86,17 @@ static func draw(node:CanvasItem,seed_:int,c:Vector2i,version:int):
  var origin:=Vector2(c)*1024.;node.draw_set_transform(origin)
  var rect:=Rect2(Vector2.ZERO,Vector2.ONE*1024.)
  var clip:=PackedVector2Array([rect.position,Vector2(rect.end.x,rect.position.y),rect.end,Vector2(rect.position.x,rect.end.y)])
- for polygon in local_geometry(seed_,c,version):
+ draw_surfaces242(node,local_geometry(seed_,c,version),clip,origin)
+ node.draw_set_transform(Vector2.ZERO)
+
+static func draw_surfaces242(node:CanvasItem,surfaces:Array,clip:PackedVector2Array,origin:Vector2=Vector2.ZERO):
+ # Paint every shoulder first, then every dirt surface. Otherwise a later
+ # overlapping contour redraws its green border across an earlier road.
+ for polygon in surfaces:
   for border in Geometry2D.intersect_polygons(polygon,clip):node.draw_colored_polygon(border,Color("697f30"))
+ for polygon in surfaces:
   for inset in Geometry2D.offset_polygon(polygon,-3.,Geometry2D.JOIN_ROUND):
    for inside in Geometry2D.intersect_polygons(inset,clip):
     var uv:=PackedVector2Array()
     for p in inside:uv.append((p+origin)/Vector2(192,50))
     node.draw_polygon(inside,PackedColorArray([Color.WHITE]),uv,texture())
-
- node.draw_set_transform(Vector2.ZERO)
