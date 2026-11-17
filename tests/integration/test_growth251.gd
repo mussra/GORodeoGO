@@ -62,7 +62,7 @@ func test_growth_overlay_animates_then_continue_closes():
  await wait_process_frames(3)
  var initial:float=view.bar.value
  await wait_seconds(2.)
- assert_gt(view.bar.value,initial);assert_almost_eq(view.progress,1.,.001);assert_false(view.spark.visible)
+ assert_gt(view.bar.value,initial);assert_almost_eq(view.progress,1.,.001);assert_true(view.spark.visible);assert_almost_eq(view.spark.phase,1.,.001)
  var button:Button=view.canvas.get_node("Continue251")
  button.pressed.emit();await wait_process_frames(2)
  assert_false(is_instance_valid(view))
@@ -86,3 +86,16 @@ func test_master_shine_keeps_equipped_finish_and_adornments():
  var material_:ShaderMaterial=HorseAdorn169.material(h,HorseFinish168.selected_spec("walk","horse"),0)
  assert_eq(material_.get_shader_parameter("style"),1);assert_almost_eq(material_.get_shader_parameter("mastery_strength251"),.6,.001)
  assert_eq(HorseAdorn169.metal(h,"legs"),"silver")
+
+func test_increment_color_and_glints_stay_only_in_added_bar_interval():
+ var view:=HorseVictory251.new();view.reward=VictoryGrowth251.apply(sut.horse_collection,"original","race");add_child(view);await wait_process_frames(3)
+ for phase in [0.,.25,.5,1.]:
+  view._advance(phase)
+  var spec:Array=[view.reward.title,view.reward.key,view.reward.low,view.base_high251()]
+  var old:float=VictoryGrowth251.visual(spec,view.reward.before)
+  var now:float=VictoryGrowth251.visual(spec,lerpf(view.reward.before,view.reward.after,phase))
+  assert_almost_eq(view.spark.old_x,(view.bar.size.x-2.)*old,.001)
+  assert_almost_eq(view.spark.current_x-view.spark.old_x,(view.bar.size.x-2.)*(now-old),.001)
+  assert_true(view.spark.clip_contents);assert_same(view.spark.get_parent(),view.bar)
+ assert_ne(view.spark.INCREMENT_COLOR,view.spark.BASE_COLOR)
+ view.free()

@@ -1,0 +1,30 @@
+{
+  "version": "2.7.182",
+  "code": 441,
+  "package": "com.example.rancho.review",
+  "sha256": "aa7d9548cd0f274400ef3a1819d385cae6b78111b3f8b5a8d4e6ed0f0ae638e1",
+  "bytes": 82764601,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "passed": 264,
+    "total": 264,
+    "assertions": 44121,
+    "scripts": 45,
+    "deprecations": 4
+  },
+  "visual_change": {
+    "existing": "gold",
+    "increment": "turquoise 68edce",
+    "spark_region": "exact old-to-animated-value interval",
+    "spark_count": 5,
+    "added_nodes": 0,
+    "final_increment_color_retained": true,
+    "reward_values_unchanged": true
+  },
+  "physical_android": false,
+  "warnings": [
+    "Two ObjectDB instances at exit in suite and visual harness",
+    "GUT font UID fallback",
+    "Intentional save-error rollback logs"
+  ]
+}

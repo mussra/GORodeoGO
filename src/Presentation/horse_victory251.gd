@@ -26,20 +26,28 @@ func _ready()->void:
   _label(spec[0]+("  +" if active else ""),Vector2(548,y),22,Color("ffe1a1") if active else Color("a7bdc1"))
   var line:=HorseStatBars.row(canvas,"",VictoryGrowth251.visual(spec,stats[spec[1]]),0.,1.,true);line.position=Vector2(748,y+4);line.size=Vector2(300,30);line.get_child(0).custom_minimum_size.x=0;line.get_child(0).hide()
   if active:
-   bar=line.get_child(1);bar.step=0.;bar.value=VictoryGrowth251.visual([reward.title,reward.key,reward.low,base_high251()],reward.before);bar.add_theme_stylebox_override("fill",RanchTheme.box(Color("ffcf70"),Color("fff3bd"),5))
+   bar=line.get_child(1);bar.step=0.;bar.value=VictoryGrowth251.visual([reward.title,reward.key,reward.low,base_high251()],reward.before);bar.add_theme_stylebox_override("fill",StyleBoxEmpty.new())
  var message:String=str(reward.title)+" mejorada · progreso guardado"
  if reward.has("new_horse"):message+="\nNuevo caballo en tu cuadra: "+str(reward.new_horse.name)
  if reward.has("champion"):message+="\nLinaje maestro: "+str(reward.champion.name)
  if reward.get("fallback",false):message+="\nLa propiedad de este modo ya estaba al máximo."
  _label(message,Vector2(198,477),20,Color("d5e3dd"))
  var close:=Button.new();close.name="Continue251";close.text="Continuar";close.position=Vector2(738,558);close.size=Vector2(310,60);canvas.add_child(close);close.pressed.connect(queue_free)
- spark=GrowthSpark251.new();spark.position=Vector2(890,257+48*HorseSummary185.STATS.map(func(spec):return spec[1]).find(reward.get("key","speed")));spark.mouse_filter=Control.MOUSE_FILTER_IGNORE;canvas.add_child(spark)
+ spark=GrowthSpark251.new();spark.name="GrowthIncrement252";spark.mouse_filter=Control.MOUSE_FILTER_IGNORE;spark.clip_contents=true;bar.add_child(spark)
+ _advance.call_deferred(0.)
  if not reward.get("maxed",false):
-  var tween:=create_tween();tween.tween_interval(.35);tween.tween_method(_advance,0.,1.,1.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT);tween.tween_callback(func():spark.hide())
+  var tween:=create_tween();tween.tween_interval(.35);tween.tween_method(_advance,0.,1.,1.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT);tween.tween_callback(func():_advance(1.))
  else:spark.hide()
 func _advance(value:float)->void:
  progress=value
  if bar!=null:bar.value=VictoryGrowth251.visual([reward.title,reward.key,reward.low,base_high251()],lerpf(reward.before,reward.after,value))
+ var spec:Array=[reward.title,reward.key,reward.low,base_high251()]
+ var before:float=VictoryGrowth251.visual(spec,reward.before)
+ var current:float=VictoryGrowth251.visual(spec,lerpf(reward.before,reward.after,value))
+ var inner_width:float=maxf(0.,bar.size.x-2.)
+ spark.position=Vector2(1.,1.)
+ spark.size=Vector2(inner_width,maxf(0.,bar.size.y-2.))
+ spark.old_x=inner_width*before;spark.current_x=inner_width*current
  spark.phase=value;spark.queue_redraw()
 func base_high251()->float:
  for spec in HorseSummary185.STATS:
@@ -54,8 +62,21 @@ func _label(text_:String,at:Vector2,font:int,color:Color)->void:
 func _unhandled_input(event:InputEvent)->void:
  if event.is_action_pressed("ui_cancel"):queue_free();get_viewport().set_input_as_handled()
 class GrowthSpark251 extends Control:
+ const BASE_COLOR=Color("ffcf70")
+ const INCREMENT_COLOR=Color("68edce")
  var phase:float=0.
+ var old_x:float=0.
+ var current_x:float=0.
  func _draw():
-  for i in 12:
-   var angle:float=i*TAU/12.;var radius:float=18.+phase*120.;var p:=Vector2(cos(angle),sin(angle))*radius;var extent:float=(1.-phase)*(3.+i%3*2.)
-   var color:=Color(1.,.85,.45,(1.-phase)*.9);draw_line(p-Vector2(extent,0),p+Vector2(extent,0),color,2.,true);draw_line(p-Vector2(0,extent),p+Vector2(0,extent),color,2.,true)
+  draw_rect(Rect2(Vector2.ZERO,Vector2(old_x,size.y)),BASE_COLOR)
+  var width:float=maxf(0.,current_x-old_x)
+  if width<=0.:return
+  draw_rect(Rect2(Vector2(old_x,0),Vector2(width,size.y)),INCREMENT_COLOR)
+  # Endpoints are clamped to the exact new interval, never the old fill.
+  for i in 5:
+   var x:float=old_x+width*(float(i)+.5)/5.
+   var y:float=size.y*(.22+.56*fposmod(float(i)*.618+phase,1.))
+   var extent:float=2.+sin(phase*PI)*3.
+   var color:=Color(1.,1.,.86,sin(phase*PI))
+   draw_line(Vector2(maxf(old_x,x-extent),y),Vector2(minf(current_x,x+extent),y),color,1.,false)
+   draw_line(Vector2(x,maxf(0.,y-extent)),Vector2(x,minf(size.y,y+extent)),color,1.,false)
