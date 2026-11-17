@@ -1,6 +1,7 @@
 shader_type canvas_item;
 #include "res://art/adorn169/metal169.gdshaderinc"
 uniform int special_finish168=0;
+uniform float mastery_strength251=0.;
 uniform vec4 emblem_color : source_color = vec4(0.45,0.8,0.7,1.);
 uniform bool emblem_enabled=false;
 uniform sampler2D emblem_mask: filter_linear;
@@ -289,5 +290,9 @@ void fragment(){
   if(special_finish168==2)out_alpha*=mix(1.,.70,region168);
  }
  col=apply_adorn169(col,src.rgb,UV);
+ if(mastery_strength251>0.){
+  float shimmer251=pow(max(0.,sin(UV.x*9.+UV.y*3.-TIME*1.7)),24.);
+  col=mix(col,vec3(1.,.95,.73),shimmer251*max(m.r,m.g)*mastery_strength251*.65);
+ }
  COLOR=vec4(col,out_alpha);
 }

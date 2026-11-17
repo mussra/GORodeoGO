@@ -30,6 +30,8 @@ static func lineage(h:Dictionary)->String:
  return label if not label.is_empty() else TranslationServer.translate("GEN_UNKNOWN")
 static func origin(h:Dictionary)->String:
  var value:String=str(h.get("origin",""))
+ if value=="mastery251":return "Maestría de familia"
+ if value=="race_prize251":return "Victoria de carrera"
  if value=="purchased":return TranslationServer.translate("GEN_PURCHASED")
  if not h.get("parents",[]).is_empty():return TranslationServer.translate("GEN_BRED")
  return TranslationServer.translate("GEN_UNRECORDED")

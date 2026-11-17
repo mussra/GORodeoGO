@@ -1,6 +1,7 @@
 shader_type canvas_item;
 #include "res://art/adorn169/metal169.gdshaderinc"
 uniform int style=0;
+uniform float mastery_strength251=0.;
 uniform sampler2D region_mask: filter_nearest;
 uniform sampler2D body_uv: filter_nearest;
 uniform bool uv_enabled=false;
@@ -39,6 +40,10 @@ void fragment(){
   vec3 col=mix(src.rgb,finish_color(p,shade),region);
   float alpha=src.a*(style==2?mix(1.,.70,region):1.);
   COLOR=vec4(col,alpha);
+ }
+ if(mastery_strength251>0. && region>.01){
+  float sweep=pow(max(0.,sin(UV.x*9.+UV.y*3.-TIME*1.7)),24.);
+  COLOR.rgb=mix(COLOR.rgb,vec3(1.,.95,.73),sweep*region*mastery_strength251*.65);
  }
  COLOR.rgb=apply_adorn169(COLOR.rgb,src.rgb,UV);
 }

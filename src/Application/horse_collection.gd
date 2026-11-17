@@ -113,6 +113,16 @@ func restore(v:Variant)->bool:
    for field169 in ["leg_adorn169","boot_adorn169"]:
     if h.has(field169) and (not h[field169] is String or h[field169] not in ["gold","silver"]):return false
    if h.has("special_finish168") and (not h.special_finish168 is String or h.special_finish168 not in ["gold","crystal","ice"]):return false
+   if not h.get("growth251",{}) is Dictionary or not h.get("mode_wins251",{}) is Dictionary or not h.get("race_courses251",[]) is Array:return false
+   for field in ["growth251","mode_wins251"]:
+    for k in h.get(field,{}):
+     if k not in (HorseStats.BASE.keys() if field=="growth251" else ModeVictories240.MODES) or not h[field][k] is int or h[field][k]<0:return false
+   var course_ids:Array=[]
+   for course in h.get("race_courses251",[]):
+    if not course is int or course not in [0,1,2,3] or course in course_ids:return false
+    course_ids.append(course)
+   for flag in ["master251","supreme251"]:
+    if h.has(flag) and not h[flag] is bool:return false
    ids[h.id]=true;by_id[h.id]=h
    if group==known:clean_ancestors.append(h.duplicate(true))
    else:clean.append(h.duplicate(true))

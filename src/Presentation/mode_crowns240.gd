@@ -33,7 +33,7 @@ func _ready()->void:
   notice.text="Hay victorias sin guardar."
   var retry:=Button.new();retry.text="Reintentar guardado";retry.position=Vector2(865,642);retry.size=Vector2(370,58);canvas.add_child(retry)
   retry.pressed.connect(func():
-   if SaveData.retry_victory240():queue_free();get_parent().add_child(ModeCrowns240.new())
+   if SaveData.retry_victory240():HorseVictory251.present(get_parent());queue_free();get_parent().add_child(ModeCrowns240.new())
    else:notice.text="No se ha guardado. Progreso anterior protegido.")
 func _texture241(mode:String,obtained:bool)->Texture2D:
  return load("res://art/ui/crowns241/"+("round/" if round241 else "")+mode+("" if obtained else "_pending")+".png")

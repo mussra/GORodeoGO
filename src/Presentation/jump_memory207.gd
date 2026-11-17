@@ -83,7 +83,8 @@ func _landed():
   var point:Vector2=POINTS[i]
   if Geometry2D.segment_intersects_segment(jump_from,player.position,point-MemoryFence208.half_axis(i),point+MemoryFence208.half_axis(i))!=null:
    var state:String=model.land(i);sound.play("lose" if state=="failed" else "win" if state in ["passed","won"] else "capture")
-   if state=="won":SaveData.record_mode_victory240(victory_ticket240)
+   if state=="won":
+    SaveData.record_mode_victory240(victory_ticket240);HorseVictory251.present(self)
    if state!="ride":player.set_physics_process(false);player.velocity=Vector2.ZERO
    _refresh();return
 func _refresh():

@@ -37,7 +37,7 @@ func _play()->void:
   return
  if goal.is_empty():
   var granted:=SaveData.claim_cup195()
-  if granted.ok:_completed()
+  if granted.ok:_completed();HorseVictory251.present(self)
   else:body.text+="\nNo se ha podido guardar. Tus premios no se han aplicado. Puedes reintentar."
   return
  var started:=RaceCupSession194.begin()

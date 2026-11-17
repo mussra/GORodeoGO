@@ -29,6 +29,6 @@ func _unhandled_input(event:InputEvent)->void:
 func show_requirement250(text_:String)->void:
  var note:Label=canvas.get_node("GameAccess239")
  note.text="Para jugar: "+text_
- note.add_theme_color_override("font_color",Color("ffcf70"))
+ note.add_theme_color_override("font_color",Color("aab9bd"))
  note.modulate.a=.45
  create_tween().tween_property(note,"modulate:a",1.0,.18)

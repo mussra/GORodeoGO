@@ -159,6 +159,7 @@ func refresh_mount237():
 		HorseAppearance.apply(_sprite_swap._frames, horse.traits,horse)
 	if _sprite_swap.has_sprite():HatAppearance.apply_classic(_sprite_swap._frames,SaveData.hat_color)
 	if _sprite_swap.has_sprite():PixelLabTrial.apply(_sprite_swap._frames,"rider","walk_side",horse.get("traits",{}),horse)
+	if _sprite_swap.has_sprite():HorseFinish168.install(_sprite_swap._sprite,horse,"rider")
 	if not horse.is_empty():
 		max_speed = HorseStats.read(horse).speed
 	if _sprite_swap.has_sprite():

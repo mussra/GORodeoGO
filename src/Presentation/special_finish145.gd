@@ -5,7 +5,7 @@ const IDS:Array[String]=["gold","crystal","ice"]
 const NAMES:Array[String]=["Oro brillante","Cristal","Hielo"]
 const SHADER=preload("res://art/special_finish145.gdshader")
 static func material(style:String,mask:Texture2D,uv:Texture2D=null,portrait:bool=false)->ShaderMaterial:
- var m:=ShaderMaterial.new();m.shader=SHADER;m.set_shader_parameter("style",IDS.find(style)+1);m.set_shader_parameter("region_mask",mask);m.set_shader_parameter("uv_enabled",uv!=null);m.set_shader_parameter("portrait",portrait)
+ var m:=ShaderMaterial.new();m.shader=SHADER;m.set_shader_parameter("style",IDS.find(style.split("|")[0])+1);m.set_shader_parameter("region_mask",mask);m.set_shader_parameter("uv_enabled",uv!=null);m.set_shader_parameter("portrait",portrait);m.set_shader_parameter("mastery_strength251",1. if style.ends_with("supreme251") else .6 if style.ends_with("master251") else 0.)
  if uv!=null:m.set_shader_parameter("body_uv",uv)
  return m
 static func riderless_frame(i:int)->Texture2D:return load("res://art/experimental/pixellab/horse/side/frame_%02d.png"%posmod(i,9))

@@ -1,6 +1,6 @@
 extends Node2D
 ## Isolated test race. Never writes collection, economy, progression or rewards.
-const EQUALIZED:bool=true
+const EQUALIZED:bool=false
 var course:=RaceCourse190.new(RaceCourse190.selected)
 var selector:Panel
 var fence_bodies:Array[StaticBody2D]=[]
@@ -45,7 +45,7 @@ func _ready()->void:
  for i in 4:
   var rider:=RaceRider190.new();rider.race=self;rider.ai=i>0;rider.racer_index=i;rider.racer_name=names[i];rider.tint=colors[i];rider.lane=-105.+i*70.
   rider.can_jump=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected))
-  if not EQUALIZED:rider.base_pace=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).speed
+  if not EQUALIZED and not rider.ai:rider.base_pace=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected)).speed
   rider.position=course.at(-30.)+course.tangent(-30.).orthogonal()*rider.lane;rider.previous_position=rider.position
   add_child(rider);riders.append(rider)
  for distance in course.fences:
@@ -180,8 +180,9 @@ func _finish()->void:
  if order[0]==player and not SaveData.record_mode_victory240(victory_ticket240,course.variant):lines+="\nVictoria no guardada. Reintenta en Coronas."
  result_text.text=lines
  result_text.add_theme_font_size_override("font_size",26)
- _label(results,"Prototipo · sin premios ni cambios en tus caballos.",Vector2(28,268),17)
+ _label(results,"La victoria mejora una propiedad de tu caballo.",Vector2(28,268),17)
  results.show()
+ HorseVictory251.present(self)
  if order[0]==player:
   _winner_story()
   if SaveData.pending_victory240.is_empty() and SaveData.mode_open240("duel"):result_text.text+="\nDuelo disponible en Juegos."
@@ -236,7 +237,7 @@ func _build_selector()->void:
  _label(selector,"CARRERAS CON LAZO · PRUEBA",Vector2(26,18),25)
  _label(selector,"Velocidad igualada. El salto depende de tu caballo.
 Vallas parciales: salta o rodea por el hueco.
-Sin daño. Carreras libres sin premios.",Vector2(26,65),20)
+Sin daño. Cada victoria mejora tu caballo y te da otro.",Vector2(26,65),20)
  for i in RaceCourse190.TITLES.size():
   var b:=_button(selector,RaceCourse190.TITLES[i],Vector2(26,172+i*64),_choose_course.bind(i));b.size=Vector2(700,54)
  _button(selector,"Menú",Vector2(500,430),_menu)

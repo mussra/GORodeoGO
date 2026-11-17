@@ -39,5 +39,6 @@ static func apply_horse(view:TextureRect,horse:Dictionary,hat:String="original")
  else:
   apply(view,horse.traits,hat)
   HorseGalaxyLook.configure_portrait(view.material,horse)
-  view.material.set_shader_parameter("special_finish168",HorseFinish168.IDS.find(HorseFinish168.style(horse)))
+  view.material.set_shader_parameter("special_finish168",maxi(0,HorseFinish168.IDS.find(HorseFinish168.base_style(horse))))
+  view.material.set_shader_parameter("mastery_strength251",1. if horse.get("supreme251",false) else .6 if horse.get("master251",false) else 0.)
   HorseAdorn169.configure(view.material,horse,preload("res://art/adorn169/portrait.png"))

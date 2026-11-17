@@ -1,0 +1,82 @@
+{
+  "version": "2.7.181",
+  "code": 440,
+  "package": "com.example.rancho.review",
+  "sha256": "6ca9c578e2d80b5460b7990f0f3a85b5f3566bb3d049b6fca711fe1041d5a7c9",
+  "bytes": 82760505,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "total": 263,
+    "passed": 263,
+    "assertions": 44103,
+    "scripts": 45,
+    "deprecations": 4
+  },
+  "compatibility_tests": {
+    "total": 37,
+    "passed": 37,
+    "assertions": 1134,
+    "scripts": 9,
+    "warnings": 2
+  },
+  "growth": {
+    "bulls": "power",
+    "race": "speed",
+    "duel": "handling",
+    "joust": "dodge",
+    "memory": "calm",
+    "cup": "speed",
+    "formula": "0.02 * base stat range * sqrt(attribute win count)",
+    "random_chance": false,
+    "race_horse_every_saved_win": true
+  },
+  "family": {
+    "key": "species plus pattern",
+    "shared_progress": true,
+    "distinct_bull_levels": 6,
+    "distinct_race_courses": 2,
+    "other_modes": [
+      "duel",
+      "joust",
+      "memory"
+    ],
+    "exclusive_prize_once": true,
+    "sold_records_preserved": true,
+    "supreme_optional": "40 bull levels, 4 race courses, duel, joust and memory with one mount; not required for family prize",
+    "duration_estimate_minutes": [
+      25,
+      45
+    ],
+    "duration_measured": false,
+    "duration_excludes": [
+      "unlocking games",
+      "retries"
+    ]
+  },
+  "atomicity": [
+    "win ledger",
+    "horse growth",
+    "horse race course record",
+    "new race horse",
+    "exclusive family horse",
+    "shine flags"
+  ],
+  "visual_review": [
+    "shaded locked cards",
+    "animated highlighted stat and stars",
+    "saved new horse notice",
+    "shared family sheet",
+    "tiger normal and preserved-pattern shine"
+  ],
+  "touch": "Continue closes with InputEventScreenTouch through desktop input pipeline, not Android hardware",
+  "performance_file": "review181/perf251.json",
+  "physical_android": false,
+  "warnings": [
+    "GUT font UID fallback",
+    "Intentional save-failure error logs",
+    "Two ObjectDB instances on some prior suite/visual/compatibility exits, absent in latest main suite"
+  ],
+  "galaxy_unicorn_route_unchanged": true,
+  "unicorn_conversion_enabled": false,
+  "no_main_or_store": true
+}

@@ -1,0 +1,140 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/unit/test_horse_stat_bars76.gd
+[0m* test_values_are_normalized_hidden_numbers_and_shared
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+[33m    [GUT WARNING]:  [0mWarn:  Float/Int comparison.  Got FLOAT but expected INT
+* test_unowned_has_no_invented_bars
+* test_limits_and_training_use_same_row
+* test_single_known_skill_bar_is_full_green_without_changing_mastery
+* test_unknown_and_legacy_skills_keep_actual_learning_and_default_capability
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_horse_summary185.gd
+[0m* test_zero_full_and_intermediate_mean
+* test_learned_skill_counts_as_full_without_gifting_mastery
+* test_summary_is_read_only_and_matches_detailed_scales
+[1m3/3 passed.
+[0m[4m
+
+res://tests/unit/test_unicorn_ritual175.gd
+[0m* test_complete_pure_master_at_source_is_eligible_but_never_converts
+* test_each_requirement_explains_missing_and_does_not_guess_genealogy
+* test_ancestry_is_unique_order_independent_and_sold_parents_still_count
+* test_missing_parent_and_cycles_are_rejected_without_recursion_or_mutation
+* test_deeper_ancestors_change_scores_without_renaming_id_rerolls
+* test_source_water_and_wrong_country_fail_even_for_eligible_master
+* test_rainbow_mane_is_not_silently_counted_as_red_mane
+* test_ancestry_walk_has_no_short_generation_cutoff_and_rejects_nonroot_cycle
+* test_exact_source_distance_uses_walkable_bank_not_water_center
+[1m9/9 passed.
+[0m[4m
+
+res://tests/unit/test_galaxy_pure143.gd
+[0m* test_two_galaxy_parents_record_birth_but_do_not_transform_or_change_stats
+* test_single_galaxy_does_not_pass_finish_or_purity
+* test_birth_snapshot_is_independent_of_parent_edits_and_sale
+* test_legacy_records_are_not_retroactively_labelled
+* test_malformed_proof_rejected_without_changing_collection
+* test_atomic_birth_and_maturity_persist_the_proof
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:154)
+       [1] save_progress (res://src/Application/save_data.gd:96)
+       [2] breed_horses (res://src/Application/save_data.gd:397)
+       [3] test_atomic_birth_and_maturity_persist_the_proof (res://tests/unit/test_galaxy_pure143.gd:29)
+       [4] _run_test (res://addons/gut/gut.gd:622)
+       [5] _test_the_scripts (res://addons/gut/gut.gd:835)
+       [6] test_scripts (res://addons/gut/gut.gd:1047)
+       [7] run_tests (res://addons/gut/gui/GutRunner.gd:198)
+       [8] _run_tests (res://addons/gut/cli/gut_cli.gd:239)
+       [9] main (res://addons/gut/cli/gut_cli.gd:297)
+       [10] _init (res://addons/gut/gut_cmdln.gd:39)
+[34m[ExpectedError][0m
+[1m6/6 passed.
+[0m[4m
+
+res://tests/unit/test_finish_pose168.gd
+[0m* test_all_adult_runtime_pose_sources_masks_and_uvs_exist_and_match_dimensions
+* test_materials_are_shared_by_exact_style_pose_and_frame_only
+[1m2/2 passed.
+[0m[4m
+
+res://tests/unit/test_finish_shop168.gd
+[0m* test_money_alone_cannot_buy_then_purchase_once_equips_and_preserves_genes_stats
+* test_save_failure_rolls_back_purchase_and_per_horse_equipment
+* test_modes_foals_invalid_style_and_unowned_horse_cannot_equip
+* test_render_mapping_covers_runtime_animation_names
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_special_finish145.gd
+[0m* test_three_studies_are_explicit_and_unknown_is_pass_through
+* test_nine_frames_wrap_reuse_materials_and_preserve_base_assets
+[1m2/2 passed.
+[0m[4m
+
+res://tests/integration/test_finish_preview145.gd
+[0m* test_preview_does_not_write_appearance_stats_inventory_or_disk
+* test_layout_at_small_landscape_and_back_closes
+* test_equipment_has_preview_entry_without_a_purchase
+[1m3/3 passed.
+[0m[4m
+
+res://tests/integration/test_finish_shop168.gd
+[0m* test_shop_requires_activity_purchase_once_equip_then_reload_without_genetic_change
+* test_new_actor_uses_finish_for_every_mounted_animation_and_drink_pose_has_shared_material
+* test_portrait_styles_and_small_layout_and_back
+[1m3/3 passed.
+[0m
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Warnings              2
+
+Scripts               9
+Tests                37
+Passing Tests        37
+Asserts            1134
+Time              1.501s
+
+
+[32m---- All tests passed! ----
+[0m
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

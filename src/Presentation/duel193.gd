@@ -101,12 +101,13 @@ func _resolve_round()->void:
   for connection in next_button.pressed.get_connections():next_button.pressed.disconnect(connection.callable)
   next_button.pressed.connect(func():get_tree().change_scene_to_file("res://src/Presentation/race_cup194.tscn"))
  if finished:title="¡Has ganado el duelo!" if scores[0]>=2 else "Luna gana el duelo"
- result_text.text=title+"\n\nTú %d - %d Luna\nSin premios ni cambios en tus caballos."%[scores[0],scores[1]]
+ result_text.text=title+"\n\nTú %d - %d Luna\nLa victoria mejora una propiedad de tu caballo."%[scores[0],scores[1]]
  next_button.text="Volver a la copa" if cup_done else "Repetir duelo" if finished else "Repetir manga" if pending.size()==2 else "Siguiente manga"
  if finished and scores[0]>=2 and not SaveData.record_mode_victory240(victory_ticket240):result_text.text+="\nVictoria no guardada. Reintenta en Coronas."
  if finished and scores[0]>=2 and SaveData.pending_victory240.is_empty():
   result_text.text+="\n"+("Hípica disponible en Juegos." if victory_mode240()=="joust" else "Justa y Copa disponibles en Juegos.")
  result.show();_refresh()
+ HorseVictory251.present(self)
 func _clear_actions()->void:
  for action in ["move_left","move_right","move_up","move_down","aim_left","aim_right","aim_up","aim_down","throw_lasso"]:Input.action_release(action)
 func _reset_controls()->void:

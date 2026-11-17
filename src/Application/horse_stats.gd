@@ -12,6 +12,8 @@ static func read(h:Dictionary)->Dictionary:
  out.dodge=clampf(number(s.get("dodge",1.0),1.0),0.75,1.0)
  # Serenidad (Ant, 7-nov-2026): how fast the horse calms bulls and wild horses.
  out.calm=calm_factor(s.get("calm",1.0))
+ for key in BASE:
+  out[key]+=VictoryGrowth251.bonus(key,int(h.get("growth251",{}).get(key,0)))
  return out
 static func inherit(a:Dictionary,b:Dictionary)->Dictionary:
  var x:=read(a);var y:=read(b);var out:Dictionary={}

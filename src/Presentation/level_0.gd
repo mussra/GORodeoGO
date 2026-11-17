@@ -570,6 +570,7 @@ func _save_win241()->void:
 		hud.restart_button.text="Reintentar guardado"
 		hud.restart_button.position=Vector2(76,200);hud.restart_button.size=Vector2(360,64)
 		return
+	HorseVictory251.present(self)
 	hud.show_win()
 	hud.quit_button.show();hud.restart_button.text="Repetir"
 	hud.restart_button.position=Vector2(40,180);hud.restart_button.size=Vector2(200,50)

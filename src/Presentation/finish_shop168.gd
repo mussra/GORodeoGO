@@ -39,7 +39,7 @@ func refresh():
  var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
  balance.text="%d puntos · %d cerdos · %d cabras · %d encargos cobrados · %s"%[SaveData.equipment_points,SaveData.world_pig_captures.size(),SaveData.world_goat_captures.size(),SaveData.repeat_contract165.completed,horse.get("name","")]
  for i in 3:
-  var style:String=SpecialFinish145.IDS[i];var id:String="finish_"+style;var item:Dictionary=ProgressionEconomy165.EXTRAS[id];var owned:bool=SaveData.equipment_owned.has(id);var equipped:bool=HorseFinish168.style(horse)==style
+  var style:String=SpecialFinish145.IDS[i];var id:String="finish_"+style;var item:Dictionary=ProgressionEconomy165.EXTRAS[id];var owned:bool=SaveData.equipment_owned.has(id);var equipped:bool=HorseFinish168.base_style(horse)==style
   var preview:Dictionary=horse.duplicate(true);preview.special_finish168=style;HorsePortrait.apply_horse(previews[i],preview,SaveData.hat_color)
   details[i].text="%d puntos\n%d cerdos · %d cabras\n%d encargos cobrados\nLos logros no se gastan."%[item.price,item.pigs,item.goats,item.contracts]
   var missing:=ProgressionEconomy165.missing(id,SaveData.equipment_points,SaveData.world_pig_captures.size(),SaveData.world_goat_captures.size(),int(SaveData.repeat_contract165.completed))

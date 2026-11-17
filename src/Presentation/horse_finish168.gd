@@ -2,9 +2,13 @@ class_name HorseFinish168
 extends RefCounted
 ## Cosmetic only: separate from genetic finish, ancestry and stats.
 const IDS:Array[String]=["","gold","crystal","ice"]
-static func style(horse:Dictionary)->String:
+static func base_style(horse:Dictionary)->String:
  var value:Variant=horse.get("special_finish168","")
  return value if value is String and IDS.has(value) else ""
+static func style(horse:Dictionary)->String:
+ var base:String=base_style(horse)
+ var shine:String="supreme251" if horse.get("supreme251",false) else "master251" if horse.get("master251",false) else ""
+ return base+"|"+shine if not base.is_empty() and not shine.is_empty() else base+shine
 static func selected_spec(animation:String,kind:String)->Dictionary:
  var id:String=animation
  if animation=="rest_gesture107":id="drink"

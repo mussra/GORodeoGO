@@ -25,6 +25,9 @@ var rodeo_intro240:bool=false
 var victories240:Dictionary=ModeVictories240.fresh()
 var _issued240:int=0
 var pending_victory240:Dictionary={}
+var last_growth251:Dictionary={}
+func take_growth251()->Dictionary:
+	var result:=last_growth251;last_growth251={};return result
 var highest_level_completed: int = 0
 var equipment_points: int = 0
 var equipment_owned: Array[String] = []
@@ -341,7 +344,7 @@ func equipped_whip_reach()->float:
 
 var rodeo_saved241:bool=false
 func record_victory(level_number:int,training_session:Dictionary={},mounted_horse_id:String="")->int:
-	rodeo_saved241=false
+	rodeo_saved241=false;last_growth251={}
 	if trial_session_active:return 0 # no temporary victory becomes an acquisition
 	if level_number<1 or level_number>LevelCatalog.MAX_LEVEL:return 0
 	if not apply_legacy_points_credit(EquipmentCatalog.REWARDS):return 0
@@ -360,7 +363,13 @@ func record_victory(level_number:int,training_session:Dictionary={},mounted_hors
 	FoalGrowth174.advance(horse_collection)
 	HorseTraining.complete(horse_collection,training_session)
 	HorseMastery.record(horse_collection,mounted_horse_id,level_number)
+	var growth_id:String=mounted_horse_id if not mounted_horse_id.is_empty() else horse_collection.selected
+	var growth:=VictoryGrowth251.apply(horse_collection,growth_id,"bulls")
+	var champion:=VictoryGrowth251.champion(horse_collection,growth_id)
+	if not champion.is_empty():growth["champion"]=champion.duplicate(true)
+	if not horse_collection.find(growth_id).is_empty():growth["horse"]=horse_collection.find(growth_id).duplicate(true)
 	if save_progress():
+		last_growth251=growth
 		rodeo_saved241=true;return reward
 	horse_collection.restore(before_horses)
 	victories240=before_victories
@@ -780,6 +789,7 @@ func equip_adorn169(horse_id:String,slot:String,metal:String)->bool:
 
 ## No spending. Completion and mode verified from the cup ledger at claim time.
 func claim_cup195()->Dictionary:
+	last_growth251={}
 	if trial_session_active:return {"ok":false,"reason":"trial_session"}
 	var loaded:=RaceCupSession194.load_state()
 	if not loaded.ok:return loaded
@@ -790,7 +800,8 @@ func claim_cup195()->Dictionary:
 	var before_victories:Dictionary=victories240.duplicate(true)
 	var ticket:=victory_ticket240("cup")
 	ModeVictories240.record(victories240,"cup",ticket.sequence)
-	if save_progress():return granted
+	var growth:=VictoryGrowth251.apply(horse_collection,horse_collection.selected,"cup")
+	if save_progress():last_growth251=growth;return granted
 	victories240=before_victories
 	horse_collection.restore(before)
 	return {"ok":false,"reason":"save_failed"}
@@ -838,13 +849,29 @@ func prepare_herd217(base:Dictionary,cx:int,cy:int)->bool:
 ## A ticket belongs to one completed run and one storage context, never a UI refresh.
 func victory_ticket240(mode:String)->Dictionary:
 	_issued240=maxi(_issued240,int(victories240.last))+1
-	return {"mode":mode,"sequence":_issued240,"debug":debug_mode,"trial":trial_session_active}
+	return {"mode":mode,"sequence":_issued240,"debug":debug_mode,"trial":trial_session_active,"horse251":horse_collection.selected}
 func record_mode_victory240(ticket:Dictionary,course:int=-1)->bool:
+	last_growth251={}
 	if trial_session_active or ticket.get("trial",true) or ticket.get("debug")!=debug_mode:return false
 	if not pending_victory240.is_empty() and pending_victory240.ticket!=ticket:return false
 	var before:=victories240.duplicate(true)
 	if not ModeVictories240.record(victories240,str(ticket.get("mode","")),int(ticket.get("sequence",0)),course):return false
-	if save_progress():pending_victory240.clear();return true
+	var horses_before:=horse_collection.export_state()
+	var horse_id:String=str(ticket.get("horse251",""))
+	var growth:=VictoryGrowth251.apply(horse_collection,horse_id,str(ticket.get("mode","")))
+	if ticket.get("mode","")=="race":
+		var mounted:=horse_collection.find(horse_id)
+		if not mounted.is_empty():
+			var courses:Array=mounted.get("race_courses251",[]).duplicate()
+			if course not in courses:courses.append(course)
+			mounted.race_courses251=courses
+		var prize:=VictoryGrowth251.race_horse(horse_collection,int(ticket.sequence))
+		if not prize.is_empty():growth["new_horse"]=prize.duplicate(true)
+	var champion:=VictoryGrowth251.champion(horse_collection,horse_id)
+	if not champion.is_empty():growth["champion"]=champion.duplicate(true)
+	if not horse_collection.find(horse_id).is_empty():growth["horse"]=horse_collection.find(horse_id).duplicate(true)
+	if save_progress():pending_victory240.clear();last_growth251=growth;return true
+	horse_collection.restore(horses_before)
 	victories240=before;pending_victory240={"ticket":ticket.duplicate(true),"course":course};return false
 func retry_victory240()->bool:
 	if pending_victory240.is_empty():return true

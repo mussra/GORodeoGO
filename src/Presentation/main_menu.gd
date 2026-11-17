@@ -307,6 +307,7 @@ func _show_games213()->void:
 	for entry in _games213.entries:
 		if not SaveData.mode_open240(entry.id):
 			entry.hint=ModeAccess240.card_requirement(entry.id)
+			entry.locked251=true
 			_games213.keep_open250.append(entry.id)
 		entry.compact250=true
 	_games213.entries.append({"id":"crowns240","icon223":"res://art/ui/crowns241/cup.png","compact250":true,"title":"Coronas y victorias","hint":"Tus resultados · tipos de corona"})

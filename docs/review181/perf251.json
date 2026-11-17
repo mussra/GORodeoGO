@@ -1,0 +1,30 @@
+{
+  "animation": {
+    "draw_calls": 55.0,
+    "mean_ms": 30.0374083333333,
+    "memory_mib": 42.2271118164062,
+    "nodes": 47.0,
+    "p95_ms": 34.602
+  },
+  "baseline": {
+    "draw_calls": 0.0,
+    "mean_ms": 3.21803333333333,
+    "memory_mib": 40.4636840820312,
+    "nodes": 13.0,
+    "p95_ms": 6.568
+  },
+  "closed": {
+    "draw_calls": 0.0,
+    "mean_ms": 3.48730833333333,
+    "memory_mib": 41.7300758361816,
+    "nodes": 13.0,
+    "p95_ms": 6.463
+  },
+  "settled": {
+    "draw_calls": 55.0,
+    "mean_ms": 29.6744083333333,
+    "memory_mib": 42.2278633117676,
+    "nodes": 47.0,
+    "p95_ms": 32.363
+  }
+}

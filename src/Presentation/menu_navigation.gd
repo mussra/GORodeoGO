@@ -16,6 +16,9 @@ static func cards(host:Control,entries:Array,selected:Callable)->void:
    var icon:=TextureRect.new();icon.name="GameIcon223";icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;icon.texture=load(str(entry.icon223));icon.position=Vector2(12,39);icon.size=Vector2(82,82);icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;icon.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(icon)
    var title:=Label.new();title.name="GameName223";title.text=str(entry.title);title.position=Vector2(104,20);title.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(title);TextFit181.fixed(title,Vector2(width-116,54),24,20,2)
    var hint:=Label.new();hint.name="GameHint250";hint.text=str(entry.get("hint",""));hint.position=Vector2(104,81);hint.add_theme_color_override("font_color",Color("bbd4dc"));hint.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(hint);TextFit181.fixed(hint,Vector2(width-116,66),19,17,3)
+   if entry.get("locked251",false):
+    button.self_modulate=Color("67757b");icon.modulate=Color("778086");title.modulate=Color("a6b1b5");hint.modulate=Color("9ba8ad")
+    var lock:=Label.new();lock.text="BLOQUEADO";lock.position=Vector2(104,139);lock.add_theme_font_size_override("font_size",12);lock.modulate=Color("839298");lock.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(lock)
    continue
   if entry.has("icon223"):
    var icon:=TextureRect.new();icon.name="GameIcon223";icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;icon.texture=load(str(entry.icon223));icon.position=Vector2((width-104.)*.5,10);icon.size=Vector2(104,104);icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;icon.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(icon)
