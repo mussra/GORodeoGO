@@ -18,8 +18,15 @@ func trial_tools_enabled()->bool:
 func debug_cheats_active()->bool:
  return trial_tools_enabled() and (SaveData.debug_mode or SaveData.trial_session_active)
 
+var performance_osd245:bool=false
+func set_performance_osd245(enabled:bool)->void:
+ performance_osd245=enabled
+ var cfg:=ConfigFile.new();cfg.set_value("performance","visible",enabled);cfg.save("user://performance245.cfg")
+
 var _exit_dialog:ConfirmationDialog
 func _ready()->void:
+ var cfg:=ConfigFile.new()
+ if cfg.load("user://performance245.cfg")==OK:performance_osd245=bool(cfg.get_value("performance","visible",false))
  var osd:Node=load("res://src/Presentation/performance_osd242.gd").new();osd.name="PerformanceOSD242";add_child.call_deferred(osd)
  process_mode=Node.PROCESS_MODE_ALWAYS
  get_tree().quit_on_go_back=false

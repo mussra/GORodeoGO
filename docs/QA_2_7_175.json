@@ -1,0 +1,23 @@
+{
+  "version": "2.7.175",
+  "version_code": 434,
+  "tests": {
+    "scripts": 22,
+    "passed": 137,
+    "assertions": 16826,
+    "physical_android": false
+  },
+  "camera": {
+    "out": 1.2,
+    "hold": 1.0,
+    "back": 1.2,
+    "curve": "quintic smootherstep, log-scale zoom",
+    "seen_state": "preserved"
+  },
+  "osd": "Independent saved toggle in world menu and settings; no debug/save switch",
+  "apk": {
+    "sha256": "c8f4528053ce9eba95dad7affab840094f504062ba54e3e268c5a5a7612aac44",
+    "bytes": 82710259,
+    "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb"
+  }
+}

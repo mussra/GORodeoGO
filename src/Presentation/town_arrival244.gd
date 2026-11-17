@@ -2,9 +2,9 @@ class_name TownArrival244
 extends Node
 ## A short camera presentation, never pauses the rider or grows streaming radius.
 const PREF_PATH:String='user://town_arrivals244.cfg'
-const OUT_SECONDS:float=.65
+const OUT_SECONDS:float=1.2
 const HOLD_SECONDS:float=1.
-const BACK_SECONDS:float=.65
+const BACK_SECONDS:float=1.2
 const CHECK_SECONDS:float=.25
 var world:Node
 var camera:Camera2D
@@ -73,12 +73,15 @@ func begin(candidate:Dictionary)->void:
  var extent:Vector2=get_viewport().get_visible_rect().size
  title.size=Vector2(minf(650.,extent.x-40.),40.);title.position=Vector2((extent.x-title.size.x)*.5,62.);title.show()
  apply_frame()
+static func cinematic_curve(t:float)->float:
+ var x:float=clampf(t,0.,1.)
+ return x*x*x*(x*(x*6.-15.)+10.)
 func apply_frame()->void:
  var blend:float
- if elapsed<OUT_SECONDS:blend=smoothstep(0.,1.,elapsed/OUT_SECONDS)
+ if elapsed<OUT_SECONDS:blend=cinematic_curve(elapsed/OUT_SECONDS)
  elif elapsed<OUT_SECONDS+HOLD_SECONDS:blend=1.
- else:blend=1.-smoothstep(0.,1.,(elapsed-OUT_SECONDS-HOLD_SECONDS)/BACK_SECONDS)
- camera.zoom=Vector2.ONE*lerpf(start_zoom,target_zoom,blend)
+ else:blend=1.-cinematic_curve((elapsed-OUT_SECONDS-HOLD_SECONDS)/BACK_SECONDS)
+ camera.zoom=Vector2.ONE*exp(lerpf(log(start_zoom),log(target_zoom),blend))
  # Center stays still for the full one-second hold; player simulation continues.
  var center:Vector2=plan.bounds.get_center()+Vector2(0,-20.)
  camera.offset=start_offset.lerp(center-world.player.global_position,blend)

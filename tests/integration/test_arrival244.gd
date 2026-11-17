@@ -22,12 +22,12 @@ func test_full_bounds_fit_with_hud_margin_for_all_shapes():
    assert_lte((item.bounds.size.y+180)*zoom_,maxf(100,extent.y-270)+.01)
 func test_hold_center_is_fixed_one_second_while_player_still_moves():
  world._camera_controls243.set_factor(.85,false);arrival.begin(plan())
- arrival.elapsed=.65;arrival.apply_frame();var zoom_:Vector2=arrival.camera.zoom
+ arrival.elapsed=1.2;arrival.apply_frame();var zoom_:Vector2=arrival.camera.zoom
  var center:Vector2=world.player.global_position+arrival.camera.offset
- world.player.position+=Vector2(100,25);arrival.elapsed=1.64;arrival.apply_frame()
+ world.player.position+=Vector2(100,25);arrival.elapsed=2.19;arrival.apply_frame()
  assert_eq(arrival.camera.zoom,zoom_);assert_almost_eq(world.player.global_position.x+arrival.camera.offset.x,center.x,.01)
  assert_true(world.player.is_physics_processing());assert_false(get_tree().paused)
- arrival.elapsed=2.3;arrival.apply_frame();arrival.finish(true)
+ arrival.elapsed=3.4;arrival.apply_frame();arrival.finish(true)
  assert_eq(arrival.camera.zoom,Vector2.ONE*.85);assert_eq(arrival.camera.offset,Vector2.ZERO)
 func test_first_completed_arrival_is_persisted_with_seed_and_save_scope():
  arrival.begin(plan());arrival.finish(true);assert_true(arrival.seen.has(arrival.key('town1')))
@@ -79,3 +79,24 @@ func test_exit_restores_zoom_offset_and_lod():
  assert_eq(camera.zoom,Vector2.ONE*.85);assert_eq(camera.offset,Vector2.ZERO)
  assert_false(world._camera_controls243.arrival_active244)
  arrival=TownArrival244.new();arrival.world=world;world.add_child(arrival);arrival.set_process(false)
+func test_cinematic_curve_has_slow_ends_and_zero_endpoint_acceleration():
+ assert_eq(TownArrival244.cinematic_curve(0),0.)
+ assert_eq(TownArrival244.cinematic_curve(1),1.)
+ assert_almost_eq(TownArrival244.cinematic_curve(.5),.5,.0001)
+ assert_lt(TownArrival244.cinematic_curve(.1),.01)
+ assert_gt(TownArrival244.cinematic_curve(.9),.99)
+ var previous:float=0.
+ for i in 101:
+  var value:float=TownArrival244.cinematic_curve(i/100.)
+  assert_gte(value,previous);previous=value
+func test_osd_toggle_keeps_same_save_and_mode():
+ var path_:String=SaveData.save_path;var mode_:bool=SaveData.debug_mode
+ GameState.set_performance_osd245(true)
+ assert_true(GameState.performance_osd245);assert_eq(SaveData.save_path,path_);assert_eq(SaveData.debug_mode,mode_)
+ GameState.set_performance_osd245(false)
+ assert_false(GameState.performance_osd245)
+func test_main_menu_has_games_catalog_not_a_second_world_shortcut():
+ var menu=load('res://src/Presentation/main_menu.tscn').instantiate();add_child(menu)
+ assert_eq(menu._play.text,'JUEGOS');assert_ne(menu._world_button.text,menu._play.text)
+ menu._play.pressed.emit();assert_not_null(menu._games213)
+ menu.free()

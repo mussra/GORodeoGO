@@ -16,8 +16,8 @@ func _ready():
  box.content_margin_left=9;box.content_margin_right=9;box.content_margin_top=5;box.content_margin_bottom=5
  label.add_theme_stylebox_override('normal',box);add_child(label);label.hide()
 func _process(delta:float):
- var enabled:bool=GameState.trial_tools_enabled() and SaveData.debug_mode
- label.visible=enabled
+ var enabled:bool=GameState.trial_tools_enabled() and (SaveData.debug_mode or GameState.performance_osd245)
+ label.visible=enabled and not get_tree().paused
  if not enabled:clock=0.;frame_sum=0.;frame_count=0;frame_max=0.;return
  frame_sum+=delta;frame_count+=1;frame_max=maxf(frame_max,delta);clock+=delta
  if clock<.5:return
@@ -28,7 +28,7 @@ func _process(delta:float):
  var physics:float=Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000.
  var process_cpu:String=_process_cpu242()
  var io:String=_process_io242()
- label.text='DEBUG · %.0f FPS | frame %.1f ms · pico %.1f ms\nMotor %.1f ms | física %.1f ms | CPU %s\nRAM motor %.1f MiB | vídeo %.1f MiB | GPU %%: N/D\nDibujo %d calls | nodos %d | objetos %d\nGuardados %d · fallo %d | último %.1f ms · máx %.1f ms\nÚltimo archivo %.1f KiB | E/S proceso %s'%[
+ label.text='RENDIMIENTO · %.0f FPS | frame %.1f ms · pico %.1f ms\nMotor %.1f ms | física %.1f ms | CPU %s\nRAM motor %.1f MiB | vídeo %.1f MiB | GPU %%: N/D\nDibujo %d calls | nodos %d | objetos %d\nGuardados %d · fallo %d | último %.1f ms · máx %.1f ms\nÚltimo archivo %.1f KiB | E/S proceso %s'%[
   1./maxf(mean,.00001),mean*1000.,frame_max*1000.,cpu,physics,process_cpu,
   Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.,video,
   int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),int(Performance.get_monitor(Performance.OBJECT_COUNT)),
@@ -39,7 +39,7 @@ func _process(delta:float):
  if world!=null and world.get('_camera_controls243')!=null:
   label.text+='\nCámara %.0f%% · LOD flores decorativas %s'%[world._camera_controls243.factor*100.,'normal' if world._camera_controls243.factor>=.99 else 'resumido']
  if world!=null and world.get('_arrival244')!=null and world._arrival244.active:
-  label.text+='\nLlegada %.0f%% · %.2f / 2.30 s · LOD %s'%[world._arrival244.camera.zoom.x*100.,world._arrival244.elapsed,'resumido' if world._arrival244.lod_applied else 'normal']
+  label.text+='\nLlegada %.0f%% · %.2f / 3.40 s · LOD %s'%[world._arrival244.camera.zoom.x*100.,world._arrival244.elapsed,'resumido' if world._arrival244.lod_applied else 'normal']
  label.text+='\nCPU/GPU del sistema: N/D · contadores del motor, no %% de uso GPU'
  var viewport:Vector2=get_viewport().get_visible_rect().size
  var k:float=clampf(minf(viewport.x/1280.,viewport.y/720.),.65,1.4)

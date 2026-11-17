@@ -1059,12 +1059,14 @@ func _open_navigation()->void:
 	elif SaveData.mode_open240("bulls") and not SaveData.mode_open240("race"):
 		_navigation.entries.append({"id":"rodeo240","title":"Misión: abre las carreras","hint":ModeAccess240.requirement("race")})
 	if GameState.trial_tools_enabled():_navigation.entries.append({"id":"debug213","title":"Herramientas DEBUG","hint":"Editor / diseño / maquetas de país"})
+	if GameState.trial_tools_enabled():_navigation.entries.append({"id":"performance245","title":"Rendimiento (OSD): "+("activado" if GameState.performance_osd245 else "desactivado"),"hint":"Mostrar FPS sin cambiar de partida"})
 	_navigation.selected.connect(_navigation_selected)
 	_navigation.closed.connect(_close_navigation)
 	_hud.add_child(_navigation)
 func _navigation_selected(id:String)->void:
 	_close_navigation()
 	match id:
+		"performance245":GameState.set_performance_osd245(not GameState.performance_osd245)
 		"crowns240":
 			var screen:=ModeCrowns240.new();screen.process_mode=Node.PROCESS_MODE_ALWAYS
 			get_tree().paused=true

@@ -108,10 +108,8 @@ func _build_menu() -> void:
 	_play.add_theme_color_override("font_color",Color("10252d"))
 	_play.add_theme_stylebox_override("normal",RanchTheme.box(Color("8de8cf"),Color("b3f6df"),8))
 	_play.add_theme_stylebox_override("hover",RanchTheme.box(Color("c3ffe9"),Color("ffffff"),8))
-	_play.text="ENTRAR EN FRONTERA" if not SaveData.mode_open240("bulls") else "JUEGOS"
-	_play.pressed.connect(func():
-		if not SaveData.mode_open240("bulls"):_world_button.pressed.emit()
-		else:_show_games213())
+	_play.text="JUEGOS"
+	_play.pressed.connect(_show_games213)
 	_hero.add_child(_play)
 	_missions = Button.new()
 	_missions.text = tr("UI_003");_missions.hide()
@@ -296,6 +294,7 @@ func _show_settings()->void:
 	pick.selected=["auto","es","en"].find(Localization.choice)
 	var note:=Label.new();note.text=tr("UI_040");box.add_child(note)
 	if GameState.trial_tools_enabled():
+		var osd:=CheckButton.new();osd.name="PerformanceToggle245";osd.text="Mostrar rendimiento (OSD)";osd.custom_minimum_size.y=56;osd.button_pressed=GameState.performance_osd245;box.add_child(osd);osd.toggled.connect(GameState.set_performance_osd245)
 		var debug:=Button.new();debug.text="Herramientas DEBUG";debug.custom_minimum_size.y=56;box.add_child(debug);debug.pressed.connect(_show_debug213)
 	var close:=Button.new();close.text=tr("UI_009");close.custom_minimum_size.y=52;box.add_child(close);close.pressed.connect(panel.queue_free)
 	pick.item_selected.connect(func(i:int):
