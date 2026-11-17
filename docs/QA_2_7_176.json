@@ -1,0 +1,33 @@
+{
+  "version": "2.7.176",
+  "code": 435,
+  "tests": {
+    "passed": 190,
+    "total": 190,
+    "scripts": 29,
+    "assertions": 18703
+  },
+  "zoom": [
+    0.25,
+    0.35,
+    0.5,
+    0.65,
+    0.75,
+    0.85,
+    1.0,
+    1.25,
+    1.5
+  ],
+  "performance": {
+    "road_micro_before_us": 652796,
+    "road_micro_after_us": 18524,
+    "same_hits": 59,
+    "physical_android": false,
+    "cause": "Confirmed redundant global road queries; phone bottleneck not conclusively isolated"
+  },
+  "apk": {
+    "sha256": "ce20e45569e8741376f49ecfc9aa25561b5f9752cf98e567d41a5f1870a04bb9",
+    "bytes": 82714355,
+    "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb"
+  }
+}

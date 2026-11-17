@@ -2,6 +2,18 @@ extends AnimatedSprite2D
 ## Nominal five-view PixelLab horse. Nine frames per movement view.
 ## Coat, mane and patterns use the reviewed v5 masks and shared genotype cache.
 static var frame_cache: Dictionary = {}
+const RETAINED_FRAME_SETS246:int=32
+static func remember246(key:String,frames:SpriteFrames)->void:
+	frame_cache[key]=frames
+	if frame_cache.size()<=RETAINED_FRAME_SETS246:return
+	var active:Dictionary={key:true}
+	var tree_:SceneTree=Engine.get_main_loop() as SceneTree
+	if tree_!=null:
+		for art_ in tree_.get_nodes_in_group('wild_art246'):active[PixelLabTrial.cache_key(art_.traits)]=true
+	for old in frame_cache.keys():
+		if frame_cache.size()<=RETAINED_FRAME_SETS246:break
+		if not active.has(old):frame_cache.erase(old)
+
 
 static var preview_frames141:Dictionary={}
 var preview_record141:Dictionary={}
@@ -55,11 +67,12 @@ static func _build_frames(traits: Dictionary) -> SpriteFrames:
 	return frames
 
 func _ready() -> void:
+	add_to_group("wild_art246")
 	var key := PixelLabTrial.cache_key(traits)
 	if preview_side141:
 		sprite_frames=_preview_frames141()
 	elif not frame_cache.has(key):
-		frame_cache[key] = _build_frames(traits)
+		remember246(key,_build_frames(traits))
 	if not preview_side141:sprite_frames = frame_cache[key]
 	centered = false
 	offset = Vector2(-48, -80)  # hooves at node origin, like the code-drawn version

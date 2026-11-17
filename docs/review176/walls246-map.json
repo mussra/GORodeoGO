@@ -1,0 +1,353 @@
+{
+  "brute_town_map_off": {
+    "chunks": 9,
+    "draw_calls_p95": 267.0,
+    "frame": {
+      "max_ms": 44.145,
+      "mean_ms": 23.5972,
+      "n": 100,
+      "p50_ms": 22.741,
+      "p95_ms": 26.81
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 110.845045089722,
+    "memory_start_mb": 110.834047317505,
+    "nodes_end": 392.0,
+    "nodes_start": 392.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.09,
+        "mean_ms": 0.0395148514851485,
+        "n": 101,
+        "p50_ms": 0.036,
+        "p95_ms": 0.062
+      },
+      "npcs": {
+        "max_ms": 0.228,
+        "mean_ms": 0.13149504950495,
+        "n": 101,
+        "p50_ms": 0.124,
+        "p95_ms": 0.183
+      },
+      "world_process": {
+        "max_ms": 1.565,
+        "mean_ms": 0.758316831683169,
+        "n": 101,
+        "p50_ms": 0.687,
+        "p95_ms": 1.074
+      }
+    }
+  },
+  "brute_town_map_on": {
+    "chunks": 9,
+    "draw_calls_p95": 275.0,
+    "frame": {
+      "max_ms": 45.245,
+      "mean_ms": 23.76439,
+      "n": 100,
+      "p50_ms": 23.129,
+      "p95_ms": 27.044
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 110.840719223022,
+    "memory_start_mb": 110.823736190796,
+    "nodes_end": 392.0,
+    "nodes_start": 392.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.069,
+        "mean_ms": 0.0372574257425742,
+        "n": 101,
+        "p50_ms": 0.036,
+        "p95_ms": 0.045
+      },
+      "npcs": {
+        "max_ms": 0.161,
+        "mean_ms": 0.122168316831683,
+        "n": 101,
+        "p50_ms": 0.121,
+        "p95_ms": 0.141
+      },
+      "world_process": {
+        "max_ms": 1.022,
+        "mean_ms": 0.71140594059406,
+        "n": 101,
+        "p50_ms": 0.655,
+        "p95_ms": 0.923
+      }
+    }
+  },
+  "gate_walls_hidden_visual_only": {
+    "chunks": 9,
+    "draw_calls_p95": 291.0,
+    "frame": {
+      "max_ms": 47.554,
+      "mean_ms": 24.53121,
+      "n": 100,
+      "p50_ms": 24.111,
+      "p95_ms": 26.139
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 111.707880020142,
+    "memory_start_mb": 111.696882247925,
+    "nodes_end": 419.0,
+    "nodes_start": 419.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.06,
+        "mean_ms": 0.0338415841584158,
+        "n": 101,
+        "p50_ms": 0.033,
+        "p95_ms": 0.036
+      },
+      "npcs": {
+        "max_ms": 0.173,
+        "mean_ms": 0.128386138613861,
+        "n": 101,
+        "p50_ms": 0.127,
+        "p95_ms": 0.148
+      },
+      "world_process": {
+        "max_ms": 0.854,
+        "mean_ms": 0.376306930693069,
+        "n": 101,
+        "p50_ms": 0.355,
+        "p95_ms": 0.663
+      }
+    }
+  },
+  "gate_walls_visible": {
+    "chunks": 9,
+    "draw_calls_p95": 297.0,
+    "frame": {
+      "max_ms": 48.21,
+      "mean_ms": 24.82923,
+      "n": 100,
+      "p50_ms": 24.372,
+      "p95_ms": 27.404
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 111.70392036438,
+    "memory_start_mb": 111.692922592163,
+    "nodes_end": 419.0,
+    "nodes_start": 419.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.064,
+        "mean_ms": 0.0343960396039604,
+        "n": 101,
+        "p50_ms": 0.034,
+        "p95_ms": 0.038
+      },
+      "npcs": {
+        "max_ms": 0.188,
+        "mean_ms": 0.125475247524753,
+        "n": 101,
+        "p50_ms": 0.124,
+        "p95_ms": 0.137
+      },
+      "world_process": {
+        "max_ms": 0.846,
+        "mean_ms": 0.363990099009901,
+        "n": 101,
+        "p50_ms": 0.344,
+        "p95_ms": 0.652
+      }
+    }
+  },
+  "indexed_town_map_off": {
+    "chunks": 9,
+    "draw_calls_p95": 267.0,
+    "frame": {
+      "max_ms": 41.636,
+      "mean_ms": 22.13751,
+      "n": 100,
+      "p50_ms": 21.366,
+      "p95_ms": 25.066
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 110.973581314087,
+    "memory_start_mb": 110.96258354187,
+    "nodes_end": 392.0,
+    "nodes_start": 392.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.044,
+        "mean_ms": 0.0360594059405941,
+        "n": 101,
+        "p50_ms": 0.036,
+        "p95_ms": 0.042
+      },
+      "npcs": {
+        "max_ms": 0.158,
+        "mean_ms": 0.123435643564356,
+        "n": 101,
+        "p50_ms": 0.122,
+        "p95_ms": 0.139
+      },
+      "world_process": {
+        "max_ms": 0.838,
+        "mean_ms": 0.37250495049505,
+        "n": 101,
+        "p50_ms": 0.35,
+        "p95_ms": 0.621
+      }
+    }
+  },
+  "indexed_town_map_on": {
+    "chunks": 9,
+    "draw_calls_p95": 275.0,
+    "frame": {
+      "max_ms": 43.479,
+      "mean_ms": 22.97726,
+      "n": 100,
+      "p50_ms": 22.179,
+      "p95_ms": 25.401
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 110.969144821167,
+    "memory_start_mb": 110.95814704895,
+    "nodes_end": 392.0,
+    "nodes_start": 392.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.104,
+        "mean_ms": 0.0376237623762376,
+        "n": 101,
+        "p50_ms": 0.036,
+        "p95_ms": 0.044
+      },
+      "npcs": {
+        "max_ms": 0.318,
+        "mean_ms": 0.12470297029703,
+        "n": 101,
+        "p50_ms": 0.121,
+        "p95_ms": 0.137
+      },
+      "world_process": {
+        "max_ms": 0.781,
+        "mean_ms": 0.37450495049505,
+        "n": 101,
+        "p50_ms": 0.348,
+        "p95_ms": 0.633
+      }
+    }
+  },
+  "manual_0.25": {
+    "chunks": 9,
+    "draw_calls_p95": 312.0,
+    "frame": {
+      "max_ms": 47.03,
+      "mean_ms": 24.45916,
+      "n": 100,
+      "p50_ms": 23.889,
+      "p95_ms": 28.128
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 111.051958084106,
+    "memory_start_mb": 111.040594100952,
+    "nodes_end": 395.0,
+    "nodes_start": 395.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.079,
+        "mean_ms": 0.041,
+        "n": 101,
+        "p50_ms": 0.039,
+        "p95_ms": 0.055
+      },
+      "npcs": {
+        "max_ms": 0.242,
+        "mean_ms": 0.137594059405941,
+        "n": 101,
+        "p50_ms": 0.134,
+        "p95_ms": 0.163
+      },
+      "world_process": {
+        "max_ms": 0.909,
+        "mean_ms": 0.418564356435643,
+        "n": 101,
+        "p50_ms": 0.388,
+        "p95_ms": 0.676
+      }
+    }
+  },
+  "manual_0.5": {
+    "chunks": 9,
+    "draw_calls_p95": 306.0,
+    "frame": {
+      "max_ms": 46.022,
+      "mean_ms": 24.05958,
+      "n": 100,
+      "p50_ms": 23.336,
+      "p95_ms": 27.811
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 111.046293258667,
+    "memory_start_mb": 111.03529548645,
+    "nodes_end": 395.0,
+    "nodes_start": 395.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.056,
+        "mean_ms": 0.0379009900990099,
+        "n": 101,
+        "p50_ms": 0.037,
+        "p95_ms": 0.047
+      },
+      "npcs": {
+        "max_ms": 0.194,
+        "mean_ms": 0.128386138613861,
+        "n": 101,
+        "p50_ms": 0.124,
+        "p95_ms": 0.164
+      },
+      "world_process": {
+        "max_ms": 0.852,
+        "mean_ms": 0.402108910891089,
+        "n": 101,
+        "p50_ms": 0.363,
+        "p95_ms": 0.678
+      }
+    }
+  },
+  "manual_1.0": {
+    "chunks": 9,
+    "draw_calls_p95": 275.0,
+    "frame": {
+      "max_ms": 43.839,
+      "mean_ms": 22.89203,
+      "n": 100,
+      "p50_ms": 22.047,
+      "p95_ms": 25.285
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 110.97841835022,
+    "memory_start_mb": 110.967054367065,
+    "nodes_end": 392.0,
+    "nodes_start": 392.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.095,
+        "mean_ms": 0.0387029702970297,
+        "n": 101,
+        "p50_ms": 0.037,
+        "p95_ms": 0.054
+      },
+      "npcs": {
+        "max_ms": 0.248,
+        "mean_ms": 0.126445544554455,
+        "n": 101,
+        "p50_ms": 0.123,
+        "p95_ms": 0.156
+      },
+      "world_process": {
+        "max_ms": 0.765,
+        "mean_ms": 0.392722772277228,
+        "n": 101,
+        "p50_ms": 0.35,
+        "p95_ms": 0.663
+      }
+    }
+  }
+}

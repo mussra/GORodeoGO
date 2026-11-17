@@ -143,7 +143,7 @@ func _ready() -> void:
 		var camera:=get_viewport().get_camera_2d()
 		visible=camera==null or camera.zoom.x>=.99
 	var overview_camera:=get_viewport().get_camera_2d()
-	if overview_camera!=null and overview_camera.zoom.x<.7:visible=false
+	if overview_camera!=null and overview_camera.zoom.x<.7:visible=false;set_meta("overview_hidden246",true)
 	scale = Vector2.ONE * size_scale
 	queue_redraw()
 

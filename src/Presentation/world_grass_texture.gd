@@ -12,7 +12,7 @@ static func uv_at(seed:int,point:Vector2)->Vector2:
 func _ready():
  add_to_group("arrival_streamed244")
  var overview_camera:=get_viewport().get_camera_2d()
- if overview_camera!=null and overview_camera.zoom.x<.7:visible=false
+ if overview_camera!=null and overview_camera.zoom.x<.7:visible=false;set_meta("overview_hidden246",true)
  z_index=-9;texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED;queue_redraw()
 func _draw():
  var origin=Vector2(c)*WorldMap.CHUNK_SIZE

@@ -1,0 +1,94 @@
+{
+  "frontier_idle": {
+    "chunks": 9,
+    "draw_calls_p95": 275.0,
+    "frame": {
+      "max_ms": 44.733,
+      "mean_ms": 23.82874,
+      "n": 150,
+      "p50_ms": 23.291,
+      "p95_ms": 26.303
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 110.26215171814,
+    "memory_start_mb": 110.23317527771,
+    "nodes_end": 407.0,
+    "nodes_start": 407.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.066,
+        "mean_ms": 0.0383245033112582,
+        "n": 151,
+        "p50_ms": 0.037,
+        "p95_ms": 0.047
+      },
+      "npcs": {
+        "max_ms": 0.225,
+        "mean_ms": 0.171198675496689,
+        "n": 151,
+        "p50_ms": 0.168,
+        "p95_ms": 0.199
+      },
+      "quest_hud": {
+        "max_ms": 0.076,
+        "mean_ms": 0.0412913907284768,
+        "n": 151,
+        "p50_ms": 0.04,
+        "p95_ms": 0.048
+      },
+      "world_process": {
+        "max_ms": 4.915,
+        "mean_ms": 0.721304635761589,
+        "n": 151,
+        "p50_ms": 0.673,
+        "p95_ms": 0.872
+      }
+    }
+  },
+  "frontier_move_out_and_back": {
+    "chunks": 7,
+    "draw_calls_p95": 284.0,
+    "frame": {
+      "max_ms": 36.313,
+      "mean_ms": 27.5946916666667,
+      "n": 240,
+      "p50_ms": 27.328,
+      "p95_ms": 32.301
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 112.97064781189,
+    "memory_start_mb": 110.269117355347,
+    "nodes_end": 369.0,
+    "nodes_start": 407.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.117,
+        "mean_ms": 0.0508291666666667,
+        "n": 240,
+        "p50_ms": 0.05,
+        "p95_ms": 0.066
+      },
+      "npcs": {
+        "max_ms": 0.274,
+        "mean_ms": 0.183379166666667,
+        "n": 240,
+        "p50_ms": 0.178,
+        "p95_ms": 0.236
+      },
+      "quest_hud": {
+        "max_ms": 0.087,
+        "mean_ms": 0.0447375,
+        "n": 240,
+        "p50_ms": 0.043,
+        "p95_ms": 0.06
+      },
+      "world_process": {
+        "max_ms": 9.112,
+        "mean_ms": 4.66065833333333,
+        "n": 240,
+        "p50_ms": 4.704,
+        "p95_ms": 8.327
+      }
+    }
+  }
+}

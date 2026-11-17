@@ -505,7 +505,7 @@ func cell_size159()->float:return WorldMap.CHUNK_SIZE
 func content_signature159()->int:return hash([SaveData.world_seed,SaveData.world_discovered,SaveData.world_edits,SaveData.world_pigs,SaveData.world_missions,SaveData.world_tamed,SaveData.world_flora138,SaveData.world_cousins140])
 func available159()->Array[Dictionary]:return world._travel144.available() if world._travel144!=null else []
 func notes159()->Dictionary:return SaveData.world_notes106
-func flowers159()->Dictionary:return world._flower_nodes105
+func flowers159()->Dictionary:return {}
 func show_sites159()->void:
  if world._travel144!=null:world._travel144.show_sites()
 func choose159(id:String)->void:

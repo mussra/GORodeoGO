@@ -100,3 +100,15 @@ func test_main_menu_has_games_catalog_not_a_second_world_shortcut():
  assert_eq(menu._play.text,'JUEGOS');assert_ne(menu._world_button.text,menu._play.text)
  menu._play.pressed.emit();assert_not_null(menu._games213)
  menu.free()
+func test_wide_manual_zoom_has_nine_levels_and_restores_decor():
+ var before_count:int=world.player.get_child_count()
+ for value in WorldCamera243.STEPS:
+  world._camera_controls243.set_factor(value,false)
+  assert_almost_eq(arrival.camera.zoom.x,value,.0001)
+ assert_eq(world.player.get_child_count(),before_count)
+ world._camera_controls243.set_factor(.25,false)
+ var decor=load('res://src/Presentation/world_decor.gd').new();decor.kind='tree';world.add_child(decor)
+ assert_false(decor.visible)
+ world._camera_controls243.set_factor(1.,false)
+ assert_true(decor.visible)
+ assert_false(is_instance_valid(world._camera_controls243.overview246))

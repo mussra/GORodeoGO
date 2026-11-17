@@ -20,11 +20,7 @@ func _init(world_seed:int=0,is_modular:bool=false,is_dark:bool=false,is_nominal:
  else:
   for lane in WorldPaths.access_lanes(seed):lanes.append(ContinuousRoadArt.rounded(lane,32.))
 func contains(point:Vector2,margin:float=0.)->bool:
- if nominal and version>=6:
-  for road in TownNetwork234.roads(seed,TownEnclosures227.plans(seed)):
-   for i in road.size()-1:
-    if point.distance_to(Geometry2D.get_closest_point_to_segment(point,road[i],road[i+1]))<=22.+margin:return true
- if nominal and version>=4 and TownEnclosures227.access_contains(seed,point,margin):return true
+ if nominal and version>=4 and _town_roads246(point,margin):return true
  if SaveData.world_garden212.stage!="locked" and not SaveData.world_garden212.anchors.is_empty() and Garden212.on_lane214(point,SaveData.world_garden212.anchors.plot,margin):return true
  if nominal and version>=3 and not SaveData.world_cousins140.is_empty():
   for id in TownEnclosures227.cousin_ids231():
@@ -92,3 +88,38 @@ func _axis_point(main:bool,t:float)->Vector2:
  if axis_points.size()>4096:axis_points.clear()
  if not axis_points.has(key):axis_points[key]=Vector2(t,WorldMap.trail_y_at(seed,t)) if main else Vector2(WorldMap.branch_x_at(seed,t),t)
  return axis_points[key]
+
+# Exact same road segments, indexed by local query cell. No road rules change.
+var _road_focus246:Vector2i=Vector2i(999999,999999)
+var _segments246:Array=[]
+var _buckets246:Dictionary={}
+var road_queries246:int=0
+var segment_checks246:int=0
+func _refresh_roads246()->void:
+ var focus_:Vector2i=TownNetwork234.focus.get(seed,Vector2i.ZERO)
+ if _road_focus246==focus_ and not _segments246.is_empty():return
+ _road_focus246=focus_;_segments246.clear();_buckets246.clear()
+ var plans_:Dictionary=TownEnclosures227.plans(seed)
+ var routes:Array=[]
+ if version>=6:routes.append_array(TownNetwork234.roads(seed,plans_))
+ for plan_ in plans_.values():routes.append(plan_.road)
+ for route in routes:
+  for i in route.size()-1:
+   var a:Vector2=route[i];var b:Vector2=route[i+1]
+   _segments246.append({'a':a,'b':b,'box':Rect2(a,Vector2.ZERO).expand(b).grow(150.001)})
+func _town_roads246(point:Vector2,margin:float)->bool:
+ _refresh_roads246();road_queries246+=1
+ var candidates:Array=_segments246
+ if margin<=128.:
+  var cell_:Vector2i=Vector2i((point/512.).floor())
+  if not _buckets246.has(cell_):
+   if _buckets246.size()>256:_buckets246.clear()
+   var rows:Array=[];var area:=Rect2(Vector2(cell_)*512.,Vector2.ONE*512.)
+   for row in _segments246:
+    if row.box.intersects(area,true):rows.append(row)
+   _buckets246[cell_]=rows
+  candidates=_buckets246[cell_]
+ for row in candidates:
+  segment_checks246+=1
+  if point.distance_to(Geometry2D.get_closest_point_to_segment(point,row.a,row.b))<=22.+margin:return true
+ return false

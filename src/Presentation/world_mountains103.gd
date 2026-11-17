@@ -7,7 +7,7 @@ var ridges:Array=[]
 func _ready():
  add_to_group("arrival_streamed244")
  var overview_camera:=get_viewport().get_camera_2d()
- if overview_camera!=null and overview_camera.zoom.x<.7:visible=false
+ if overview_camera!=null and overview_camera.zoom.x<.7:visible=false;set_meta("overview_hidden246",true)
  z_index=-6
  ridges=WorldTerrain103.ridges_for_chunk(seed,chunk)
  for item in ridges:

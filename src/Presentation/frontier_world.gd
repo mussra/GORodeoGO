@@ -180,14 +180,25 @@ func _ready() -> void:
 	player.set_physics_process(false)
 	# Keep the construction hidden until the original safety ring is ready.
 
+var perf246:Dictionary={'idle_us':0,'physics_us':0,'idle_count':0,'physics_count':0}
 func _physics_process(delta:float)->void:
+	var t_:int=Time.get_ticks_usec()
+	_physics246(delta)
+	if GameState.performance_osd245:
+		perf246.physics_us+=Time.get_ticks_usec()-t_;perf246.physics_count+=1
+func _physics246(delta:float)->void:
 	if (_travel144!=null and (_travel144.active or is_instance_valid(_travel144.panel))) or _loading_world or is_instance_valid(_journal140) or is_instance_valid(_npc_dialog) or is_instance_valid(_note_dialog106) or (is_instance_valid(_map_overlay) and _map_overlay.expanded):return
 	# One escape decision per physics step; idle updates skipped movement at low FPS.
 	_tick_taming(delta)
 	_tick_pigs(delta)
 	_tick_goats(delta)
 
-func _process(delta: float) -> void:
+func _process(delta:float)->void:
+	var t_:int=Time.get_ticks_usec()
+	_frame246(delta)
+	if GameState.performance_osd245:
+		perf246.idle_us+=Time.get_ticks_usec()-t_;perf246.idle_count+=1
+func _frame246(delta: float) -> void:
 	if SaveData.world_generator_version>=6 and is_instance_valid(player):
 		TownNetwork234.ensure_near(SaveData.world_seed,player.position)
 		_sync_mount237()
@@ -555,7 +566,7 @@ func _advance_builder(b: Dictionary) -> void:
 				frames.set_animation_speed(step[2], step[3])
 			frames.add_frame(step[2],PixelLabTrial.pose_texture("horse",step[0],int(step[1]),traits))
 			if (b["frame_specs"] as Array).is_empty():
-				WildHorseArtScript.frame_cache[cache_key] = frames
+				WildHorseArtScript.remember246(cache_key,frames)
 				b["herd_cursor"] = int(b["herd_cursor"])+1
 				b["frame_specs"]=null;b["frames"]=null
 		5:
@@ -623,7 +634,7 @@ func _affinity(horse: Node2D) -> Dictionary:
 
 func _exit_distance110()->float:
 	var camera:Camera2D=get_viewport().get_camera_2d()
-	var zoom_:Vector2=camera.zoom if camera!=null else Vector2.ONE
+	var zoom_:Vector2=camera.zoom.clamp(Vector2.ONE*WorldCamera243.loaded_minimum246(get_viewport_rect().size),Vector2.ONE) if camera!=null else Vector2.ONE
 	return (get_viewport_rect().size/zoom_).length()*.5+100.
 func _wild_candidates112()->Array:
 	var out:Array=_herd_horses.values()
@@ -1288,9 +1299,10 @@ func _tick_npcs()->void:
 	_npc_button.text="Hablar con "+str(nearest.name).to_lower()
 	_tick_flowers105()
 	if SaveData.world_generator_version<6:_tick_flora138()
-	for id in NpcQuests.activate_triggers(SaveData.world_quests,player.position):
+	var triggered246:Array=NpcQuests.activate_triggers(SaveData.world_quests,player.position)
+	for id in triggered246:
 		_toast(NpcQuests.QUESTS[id].text);SaveData.save_world_state(player.position)
-	_refresh_quest_hud()
+	if not triggered246.is_empty():_refresh_quest_hud()
 	var flower:Dictionary=NpcQuests.state(SaveData.world_quests,"east_flower")
 	_story_flower.visible=flower.status=="active" and flower.has("spawn")
 	if flower.has("spawn"):_story_flower.position=flower.spawn

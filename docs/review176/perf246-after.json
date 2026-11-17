@@ -1,0 +1,80 @@
+{
+  "frontier_idle": {
+    "chunks": 9,
+    "draw_calls_p95": 275.0,
+    "frame": {
+      "max_ms": 43.151,
+      "mean_ms": 22.8443866666667,
+      "n": 150,
+      "p50_ms": 22.314,
+      "p95_ms": 25.329
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 110.302703857422,
+    "memory_start_mb": 110.277961730957,
+    "nodes_end": 392.0,
+    "nodes_start": 392.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.056,
+        "mean_ms": 0.0388145695364238,
+        "n": 151,
+        "p50_ms": 0.037,
+        "p95_ms": 0.05
+      },
+      "npcs": {
+        "max_ms": 0.188,
+        "mean_ms": 0.130152317880795,
+        "n": 151,
+        "p50_ms": 0.126,
+        "p95_ms": 0.169
+      },
+      "world_process": {
+        "max_ms": 0.866,
+        "mean_ms": 0.391185430463576,
+        "n": 151,
+        "p50_ms": 0.362,
+        "p95_ms": 0.53
+      }
+    }
+  },
+  "frontier_move_out_and_back": {
+    "chunks": 7,
+    "draw_calls_p95": 284.0,
+    "frame": {
+      "max_ms": 33.656,
+      "mean_ms": 26.1775458333334,
+      "n": 240,
+      "p50_ms": 25.825,
+      "p95_ms": 30.416
+    },
+    "map_rebuilds": 3,
+    "memory_end_mb": 113.085079193115,
+    "memory_start_mb": 110.308917999268,
+    "nodes_end": 354.0,
+    "nodes_start": 392.0,
+    "sections": {
+      "chunks": {
+        "max_ms": 0.115,
+        "mean_ms": 0.0491541666666667,
+        "n": 240,
+        "p50_ms": 0.048,
+        "p95_ms": 0.072
+      },
+      "npcs": {
+        "max_ms": 0.24,
+        "mean_ms": 0.127525,
+        "n": 240,
+        "p50_ms": 0.125,
+        "p95_ms": 0.151
+      },
+      "world_process": {
+        "max_ms": 8.332,
+        "mean_ms": 4.16407916666667,
+        "n": 240,
+        "p50_ms": 4.172,
+        "p95_ms": 7.871
+      }
+    }
+  }
+}

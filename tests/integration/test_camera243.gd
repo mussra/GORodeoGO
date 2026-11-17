@@ -13,16 +13,16 @@ func after_each():
 func test_steps_clamp_and_reset_do_not_change_physics():
  controls.step(-1);assert_almost_eq(controls.factor,.85,.001)
  controls.step(-1);assert_almost_eq(controls.factor,.75,.001)
- controls.step(-1);assert_almost_eq(controls.factor,.75,.001);assert_true(controls.minus.disabled)
- controls.step(1);assert_almost_eq(controls.factor,.85,.001)
- controls.set_factor(5.,false);assert_eq(controls.camera.zoom,Vector2.ONE);assert_true(controls.plus.disabled)
- controls.set_factor(-2.,false);assert_eq(controls.camera.zoom,Vector2.ONE*.75)
+ controls.set_factor(.25,false);controls.step(-1);assert_almost_eq(controls.factor,.25,.001);assert_true(controls.minus.disabled)
+ controls.step(1);assert_almost_eq(controls.factor,.35,.001)
+ controls.set_factor(5.,false);assert_eq(controls.camera.zoom,Vector2.ONE*1.5);assert_true(controls.plus.disabled)
+ controls.set_factor(-2.,false);assert_eq(controls.camera.zoom,Vector2.ONE*.25)
  assert_true(world.is_physics_processing())
 func test_minimum_covers_loaded_chunks_at_edges_and_ultrawide():
  for extent in [Vector2(1280,720),Vector2(1600,720),Vector2(1848,720),Vector2(720,1280)]:
-  var factor:float=WorldCamera243.minimum_for(extent)
+  var factor:float=WorldCamera243.loaded_minimum246(extent)
   assert_lte(maxf(extent.x,extent.y)/(2.*factor),924.01)
- assert_eq(WorldCamera243.minimum_for(Vector2(1280,720)),.75)
+ assert_eq(WorldCamera243.loaded_minimum246(Vector2(1280,720)),.75)
 func test_only_noncolliding_decorative_flower_lod_changes():
  var decor=load('res://src/Presentation/world_decor.gd').new();decor.kind='flower';holder.add_child(decor)
  var tree=load('res://src/Presentation/world_decor.gd').new();tree.kind='tree';holder.add_child(tree)

@@ -53,8 +53,8 @@ func test_genealogy_hides_all_filter_choices_in_same_drawer()->void:
  drawer.changed.emit("mode",true);assert_true(graph.only_matches)
  drawer.cleared.emit();assert_true(graph.filters.is_empty());assert_eq(graph.origin_filter,0);assert_false(graph.only_matches)
  graph.queue_free()
-func test_shared_map_opacity_keeps_frame_clear_and_floor_translucent()->void:
- assert_almost_eq(MapAppearance.floor_color("34575c").a,.75,.001)
+func test_shared_map_floor_is_opaque_so_world_flowers_do_not_show_through()->void:
+ assert_almost_eq(MapAppearance.floor_color("34575c").a,1.0,.001)
  assert_eq(MapAppearance.frame().bg_color.a,0.0)
  assert_eq(MapAppearance.frame().border_color.a,1.0)
 func test_common_menu_finish_respects_mute_and_wires_new_controls()->void:

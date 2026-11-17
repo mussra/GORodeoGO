@@ -89,7 +89,7 @@ func apply_frame()->void:
  _set_lod(camera.zoom.x<.7)
 func finish(completed:bool)->void:
  if not active:return
- _set_lod(false)
+ _set_lod(controls.factor<.7)
  active=false;camera.zoom=Vector2.ONE*controls.factor;camera.offset=start_offset;controls.arrival_active244=false
  if is_instance_valid(preview):preview.queue_free()
  title.hide()
@@ -104,16 +104,16 @@ func _set_lod(enabled:bool)->void:
   for group in ['arrival_decor244','arrival_streamed244']:
    for item in get_tree().get_nodes_in_group(group):
     if item.get_viewport()!=get_viewport():continue
-    hidden_nodes[item]=item.visible;item.hide()
+    hidden_nodes[item]=item.visible or bool(item.get_meta("overview_hidden246",false));item.hide()
  else:
   for item in hidden_nodes:
-   if is_instance_valid(item):item.visible=hidden_nodes[item]
+   if is_instance_valid(item):item.visible=hidden_nodes[item];item.remove_meta("overview_hidden246")
   # Nodes streamed while overview was active were hidden in their _ready.
   for group in ['arrival_decor244','arrival_streamed244']:
    for item in get_tree().get_nodes_in_group(group):
     if item.get_viewport()!=get_viewport():continue
     if hidden_nodes.has(item):continue
-    if group=='arrival_streamed244':item.show()
+    if group=='arrival_streamed244':item.show();item.remove_meta('overview_hidden246')
     elif item.kind!='flower' or controls.factor>=.99:item.show()
   hidden_nodes.clear()
 func _exit_tree()->void:

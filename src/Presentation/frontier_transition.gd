@@ -66,7 +66,7 @@ func _warm_showcase():
   for step in PixelLabTrial.frame_specs("horse"):
    PixelLabTrial.append_pose(frames,"horse",step,traits)
    await get_tree().process_frame
-  art.frame_cache[key]=frames
+  art.remember246(key,frames)
 func _warm_selected():
  var horse=SaveData.horse_collection.find(SaveData.horse_collection.selected)
  var traits:Dictionary=horse.get("traits",{})
