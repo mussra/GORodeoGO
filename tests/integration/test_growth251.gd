@@ -1,19 +1,18 @@
 extends GutTest
 var sut:Node
 func before_each():
- sut=load("res://src/Application/save_data.gd").new();sut.save_path="user://growth251.cfg";sut.horse_collection.seed_trial()
+ sut=load("res://src/Application/save_data.gd").new();sut.save_path="user://growth251.cfg";sut.horse_collection.seed_trial();sut.horse_collection.find("original").stats={"dodge":.85}
 func after_each():
  sut.free()
  if FileAccess.file_exists("user://growth251.cfg"):DirAccess.remove_absolute("user://growth251.cfg")
-func test_every_mode_grows_its_property_including_above_old_max():
+func test_every_mode_stays_at_max_after_hundreds_of_wins():
  var c:HorseCollection=sut.horse_collection
  c.find("original").stats={"speed":300.,"handling":1500.,"power":.9,"dodge":1.,"calm":2.}
  for mode in VictoryGrowth251.PRIMARY:
-  var key:String=VictoryGrowth251.PRIMARY[mode]
-  var before:float=HorseStats.read(c.find("original"))[key]
   for i in 100:
    var result:=VictoryGrowth251.apply(c,"original",mode)
-   assert_eq(result.key,key);assert_gt(result.after,before);before=result.after
+   for change in result.changes254:
+    assert_eq(change.after,change.high);assert_eq(change.points,0.)
  assert_true(c.restore(c.export_state()))
 func test_race_always_adds_horse_once_and_rewards_participating_mount():
  sut.horse_collection.add_trial_parents();sut.horse_collection.selected="trial_a"
@@ -40,7 +39,8 @@ func test_family_progress_shared_exclusive_champion_and_glow():
  a.mode_wins251={"duel":1};b.mode_wins251={"joust":1,"memory":1}
  assert_true(VictoryGrowth251.family_ready(c,a));assert_false(VictoryGrowth251.full_master(a))
  var prize:=VictoryGrowth251.champion(c,a.id);assert_false(prize.is_empty());assert_eq(prize.traits.pattern,10);assert_eq(prize.origin,"mastery251");assert_true(a.master251);assert_true(b.master251)
- for spec in HorseSummary185.STATS:assert_gt(HorseStats.read(prize)[spec[1]],maxf(HorseStats.read(a)[spec[1]],HorseStats.read(b)[spec[1]]))
+ for spec in HorseSummary185.STATS:
+  assert_gte(HorseStats.read(prize)[spec[1]],maxf(HorseStats.read(a)[spec[1]],HorseStats.read(b)[spec[1]]));assert_lte(HorseStats.read(prize)[spec[1]],float(spec[3]))
  assert_true(VictoryGrowth251.champion(c,b.id).is_empty());assert_true(c.restore(c.export_state()))
  assert_eq(HorseFinish168.style(c.find(a.id)),"master251")
 func test_trial_and_losses_cannot_grow_or_grant():
@@ -68,12 +68,11 @@ func test_growth_overlay_animates_then_continue_closes():
  assert_false(is_instance_valid(view))
  if is_instance_valid(view):view.free()
 
-func test_stat_bars_keep_growing_past_old_max_without_rescaling_backwards():
+func test_stat_bars_are_clamped_at_both_ends_and_full_at_max():
  for spec in HorseSummary185.STATS:
-  var before:float=VictoryGrowth251.visual(spec,spec[3])
-  for n in 100:
-   var after:float=VictoryGrowth251.visual(spec,spec[3]+VictoryGrowth251.bonus(spec[1],n+1))
-   assert_gt(after,before);assert_lt(after,1.);before=after
+  assert_eq(VictoryGrowth251.visual(spec,spec[2]-999.),0.)
+  assert_eq(VictoryGrowth251.visual(spec,spec[3]),1.)
+  assert_eq(VictoryGrowth251.visual(spec,spec[3]+999.),1.)
 func test_family_requires_distinct_content_and_not_other_families():
  var c:HorseCollection=sut.horse_collection;c.add_trial_parents();var a:=c.find("trial_a");var b:=c.find("trial_b")
  a.completed_levels=[1,2,3,4,5,6];b.race_courses251=[0,1];b.mode_wins251={"duel":1,"joust":1,"memory":1}
@@ -133,3 +132,76 @@ func test_failed_multi_reward_rolls_back_all_properties_and_retries_once():
  assert_false(sut.record_mode_victory240(sut.victory_ticket240("joust")));assert_push_error_count(1);assert_eq(sut.horse_collection.export_state(),before)
  sut.save_path="user://growth251.cfg";assert_true(sut.retry_victory240());var stats:Dictionary=sut.horse_collection.find("original").growth251
  assert_eq(stats,{"dodge":1,"handling":1,"calm":1});assert_true(sut.retry_victory240());assert_eq(sut.horse_collection.find("original").growth251,stats)
+
+func test_near_max_multiple_properties_use_only_remaining_headroom():
+ var h:Dictionary=sut.horse_collection.find("original")
+ h.stats={"speed":300.,"power":.9,"handling":1495.5,"dodge":.999,"calm":1.999}
+ var result:=VictoryGrowth251.apply(sut.horse_collection,"original","joust")
+ assert_eq(result.changes254.size(),3)
+ for change in result.changes254:
+  assert_eq(change.after,change.high)
+  assert_almost_eq(change.points,(change.high-change.before)/(change.high-change.low)*100.,.00001)
+  assert_lt(change.points,2.)
+ var counts:Dictionary=h.growth251.duplicate(true)
+ var again:=VictoryGrowth251.apply(sut.horse_collection,"original","joust")
+ assert_eq(h.growth251,counts)
+ for change in again.changes254:assert_eq(change.points,0.)
+ assert_eq(HorseStats.read(h).speed,300.);assert_eq(HorseStats.read(h).power,.9)
+func test_legacy_excess_migrates_to_bounded_saved_stats_without_double_growth():
+ var h:Dictionary=sut.horse_collection.find("original")
+ h.stats={"speed":999.,"handling":9999.,"power":9.,"dodge":9.,"calm":9.}
+ h.growth251={"speed":100,"handling":100,"power":100,"dodge":100,"calm":100}
+ var state:Dictionary=sut.horse_collection.export_state()
+ assert_true(state.horses[0].growth_capped255)
+ for spec in HorseSummary185.STATS:
+  assert_eq(state.horses[0].stats[spec[1]],float(spec[3]));assert_eq(HorseStats.read(h)[spec[1]],float(spec[3]))
+ assert_true(sut.horse_collection.restore(state));assert_eq(sut.horse_collection.export_state(),state)
+ assert_true(sut.save_progress());var cfg:=ConfigFile.new();assert_eq(cfg.load(sut.save_path),OK)
+ assert_eq(cfg.get_value("horses_trial","state"),state)
+func test_under_cap_legacy_migration_preserves_actual_value_and_next_diminished_gain():
+ var h:Dictionary=sut.horse_collection.find("original");h.growth251={"handling":3}
+ var before:float=HorseStats.read(h).handling
+ var state:Dictionary=sut.horse_collection.export_state();assert_true(sut.horse_collection.restore(state))
+ h=sut.horse_collection.find("original");assert_almost_eq(HorseStats.read(h).handling,before,.0001)
+ var reward:=VictoryGrowth251.apply(sut.horse_collection,"original","duel")
+ assert_almost_eq(reward.after-before,VictoryGrowth251.bonus("handling",4)-VictoryGrowth251.bonus("handling",3),.0001)
+func test_mixed_capped_rows_animation_and_shine_never_exceed_bar():
+ var h:Dictionary=sut.horse_collection.find("original");h.stats={"handling":1500.,"dodge":.999,"calm":1.99}
+ var view:=HorseVictory251.new();view.reward=VictoryGrowth251.apply(sut.horse_collection,"original","joust");add_child(view);await wait_process_frames(3)
+ for phase in [-.1,0.,.5,1.,1.2]:
+  view._advance(phase)
+  for row in view.rows254:
+   assert_lte(row.bar.value,1.);assert_gte(row.bar.value,0.)
+   assert_lte(row.spark.current_x,row.spark.size.x);assert_gte(row.spark.old_x,0.)
+   if row.change.key=="handling":assert_eq(row.spark.old_x,row.spark.current_x)
+ view.free()
+func test_inheritance_averages_each_parents_effective_property_with_hard_caps():
+ var a:Dictionary={"stats":{"speed":290.,"handling":700.,"power":.9,"dodge":.8,"calm":1.2},"growth251":{"power":100}}
+ var b:Dictionary={"stats":{"speed":250.,"handling":1499.,"power":.6,"dodge":1.,"calm":2.},"growth251":{"speed":10000,"handling":10000}}
+ var child:=HorseStats.inherit(a,b)
+ for spec in HorseSummary185.STATS:
+  assert_eq(child[spec[1]],(HorseStats.read(a)[spec[1]]+HorseStats.read(b)[spec[1]])*.5);assert_lte(child[spec[1]],float(spec[3]))
+func test_maxed_family_prize_and_supreme_keep_caps_and_glow():
+ var h:Dictionary=sut.horse_collection.find("original")
+ h.stats={"speed":300.,"handling":1500.,"power":.9,"dodge":1.,"calm":2.}
+ h.completed_levels=[1,2,3,4,5,6];h.race_courses251=[0,1];h.mode_wins251={"duel":1,"joust":1,"memory":1}
+ var prize:=VictoryGrowth251.champion(sut.horse_collection,"original");assert_false(prize.is_empty());assert_true(prize.master251)
+ for i in range(7,41):h.completed_levels.append(i)
+ h.race_courses251=[0,1,2,3]
+ assert_false(VictoryGrowth251.champion(sut.horse_collection,"original").is_empty());assert_true(prize.supreme251)
+ for spec in HorseSummary185.STATS:assert_eq(HorseStats.read(prize)[spec[1]],float(spec[3]))
+ assert_eq(HorseFinish168.style(prize),"supreme251")
+
+func test_inheritance_average_keeps_fractional_values_and_base_for_missing_stats():
+ var child:=HorseStats.inherit({"stats":{"speed":281.25}},{})
+ assert_eq(child.speed,270.625);assert_eq(child.handling,900.);assert_eq(child.calm,1.)
+ var improved:Dictionary={"stats":{"speed":281.25},"growth251":{"speed":1}}
+ assert_almost_eq(HorseStats.inherit(improved,{}).speed,(HorseStats.read(improved).speed+260.)*.5,.00001)
+func test_actual_newborn_uses_mean_and_has_no_second_growth_bonus():
+ var c:HorseCollection=sut.horse_collection;c.add_trial_parents()
+ c.find("trial_a").growth251={"speed":5};c.find("trial_b").growth251={"handling":5}
+ var a:=HorseStats.read(c.find("trial_a"));var b:=HorseStats.read(c.find("trial_b"))
+ var child:=c.breed("trial_a","trial_b",{})
+ assert_false(child.is_empty());assert_true(child.growth_capped255)
+ for key in HorseStats.BASE:assert_almost_eq(HorseStats.read(child)[key],(a[key]+b[key])*.5,.000000001)
+ var state:=c.export_state();assert_true(c.restore(state));assert_eq(c.export_state(),state)

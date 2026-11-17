@@ -58,7 +58,7 @@ func test_policy_save_is_atomic_future_version_blocks_load_and_collection_unchan
  var base:Dictionary={"pos":SaveData.world_cousins140.doors.home,"traits":{"coat":0,"pattern":0,"mane":0,"eyes":0,"finish":"normal"},"stats":{"speed":280.}}
  var before:=SaveData.world_herd_town217.duplicate(true);SaveData._load_valid=false;assert_false(SaveData.prepare_herd217(base,8,4));assert_eq(SaveData.world_herd_town217,before)
  SaveData._load_valid=true;assert_true(SaveData.prepare_herd217(base,8,4));var expected:=SaveData.world_herd_town217.duplicate(true)
- SaveData.load_progress();assert_eq(SaveData.world_herd_town217,expected);assert_eq(SaveData.horse_collection.export_state(),collection)
+ SaveData.load_progress();assert_eq(SaveData.world_herd_town217,expected);_assert_collection255(SaveData.horse_collection.export_state(),collection)
  var config:=ConfigFile.new();assert_eq(config.load(SaveData.save_path),OK);config.set_value("world","herd_town217",{"version":999});assert_eq(config.save(SaveData.save_path),OK)
  SaveData.load_progress();assert_false(SaveData._load_valid);assert_false(SaveData.save_progress())
  SaveData._load_valid=true;SaveData.world_seed=seed_;SaveData.world_herd_town217=old;DirAccess.remove_absolute(SaveData.save_path);SaveData.save_path=path
@@ -101,3 +101,14 @@ func test_far_from_all_towns_keeps_unbiased_original_random_population():
    assert_eq(after,before,"Beyond all town influence the original generator is unchanged")
    for horse in after:colors[horse.traits.coat]=true;patterns[horse.traits.pattern]=true;count+=1
  assert_gt(count,20);assert_gt(colors.size(),5);assert_gt(patterns.size(),3)
+
+func _assert_collection255(actual:Dictionary,expected:Dictionary):
+ # Baked legacy growth contains doubles. ConfigFile decimal serialization can
+ # round a final binary bit, so compare only these values with tiny tolerance.
+ for group in ["horses","ancestors"]:
+  assert_eq(actual[group].size(),expected[group].size())
+  for i in actual[group].size():
+   for key in HorseStats.BASE:
+    assert_almost_eq(actual[group][i].stats[key],expected[group][i].stats[key],.000000001)
+   actual[group][i].erase("stats");expected[group][i].erase("stats")
+ assert_eq(actual,expected)

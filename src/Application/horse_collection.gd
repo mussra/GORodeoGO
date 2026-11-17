@@ -77,13 +77,15 @@ func preview(a:String,b:String,choices:Dictionary)->Dictionary:
 func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
  if t.is_empty():return {}
- var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b))}
+ var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b)),"growth_capped255":true}
  var proof:Dictionary=GalaxyPure143.birth(find(a),find(b))
  if not proof.is_empty():child["galaxy_birth143"]=proof
  if CupRewards195.has_temper(find(a)) or CupRewards195.has_temper(find(b)):child["cup_temper195"]=CupRewards195.TEMPER
  child["can_jump"]=false;child["can_dodge"]=false;child.name=suggest_name(t);next_id+=1;horses.append(child);return child
 func export_state()->Dictionary:
- return {"cup_rewards195":cup_rewards195.duplicate(true),"mastery_rule179":1,"galaxy_keys173":galaxy_keys173.duplicate(),"galaxy_rule173":galaxy_rule173,"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":ancestors.duplicate(true),"horses":horses.duplicate(true),"selected":selected,"next_id":next_id}
+ var saved_horses:=horses.duplicate(true);var saved_ancestors:=ancestors.duplicate(true)
+ for h in saved_horses+saved_ancestors:HorseStats.cap255(h)
+ return {"cup_rewards195":cup_rewards195.duplicate(true),"mastery_rule179":1,"galaxy_keys173":galaxy_keys173.duplicate(),"galaxy_rule173":galaxy_rule173,"training_pair":training_pair.duplicate(true),"affinities":affinities.duplicate(true),"birth_credits":birth_credits,"bought_offers":bought_offers.duplicate(),"ancestors":saved_ancestors,"horses":saved_horses,"selected":selected,"next_id":next_id}
 func restore(v:Variant)->bool:
  if not v is Dictionary or not v.get("horses") is Array:return false
  if not CupRewards195.valid_receipts(v.get("cup_rewards195",{})):return false
@@ -121,11 +123,12 @@ func restore(v:Variant)->bool:
    for course in h.get("race_courses251",[]):
     if not course is int or course not in [0,1,2,3] or course in course_ids:return false
     course_ids.append(course)
-   for flag in ["master251","supreme251"]:
+   for flag in ["master251","supreme251","growth_capped255"]:
     if h.has(flag) and not h[flag] is bool:return false
    ids[h.id]=true;by_id[h.id]=h
    if group==known:clean_ancestors.append(h.duplicate(true))
    else:clean.append(h.duplicate(true))
+ for h in clean+clean_ancestors:HorseStats.cap255(h)
  for h in by_id.values():
   for parent in h.parents:
    if typeof(parent)!=TYPE_STRING or not ids.has(parent):return false

@@ -12,12 +12,26 @@ static func read(h:Dictionary)->Dictionary:
  out.dodge=clampf(number(s.get("dodge",1.0),1.0),0.75,1.0)
  # Serenidad (Ant, 7-nov-2026): how fast the horse calms bulls and wild horses.
  out.calm=calm_factor(s.get("calm",1.0))
- for key in BASE:
-  out[key]+=VictoryGrowth251.bonus(key,int(h.get("growth251",{}).get(key,0)))
+ if not h.get("growth_capped255",false):
+  for spec in HorseSummary185.STATS:
+   var key:String=spec[1]
+   out[key]=clampf(out[key]+VictoryGrowth251.bonus(key,int(h.get("growth251",{}).get(key,0))),spec[2],spec[3])
  return out
+# Bake legacy growth into bounded saved properties once; keep historical counts
+# for diminishing returns, never add those counts a second time.
+static func cap255(h:Dictionary)->void:
+ h.stats=read(h);h.growth_capped255=true
+static func grow255(h:Dictionary,key:String,steps:int=1)->void:
+ cap255(h)
+ for spec in HorseSummary185.STATS:
+  if spec[1]!=key or h.stats[key]>=spec[3]:continue
+  var counts:Dictionary=h.get("growth251",{}).duplicate(true)
+  var old:int=int(counts.get(key,0));var next:int=old+steps
+  h.stats[key]=minf(spec[3],h.stats[key]+VictoryGrowth251.bonus(key,next)-VictoryGrowth251.bonus(key,old))
+  counts[key]=next;h.growth251=counts
 static func inherit(a:Dictionary,b:Dictionary)->Dictionary:
  var x:=read(a);var y:=read(b);var out:Dictionary={}
- for k in BASE:out[k]=maxf(x[k],y[k])
+ for k in BASE:out[k]=(x[k]+y[k])*.5
  return out
 
 static func number(v:Variant,fallback:float)->float:

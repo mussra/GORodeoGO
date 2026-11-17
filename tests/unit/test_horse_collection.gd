@@ -1,4 +1,11 @@
 extends GutTest
+var valid255:bool
+var trial255:bool
+func before_each():
+ valid255=SaveData._load_valid;trial255=SaveData.trial_session_active
+ SaveData._load_valid=true;SaveData.trial_session_active=false
+func after_each():
+ SaveData._load_valid=valid255;SaveData.trial_session_active=trial255
 func test_starter_and_explicit_test_parents()->void:
  var c:=HorseCollection.new();c.seed_trial();assert_eq(c.horses.size(),1);assert_eq(c.selected,"original")
  c.add_trial_parents();c.add_trial_parents();assert_eq(c.horses.size(),3)

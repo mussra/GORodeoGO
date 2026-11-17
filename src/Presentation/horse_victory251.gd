@@ -27,7 +27,7 @@ func _ready()->void:
   for item in reward.get("changes254",[reward]):
    if item.key==spec[1]:change=item
   var active:bool=not change.is_empty();var y:float=234.+i*48.
-  _label(spec[0]+("  "+VictoryGrowth251.delta_text254(change) if active else ""),Vector2(528,y),20,Color("ffe1a1") if active else Color("a7bdc1"))
+  _label(spec[0]+("  "+(VictoryGrowth251.delta_text254(change) if change.after>change.before else "Máximo") if active else ""),Vector2(528,y),20,Color("ffe1a1") if active else Color("a7bdc1"))
   var line:=HorseStatBars.row(canvas,"",VictoryGrowth251.visual(spec,stats[spec[1]]),0.,1.,true);line.position=Vector2(748,y+4);line.size=Vector2(300,30);line.get_child(0).custom_minimum_size.x=0;line.get_child(0).hide()
   if active:
    var current_bar:ProgressBar=line.get_child(1);current_bar.step=0.;current_bar.add_theme_stylebox_override("fill",StyleBoxEmpty.new())
@@ -45,6 +45,7 @@ func _ready()->void:
   var tween:=create_tween();tween.tween_interval(.35);tween.tween_method(_advance,0.,1.,1.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT);tween.tween_callback(func():_advance(1.));tween.tween_method(_fade_effect253,1.,0.,1.0)
  else:spark.hide()
 func _advance(value:float)->void:
+ value=clampf(value,0.,1.)
  progress=value
  for row in rows254:
   var change:Dictionary=row.change;var current_bar:ProgressBar=row.bar;var effect:Control=row.spark

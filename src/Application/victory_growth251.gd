@@ -6,9 +6,7 @@ static func apply(collection:HorseCollection,id:String,mode:String)->Dictionary:
  if horse.is_empty() or horse.get("stage","adult")!="adult" or not PRIMARY.has(mode):return {}
  var keys:Array=["handling","calm"] if mode=="duel" else ["dodge","handling","calm"] if mode=="joust" else [PRIMARY[mode]]
  var before_stats:=HorseStats.read(horse)
- var counts:Dictionary=horse.get("growth251",{}).duplicate(true)
- for key in keys:counts[key]=int(counts.get(key,0))+1
- horse.growth251=counts
+ for key in keys:HorseStats.grow255(horse,key)
  var wins:Dictionary=horse.get("mode_wins251",{}).duplicate(true);wins[mode]=int(wins.get(mode,0))+1;horse.mode_wins251=wins
  var after_stats:=HorseStats.read(horse);var changes:Array=[]
  # Primary first preserves the existing reward envelope and single-row callers.
@@ -29,8 +27,7 @@ static func bonus(key:String,count:int)->float:
   if spec[1]==key:return (spec[3]-spec[2])*.02*sqrt(float(maxi(count,0)))
  return 0.
 static func visual(spec:Array,value:float)->float:
- var x:float=maxf(0.,(value-float(spec[2]))/(float(spec[3])-float(spec[2])))
- return x if x<=.5 else .5+.5*(1.-exp(-(x-.5)*2.))
+ return clampf((value-float(spec[2]))/(float(spec[3])-float(spec[2])),0.,1.)
 static func race_horse(collection:HorseCollection,sequence:int)->Dictionary:
  var id:String="race_prize251_"+str(sequence)
  if not collection.known_record(id).is_empty():return {}
@@ -50,17 +47,16 @@ static func champion(collection:HorseCollection,id:String)->Dictionary:
   if full_master(horse) and not existing.get("supreme251",false):
    existing["supreme251"]=true;existing["master251"]=true
    for spec in HorseSummary185.STATS:
-    var counts:Dictionary=existing.get("growth251",{}).duplicate();counts[spec[1]]=int(counts.get(spec[1],0))+25;existing.growth251=counts
+    HorseStats.grow255(existing,spec[1],25)
    return existing
   return {}
- var h:Dictionary={"id":prize_id,"name":HorseCollection.PATTERNS[int(horse.traits.pattern)]+" · Linaje maestro","parents":[],"origin":"mastery251","mastered_from251":id,"lineage_label":HorseCollection.PATTERNS[int(horse.traits.pattern)],"traits":horse.traits.duplicate(true),"species":horse.get("species","horse"),"can_jump":true,"can_dodge":true,"stats":HorseStats.read(horse),"growth251":{},"master251":true,"supreme251":full_master(horse)}
+ var h:Dictionary={"id":prize_id,"name":HorseCollection.PATTERNS[int(horse.traits.pattern)]+" · Linaje maestro","parents":[],"origin":"mastery251","mastered_from251":id,"lineage_label":HorseCollection.PATTERNS[int(horse.traits.pattern)],"traits":horse.traits.duplicate(true),"species":horse.get("species","horse"),"can_jump":true,"can_dodge":true,"stats":HorseStats.read(horse),"growth251":{},"growth_capped255":true,"master251":true,"supreme251":full_master(horse)}
  # Match the best effective property in this family, then add one extra growth step.
  for spec in HorseSummary185.STATS:
   var best:float=h.stats[spec[1]]
   for candidate in collection.horses:
    if family(candidate)==key:best=maxf(best,HorseStats.read(candidate)[spec[1]])
-  h.stats[spec[1]]=minf(best,spec[3]);var n:int=maxi(1,int(pow(maxf(0.,best-h.stats[spec[1]])/((spec[3]-spec[2])*.02),2.))+1)
-  h.growth251[spec[1]]=n+(25 if full_master(horse) else 0)
+  h.stats[spec[1]]=minf(best,spec[3]);HorseStats.grow255(h,spec[1],26 if full_master(horse) else 1)
  if horse.has("unicorn_variant"):h.unicorn_variant=horse.unicorn_variant
  collection.horses.append(h);return h
 static func full_master(h:Dictionary)->bool:

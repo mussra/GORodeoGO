@@ -1,0 +1,24 @@
+{
+  "version": "2.7.185",
+  "code": 444,
+  "package": "com.example.rancho.review",
+  "sha256": "c35b6e75ffea95f1eae091e39a333bb383cd66c9f817ffbcceaa2bafbd493ded",
+  "bytes": 82764601,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "passed": 289,
+    "total": 289,
+    "assertions": 44243,
+    "scripts": 48
+  },
+  "limits": {
+    "speed": 300,
+    "handling": 1500,
+    "power": 0.9,
+    "dodge": 1,
+    "calm": 2
+  },
+  "inheritance": "arithmetic mean of bounded effective parents, no internal rounding",
+  "legacy_migration": "baked effective bounded stats, historical counts retained",
+  "physical_android": false
+}

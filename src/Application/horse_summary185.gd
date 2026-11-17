@@ -11,4 +11,4 @@ static func average(h:Dictionary)->float:
  var items:=values(h);var total:float=0.
  for value in items:total+=value
  return total/items.size()
-const HELP="Promedio con igual peso de 8 propiedades: Velocidad, Manejo, Fuerza, Agilidad, Serenidad, aprendizaje de Salto, aprendizaje de Esquiva y Maestría. Cada una usa la escala de 0 a 100 de la ficha. Una habilidad aprendida aporta 100; si no, su progreso de aprendizaje. No incluye pelaje, rareza, genes ni equipo. Las barras reservan margen visual para las mejoras de victoria por encima de la escala base."
+const HELP="Promedio con igual peso de 8 propiedades: Velocidad, Manejo, Fuerza, Agilidad, Serenidad, aprendizaje de Salto, aprendizaje de Esquiva y Maestría. Cada una usa la escala de 0 a 100 de la ficha. Una habilidad aprendida aporta 100; si no, su progreso de aprendizaje. No incluye pelaje, rareza, genes ni equipo. Las mejoras de victoria respetan el máximo de cada propiedad."
