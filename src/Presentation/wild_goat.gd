@@ -24,7 +24,8 @@ func _ready()->void:
 func _process(delta:float)->void:
  _settle_offroad95(delta)
  _fence_jump=maxf(0,_fence_jump-delta)
- z_index=30 if _fence_jump>0 else 0
+ # The visual lifts during a jump, but depth still follows the feet like peers.
+ z_index=0
  goat_art.position.y=-sin(PI*(1-_fence_jump/.48))*28 if _fence_jump>0 else 0
  touch_grace=maxf(0,touch_grace-delta)
  if roped:held=maxf(0,held-delta)

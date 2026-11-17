@@ -23,16 +23,16 @@ func _ready():
  queue_redraw()
 func _draw():
  if SaveData.world_generator_version>=4:
-  texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
+  texture_repeat=TownPaint215.REPEAT248
   TownWallArt242.draw(self,seed,chunk);return
  var gates:Dictionary={}
- texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
+ texture_repeat=TownPaint215.REPEAT248
  for item in ridges:
   if item.has("town227"):
    var look227:=TownIdentity215.look(SaveData.world_cousins140,item.town227)
    var a:Vector2=item.a;var b:Vector2=item.b;var normal:Vector2=(b-a).normalized().orthogonal()*TownEnclosures227.THICKNESS*.5
    var polygon:=PackedVector2Array([a+normal,b+normal,b-normal,a-normal]);var uv:=PackedVector2Array()
-   for point in polygon:uv.append(point/128.)
+   for point in polygon:uv.append(TownPaint215.uv248(point))
    draw_polyline(PackedVector2Array([a,b]),Color("514537"),TownEnclosures227.THICKNESS+8.,true)
    draw_polygon(polygon,PackedColorArray([Color.WHITE]),uv,TownPaint215.texture(look227))
    draw_line(a+normal,b+normal,Color("f3dfb3"),6.,true);draw_line(a-normal,b-normal,Color("6e5b45"),5.,true)

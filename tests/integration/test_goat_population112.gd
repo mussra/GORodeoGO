@@ -1,4 +1,4 @@
-extends GutTest
+extends "res://tests/integration/test_herd_migration226.gd"
 func test_stream_generated_goats_share_alert_capture_and_ids():
  SaveData.save_path="user://goat112-only.dat";SaveData.trial_session_active=true;SaveData.world_generator_version=3;SaveData.world_seed=752026;SaveData.world_goat_captures=[];SaveData.world_edits=[];SaveData.world_quests={};SaveData.horse_collection.seed_trial();SaveData.world_position=WorldNominal98.home()
  var world=load("res://src/Presentation/frontier_world.gd").new();add_child(world)

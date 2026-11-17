@@ -131,16 +131,35 @@ func _physics_process(delta: float) -> void:
 			_graze_timer = randf_range(2.0, 5.0)
 			_art.grazing = not _art.grazing
 	var before94:Vector2=global_position
-	var wanted94:Vector2=before94+velocity*delta if escaping95 else WorldWildRoads94.safe_step(before94,before94+velocity*delta,road_provider94)
-	wanted94=WorldWildRoads94.terrain_step(self,before94,wanted94)
+	var wanted_motion248:Vector2=velocity*delta
+	var wanted94:Vector2=_legal_step248(wanted_motion248,escaping95)
+	if wanted94.distance_to(before94)<wanted_motion248.length()*.8:
+		var threat248:Vector2=player_ref.global_position if is_instance_valid(player_ref) else before94-wanted_motion248*100.
+		wanted94=WorldEscapeMotion.slide248(before94,threat248,wanted_motion248,wanted94,func(step:Vector2)->Vector2:return _legal_step248(step,escaping95))
 	velocity=(wanted94-before94)/maxf(delta,.001)
-	move_and_slide()
+	# This actor intentionally has collision_mask=0. Commit the already checked
+	# terrain step directly, without a second integration at a different delta.
+	global_position=wanted94
+	if not escaping95 and not (road_provider94.is_valid() and road_provider94.call(before94,WorldWildRoads94.FOOTPRINT)) and not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94
+	# Animate final displacement, not an intended move that hit a wall or a stale
+	# distance-cull pause. Cached frames stay shared; playback belongs to this art.
+	velocity=(global_position-before94)/maxf(delta,.001)
+	if velocity.length()>=WildHeading129.MIN_MOTION:
+		_art.grazing=false
+		if _art.speed_scale<=0.:_art.speed_scale=1.
 	_art.set_motion107(velocity)
 	_steered129=velocity
 	_art.update_heading129(velocity,delta)
-	if not escaping95 and not (road_provider94.is_valid() and road_provider94.call(before94,WorldWildRoads94.FOOTPRINT)) and not WorldWildRoads94.segment_clear(before94,global_position,road_provider94):global_position=before94
 	_art.position.y = sin(_bob * 1.6) * 1.5
 	queue_redraw()
+
+func _legal_step248(wanted:Vector2,escaping:bool)->Vector2:
+	var target:Vector2=global_position+wanted
+	if float(get_meta("escape_left110",0.))<=0. and not (is_instance_valid(herd_guide) and herd_guide!=self):
+		var threat:Vector2=player_ref.global_position if is_instance_valid(player_ref) else global_position-wanted*100.
+		target=WorldEscapeMotion.bounded_step(global_position,get_parent().to_global(home),threat,wanted,WorldTaming.FLEE_LEASH)
+	if not escaping:target=WorldWildRoads94.safe_step(global_position,target,road_provider94)
+	return WorldWildRoads94.terrain_step(self,global_position,target)
 
 ## Rope visuals identical to a held corral bull; while trust builds unroped
 ## (walk-up taming) the same trust bar shows progress.

@@ -1170,7 +1170,7 @@ func _exit_tree()->void:
 
 ## Additive, repeatable near-ranch prototype; does not alter chunk RNG or saves.
 func _setup_goat_prototype()->void:
-	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";add_child(_prototype_goats)
+	_prototype_goats=Node2D.new();_prototype_goats.name="prototype_goats";_prototype_goats.y_sort_enabled=true;add_child(_prototype_goats)
 	for pos in ([] if SaveData.world_generator_version>=3 else ([Vector2(200,600),Vector2(320,600),Vector2(400,600)] if WorldNominal98.enabled() else [Vector2(-200,400),Vector2(-90,470),Vector2(-310,480)])):
 		if SaveData.world_goat_captures.has("goat:"+str(pos)):continue
 		var goat=GoatScript.new();goat.setup({"pos":pos});goat.set_meta("origin",pos);_prototype_goats.add_child(goat)
@@ -1610,7 +1610,7 @@ func _open_town234(data:Dictionary):
 	dialog.closed.connect(_close_npc)
 	dialog.recommend_requested.connect(func(target:String):
 		var next:=SaveData.world_cousins140.duplicate(true);next.revealed215[target]=true;next.known[data.town234]=true;next.hint215=target
-		if SaveData.commit_cousins140(next,player.position):_toast("Destino: "+TownIdentity215.title(next,target)+" · marcado en el minimapa")
+		if SaveData.commit_cousins140(next,player.position):_toast("Destino: "+TownIdentity215.display_name248(next,target)+" · marcado en el minimapa")
 		else:_toast("No se pudo guardar el destino")
 		_close_npc())
 	dialog.service_requested.connect(func(role:String,town:String):

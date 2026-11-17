@@ -84,15 +84,7 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 ## take a legal tangent instead of running forever into the same wall.
 func _flee_step224(threat:Vector2,wanted:Vector2)->Vector2:
 	var direct:Vector2=_legal_flee_step224(threat,wanted)
-	if direct.distance_to(position)>=wanted.length()*.8:return direct
-	var best:Vector2=direct
-	var score:float=-INF
-	for angle in [PI/4,-PI/4,PI/2,-PI/2,3*PI/4,-3*PI/4,PI]:
-		var candidate:Vector2=_legal_flee_step224(threat,wanted.rotated(angle))
-		if candidate.distance_to(position)<wanted.length()*.5:continue
-		var value:float=candidate.distance_squared_to(threat)
-		if value>score:best=candidate;score=value
-	return best
+	return WorldEscapeMotion.slide248(position,threat,wanted,direct,func(step:Vector2)->Vector2:return _legal_flee_step224(threat,step))
 func _legal_flee_step224(threat:Vector2,wanted:Vector2)->Vector2:
 	var target:Vector2=position+wanted
 	if not roped:target=WorldEscapeMotion.bounded_step(position,home,threat,wanted,WorldPigs.FLEE_LEASH)

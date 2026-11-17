@@ -13,8 +13,8 @@ static func pending(seed_:int,state:Dictionary,role:String)->Array[String]:
 static func message(seed_:int,town:String,role:String)->String:
  var node:Dictionary=TownNetwork234.node_for(seed_,town)
  var target:String=node.get('targets',{}).get(role,'')
- if target.is_empty():return 'En %s puedes hablar con %s.'%[TownIdentity215.title(SaveData.world_cousins140,town),TownNetwork234.role_text(seed_,town)]
- return 'En %s te recomiendan visitar %s, hacia el %s.'%[TownIdentity215.title(SaveData.world_cousins140,town),TownIdentity215.title(SaveData.world_cousins140,target),TownNetwork234.direction(node.door,TownNetwork234.node_for(seed_,target).door)]
+ if target.is_empty():return 'En %s puedes hablar con %s.'%[TownIdentity215.display_name248(SaveData.world_cousins140,town),TownNetwork234.role_text(seed_,town)]
+ return 'En %s te recomiendan visitar %s, hacia el %s.'%[TownIdentity215.display_name248(SaveData.world_cousins140,town),TownIdentity215.display_name248(SaveData.world_cousins140,target),direction248(node.door,TownNetwork234.node_for(seed_,target).door)]
 static func open(seed_:int,state:Dictionary,town:String,role:String)->Dictionary:
  var next:Dictionary=state.duplicate(true)
  if not next.get('heard247') is Dictionary:next['heard247']={}
@@ -38,3 +38,12 @@ static func clean(raw:Variant,seed_:int)->Dictionary:
   var node:Dictionary=TownNetwork234.node_for(seed_,parts[0])
   if not node.is_empty() and parts[1] in node.roles:out[id]=raw[id]
  return out
+
+static func direction248(from:Vector2,to:Vector2)->String:
+ var gap:Vector2=to-from
+ if gap.length_squared()<1.:return 'aquí'
+ var vertical:String='sur' if gap.y>0 else 'norte'
+ var horizontal:String='este' if gap.x>0 else 'oeste'
+ if absf(gap.x)<absf(gap.y)*.4:return vertical
+ if absf(gap.y)<absf(gap.x)*.4:return horizontal
+ return ("nor" if vertical=="norte" else "sur")+horizontal

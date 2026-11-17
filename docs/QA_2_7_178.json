@@ -1,0 +1,75 @@
+{
+  "version": "2.7.178",
+  "code": 437,
+  "package": "com.example.rancho.review",
+  "sha256": "991fc6f5ddc3143fd3d0ea158e9441c95b6083a28592137619b16effff905287",
+  "bytes": 82727013,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "passed": 231,
+    "total": 231,
+    "assertions": 41433,
+    "scripts": 40,
+    "deprecations": 4,
+    "exit_warning": null,
+    "earlier_run_warning": "2 ObjectDB instances at shutdown in earlier suite runs, not present in final full run"
+  },
+  "physical_android": false,
+  "visual_review": [
+    "mirrored wall corners and chunk edge",
+    "goat behind/in front of tree",
+    "real destination contour and material swatch",
+    "name under thumbnail; no coordinates",
+    "relay target, direction, time and button consistent",
+    "before/after wall escape and animation videos"
+  ],
+  "horse_reproduction": {
+    "before": {
+      "animation_frame_changes": 0,
+      "animation_speed": 0.0,
+      "cpu_p95_us": 120,
+      "cpu_two_horses_mean_us": 87.12,
+      "slide_distance": 148.083984375,
+      "wall_crossings": 0,
+      "wall_distance": 3.83343005180359
+    },
+    "after": {
+      "animation_frame_changes": 32,
+      "animation_speed": 1.0,
+      "cpu_p95_us": 163,
+      "cpu_two_horses_mean_us": 103.033333333333,
+      "slide_distance": 100.048828125,
+      "wall_crossings": 0,
+      "wall_distance": 550.142639160156
+    }
+  },
+  "thumbnail_cache": [
+    {
+      "cached_images": 1,
+      "case": "end",
+      "live_raster": false
+    },
+    {
+      "cached_images": 2,
+      "case": "next",
+      "live_raster": false
+    },
+    {
+      "cached_images": 3,
+      "case": "via",
+      "live_raster": false
+    },
+    {
+      "cached_images": 3,
+      "case": "saddler",
+      "live_raster": false
+    },
+    {
+      "cached_images": 3,
+      "case": "complete",
+      "live_raster": false
+    }
+  ],
+  "physics_spike": "31 ms Android engine sample not reproduced or conclusively attributed",
+  "no_main_or_store": true
+}

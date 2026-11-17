@@ -1,0 +1,9 @@
+{
+  "animation_frame_changes": 32,
+  "animation_speed": 1.0,
+  "cpu_p95_us": 163,
+  "cpu_two_horses_mean_us": 103.033333333333,
+  "slide_distance": 100.048828125,
+  "wall_crossings": 0,
+  "wall_distance": 550.142639160156
+}

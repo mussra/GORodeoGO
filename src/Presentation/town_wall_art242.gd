@@ -29,6 +29,8 @@ static func geometry(plan:Dictionary)->Dictionary:
   inset.append_array(Geometry2D.offset_polyline(path,TownEnclosures227.THICKNESS*.5-5.,Geometry2D.JOIN_ROUND,Geometry2D.END_ROUND))
  var result:Dictionary={'outer':outer,'surface':surface,'inset':inset};cache[key]=result;return result
 static func draw(node:CanvasItem,seed_:int,chunk:Vector2i):
+ # Global UVs + mirrored repeat share phase across corners and chunk clips.
+ node.texture_repeat=TownPaint215.REPEAT248
  var box:=Rect2(Vector2(chunk)*1024.,Vector2.ONE*1024.)
  var clip:=PackedVector2Array([box.position,Vector2(box.end.x,box.position.y),box.end,Vector2(box.position.x,box.end.y)])
  for plan in TownEnclosures227.plans(seed_).values():
@@ -41,5 +43,5 @@ static func draw(node:CanvasItem,seed_:int,chunk:Vector2i):
   for polygon in polygons.inset:
    for part in Geometry2D.intersect_polygons(polygon,clip):
     var uv:=PackedVector2Array()
-    for point in part:uv.append(point/128.)
+    for point in part:uv.append(TownPaint215.uv248(point))
     node.draw_polygon(part,PackedColorArray([Color.WHITE]),uv,TownPaint215.texture(look))

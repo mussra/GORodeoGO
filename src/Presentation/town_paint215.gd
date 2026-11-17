@@ -2,6 +2,8 @@ class_name TownPaint215
 extends RefCounted
 static var textures:Dictionary={}
 static var giraffe:Image
+const REPEAT248:int=CanvasItem.TEXTURE_REPEAT_MIRROR
+static func uv248(point:Vector2)->Vector2:return point/128.
 static func texture(look:Dictionary)->Texture2D:
  var key:String=str([look.base,look.spot,look.pattern])
  if textures.has(key):return textures[key]
@@ -26,6 +28,7 @@ static func texture(look:Dictionary)->Texture2D:
     if weight>0.:image.set_pixel(x,y,base.lerp(spot,weight))
  var result:=ImageTexture.create_from_image(image);textures[key]=result;return result
 static func wall(node:CanvasItem,box:Rect2,look:Dictionary,full_width:float=0.,center_x:float=INF):
+ node.texture_repeat=REPEAT248
  var points:=PackedVector2Array([box.position,Vector2(box.end.x,box.position.y),box.end,Vector2(box.position.x,box.end.y)])
  var uv:=PackedVector2Array()
  for point in points:uv.append(Vector2((point.x-((center_x if is_finite(center_x) else box.get_center().x)-(full_width if full_width>0. else box.size.x)*.5))/(full_width if full_width>0. else box.size.x),point.y/128.))

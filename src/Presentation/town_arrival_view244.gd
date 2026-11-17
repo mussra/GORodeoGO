@@ -14,7 +14,7 @@ func _ready()->void:
  if overview246:_refresh246()
  ground=Node2D.new();ground.z_index=-9;ground.texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED;add_child(ground)
  ground.draw.connect(_ground)
- walls=Node2D.new();walls.z_index=-6;walls.texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED;add_child(walls)
+ walls=Node2D.new();walls.z_index=-6;walls.texture_repeat=TownPaint215.REPEAT248;add_child(walls)
  walls.draw.connect(_walls)
 func _ground()->void:
  var box:Rect2=_bounds246.grow(1024.) if overview246 else (plan.bounds as Rect2).grow(7000.)
@@ -35,7 +35,7 @@ func _wall246(item:Dictionary)->void:
  for polygon in shape.surface:walls.draw_colored_polygon(polygon,Color('ead7aa'))
  for polygon in shape.inset:
   var uv:=PackedVector2Array()
-  for point in polygon:uv.append(point/128.)
+  for point in polygon:uv.append(TownPaint215.uv248(point))
   walls.draw_polygon(polygon,PackedColorArray([Color.WHITE]),uv,TownPaint215.texture(look))
 
 func _refresh246()->void:

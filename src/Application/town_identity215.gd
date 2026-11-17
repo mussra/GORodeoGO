@@ -83,3 +83,10 @@ static func look236(seed_:int,id:String)->Dictionary:
  var result:Dictionary={"version":2,"coat":coat,"spot_index":spot,"pattern":pattern,"base":HorseAppearance.COLORS[coat],"spot":HorseAppearance.COLORS[spot],"name":name_}
  if look_cache236.size()>512:look_cache236.clear()
  look_cache236[key]=result;return result
+
+static func display_name248(state:Dictionary,id:String)->String:
+ var name_:String=title(state,id)
+ if SaveData.world_generator_version>=6:
+  var split_:int=name_.rfind(' · ')
+  if split_>=0:name_=name_.left(split_)
+ return name_

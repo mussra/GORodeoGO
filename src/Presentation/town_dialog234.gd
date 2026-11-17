@@ -15,7 +15,7 @@ func _ready():
  size=Vector2(940,560);z_index=150;DetailCard179.style_panel(self);_fit();get_viewport().size_changed.connect(_fit)
  var node:Dictionary=TownNetwork234.nodes(SaveData.world_seed)[town]
  _label247(TownNetwork234.npc_name(town,role),Vector2(32,24),Vector2(876,42),30,Color('f7cf7c'))
- _label247(TownIdentity215.title(SaveData.world_cousins140,town),Vector2(32,72),Vector2(876,38),21,Color('bed0d0'))
+ _label247(TownIdentity215.display_name248(SaveData.world_cousins140,town),Vector2(32,72),Vector2(876,38),21,Color('bed0d0'))
  var line:=ColorRect.new();line.color=Color('45616a');line.position=Vector2(32,122);line.size=Vector2(876,2);line.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(line)
  if conversation247.is_empty():conversation247=TownMessages247.open(SaveData.world_seed,SaveData.world_cousins140,town,role)
  target247=conversation247.target
@@ -26,21 +26,29 @@ func _ready():
  if not relayed.is_empty():
   heading247.text="Tengo un recado para ti"
   body247.text=TownMessages247.message(SaveData.world_seed,relayed,role)
-  route247.text="Siguiente recado: "+TownIdentity215.title(SaveData.world_cousins140,target247)+"." if not target247.is_empty() else "Con este recado ya estás al día. ¡Buen viaje!"
+  route247.text="Siguiente recado: "+TownIdentity215.display_name248(SaveData.world_cousins140,target247)+"." if not target247.is_empty() else "Con este recado ya estás al día. ¡Buen viaje!"
  elif target247.is_empty():
   heading247.text="Ya estás al día"
   body247.text="Ya has oído todos los recados de %s. Si sigues explorando, encontrarás otros pueblos."%TownMessages247.PLURALS[role]
  else:
-  var next:Dictionary=TownNetwork234.node_for(SaveData.world_seed,target247);var side:=TownNetwork234.direction(node.door,next.door)
+  heading247.text="Tengo a alguien que presentarte"
+  var who:String={"loco":"mi primo","farmer":"mi primo, el granjero","florist":"mi prima, la florista","saddler":"mi primo, el guarnicionero"}[role]
+  body247.text="Ve a ver a "+who+"."
   var route:=TravelEstimate237.route(SaveData.world_seed,town,role)
+  if route.hops>1:body247.text+=" Pasarás por otro pueblo antes de llegar."
+ if not target247.is_empty():
+  body247.size=Vector2(548,124)
+  var side:String=TownMessages247.direction248(node.door,TownNetwork234.node_for(SaveData.world_seed,target247).door)
+  if relayed.is_empty():body247.text+=" Está al "+side+"."
   var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
   var nutrition:float=Garden212.multiplier(SaveData.world_garden212,SaveData.horse_collection.selected)
-  var estimate:float=TravelEstimate237.seconds(route.distance,horse,energy237,nutrition)
-  heading247.text="Tengo a alguien que presentarte"
-  var who:String={"loco":"mi primo","farmer":"mi primo, el granjero,","florist":"mi prima, la florista,","saddler":"mi primo, el guarnicionero,"}[role]
-  body247.text="Busca a %s en %s, hacia el %s. Reconocerás el pueblo por el color y el dibujo de su muralla."%[who,TownIdentity215.title(SaveData.world_cousins140,target247),side]
-  if route.hops>1:body247.text+=" Pasarás por otro pueblo antes de llegar."
-  route247.text="A caballo: %s, aproximadamente. Sigue el camino."%TravelEstimate237.text(estimate)
+  var distance_:float=TravelEstimate237.between248(SaveData.world_seed,town,target247,role)
+  var estimate:float=TravelEstimate237.seconds(distance_,horse,energy237,nutrition)
+  route247.text=("El siguiente recado está al "+side+".\n" if not relayed.is_empty() else "")+TravelEstimate237.minutes248(estimate)
+  route247.size=Vector2(548,88);route247.add_theme_font_size_override("font_size",20);route247.position.y=330
+  var preview:=TownThumbnail248.new();preview.name='DestinationThumbnail248';preview.town=target247;preview.seed_=SaveData.world_seed;preview.position=Vector2(616,204);preview.size=Vector2(288,160);add_child(preview)
+  _label247(TownIdentity215.display_name248(SaveData.world_cousins140,target247),Vector2(616,368),Vector2(288,25),18,Color('f7cf7c'))
+  _label247(("Siguiente recado · " if not relayed.is_empty() else "Al ")+side,Vector2(616,394),Vector2(288,22),16,Color('bed0d0'))
  if not target247.is_empty():
   button("Marcar siguiente recado" if not relayed.is_empty() else "Marcar en el mapa",Vector2(32,420),func():recommend_requested.emit(target247),Vector2(876,58))
  var has_service:bool=role in ["saddler","farmer"] or (town=="home" and role=="florist")

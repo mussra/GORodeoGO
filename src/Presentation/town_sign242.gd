@@ -25,7 +25,7 @@ func _process(delta:float):
   var gap:float=world.player.position.distance_to(plan.gate)
   if gap<distance:best=plan;distance=gap
  if best.is_empty():hide();return
- text=TownIdentity215.title(SaveData.world_cousins140,best.id)+'\n'+TownEnclosures227.role231(best.id)
+ text=TownIdentity215.display_name248(SaveData.world_cousins140,best.id)+'\n'+TownEnclosures227.role231(best.id)
  var extent:Vector2=get_viewport_rect().size
  var k:float=minf(extent.x/1280.,extent.y/720.)
  scale=Vector2.ONE*k;size=Vector2(minf(580.,extent.x/k-270.),0)

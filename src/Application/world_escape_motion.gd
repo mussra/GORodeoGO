@@ -15,3 +15,15 @@ static func bounded_step(position:Vector2,home:Vector2,threat:Vector2,wanted:Vec
   var value:float=candidate.distance_squared_to(threat)
   if value>score:best=candidate;score=value
  return best
+
+## Shared pig/horse wall escape. The ordinary legal step stays unchanged;
+## tangent candidates are tested only when the direct move is mostly blocked.
+static func slide248(position:Vector2,threat:Vector2,wanted:Vector2,direct:Vector2,legal:Callable)->Vector2:
+ if wanted.is_zero_approx() or direct.distance_to(position)>=wanted.length()*.8:return direct
+ var best:Vector2=direct;var score:float=-INF
+ for angle in [PI/4,-PI/4,PI/2,-PI/2,3*PI/4,-3*PI/4,PI]:
+  var candidate:Vector2=legal.call(wanted.rotated(angle))
+  if candidate.distance_to(position)<wanted.length()*.5:continue
+  var value:float=candidate.distance_squared_to(threat)
+  if value>score:best=candidate;score=value
+ return best
