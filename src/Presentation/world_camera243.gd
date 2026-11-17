@@ -1,7 +1,7 @@
 class_name WorldCamera243
 extends HBoxContainer
 ## Camera-only presentation. No gesture recognizer, physics or streaming changes.
-const STEPS:Array[float]=[.25,.35,.5,.65,.75,.85,1.,1.25,1.5]
+const STEPS:Array[float]=[.05,.1,.15,.25,.35,.5,.65,.75,.85,1.,1.25,1.5]
 const PREF_PATH:String='user://world_camera243.cfg'
 var world:Node
 var camera:Camera2D
@@ -22,13 +22,15 @@ func _ready()->void:
  plus.pressed.connect(func():step(1))
  get_viewport().size_changed.connect(_layout)
  var cfg:=ConfigFile.new()
- if cfg.load(PREF_PATH)==OK:factor=clampf(float(cfg.get_value('camera','zoom',1.)),.25,1.5)
+ if cfg.load(PREF_PATH)==OK:factor=clampf(float(cfg.get_value('camera','zoom',1.)),.05,1.5)
  set_factor(factor,false);_layout();_overview246.call_deferred()
 func _button(text_:String,width:float)->Button:
  var button:=Button.new();button.text=text_;button.custom_minimum_size=Vector2(width,46)
  button.focus_mode=Control.FOCUS_NONE;QuestButtonStyle.apply(button)
  add_child(button);return button
-static func minimum_for(_extent:Vector2)->float:return .25
+static func minimum_for(_extent:Vector2)->float:return .05
+static func spawn_radius249(zoom_:float)->int:
+ return 3 if zoom_<.25 else 2 if zoom_<.7 else 1
 static func loaded_minimum246(extent:Vector2)->float:
  return clampf(maxf(extent.x,extent.y)/1848.,.75,1.)
 func step(direction:int)->void:

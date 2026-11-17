@@ -28,3 +28,20 @@ func test_fence_block_also_has_a_legal_flee_direction():
  var start:Vector2=pig.position
  for i in 40:pig.flee_from(pig.position+Vector2(100,0),1./60.,225.)
  assert_gt(pig.position.distance_to(start),60.);assert_gt(pig.position.x,95.)
+func test_sprite_has_deadzone_and_temporal_hysteresis_near_vertical_motion():
+ pig.flip_h=false
+ for i in 120:pig._heading249(Vector2(-2. if i%2==0 else 2.,225.),1./60.)
+ assert_false(pig.flip_h)
+ for i in 4:pig._heading249(Vector2(-225.,0),1./60.)
+ assert_false(pig.flip_h)
+ for i in 4:pig._heading249(Vector2(-225.,0),1./60.)
+ assert_true(pig.flip_h)
+func test_jittering_threat_along_wall_keeps_tangent_progress_and_lasso_state():
+ var start:Vector2=pig.position;var changes:int=0;var last:bool=pig.flip_h
+ for i in 180:
+  pig.flee_from(pig.position+Vector2(100,1. if i%2==0 else -1.),1./60.,225.)
+  if pig.flip_h!=last:changes+=1;last=pig.flip_h
+  assert_false(WorldTerrain103.blocked(host.SEED,pig.position,18.))
+ assert_gt(pig.position.distance_to(start),120.)
+ assert_lt(changes,8)
+ assert_false(pig.roped)

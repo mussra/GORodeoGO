@@ -31,6 +31,8 @@ func _settle_offroad95(delta:float)->void:
 
 var home: Vector2 = Vector2.ZERO
 var flip_h: bool = false
+var _wall249:Dictionary={}
+var _flip_pending249:float=0.
 var movement:Vector2=Vector2.RIGHT
 var _art:WildPigArt
 
@@ -49,7 +51,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_settle_offroad95(delta)
-	if is_instance_valid(_art):_art.update_state(bool(state.get("flee",false)),bool(state.get("tired",false)),flip_h,movement)
+	if is_instance_valid(_art):_art.update_state(bool(state.get("flee",false)) and not movement.is_zero_approx(),bool(state.get("tired",false)),flip_h,movement)
 	touch_grace = maxf(0.0, touch_grace - delta)
 	if roped:
 		# Safety timer. Chase motion is handled by the shared world tick.
@@ -74,18 +76,18 @@ func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
 		var chase_time:float=float(state.get("rope_run",0.0))
 		away=away.rotated(sin(chase_time*2.6+home.x*.01)*.7)
 	var wanted:Vector2=away.normalized()*speed*delta
-	var target:Vector2=_flee_step224(from,wanted)
+	var target:Vector2=_flee_step224(from,wanted,delta)
 	_escape_left95=.2 # Genuine flee motion may cross the road.
 	movement=(target-position).normalized()
 	position = target
-	flip_h = movement.x < 0.0
+	_heading249(movement*speed,delta)
 
 ## Keep the same home leash and solid walls. If the direct step is blocked,
 ## take a legal tangent instead of running forever into the same wall.
-func _flee_step224(threat:Vector2,wanted:Vector2)->Vector2:
+func _flee_step224(threat:Vector2,wanted:Vector2,delta:float=1./60.)->Vector2:
 	var direct:Vector2=_legal_flee_step224(threat,wanted)
-	return WorldEscapeMotion.slide248(position,threat,wanted,direct,func(step:Vector2)->Vector2:return _legal_flee_step224(threat,step))
-func _legal_flee_step224(threat:Vector2,wanted:Vector2)->Vector2:
+	return WorldEscapeMotion.slide249(position,threat,wanted,direct,func(step:Vector2)->Vector2:return _legal_flee_step224(threat,step),_wall249,delta)
+func _legal_flee_step224(threat:Vector2,wanted:Vector2,delta:float=1./60.)->Vector2:
 	var target:Vector2=position+wanted
 	if not roped:target=WorldEscapeMotion.bounded_step(position,home,threat,wanted,WorldPigs.FLEE_LEASH)
 	if WorldFence.crosses(self,target):return position
@@ -93,7 +95,7 @@ func _legal_flee_step224(threat:Vector2,wanted:Vector2)->Vector2:
 	return target
 
 func face_towards(point: Vector2) -> void:
-	flip_h = point.x < position.x
+	if absf(point.x-position.x)>12.:flip_h = point.x < position.x
 
 func _draw() -> void:
 	AnimalFatigueBar.draw(self,state)
@@ -112,3 +114,9 @@ func try_capture(landing_point: Vector2) -> bool:
 	if roped:
 		return false
 	return global_position.distance_to(landing_point) <= LassoController.PREY_HIT_RADIUS + LassoController.PREY_CAPTURE_TOLERANCE
+
+func _heading249(motion:Vector2,delta:float)->void:
+	var desired:bool=WildHeading129.flip(motion,flip_h)
+	if desired==flip_h:_flip_pending249=0.;return
+	_flip_pending249+=maxf(0.,delta)
+	if _flip_pending249>=WildHeading129.VIEW_HOLD:flip_h=desired;_flip_pending249=0.

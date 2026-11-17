@@ -1,0 +1,200 @@
+{
+  "25pct_radius1_steady": {
+    "chunks": 9,
+    "discovered": 9,
+    "draw_calls": 312.0,
+    "elapsed_s": 3.442129,
+    "frame": {
+      "max_ms": 28.025,
+      "mean_ms": 22.9397133333333,
+      "n": 150,
+      "p95_ms": 25.712
+    },
+    "goats": 3,
+    "horses": 0,
+    "memory_mib": 110.343440055847,
+    "nodes": 395.0,
+    "physics_monitor": {
+      "max_ms": 0.183,
+      "mean_ms": 0.17468,
+      "n": 150,
+      "p95_ms": 0.183
+    },
+    "pigs": 0,
+    "process_monitor": {
+      "max_ms": 39.491,
+      "mean_ms": 30.61322,
+      "n": 150,
+      "p95_ms": 39.491
+    },
+    "queue": 0,
+    "radius": 1,
+    "save_calls_delta": 0,
+    "zoom": 0.25
+  },
+  "25pct_radius1_warm": {
+    "chunks": 9,
+    "discovered": 9,
+    "draw_calls": 312.0,
+    "elapsed_s": 1.443591,
+    "frame": {
+      "max_ms": 42.786,
+      "mean_ms": 23.657393442623,
+      "n": 61,
+      "p95_ms": 28.374
+    },
+    "goats": 3,
+    "horses": 0,
+    "memory_mib": 110.31445980072,
+    "nodes": 395.0,
+    "physics_monitor": {
+      "max_ms": 0.197,
+      "mean_ms": 0.185196721311475,
+      "n": 61,
+      "p95_ms": 0.197
+    },
+    "pigs": 0,
+    "process_monitor": {
+      "max_ms": 73.769,
+      "mean_ms": 59.9582786885247,
+      "n": 61,
+      "p95_ms": 73.769
+    },
+    "queue": 0,
+    "radius": 1,
+    "save_calls_delta": 0,
+    "zoom": 0.25
+  },
+  "25pct_radius2_expansion": {
+    "chunks": 25,
+    "discovered": 9,
+    "draw_calls": 327.0,
+    "elapsed_s": 16.017256,
+    "frame": {
+      "max_ms": 42.599,
+      "mean_ms": 28.2369400352734,
+      "n": 567,
+      "p95_ms": 32.38
+    },
+    "goats": 19,
+    "horses": 15,
+    "memory_mib": 127.413683891296,
+    "nodes": 1020.0,
+    "physics_monitor": {
+      "max_ms": 0.546,
+      "mean_ms": 0.224830687830688,
+      "n": 567,
+      "p95_ms": 0.546
+    },
+    "pigs": 5,
+    "process_monitor": {
+      "max_ms": 42.399,
+      "mean_ms": 32.7925978835981,
+      "n": 567,
+      "p95_ms": 42.399
+    },
+    "queue": 0,
+    "radius": 2,
+    "save_calls_delta": 0,
+    "zoom": 0.25
+  },
+  "25pct_radius2_steady": {
+    "chunks": 25,
+    "discovered": 9,
+    "draw_calls": 327.0,
+    "elapsed_s": 3.515149,
+    "frame": {
+      "max_ms": 29.151,
+      "mean_ms": 23.4227666666667,
+      "n": 150,
+      "p95_ms": 25.901
+    },
+    "goats": 19,
+    "horses": 15,
+    "memory_mib": 127.38627910614,
+    "nodes": 1020.0,
+    "physics_monitor": {
+      "max_ms": 0.512,
+      "mean_ms": 0.41078,
+      "n": 150,
+      "p95_ms": 0.512
+    },
+    "pigs": 5,
+    "process_monitor": {
+      "max_ms": 34.02,
+      "mean_ms": 27.8935266666666,
+      "n": 150,
+      "p95_ms": 31.538
+    },
+    "queue": 0,
+    "radius": 2,
+    "save_calls_delta": 0,
+    "zoom": 0.25
+  },
+  "5pct_radius3_expansion": {
+    "chunks": 49,
+    "discovered": 9,
+    "draw_calls": 510.0,
+    "elapsed_s": 11.193072,
+    "frame": {
+      "max_ms": 131.492,
+      "mean_ms": 30.0762580645161,
+      "n": 372,
+      "p95_ms": 33.476
+    },
+    "goats": 44,
+    "horses": 33,
+    "memory_mib": 132.796347618103,
+    "nodes": 1800.0,
+    "physics_monitor": {
+      "max_ms": 1.087,
+      "mean_ms": 0.688395161290321,
+      "n": 372,
+      "p95_ms": 1.087
+    },
+    "pigs": 22,
+    "process_monitor": {
+      "max_ms": 130.882,
+      "mean_ms": 41.7936155913979,
+      "n": 372,
+      "p95_ms": 130.882
+    },
+    "queue": 0,
+    "radius": 3,
+    "save_calls_delta": 0,
+    "zoom": 0.05
+  },
+  "5pct_radius3_steady": {
+    "chunks": 49,
+    "discovered": 9,
+    "draw_calls": 510.0,
+    "elapsed_s": 3.59262,
+    "frame": {
+      "max_ms": 25.818,
+      "mean_ms": 23.93966,
+      "n": 150,
+      "p95_ms": 25.101
+    },
+    "goats": 44,
+    "horses": 33,
+    "memory_mib": 132.790686607361,
+    "nodes": 1800.0,
+    "physics_monitor": {
+      "max_ms": 0.944,
+      "mean_ms": 0.722780000000002,
+      "n": 150,
+      "p95_ms": 0.944
+    },
+    "pigs": 22,
+    "process_monitor": {
+      "max_ms": 33.088,
+      "mean_ms": 27.7276333333334,
+      "n": 150,
+      "p95_ms": 33.088
+    },
+    "queue": 0,
+    "radius": 3,
+    "save_calls_delta": 0,
+    "zoom": 0.05
+  }
+}

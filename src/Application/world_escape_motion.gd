@@ -27,3 +27,29 @@ static func slide248(position:Vector2,threat:Vector2,wanted:Vector2,direct:Vecto
   var value:float=candidate.distance_squared_to(threat)
   if value>score:best=candidate;score=value
  return best
+
+## Commit to a legal wall tangent briefly, instead of choosing the opposite
+## equal-scoring tangent each frame. A blocked commitment is abandoned at once.
+static func slide249(position:Vector2,threat:Vector2,wanted:Vector2,direct:Vector2,legal:Callable,memory:Dictionary,delta:float)->Vector2:
+ if wanted.is_zero_approx():memory.clear();return direct
+ var previous:Vector2=memory.get("heading",Vector2.ZERO)
+ var hold:float=maxf(0.,float(memory.get("hold",0.))-delta)
+ if hold>0. and not previous.is_zero_approx():
+  var committed:Vector2=legal.call(previous*wanted.length())
+  if committed.distance_to(position)>=wanted.length()*.75:
+   memory.hold=hold;return committed
+ if direct.distance_to(position)>=wanted.length()*.8:
+  memory.clear();return direct
+ var best:Vector2=direct;var score:float=-INF
+ for angle in [PI/4,-PI/4,PI/2,-PI/2,3*PI/4,-3*PI/4,PI]:
+  var candidate:Vector2=legal.call(wanted.rotated(angle))
+  var step:Vector2=candidate-position
+  if step.length()<wanted.length()*.5:continue
+  # Continuity is a tie-breaker strong enough to prevent a wall-side seesaw.
+  var away:Vector2=(position-threat).normalized()
+  var value:float=step.normalized().dot(away)+step.normalized().dot(previous)*.8
+  if value>score:best=candidate;score=value
+ if best.distance_to(position)>=wanted.length()*.5:
+  memory.heading=(best-position).normalized();memory.hold=.55
+ else:memory.clear()
+ return best

@@ -5,6 +5,7 @@ signal contracts_requested165
 signal acknowledged(quest_id:String)
 signal closed
 signal accepted(quest_id:String)
+signal animals_delivered249(quest_id:String)
 func setup(npc:Dictionary,states:Dictionary):
  add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("6d9b94"),12))
  position=Vector2(300,180);size=Vector2(680,460);z_index=100;mouse_filter=Control.MOUSE_FILTER_STOP
@@ -24,6 +25,14 @@ func setup(npc:Dictionary,states:Dictionary):
  body.name="QuestBody"
  body.text=RegionalVillages123.THANKS if finished123 else q.text if s.status=="locked" else (q.done if s.status=="done" else q.active+" · %d/%d"%[s.count,q.goal]);add_child(body)
  var yes=Button.new();yes.position=Vector2(24,275);yes.size=Vector2(280,52);yes.text="Aceptar encargo";yes.visible=s.status=="locked";QuestButtonStyle.apply(yes);add_child(yes);yes.pressed.connect(func():accepted.emit(id))
+ if npc.id=="farmer" and q.kind=="capture_animal" and not finished123:
+  var available_:int=TownJobs249.inventory(q.target)
+  var word:String="cerdos" if q.target=="pig" else "cabras"
+  body.text=("Veo que tienes %d %s. Me vendrían bien %d. ¿Me vendes %d por %d puntos?"%[available_,word,q.goal,q.goal,int(q.goal)*40]) if available_>=int(q.goal) else "Necesito %d %s. Puedes capturarlos con el lazo. Tienes %d; vuelve cuando los tengas."%[q.goal,word,available_]
+  if available_>=int(q.goal):
+   yes.visible=true;yes.text="Vender %d %s"%[q.goal,word]
+   for connection in yes.pressed.get_connections():yes.pressed.disconnect(connection.callable)
+   yes.pressed.connect(func():animals_delivered249.emit(id))
  if npc.id=="florist" and not finished123:
   if npc.has("town_id123"):
    var flower=TextureRect.new();flower.texture=RegionalFlowerField123.FLOWERS[RegionalVillages123.PROFILES[npc.profile123].quest_flower];flower.position=Vector2(24,340);flower.size=Vector2(75,75);flower.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;flower.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;add_child(flower)
@@ -31,7 +40,7 @@ func setup(npc:Dictionary,states:Dictionary):
   else:
    var flower=FlowerQuestGlyph105.new();flower.position=Vector2(24,345);flower.color=WorldFlowers105.color_for(id);flower.caption="Recoge al pasar por encima";add_child(flower)
  var back=Button.new();back.position=Vector2(355,275);back.size=Vector2(295,52);back.text="Seguir explorando" if finished123 else "Ahora no" if s.status=="locked" else ("Gracias · continuar" if s.status=="done" else "Seguir explorando");QuestButtonStyle.apply(back);add_child(back);back.pressed.connect(func():
-  if s.status=="done":acknowledged.emit(id)
+  if s.status=="done" and not (npc.id=="farmer" and q.kind=="capture_animal"):acknowledged.emit(id)
   closed.emit())
 
 func add_sale104()->void:

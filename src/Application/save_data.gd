@@ -52,6 +52,8 @@ var world_cousins140:Dictionary={} # Four-town journal, separate additive V3 sta
 var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk indexed at runtime.
 var world_garden212:Dictionary=Garden212.fresh()
 var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
+var world_jobs249:Dictionary={}
+var world_goats_given249:int=0
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
 var world_pigs: Array[String] = []  # captured pig-pen ids ("pig_cx_cy")
@@ -119,6 +121,8 @@ func _save_progress242() -> bool:
 	config.set_value("world", "tamed", world_tamed)
 	config.set_value("world", "position", world_position)
 	config.set_value("world", "quests", world_quests)
+	config.set_value("world","jobs249",world_jobs249)
+	config.set_value("world","goats_given249",world_goats_given249)
 	config.set_value("world","flora138",world_flora138)
 	config.set_value("world","garden212",world_garden212)
 	config.set_value("world","roaming139",world_roaming139)
@@ -171,7 +175,7 @@ func load_progress() -> void:
 	world_position = Vector2(0, 160)
 	rodeo_intro240=false
 	victories240=ModeVictories240.fresh();_issued240=0;pending_victory240.clear()
-	world_quests.clear()
+	world_quests.clear();world_jobs249.clear();world_goats_given249=0
 	world_flora138.clear()
 	world_garden212=Garden212.fresh()
 	world_roaming139.clear()
@@ -248,6 +252,8 @@ func load_progress() -> void:
 		_load_valid=false;return
 	victories240=victory_raw.duplicate(true);_issued240=victories240.last;pending_victory240.clear()
 	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
+	world_jobs249=TownJobs249.clean(config.get_value("world","jobs249",{}),world_seed)
+	world_goats_given249=clampi(int(config.get_value("world","goats_given249",0)),0,world_goat_captures.size())
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
 	var garden_raw:Variant=config.get_value("world","garden212",{})
 	if not garden_raw is Dictionary or (not garden_raw.is_empty() and garden_raw.get("version",0)!=Garden212.VERSION):
@@ -421,7 +427,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
@@ -700,10 +706,39 @@ func claim_repeat_contract165()->int:
 	if save_progress():return reward
 	repeat_contract165=before;equipment_points=points;horse_collection.restore(horses);return 0
 func can_capture_animal165(target:String)->bool:
-	if NpcQuests.can_capture(world_quests,target):return true
-	if target not in ["pig","goat"]:return false
-	if int(repeat_contract165.completed)>=(1 if target=="pig" else 2):return true
-	return (repeat_contract165.active or repeat_contract165.ready) and ProgressionEconomy165.target(repeat_contract165)==target
+	return target in ["pig","goat"]
+
+## Inventory is spent exactly once, in the same save as points and completion.
+func _deliver_job249(id:String,q:Dictionary,legacy:bool=false)->bool:
+	var states:Dictionary=world_quests if legacy else world_jobs249
+	var state_:Dictionary=NpcQuests.state(states,id)
+	if state_.get("thanked",false):return false
+	if not TownJobs249.ready(q,state_):return false
+	var before:Dictionary=states.duplicate(true);var points:int=equipment_points
+	var sold:int=world_pigs_sold;var goats:int=world_goats_given249
+	if q.kind=="capture_animal":
+		var from_:int=sold if q.target=="pig" else goats
+		var captures:Array=world_pig_captures if q.target=="pig" else world_goat_captures
+		var events:Array=captures.slice(from_,from_+int(q.goal))
+		states[id]={"status":"done","count":int(q.goal),"events":events,"thanked":true}
+		if q.target=="pig":world_pigs_sold+=int(q.goal)
+		else:world_goats_given249+=int(q.goal)
+	else:NpcQuests.acknowledge(states,id)
+	equipment_points+=int(q.get("reward",120))
+	if save_progress():return true
+	if legacy:world_quests=before
+	else:world_jobs249=before
+	equipment_points=points;world_pigs_sold=sold;world_goats_given249=goats
+	return false
+func deliver_town_job249(town:String,role:String)->bool:
+	var q:=TownJobs249.job(world_seed,town,role)
+	return false if q.is_empty() else _deliver_job249(TownJobs249.key(town,role),q)
+func deliver_legacy_animals249(id:String)->bool:
+	if not NpcQuests.QUESTS.has(id):return false
+	var q:Dictionary=NpcQuests.QUESTS[id].duplicate(true)
+	if q.kind!="capture_animal" or q.npc!="farmer":return false
+	q["reward"]=int(q.goal)*40
+	return _deliver_job249(id,q,true)
 
 func buy_finish168(style:String)->bool:
 	var id:String="finish_"+style

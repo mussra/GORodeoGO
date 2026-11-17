@@ -366,9 +366,12 @@ func _toast(text: String,replace_key:String="") -> void:
 func _update_chunks() -> void:
 	_snapshot_roaming139()
 	var pc: Vector2i = WorldMap.chunk_at(player.position)
-	for dx in range(-1, 2):
-		for dy in range(-1, 2):
+	var radius249:int=_spawn_radius249()
+	for dx in range(-radius249, radius249+1):
+		for dy in range(-radius249, radius249+1):
 			_activate_or_queue(pc.x + dx, pc.y + dy)
+	for dx in range(-1,2):
+		for dy in range(-1,2):_discover_chunk249(pc+Vector2i(dx,dy))
 	# Pregeneración: la manzana hacia la que cabalga el jinete se construye antes.
 	if is_instance_valid(player) and player.velocity.length() > 30.0:
 		var ahead: Vector2i = WorldMap.chunk_at(player.position + player.velocity * CHUNK_LOOKAHEAD_SECONDS)
@@ -379,7 +382,7 @@ func _update_chunks() -> void:
 					_queue_build(c.x, c.y)
 	for key in _chunks.keys():
 		var c: Vector2i = _chunks[key].get_meta("c")
-		if absi(c.x - pc.x) > 2 or absi(c.y - pc.y) > 2:
+		if absi(c.x - pc.x) > _spawn_radius249()+1 or absi(c.y - pc.y) > _spawn_radius249()+1:
 			_chunks[key].queue_free()
 			_chunks.erase(key)
 			for e in _chunk_entities.get(key, []):
@@ -402,7 +405,7 @@ func _update_chunks() -> void:
 func _drop_far(pc: Vector2i, store: Dictionary) -> void:
 	for key in store.keys():
 		var b: Dictionary = store[key]
-		if absi(int(b["cx"]) - pc.x) > 2 or absi(int(b["cy"]) - pc.y) > 2:
+		if absi(int(b["cx"]) - pc.x) > _spawn_radius249()+1 or absi(int(b["cy"]) - pc.y) > _spawn_radius249()+1:
 			_discard_builder(b)
 			store.erase(key)
 			_build_queue.erase(key)
@@ -455,7 +458,7 @@ func _step_chunk_build() -> void:
 		_chunk_built[key] = b
 		_build_queue.pop_front()
 		var pc: Vector2i = WorldMap.chunk_at(player.position)
-		if absi(int(b["cx"]) - pc.x) <= 1 and absi(int(b["cy"]) - pc.y) <= 1:
+		if absi(int(b["cx"]) - pc.x) <= _spawn_radius249() and absi(int(b["cy"]) - pc.y) <= _spawn_radius249():
 			_activate_built(key)
 
 ## Un micro-paso de construcción por llamada; el drenaje repite hasta gastar el
@@ -615,6 +618,15 @@ func _activate_built(key: String) -> void:
 	_chunks[key] = b["node"]
 	_chunk_entities[key] = entities
 	_resume_roaming139()
+	(b["node"] as Node).set_meta("herd249",herd)
+	var pc249:Vector2i=WorldMap.chunk_at(player.position)
+	if absi(cx-pc249.x)<=1 and absi(cy-pc249.y)<=1:_discover_chunk249(Vector2i(cx,cy))
+
+func _discover_chunk249(c:Vector2i)->void:
+	var key:String=WorldMap.chunk_key(c.x,c.y)
+	if not _chunks.has(key) or SaveData.world_discovered.has(key):return
+	var herd:Dictionary=_chunks[key].get_meta("herd249",{})
+	var mission_id:String=WorldMap.herd_mission_id(c.x,c.y)
 	if not SaveData.world_discovered.has(key):
 		SaveData.mark_world_discovered(key)
 		if not herd.is_empty() and not SaveData.world_tamed.has(mission_id) and not SaveData.world_missions.has(mission_id):
@@ -780,6 +792,7 @@ func _deliver_horse(c: Vector2i, horse: Node2D) -> void:
 	if herd.has("member_index"):h["id"]+="_"+str(herd.member_index)
 	h["name"] = SaveData.horse_collection.suggest_name(traits)
 	SaveData.horse_collection.horses.append(h)
+	TownJobs249.record("tame_horse","horse",str(herd.get("member_id",mission_id)))
 	WorldMissions.complete(mission_id)
 	_audio.play("return")
 	horse.queue_free()
@@ -1255,6 +1268,9 @@ func _open_npc(data:Dictionary)->void:
 		_close_npc();player.cancel_input();player.set_physics_process(false)
 		var contracts:=RepeatContractsPanel165.new();_npc_dialog=contracts;_hud.add_child(contracts);contracts.closed.connect(_close_npc))
 	_npc_dialog.closed.connect(_close_npc)
+	if _npc_dialog is NpcDialog:_npc_dialog.animals_delivered249.connect(func(id:String):
+		_toast("Gracias. Encargo entregado y recompensa guardada." if SaveData.deliver_legacy_animals249(id) else "No se ha podido guardar la entrega. Conservas tus animales.")
+		_refresh_livestock104();_close_npc())
 	_npc_dialog.pigs_sold104.connect(func(count:int,price:int):
 		var sale:Dictionary=SaveData.sell_pigs104(count,price)
 		_toast(tr("WORLD_PIG_SOLD104") % [sale.count,sale.total] if not sale.is_empty() else tr("WORLD_SAVE_FAILED104"))
@@ -1283,7 +1299,7 @@ func _refresh_quest_hud()->void:
 			_quest_label.text+="\n"+("Misión de Rodeo disponible en Menú de Frontera." if ModeAccess240.rodeo_offered(SaveData.world_quests) else "Para descubrir Rodeo: ayuda al granjero con tres cerdos.")
 		elif not SaveData.mode_open240("race"):_quest_label.text+="\n"+ModeAccess240.requirement("race")
 		if SaveData.world_generator_version>=3 and not SaveData.world_flora138.is_empty():_quest_label.text+="\n"+FloristJourney138.hud(SaveData.world_flora138)
-	if is_instance_valid(_quest_details179):_quest_details179.update_states(SaveData.world_quests,SaveData.repeat_contract165,SaveData.world_flora138 if SaveData.world_generator_version>=3 else {})
+	if is_instance_valid(_quest_details179):_quest_details179.update_states(SaveData.world_quests,SaveData.repeat_contract165,SaveData.world_flora138 if SaveData.world_generator_version>=3 and SaveData.world_generator_version<6 else {})
 	if not is_instance_valid(_flower_strip105):return
 	var signature:int=hash(SaveData.world_quests)
 	if signature==_flower_hud_signature105:return
@@ -1298,6 +1314,7 @@ func _tick_npcs()->void:
 	_npc_button.visible=player.position.distance_to(nearest.position)<155.0
 	_npc_button.text="Hablar con "+str(nearest.name).to_lower()
 	_tick_flowers105()
+	_tick_jobs249()
 	if SaveData.world_generator_version<6:_tick_flora138()
 	var triggered246:Array=NpcQuests.activate_triggers(SaveData.world_quests,player.position)
 	for id in triggered246:
@@ -1601,15 +1618,33 @@ func _open_service231(id:String)->void:
 
 func _open_town234(data:Dictionary):
 	_sync_mount237()
+	if TownJobs249.legacy_pending(data.town234,data.role234):
+		for original in _legacy_npcs234():
+			if original.id==data.role234:_open_npc(original);return
 	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>180.:return
 	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false)
-	var conversation247:Dictionary=TownMessages247.open(SaveData.world_seed,SaveData.world_cousins140,data.town234,data.role234)
+	var conversation247:Dictionary=TownMessages247.after_job249(SaveData.world_seed,SaveData.world_cousins140,data.town234,data.role234) if TownJobs249.delivered(data.town234,data.role234) else {"state":SaveData.world_cousins140,"target":"","relayed":"","complete":false}
 	if conversation247.state!=SaveData.world_cousins140:
 		if not SaveData.commit_cousins140(conversation247.state,player.position):_toast("El recado no se ha guardado. Podrás volver a escucharlo.")
 	var dialog:=TownDialog234.new();dialog.town=data.town234;dialog.role=data.role234;dialog.energy237=_stamina.duplicate(true);dialog.conversation247=conversation247;_hud.add_child(dialog);_npc_dialog=dialog
 	dialog.closed.connect(_close_npc)
+	dialog.job_action249.connect(func(action:String):
+		var q:=TownJobs249.job(SaveData.world_seed,data.town234,data.role234)
+		var id:=TownJobs249.key(data.town234,data.role234)
+		if action=="deliver":
+			_toast("Gracias. Encargo entregado y recompensa guardada." if SaveData.deliver_town_job249(data.town234,data.role234) else "No se ha podido guardar la entrega. Conservas tu progreso.")
+		elif action=="accept":
+			var before:=SaveData.world_jobs249.duplicate(true)
+			if NpcQuests.accept(SaveData.world_jobs249,id,{id:q}):
+				if not SaveData.save_world_state(player.position):SaveData.world_jobs249=before;_toast("No se pudo guardar el encargo");return
+				_toast(q.active)
+		_close_npc()
+		if action=="map":_toggle_map()
+		else:_open_town234.call_deferred(data))
 	dialog.recommend_requested.connect(func(target:String):
 		var next:=SaveData.world_cousins140.duplicate(true);next.revealed215[target]=true;next.known[data.town234]=true;next.hint215=target
+		if not next.get("routes249") is Dictionary:next["routes249"]={}
+		next.routes249[TownJobs249.key(data.town234,data.role234)]={"town":data.town234,"role":data.role234,"target":target}
 		if SaveData.commit_cousins140(next,player.position):_toast("Destino: "+TownIdentity215.display_name248(next,target)+" · marcado en el minimapa")
 		else:_toast("No se pudo guardar el destino")
 		_close_npc())
@@ -1636,3 +1671,26 @@ func _sync_mount237():
 		_stamina=_energy_by_horse237.get(id,WorldStamina.new_state(HorseStats.read(horse).power)).duplicate(true)
 		_mounted_id237=id
 	_mounted_look237=signature;player.refresh_mount237()
+
+var _job_nodes249:Dictionary={}
+func _tick_jobs249()->void:
+	if SaveData.world_generator_version<6:return
+	var live:Dictionary={}
+	for item in TownJobs249.objective_points():
+		if player.position.distance_squared_to(item.pos)>pow(1900.,2):continue
+		live[item.event]=true
+		if not _job_nodes249.has(item.event):
+			var glyph:=WorldFlowerTarget105.new();glyph.position=item.pos;glyph.color=Color("68cfff") if item.kind=="collect_flower" else Color("f6c75b");glyph.set_meta("waypoint249",item.kind=="visit_gate");add_child(glyph);_job_nodes249[item.event]=glyph
+		if player.position.distance_to(item.pos)>(35. if item.kind=="collect_flower" else 85.):continue
+		var before:=SaveData.world_jobs249.duplicate(true)
+		var changed:=TownJobs249.record(item.kind,item.target,item.event)
+		if not changed.is_empty():
+			if not SaveData.save_world_state(player.position):SaveData.world_jobs249=before;continue
+			_toast("Objetivo cumplido. Vuelve a quien te dio el encargo." if NpcQuests.state(SaveData.world_jobs249,item.id).status=="done" else "Flor recogida · %d/3"%NpcQuests.state(SaveData.world_jobs249,item.id).count)
+			_refresh_quest_hud()
+	for event in _job_nodes249.keys():
+		if live.has(event):continue
+		_job_nodes249[event].queue_free();_job_nodes249.erase(event)
+
+func _spawn_radius249()->int:
+	return WorldCamera243.spawn_radius249(_camera_controls243.factor) if is_instance_valid(_camera_controls243) else 1

@@ -112,3 +112,12 @@ func test_wide_manual_zoom_has_nine_levels_and_restores_decor():
  world._camera_controls243.set_factor(1.,false)
  assert_true(decor.visible)
  assert_false(is_instance_valid(world._camera_controls243.overview246))
+
+func test_arrival_h1_uses_display_name_and_fades_in_then_out():
+ arrival.begin(plan());assert_eq(arrival.title.modulate.a,0.)
+ assert_eq(arrival.title.text,TownIdentity215.display_name248(SaveData.world_cousins140,plan().id))
+ assert_gte(arrival.title.get_theme_font_size("font_size"),44)
+ arrival.elapsed=.35;arrival.apply_frame();assert_almost_eq(arrival.title.modulate.a,.5,.01)
+ arrival.elapsed=1.5;arrival.apply_frame();assert_eq(arrival.title.modulate.a,1.)
+ arrival.elapsed=3.4;arrival.apply_frame();assert_almost_eq(arrival.title.modulate.a,0.,.001)
+ arrival.finish(true);assert_false(arrival.title.visible)

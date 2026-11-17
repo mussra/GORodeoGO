@@ -2,6 +2,7 @@ extends GutTest
 var world:Node2D
 var previous:String
 func before_each():
+ SaveData.world_herd_town217={};SaveData.world_garden212=Garden212.fresh()
  previous=SaveData.save_path;SaveData.save_path="user://repeat167.dat";SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_position=WorldNominal98.home();SaveData.world_edits=[];SaveData.world_roaming139={};SaveData.country_ledger146={};SaveData.world_missions={};SaveData.world_quests={};SaveData.world_discovered=[];SaveData.world_places144={};SaveData.world_cousins140={};SaveData.world_flora138={};SaveData.world_pig_captures=[];SaveData.world_goat_captures=[];SaveData.world_pigs_sold=0;SaveData.repeat_contract165=ProgressionEconomy165.new_contract();SaveData.equipment_points=0;SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial()
  world=load("res://src/Presentation/frontier_world.gd").new();add_child(world)
  while world._loading_world:await get_tree().process_frame

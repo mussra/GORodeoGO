@@ -47,3 +47,17 @@ static func direction248(from:Vector2,to:Vector2)->String:
  if absf(gap.x)<absf(gap.y)*.4:return vertical
  if absf(gap.y)<absf(gap.x)*.4:return horizontal
  return ("nor" if vertical=="norte" else "sur")+horizontal
+
+## New recommendations follow a completed, returned job. An absent office does
+## not speak for another one or mark that other office's work as delivered.
+static func after_job249(seed_:int,state:Dictionary,town:String,role:String)->Dictionary:
+ var next:=state.duplicate(true)
+ if not next.get('heard247') is Dictionary:next['heard247']={}
+ next.heard247[key(town,role)]='direct'
+ var node:=TownNetwork234.node_for(seed_,town)
+ var target:String=node.get('targets',{}).get(role,'')
+ if not target.is_empty() and TownJobs249.delivered(target,role):target=''
+ if target.is_empty():
+  for candidate in TownNetwork234.base_nodes(seed_).values():
+   if candidate.id!=town and role in candidate.roles and not TownJobs249.delivered(candidate.id,role):target=candidate.id;break
+ return {'state':next,'target':target,'relayed':'','complete':target.is_empty()}

@@ -16,4 +16,7 @@ func _draw()->void:
  draw_circle(Vector2.ZERO,46.+sin(pulse*2)*3,Color(color,.14))
  draw_arc(Vector2.ZERO,42.,0,TAU,48,Color(color,.7),2.,true)
  draw_line(Vector2(0,4),Vector2(0,18),Color("38754c"),4.)
- glyph(self,Vector2(0,-7),15.,color)
+ if get_meta("waypoint249",false):
+  draw_line(Vector2(0,5),Vector2(0,-40),Color("6f5130"),5.)
+  draw_colored_polygon(PackedVector2Array([Vector2(0,-40),Vector2(34,-29),Vector2(0,-17)]),color)
+ else:glyph(self,Vector2(0,-7),15.,color)

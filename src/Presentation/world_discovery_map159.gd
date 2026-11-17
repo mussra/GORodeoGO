@@ -110,18 +110,18 @@ func _ensure_terrain() -> void:
 func _layout() -> void:
  var viewport: Vector2 = get_viewport_rect().size
  var previous_size:Vector2=size
- size = Vector2(minf(700, viewport.x - 80), minf(470, viewport.y - 105)) if expanded else Vector2(180, 112)
+ size = Vector2(minf(1060, viewport.x - 60), minf(620, viewport.y - 90)) if expanded else Vector2(180, 112)
  position = (viewport - size) / 2.0 if expanded else Vector2(18, minimap_top159())
  if size!=previous_size:_terrain_valid=false
- if _sites144!=null:_sites144.visible=expanded;_sites144.size=Vector2(170,56)
- if _notes162!=null:_notes162.visible=expanded;_notes162.position=Vector2(200,16);_notes162.size=Vector2(104,56)
+ if _sites144!=null:_sites144.visible=expanded;_sites144.size=Vector2(220,56)
+ if _notes162!=null:_notes162.visible=expanded;_notes162.position=Vector2(252,16);_notes162.size=Vector2(104,56)
  if _find108!=null:
   _find108.visible=expanded;_find108.position=Vector2(size.x-380,16);_find108.size=Vector2(272,56)
  if _zoom_btns.size()==2:
   _zoom_btns[0].position=Vector2(24,size.y-76);_zoom_btns[1].position=Vector2(size.x-88,size.y-76)
  if _zoom_slider106!=null:
   _zoom_slider106.position=Vector2(105,size.y-64);_zoom_slider106.size=Vector2(size.x-210,40)
-  _note_help106.visible=expanded;_note_help106.position=Vector2(96,size.y-24);_note_help106.size=Vector2(size.x-192,20);_note_help106.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+  _note_help106.visible=expanded;_note_help106.position=Vector2(96,size.y-33);_note_help106.size=Vector2(size.x-192,20);_note_help106.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
   _zoom_slider106.visible=expanded;_zoom_label106.position=Vector2(size.x/2.-40,size.y-98);_zoom_label106.visible=expanded
 
 func _process(delta: float) -> void:
@@ -293,6 +293,12 @@ func _cells() -> Dictionary:
   out.cells.append(c)
   mins = Vector2i(mini(mins.x, c.x), mini(mins.y, c.y))
   maxs = Vector2i(maxi(maxs.x, c.x), maxi(maxs.y, c.y))
+ if expanded:
+  var targets:Dictionary=TownRoutes249.destinations(SaveData.world_cousins140)
+  if not str(SaveData.world_cousins140.get("hint215","")).is_empty():targets[SaveData.world_cousins140.hint215]=[]
+  for id in targets:
+   var c:Vector2i=WorldMap.chunk_at(TownRoutes249.position_for(SaveData.world_cousins140,id))
+   mins=Vector2i(mini(mins.x,c.x-2),mini(mins.y,c.y-2));maxs=Vector2i(maxi(maxs.x,c.x+2),maxi(maxs.y,c.y+2))
  mins = Vector2i(mini(mins.x, 0), mini(mins.y, 0))
  maxs = Vector2i(maxi(maxs.x, 0), maxi(maxs.y, 0))
  out.mins = mins
@@ -355,7 +361,7 @@ func _draw_fields138(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
    for i in segment.size()-1:_terrain.draw_line(_to_map(segment[i],mins,cell,origin),_to_map(segment[i+1],mins,cell,origin),Color("bb9460"),maxf(1.,cell*.03))
  if not SaveData.world_cousins140.is_empty():
   for id in TownEnclosures227.cousin_ids231():
-   var cousin:Vector2=VillageCousins140.point(SaveData.world_cousins140,id)
+   var cousin:Vector2=TownRoutes249.position_for(SaveData.world_cousins140,id)
    var lane:=PackedVector2Array([Vector2(cousin.x,470),cousin])
    for segment in Geometry2D.intersect_polyline_with_polygon(lane,clip):
     for i in segment.size()-1:_terrain.draw_line(_to_map(segment[i],mins,cell,origin),_to_map(segment[i+1],mins,cell,origin),Color("bb9460"),maxf(1.,cell*.03))
@@ -397,8 +403,8 @@ func _draw_markers108()->void:
     if expanded and str(note.id)==_selected_note162:_markers108.draw_arc(point,15.+sin(_pulse*3.)*2.,0,TAU,32,Color("fff1d2"),3.)
     _markers108.draw_circle(point,8.,Color("f2bc51"));_markers108.draw_circle(point,3.,Color("413126"))
  for id in TownIdentity215.known_ids(SaveData.world_cousins140):
-  var active:bool=SaveData.world_cousins140.get("hint215","")==id
-  var true_point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),mins,cell,origin)
+  var active:bool=SaveData.world_cousins140.get("hint215","")==id or TownRoutes249.destinations(SaveData.world_cousins140).has(id)
+  var true_point:Vector2=_to_map(TownRoutes249.position_for(SaveData.world_cousins140,id),mins,cell,origin)
   if not active and not Rect2(Vector2(22,22),_clip106.size-Vector2(44,44)).has_point(true_point):continue
   var point:Vector2=_town_marker215(id)
   var icon_size:=Vector2(44,32) if expanded else Vector2(26,19)
@@ -410,11 +416,29 @@ func _draw_markers108()->void:
    _markers108.draw_line(point+direction*23.,point+direction*30.,Color("fff0bf"),3.)
    _markers108.draw_colored_polygon(PackedVector2Array([point+direction*34.,point+direction*27.+direction.orthogonal()*4.,point+direction*27.-direction.orthogonal()*4.]),Color("fff0bf"))
   if expanded and active:
-   var name_:String=TownIdentity215.title(SaveData.world_cousins140,id)
+   var name_:String=TownIdentity215.display_name248(SaveData.world_cousins140,id)
    var font:=get_theme_default_font();var width:float=font.get_string_size(name_,HORIZONTAL_ALIGNMENT_LEFT,-1,16).x
    var at:=Vector2(clampf(point.x-width*.5,4.,maxf(4.,_clip106.size.x-width-4.)),clampf(point.y+33.,18.,_clip106.size.y-4.))
+   if point.y>_clip106.size.y-75.:at.y=point.y-46.
    _markers108.draw_rect(Rect2(at-Vector2(4,17),Vector2(width+8,23)),Color("18302c"))
    _markers108.draw_string(font,at,name_,HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff0bf"))
+   var source_:String=TownRoutes249.source_label(SaveData.world_cousins140,id)
+   if not source_.is_empty():
+    # Short office labels are visible on the map; full origin in the tapped sheet.
+    var roles_:PackedStringArray=[]
+    for route in TownRoutes249.clean(SaveData.world_cousins140.get("routes249",{}),SaveData.world_seed).values():
+     if route.target==id and TownNetwork234.NAMES[route.role] not in roles_:roles_.append(TownNetwork234.NAMES[route.role])
+    if roles_.is_empty():
+     for source in TownRoutes249.destinations(SaveData.world_cousins140).get(id,[]):roles_.append(str(source).get_slice(" de ",0))
+    var from_:String="Te envía: "+" / ".join(roles_)
+    var w:float=font.get_string_size(from_,HORIZONTAL_ALIGNMENT_LEFT,-1,15).x
+    var at2:=Vector2(clampf(point.x-w*.5,4.,maxf(4.,_clip106.size.x-w-4.)),clampf(at.y+24.,18.,_clip106.size.y-4.))
+    _markers108.draw_rect(Rect2(at2-Vector2(4,16),Vector2(w+8,22)),Color("18302c"))
+    _markers108.draw_string(font,at2,from_,HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("f2c86d"))
+ for item in job_points249():
+  var point:Vector2=_to_map(item.pos,mins,cell,origin)
+  _markers108.draw_circle(point,6.,Color("68cfff") if item.kind=="collect_flower" else Color("f2c86d"))
+  _markers108.draw_arc(point,8.,0,TAU,16,Color("10252d"),2.)
  MapPlayerMarker99.draw(_markers108,ppos,world.player.velocity,_pulse)
 
 func _draw_trails(c: Vector2i, mins: Vector2i, cell: float, origin: Vector2, r: Rect2) -> void:
@@ -522,21 +546,21 @@ func center_note162(note:Dictionary)->void:
  pan+=_map_geometry.area.get_center()-point;_note_pan162=pan;_terrain_valid=false;_ensure_terrain();queue_redraw()
 
 func _town_marker215(id:String)->Vector2:
- var point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin-_map_geometry.area.position)
+ var point:Vector2=_to_map(TownRoutes249.position_for(SaveData.world_cousins140,id),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin-_map_geometry.area.position)
  return point.clamp(Vector2(26,24),(_clip106.size-Vector2(26,28)).max(Vector2(26,24)))
 func _show_town215(id:String):
- var sheet:=NavigationSheet.new();sheet.title=TownIdentity215.title(SaveData.world_cousins140,id)
- sheet.entries=[{"id":"focus215","title":"Ver destino en el mapa","hint":"La pista no descubre terreno ni permite la primera siesta"}]
+ var sheet:=NavigationSheet.new();sheet.title=TownIdentity215.display_name248(SaveData.world_cousins140,id)
+ sheet.entries=[{"id":"focus215","title":"Ver destino en el mapa","hint":TownRoutes249.source_label(SaveData.world_cousins140,id) if not TownRoutes249.source_label(SaveData.world_cousins140,id).is_empty() else "Destino conocido · sigue el camino"}]
  if SaveData.world_places144.get("visited",{}).get(id,false):sheet.entries.append({"id":"sleep215","title":"Ir con una siesta","hint":"Pueblo visitado · conserva el avance de media ruta"})
  sheet.selected.connect(func(action:String):
   if action=="sleep215":choose159(id)
-  else:center_note162({"id":"town215:"+id,"pos":VillageCousins140.point(SaveData.world_cousins140,id)}))
+  else:center_note162({"id":"town215:"+id,"pos":TownRoutes249.position_for(SaveData.world_cousins140,id)}))
  world._hud.add_child(sheet)
  var icon:=TownIcon215.new();icon.look=TownIdentity215.look(SaveData.world_cousins140,id);icon.position=Vector2(570,560);icon.size=Vector2(140,100);sheet.canvas.add_child(icon)
 
 func _town_visible215(id:String)->bool:
  if SaveData.world_cousins140.get("hint215","")==id:return true
- var point:Vector2=_to_map(VillageCousins140.point(SaveData.world_cousins140,id),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin-_map_geometry.area.position)
+ var point:Vector2=_to_map(TownRoutes249.position_for(SaveData.world_cousins140,id),_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin-_map_geometry.area.position)
  return Rect2(Vector2(22,22),_clip106.size-Vector2(44,44)).has_point(point)
 
 func _draw_walls227(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
@@ -546,3 +570,5 @@ func _draw_walls227(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
    _terrain.draw_line(_to_map(ridge.a,mins,cell,origin),_to_map(ridge.b,mins,cell,origin),Color(look.base),maxf(1.,TownEnclosures227.THICKNESS/1024.*cell),true)
   else:
    var box:Rect2=ridge.box;_terrain.draw_rect(Rect2(_to_map(box.position,mins,cell,origin),Vector2(maxf(1.,box.size.x/1024.*cell),maxf(1.,box.size.y/1024.*cell))),Color(look.base))
+
+func job_points249()->Array:return TownJobs249.objective_points()

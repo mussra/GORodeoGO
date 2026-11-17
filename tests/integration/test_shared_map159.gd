@@ -1,12 +1,21 @@
 extends GutTest
 var world:CountrySession152
 var previous:String
+var saved249:Dictionary={}
+var horses249:Dictionary={}
 func before_each():
+ for property in SaveData.get_script().get_script_property_list():
+  var value:Variant=SaveData.get(property.name);saved249[property.name]=value.duplicate(true) if value is Dictionary or value is Array else value
+ horses249=SaveData.horse_collection.export_state().duplicate(true)
+ SaveData.world_herd_town217={};SaveData.world_garden212=Garden212.fresh();SaveData.repeat_contract165=ProgressionEconomy165.new_contract();SaveData.world_cousins140={};SaveData.world_jobs249={}
+
  previous=SaveData.save_path;SaveData.save_path="user://shared159.dat";SaveData._load_valid=true;SaveData.trial_session_active=false;SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.world_position=WorldNominal98.home();SaveData.country_ledger146={};SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.world_notes106={"0,0":[{"id":"frontier_note","pos":Vector2(100,100),"text":"Keep original world","icon":"pin","horse":"","photo":""}]};SaveData.save_progress()
  world=CountrySession152.new();world.session_state=CountryLedger146.enter(CountryLedger146.fresh(752026,3),SaveData.world_position,752026);add_child(world);await get_tree().physics_frame;world.activate152();world.player.set_physics_process(false);world.set_process(false);world._process(0.)
 func after_each():
  if is_instance_valid(world):world.free()
  SaveData._load_valid=true;SaveData.country_ledger146={};SaveData.save_path=previous;DirAccess.remove_absolute("user://shared159.dat");await get_tree().process_frame
+ for key in saved249:SaveData.set(key,saved249[key])
+ SaveData.horse_collection.restore(horses249)
 func test_frontier_alias_and_country_use_one_map_class_with_same_controls():
  var frontier=load("res://src/Presentation/frontier_world.gd");var original=frontier.DiscoveryMap.new();assert_true(original is WorldDiscoveryMap159);original.free()
  var map:=world._map_overlay;assert_true(map is WorldDiscoveryMap159);assert_false(map.expanded);assert_true(map.visible);world.show_map();map._process(.01)

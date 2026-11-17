@@ -1,0 +1,49 @@
+{
+  "version": "2.7.179",
+  "code": 438,
+  "package": "com.example.rancho.review",
+  "sha256": "8387d2e27c81b335917be8ec5503dc4d64966d7c4e7ae5e912f9ce706cd6636b",
+  "bytes": 82743751,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "physical_android": false,
+  "tests": {
+    "passed": 250,
+    "total": 250,
+    "assertions": 41748,
+    "scripts": 43,
+    "deprecations": 4,
+    "latest_exit_object_warning": false,
+    "earlier_run_warning": "2 ObjectDB instances at shutdown; not present in latest full run",
+    "intentional_errors": "Save-failure rollback tests intentionally log save error 7",
+    "other_warnings": "GUT font UID fallback to text path"
+  },
+  "zoom_min": 0.05,
+  "max_chunk_radius": 3,
+  "perf_file": "review179/perf249.json",
+  "pig_reproduction": {
+    "before": {
+      "hz": 60,
+      "net_distance": 410.876281738281,
+      "path_length": 675.03284740448,
+      "sprite_flips": 145,
+      "steps": 180,
+      "wall_crossings": 0
+    },
+    "after": {
+      "hz": 60,
+      "net_distance": 416.162628173828,
+      "path_length": 675.005232810974,
+      "sprite_flips": 3,
+      "steps": 180,
+      "wall_crossings": 0
+    }
+  },
+  "caveats": [
+    "Desktop software-rendered measurements, not Android FPS",
+    "Expansion to 49 chunks had a 131.492 ms frame peak; physics peak 1.087 ms",
+    "Exact mobile wall pin not reproduced; controlled fixture tests facing jitter",
+    "Home farmer/florist preserve original two-job unlock sequence",
+    "Visual harness warns of resources at shutdown"
+  ],
+  "no_main_or_store": true
+}

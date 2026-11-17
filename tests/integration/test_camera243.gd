@@ -13,10 +13,10 @@ func after_each():
 func test_steps_clamp_and_reset_do_not_change_physics():
  controls.step(-1);assert_almost_eq(controls.factor,.85,.001)
  controls.step(-1);assert_almost_eq(controls.factor,.75,.001)
- controls.set_factor(.25,false);controls.step(-1);assert_almost_eq(controls.factor,.25,.001);assert_true(controls.minus.disabled)
- controls.step(1);assert_almost_eq(controls.factor,.35,.001)
+ controls.set_factor(.05,false);controls.step(-1);assert_almost_eq(controls.factor,.05,.001);assert_true(controls.minus.disabled)
+ controls.step(1);assert_almost_eq(controls.factor,.1,.001)
  controls.set_factor(5.,false);assert_eq(controls.camera.zoom,Vector2.ONE*1.5);assert_true(controls.plus.disabled)
- controls.set_factor(-2.,false);assert_eq(controls.camera.zoom,Vector2.ONE*.25)
+ controls.set_factor(-2.,false);assert_eq(controls.camera.zoom,Vector2.ONE*.05)
  assert_true(world.is_physics_processing())
 func test_minimum_covers_loaded_chunks_at_edges_and_ultrawide():
  for extent in [Vector2(1280,720),Vector2(1600,720),Vector2(1848,720),Vector2(720,1280)]:
@@ -35,3 +35,9 @@ func test_preference_is_separate_and_reloaded():
  assert_almost_eq(second.factor,.85,.001)
  assert_eq(controls.mouse_filter,Control.MOUSE_FILTER_IGNORE)
  assert_eq(controls.minus.focus_mode,Control.FOCUS_NONE)
+
+func test_zoom_uses_bounded_spawn_radius_not_inverse_zoom_simulation():
+ assert_eq(WorldCamera243.spawn_radius249(1.),1)
+ assert_eq(WorldCamera243.spawn_radius249(.25),2)
+ assert_eq(WorldCamera243.spawn_radius249(.05),3)
+ assert_eq(WorldCamera243.spawn_radius249(.0001),3)

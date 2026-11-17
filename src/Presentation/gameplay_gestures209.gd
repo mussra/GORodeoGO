@@ -46,6 +46,20 @@ func _ui_at(_node:Node,point:Vector2)->bool:
  for control in controls209:
   if is_instance_valid(control) and control.is_visible_in_tree() and control.mouse_filter!=Control.MOUSE_FILTER_IGNORE and control.get_global_rect().has_point(point):return true
  return false
+func _scroll_at249(point:Vector2)->ScrollContainer:
+ for control in controls209:
+  if is_instance_valid(control) and control is ScrollContainer and control.is_visible_in_tree() and control.get_global_rect().has_point(point):return control
+ return null
+func _scroll_drag249(state:Dictionary,point:Vector2)->void:
+ var scroll:ScrollContainer=state.scroll249
+ if not is_instance_valid(scroll) or not scroll.is_visible_in_tree():return
+ var bar:VScrollBar=scroll.get_v_scroll_bar()
+ var dy:float=(state.press.position.y-point.y)/maxf(.01,scroll.get_global_transform().get_scale().y)
+ if state.get("scrollbar249",false):
+  var range_:float=maxf(0.,bar.max_value-bar.page)
+  var thumb:float=maxf(24.,bar.size.y*bar.page/maxf(1.,bar.max_value))
+  dy=-dy*range_/maxf(1.,bar.size.y-thumb)
+ scroll.scroll_vertical=roundi(state.scroll_start249+dy)
 func _full_touch_area211(stick:VirtualJoystick)->void:
  if not is_instance_valid(stick):return
  # UI tap/drag ownership is decided above the sticks. Both native touch areas
@@ -60,7 +74,11 @@ func _input(event:InputEvent)->void:
    if not _can_begin():return
    if touches.has(event.index):_cancel_touches224()
    var ui:=_ui_at(game,event.position)
-   touches[event.index]={"press":event.duplicate(),"ui":ui,"play":not ui,"offset":Vector2.ZERO,"last":event.position}
+   touches[event.index]={"press":event.duplicate(),"ui":ui,"play":not ui,"offset":Vector2.ZERO,"last":event.position,"scroll249":_scroll_at249(event.position) if ui else null}
+   if touches[event.index].scroll249!=null:
+    var scroll:ScrollContainer=touches[event.index].scroll249
+    touches[event.index]["scroll_start249"]=scroll.scroll_vertical
+    touches[event.index]["scrollbar249"]=scroll.get_v_scroll_bar().get_global_rect().has_point(event.position)
    if ui:get_viewport().set_input_as_handled()
   elif touches.has(event.index):
    var state:Dictionary=touches[event.index];touches.erase(event.index)
@@ -68,7 +86,8 @@ func _input(event:InputEvent)->void:
    if event.canceled:
     _cancel_touches224()
     return
-   if state.play:_send(event,state.offset,true)
+   if state.get("scroll249")!=null:_scroll_drag249(state,event.position)
+   elif state.play:_send(event,state.offset,true)
    elif _can_begin() and event.position.distance_to(state.press.position)<DRAG_DISTANCE:
     _send(state.press,Vector2.ZERO,false);_send(event,Vector2.ZERO,false)
  elif event is InputEventScreenDrag and touches.has(event.index):
@@ -77,6 +96,8 @@ func _input(event:InputEvent)->void:
   if not get_viewport().get_visible_rect().grow(-2.).has_point(event.position) and not game.player.dodge.drawing:
    _cancel_touches224();get_viewport().set_input_as_handled();return
   get_viewport().set_input_as_handled()
+  if state.get("scroll249")!=null:
+   _scroll_drag249(state,event.position);return
   if not state.play and event.position.distance_to(state.press.position)>=DRAG_DISTANCE:
    state.play=true
    _send(state.press,state.offset,true)

@@ -31,7 +31,11 @@ func _ready()->void:
  camera=world.get_viewport().get_camera_2d();controls=world._camera_controls243
  var layer:=CanvasLayer.new();layer.layer=21;add_child(layer)
  title=Label.new();title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;title.mouse_filter=Control.MOUSE_FILTER_IGNORE
- title.add_theme_font_size_override('font_size',20)
+ title.add_theme_font_size_override('font_size',46)
+ title.add_theme_color_override('font_color',Color('fff2c5'))
+ title.add_theme_color_override('font_shadow_color',Color('091c24'))
+ title.add_theme_constant_override('shadow_offset_x',3);title.add_theme_constant_override('shadow_offset_y',4)
+ title.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  title.add_theme_stylebox_override('normal',RanchTheme.box(Color('183c30ee'),Color('d9ab58'),6))
  layer.add_child(title);title.hide()
 func key(id:String)->String:return '%s|%d|%d|%s'%[SaveData.save_path,SaveData.world_seed,SaveData.world_generator_version,id]
@@ -69,14 +73,15 @@ func begin(candidate:Dictionary)->void:
  for sign_ in get_tree().get_nodes_in_group("arrival_sign244"):
   if sign_.get_viewport()==get_viewport():sign_.hide()
  preview=load('res://src/Presentation/town_arrival_view244.gd').new();preview.plan=plan;preview.world=world;world.add_child(preview)
- title.text='Vista de llegada · '+TownIdentity215.title(SaveData.world_cousins140,plan.id)
+ title.text=TownIdentity215.display_name248(SaveData.world_cousins140,plan.id)
  var extent:Vector2=get_viewport().get_visible_rect().size
- title.size=Vector2(minf(650.,extent.x-40.),40.);title.position=Vector2((extent.x-title.size.x)*.5,62.);title.show()
+ title.size=Vector2(minf(1000.,extent.x-80.),110.);title.position=Vector2((extent.x-title.size.x)*.5,112.);title.show()
  apply_frame()
 static func cinematic_curve(t:float)->float:
  var x:float=clampf(t,0.,1.)
  return x*x*x*(x*(x*6.-15.)+10.)
 func apply_frame()->void:
+ title.modulate.a=minf(cinematic_curve(elapsed/.7),1.-cinematic_curve((elapsed-OUT_SECONDS-HOLD_SECONDS)/BACK_SECONDS))
  var blend:float
  if elapsed<OUT_SECONDS:blend=cinematic_curve(elapsed/OUT_SECONDS)
  elif elapsed<OUT_SECONDS+HOLD_SECONDS:blend=1.

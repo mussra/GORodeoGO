@@ -47,6 +47,7 @@ var player_ref: Node2D = null
 var _touching_rider: bool = false
 var herd_guide:Node2D
 var _art: Node2D
+var _wall249:Dictionary={}
 var _bob: float = 0.0
 var _steered129:Vector2=Vector2.ZERO
 var _graze_timer: float = 0.0
@@ -133,9 +134,9 @@ func _physics_process(delta: float) -> void:
 	var before94:Vector2=global_position
 	var wanted_motion248:Vector2=velocity*delta
 	var wanted94:Vector2=_legal_step248(wanted_motion248,escaping95)
-	if wanted94.distance_to(before94)<wanted_motion248.length()*.8:
+	if not _wall249.is_empty() or wanted94.distance_to(before94)<wanted_motion248.length()*.8:
 		var threat248:Vector2=player_ref.global_position if is_instance_valid(player_ref) else before94-wanted_motion248*100.
-		wanted94=WorldEscapeMotion.slide248(before94,threat248,wanted_motion248,wanted94,func(step:Vector2)->Vector2:return _legal_step248(step,escaping95))
+		wanted94=WorldEscapeMotion.slide249(before94,threat248,wanted_motion248,wanted94,func(step:Vector2)->Vector2:return _legal_step248(step,escaping95),_wall249,delta)
 	velocity=(wanted94-before94)/maxf(delta,.001)
 	# This actor intentionally has collision_mask=0. Commit the already checked
 	# terrain step directly, without a second integration at a different delta.

@@ -37,10 +37,10 @@ static func next_for(states:Dictionary,npc:Dictionary)->String:
  for id in npc.quests:
   if state(states,id).status!="done" and available(states,id):return id
  return str(npc.quests[-1])
-static func clean(raw:Variant)->Dictionary:
+static func clean(raw:Variant,definitions:Dictionary=QUESTS)->Dictionary:
  var out:Dictionary={}
  if not raw is Dictionary:return out
- for id in QUESTS:
+ for id in definitions:
   if not raw.has(id) or not raw[id] is Dictionary:continue
   var s:Dictionary=raw[id]
   if s.get("status","") not in ["active","done"] or not s.get("events",[]) is Array:continue
@@ -49,8 +49,8 @@ static func clean(raw:Variant)->Dictionary:
   var events:Array=[]
   for event in s.events:
    if event is String and not events.has(event):events.append(event)
-  var n:int=mini(int(QUESTS[id].goal),mini(count_value,events.size()))
-  out[id]={"status":"done" if n==int(QUESTS[id].goal) else "active","count":n,"events":events}
+  var n:int=mini(int(definitions[id].goal),mini(count_value,events.size()))
+  out[id]={"status":"done" if n==int(definitions[id].goal) else "active","count":n,"events":events}
   if s.has("thanked"):out[id]["thanked"]=bool(s.get("thanked",false))
   if s.get("spawn") is Vector2 and s.spawn.is_finite():out[id]["spawn"]=s.spawn
  return out

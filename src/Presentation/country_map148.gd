@@ -47,3 +47,5 @@ func _draw_terrain()->void:
   if expanded:_terrain.draw_string(get_theme_default_font(),_to_map(site.pos,mins,cell,origin)+Vector2(14,-10),site.name,HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff2c5"))
 
 func minimap_top159()->float:return 114.
+
+func job_points249()->Array:return []
