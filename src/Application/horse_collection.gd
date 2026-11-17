@@ -78,6 +78,7 @@ func breed(a:String,b:String,choices:Dictionary)->Dictionary:
  var t:=preview(a,b,choices)
  if t.is_empty():return {}
  var child:Dictionary={"id":"child_%d"%next_id,"name":"Cría %d"%next_id,"parents":[a,b],"stage":"foal","traits":t,"stats":HorseStats.inherit(find(a),find(b)),"growth_capped255":true}
+ BreedingAdvice256.inherit_mastery(self,child,find(a),find(b))
  var proof:Dictionary=GalaxyPure143.birth(find(a),find(b))
  if not proof.is_empty():child["galaxy_birth143"]=proof
  if CupRewards195.has_temper(find(a)) or CupRewards195.has_temper(find(b)):child["cup_temper195"]=CupRewards195.TEMPER
@@ -123,7 +124,7 @@ func restore(v:Variant)->bool:
    for course in h.get("race_courses251",[]):
     if not course is int or course not in [0,1,2,3] or course in course_ids:return false
     course_ids.append(course)
-   for flag in ["master251","supreme251","growth_capped255"]:
+   for flag in ["master251","supreme251","growth_capped255","master_inherited256"]:
     if h.has(flag) and not h[flag] is bool:return false
    ids[h.id]=true;by_id[h.id]=h
    if group==known:clean_ancestors.append(h.duplicate(true))

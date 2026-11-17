@@ -22,12 +22,12 @@ func test_full_bounds_fit_with_hud_margin_for_all_shapes():
    assert_lte((item.bounds.size.y+180)*zoom_,maxf(100,extent.y-270)+.01)
 func test_hold_center_is_fixed_one_second_while_player_still_moves():
  world._camera_controls243.set_factor(.85,false);arrival.begin(plan())
- arrival.elapsed=1.2;arrival.apply_frame();var zoom_:Vector2=arrival.camera.zoom
+ arrival.elapsed=TownArrival244.OUT_SECONDS;arrival.apply_frame();var zoom_:Vector2=arrival.camera.zoom
  var center:Vector2=world.player.global_position+arrival.camera.offset
  world.player.position+=Vector2(100,25);arrival.elapsed=2.19;arrival.apply_frame()
  assert_eq(arrival.camera.zoom,zoom_);assert_almost_eq(world.player.global_position.x+arrival.camera.offset.x,center.x,.01)
  assert_true(world.player.is_physics_processing());assert_false(get_tree().paused)
- arrival.elapsed=3.4;arrival.apply_frame();arrival.finish(true)
+ arrival.elapsed=TownArrival244.OUT_SECONDS+TownArrival244.HOLD_SECONDS+TownArrival244.BACK_SECONDS;arrival.apply_frame();arrival.finish(true)
  assert_eq(arrival.camera.zoom,Vector2.ONE*.85);assert_eq(arrival.camera.offset,Vector2.ZERO)
 func test_first_completed_arrival_is_persisted_with_seed_and_save_scope():
  arrival.begin(plan());arrival.finish(true);assert_true(arrival.seen.has(arrival.key('town1')))
@@ -119,5 +119,5 @@ func test_arrival_h1_uses_display_name_and_fades_in_then_out():
  assert_gte(arrival.title.get_theme_font_size("font_size"),44)
  arrival.elapsed=.35;arrival.apply_frame();assert_almost_eq(arrival.title.modulate.a,.5,.01)
  arrival.elapsed=1.5;arrival.apply_frame();assert_eq(arrival.title.modulate.a,1.)
- arrival.elapsed=3.4;arrival.apply_frame();assert_almost_eq(arrival.title.modulate.a,0.,.001)
+ arrival.elapsed=TownArrival244.OUT_SECONDS+TownArrival244.HOLD_SECONDS+TownArrival244.BACK_SECONDS;arrival.apply_frame();assert_almost_eq(arrival.title.modulate.a,0.,.001)
  arrival.finish(true);assert_false(arrival.title.visible)

@@ -27,7 +27,7 @@ var _cousin_layer140:CousinLayer140
 var _journal140:Panel
 var _roaming139:WorldHerdPositions139
 var _flower_sample138:WorldFlowerTarget105
-var _npc_dialog:Control
+var _npc_dialog:Node
 var _npc_button:Button
 var _quest_label:Label
 var _quest_details179:QuestDetails179
@@ -1077,7 +1077,7 @@ func _open_navigation()->void:
 	var touch:Node=get_node_or_null("TouchControls")
 	if touch!=null:touch.visible=false
 	_navigation=NavigationSheet.new();_navigation.title="FRONTERA"
-	_navigation.entries=[{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"},{"id":"crowns240","title":"Coronas y victorias","hint":"Logros conseguidos y pendientes"}]
+	_navigation.entries=[{"id":"book256","title":"Libro de crianza","hint":"Consejos de Alma · media, maestría y linajes"},{"id":"exit","title":"Menú principal","hint":"Guarda y sal de Frontera"},{"id":"crowns240","title":"Coronas y victorias","hint":"Logros conseguidos y pendientes"}]
 	if ModeAccess240.rodeo_offered(SaveData.world_quests) and not SaveData.mode_open240("bulls"):
 		_navigation.entries.append({"id":"rodeo240","title":"Misión: Rodeo de toros","hint":"Acepta el encargo y supera el primer nivel de Rodeo."})
 	elif SaveData.mode_open240("bulls") and not SaveData.mode_open240("race"):
@@ -1090,6 +1090,9 @@ func _open_navigation()->void:
 func _navigation_selected(id:String)->void:
 	_close_navigation()
 	match id:
+		"book256":
+			var book:=BreedingBook256.new();_hud.add_child(book)
+			get_tree().paused=true;book.closed.connect(func():get_tree().paused=_navigation_was_paused)
 		"performance245":GameState.set_performance_osd245(not GameState.performance_osd245)
 		"crowns240":
 			var screen:=ModeCrowns240.new();screen.process_mode=Node.PROCESS_MODE_ALWAYS
@@ -1224,9 +1227,11 @@ func _tick_goats(delta:float)->void:
 
 
 func _setup_npcs()->void:
+	add_child(SaddleryExterior256.new())
 	var musician205:=GanjoMusician205.new()
 	musician205.position=(WorldNominal98.home() if WorldNominal98.enabled() else HOME_POS)+Vector2(-180,100)
 	add_child(musician205)
+	var mentor256:=WorldNpc.new();mentor256.setup(BreedingAdvice256.mentor());add_child(mentor256)
 	for data in _npcs98():
 		if data.id=="farmer":
 			var npc:=WorldNpc.new();npc.setup(data);add_child(npc)
@@ -1250,6 +1255,12 @@ func _setup_npcs()->void:
 	_flower_button=Button.new();_flower_button.position=Vector2(475,500);_flower_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_flower_button);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)
 func _open_npc(data:Dictionary)->void:
+	if data.id=="workshop256" or (data.get("town234","")=="home" and data.get("role234","")=="saddler"):
+		_open_workshop256(data.position);return
+	if data.id=="mentor256":
+		if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>155.:return
+		player.cancel_input();player.set_physics_process(false)
+		var book:=BreedingBook256.new();book.tutorial=true;book.page=0;_npc_dialog=book;_hud.add_child(book);book.closed.connect(_close_npc);return
 	if data.has("town234"):_open_town234(data);return
 	if data.has("service231"):_open_service231(str(data.service231));return
 	if data.has("cousin140"):_open_cousin140(str(data.cousin140));return
@@ -1312,7 +1323,7 @@ func _refresh_quest_hud()->void:
 func _tick_npcs()->void:
 	var nearest:Dictionary=_nearest_npc105()
 	_npc_button.visible=player.position.distance_to(nearest.position)<155.0
-	_npc_button.text="Hablar con "+str(nearest.name).to_lower()
+	_npc_button.text="Entrar al taller" if (nearest.id=="workshop256" or (nearest.get("town234","")=="home" and nearest.get("role234","")=="saddler")) else "Hablar con "+str(nearest.name).to_lower()
 	_tick_flowers105()
 	_tick_jobs249()
 	if SaveData.world_generator_version<6:_tick_flora138()
@@ -1390,7 +1401,7 @@ func _refresh_livestock104()->void:
 	if is_instance_valid(_pigs_label):_pigs_label.text=tr("WORLD_PIG_INVENTORY104") % SaveData.pig_inventory104()
 
 func _nearest_npc105()->Dictionary:
-	var roster:Array=_npcs98()
+	var roster:Array=_npcs98().duplicate();roster.append(BreedingAdvice256.mentor());roster.append(SaddleryExterior256.definition())
 	var best:Dictionary=roster[0]
 	for data in roster:
 		if player.position.distance_to(data.position)<player.position.distance_to(best.position):best=data
@@ -1694,3 +1705,8 @@ func _tick_jobs249()->void:
 
 func _spawn_radius249()->int:
 	return WorldCamera243.spawn_radius249(_camera_controls243.factor) if is_instance_valid(_camera_controls243) else 1
+
+func _open_workshop256(door:Vector2)->void:
+	if is_instance_valid(_npc_dialog) or player.position.distance_to(door)>180.:return
+	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false)
+	var room:=SaddleryRoom256.new();_npc_dialog=room;_hud.add_child(room);room.closed.connect(_close_npc)

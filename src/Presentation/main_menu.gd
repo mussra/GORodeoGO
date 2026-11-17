@@ -4,6 +4,7 @@ extends Control
 var level_scroll173:ScrollContainer
 @onready var quit_button: Button = $QuitButton
 var _settings_button:Button
+var _book256:Button
 var _hero: Control
 var _drawer: Panel
 var _play: Button
@@ -137,6 +138,7 @@ func _build_menu() -> void:
 	add_child(_equipment_panel)
 	_equipment_panel.closed.connect(_refresh_points_caption)
 	_settings_button=Button.new();_settings_button.text=tr("UI_035");_settings_button.position=Vector2(1000,70);_settings_button.size=Vector2(210,48);_settings_button.pressed.connect(_show_settings);_hero.add_child(_settings_button)
+	_book256=Button.new();_book256.name="BreedingBook256";_book256.text="Libro de crianza";_book256.position=Vector2(760,70);_book256.size=Vector2(210,48);_hero.add_child(_book256);_book256.pressed.connect(func():add_child(BreedingBook256.new()))
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)

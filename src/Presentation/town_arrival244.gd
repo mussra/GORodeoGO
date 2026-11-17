@@ -2,9 +2,9 @@ class_name TownArrival244
 extends Node
 ## A short camera presentation, never pauses the rider or grows streaming radius.
 const PREF_PATH:String='user://town_arrivals244.cfg'
-const OUT_SECONDS:float=1.2
+const OUT_SECONDS:float=1.6
 const HOLD_SECONDS:float=1.
-const BACK_SECONDS:float=1.2
+const BACK_SECONDS:float=1.6
 const CHECK_SECONDS:float=.25
 var world:Node
 var camera:Camera2D

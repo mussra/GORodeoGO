@@ -20,7 +20,7 @@ func build(node:Dictionary)->Node2D:
   for x in [-380,380]:
    var h:=Sprite2D.new();h.texture=WorldTestZone.HOUSE_TEX;h.position=node.door+Vector2(x,-130);h.offset=Vector2(0,-h.texture.get_height()/2.);h.scale=Vector2.ONE*116./h.texture.get_height();root.add_child(h);WorldPhysics.add_box(root,Rect2(h.position+Vector2(-58,-50),Vector2(116,30)))
  for role in node.roles:
-  if node.id=="home" and role=="florist":continue
+  if node.id=="home" and role in ["florist","saddler"]:continue
   var art:=Sprite2D.new();art.texture=WorldFloristShop.FLORIST if role=="florist" else load("res://art/npc/loco-normal140.png") if role=="loco" else WorldNpc.PORTRAIT;art.position=TownNetwork234.point(SaveData.world_seed,node.id,role);NpcScale214.apply(art,art.texture);root.add_child(art)
   if role=="saddler":art.modulate=Color("efd59f")
   var label:=Label.new();label.text=TownNetwork234.npc_name(node.id,role);label.position=art.position+Vector2(-80,10);label.add_theme_font_size_override("font_size",17);root.add_child(label)

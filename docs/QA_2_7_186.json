@@ -1,0 +1,24 @@
+{
+  "version": "2.7.186",
+  "versionCode": 445,
+  "package": "com.example.rancho.review",
+  "tests": 300,
+  "passing": 300,
+  "asserts": 44335,
+  "scripts": 50,
+  "touch_synthetic": true,
+  "android_physical": false,
+  "apk_sha256": "9e32b1122a11d4ab1a135ab7ff368b367a5f53d3a377e76e8fe878d53e2f9f20",
+  "signer_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "camera_seconds": {
+    "out": 1.6,
+    "hold": 1.0,
+    "back": 1.6,
+    "total": 4.2
+  },
+  "assumptions": [
+    "new births only",
+    "family species and pattern",
+    "illustrated button-driven workshop"
+  ]
+}
