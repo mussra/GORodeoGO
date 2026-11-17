@@ -109,3 +109,27 @@ func test_increment_rounded_and_visible_star_rooted_at_earned_segment():
  assert_eq(view.spark.effect_alpha,1.)
  view._fade_effect253(0.);assert_eq(view.spark.effect_alpha,0.)
  view.free()
+
+func test_duel_and_joust_improve_multiple_properties_but_never_speed_or_power():
+ for mode in ["duel","joust"]:
+  var before:Dictionary=HorseStats.read(sut.horse_collection.find("original"));var reward:=VictoryGrowth251.apply(sut.horse_collection,"original",mode)
+  assert_eq(reward.changes254.size(),2 if mode=="duel" else 3)
+  var after:Dictionary=HorseStats.read(sut.horse_collection.find("original"))
+  assert_eq(after.speed,before.speed);assert_eq(after.power,before.power)
+  for change in reward.changes254:assert_gt(change.after,change.before);assert_true(change.key in ["handling","dodge","calm"])
+func test_delta_label_preserves_integer_tens_and_fractional_actual_points():
+ assert_eq(VictoryGrowth251.delta_text254({"points":2.,"before":0.,"after":2.,"low":0.,"high":100.}),"+2 pts")
+ assert_eq(VictoryGrowth251.delta_text254({"points":10.,"before":0.,"after":10.,"low":0.,"high":100.}),"+10 pts")
+ assert_eq(VictoryGrowth251.delta_text254({"points":.828427,"before":0.,"after":.828427,"low":0.,"high":100.}),"+0,83 pts")
+func test_multi_improvement_animates_each_matching_row():
+ var view:=HorseVictory251.new();view.reward=VictoryGrowth251.apply(sut.horse_collection,"original","joust");add_child(view);await wait_process_frames(3)
+ assert_eq(view.rows254.size(),3);view._advance(.5)
+ for row in view.rows254:assert_gt(row.spark.current_x,row.spark.old_x);assert_gt(row.bar.value,VictoryGrowth251.visual(row.spec,row.change.before))
+ view._fade_effect253(0.)
+ for row in view.rows254:assert_eq(row.spark.effect_alpha,0.)
+ view.free()
+func test_failed_multi_reward_rolls_back_all_properties_and_retries_once():
+ var before:Dictionary=sut.horse_collection.export_state();sut.save_path="user://missing251/fail.cfg"
+ assert_false(sut.record_mode_victory240(sut.victory_ticket240("joust")));assert_push_error_count(1);assert_eq(sut.horse_collection.export_state(),before)
+ sut.save_path="user://growth251.cfg";assert_true(sut.retry_victory240());var stats:Dictionary=sut.horse_collection.find("original").growth251
+ assert_eq(stats,{"dodge":1,"handling":1,"calm":1});assert_true(sut.retry_victory240());assert_eq(sut.horse_collection.find("original").growth251,stats)

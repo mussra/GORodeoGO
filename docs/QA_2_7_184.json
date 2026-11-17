@@ -1,0 +1,44 @@
+{
+  "version": "2.7.184",
+  "code": 443,
+  "package": "com.example.rancho.review",
+  "sha256": "1939de91fc0ace01ae91ae9357ad0bb980fba601554e9e8e37a9c42e40f59636",
+  "bytes": 82764601,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "passed": 269,
+    "total": 269,
+    "assertions": 44167,
+    "scripts": 45,
+    "deprecations": 4
+  },
+  "properties": {
+    "duel": [
+      "handling",
+      "calm"
+    ],
+    "joust": [
+      "dodge",
+      "handling",
+      "calm"
+    ]
+  },
+  "numeric_gain": "actual normalized property points, decimal comma",
+  "finish_hooks_tested": [
+    "race",
+    "duel",
+    "joust"
+  ],
+  "atomic_reward": true,
+  "physical_android": false,
+  "visual_review": [
+    "three simultaneous gains and stars",
+    "saved increments",
+    "animation video"
+  ],
+  "warnings": [
+    "two ObjectDB at test shutdown",
+    "GUT UID warnings",
+    "intentional save rollback errors"
+  ]
+}

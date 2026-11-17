@@ -5,6 +5,7 @@ var canvas:Control
 var progress:float=0.0
 var bar:ProgressBar
 var spark:Control
+var rows254:Array=[]
 static func present(host:Node)->void:
  var data:Dictionary=SaveData.take_growth251()
  if data.is_empty():return
@@ -22,35 +23,39 @@ func _ready()->void:
  canvas.add_child(portrait)
  var stats:=HorseStats.read(reward.horse)
  for i in HorseSummary185.STATS.size():
-  var spec:Array=HorseSummary185.STATS[i];var active:bool=spec[1]==reward.get("key","");var y:float=234.+i*48.
-  _label(spec[0]+("  +" if active else ""),Vector2(548,y),22,Color("ffe1a1") if active else Color("a7bdc1"))
+  var spec:Array=HorseSummary185.STATS[i];var change:Dictionary={}
+  for item in reward.get("changes254",[reward]):
+   if item.key==spec[1]:change=item
+  var active:bool=not change.is_empty();var y:float=234.+i*48.
+  _label(spec[0]+("  "+VictoryGrowth251.delta_text254(change) if active else ""),Vector2(528,y),20,Color("ffe1a1") if active else Color("a7bdc1"))
   var line:=HorseStatBars.row(canvas,"",VictoryGrowth251.visual(spec,stats[spec[1]]),0.,1.,true);line.position=Vector2(748,y+4);line.size=Vector2(300,30);line.get_child(0).custom_minimum_size.x=0;line.get_child(0).hide()
   if active:
-   bar=line.get_child(1);bar.step=0.;bar.value=VictoryGrowth251.visual([reward.title,reward.key,reward.low,base_high251()],reward.before);bar.add_theme_stylebox_override("fill",StyleBoxEmpty.new())
- var message:String=str(reward.title)+" mejorada · progreso guardado"
+   var current_bar:ProgressBar=line.get_child(1);current_bar.step=0.;current_bar.add_theme_stylebox_override("fill",StyleBoxEmpty.new())
+   var effect:=GrowthSpark251.new();effect.name="GrowthIncrement252";effect.mouse_filter=Control.MOUSE_FILTER_IGNORE;current_bar.add_child(effect)
+   rows254.append({"bar":current_bar,"spark":effect,"change":change,"spec":spec})
+   if change.key==reward.key:bar=current_bar;spark=effect
+ var message:String="Mejoras guardadas · puntos de propiedad"
  if reward.has("new_horse"):message+="\nNuevo caballo en tu cuadra: "+str(reward.new_horse.name)
  if reward.has("champion"):message+="\nLinaje maestro: "+str(reward.champion.name)
  if reward.get("fallback",false):message+="\nLa propiedad de este modo ya estaba al máximo."
  _label(message,Vector2(198,477),20,Color("d5e3dd"))
  var close:=Button.new();close.name="Continue251";close.text="Continuar";close.position=Vector2(738,558);close.size=Vector2(310,60);canvas.add_child(close);close.pressed.connect(queue_free)
- spark=GrowthSpark251.new();spark.name="GrowthIncrement252";spark.mouse_filter=Control.MOUSE_FILTER_IGNORE;spark.clip_contents=false;bar.add_child(spark)
  _advance.call_deferred(0.)
  if not reward.get("maxed",false):
   var tween:=create_tween();tween.tween_interval(.35);tween.tween_method(_advance,0.,1.,1.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT);tween.tween_callback(func():_advance(1.));tween.tween_method(_fade_effect253,1.,0.,1.0)
  else:spark.hide()
 func _advance(value:float)->void:
  progress=value
- if bar!=null:bar.value=VictoryGrowth251.visual([reward.title,reward.key,reward.low,base_high251()],lerpf(reward.before,reward.after,value))
- var spec:Array=[reward.title,reward.key,reward.low,base_high251()]
- var before:float=VictoryGrowth251.visual(spec,reward.before)
- var current:float=VictoryGrowth251.visual(spec,lerpf(reward.before,reward.after,value))
- var inner_width:float=maxf(0.,bar.size.x-2.)
- spark.position=Vector2(1.,1.)
- spark.size=Vector2(inner_width,maxf(0.,bar.size.y-2.))
- spark.old_x=inner_width*before;spark.current_x=inner_width*current
- spark.phase=value;spark.queue_redraw()
+ for row in rows254:
+  var change:Dictionary=row.change;var current_bar:ProgressBar=row.bar;var effect:Control=row.spark
+  var before:float=VictoryGrowth251.visual(row.spec,change.before)
+  var current:float=VictoryGrowth251.visual(row.spec,lerpf(change.before,change.after,value))
+  current_bar.value=current
+  var width:float=maxf(0.,current_bar.size.x-2.)
+  effect.position=Vector2(1.,1.);effect.size=Vector2(width,maxf(0.,current_bar.size.y-2.))
+  effect.old_x=width*before;effect.current_x=width*current;effect.phase=value;effect.queue_redraw()
 func _fade_effect253(value:float)->void:
- spark.effect_alpha=value;spark.queue_redraw()
+ for row in rows254:row.spark.effect_alpha=value;row.spark.queue_redraw()
 func base_high251()->float:
  for spec in HorseSummary185.STATS:
   if spec[1]==reward.key:return spec[3]

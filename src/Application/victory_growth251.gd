@@ -4,13 +4,26 @@ const PRIMARY={"bulls":"power","race":"speed","duel":"handling","joust":"dodge",
 static func apply(collection:HorseCollection,id:String,mode:String)->Dictionary:
  var horse:=collection.find(id)
  if horse.is_empty() or horse.get("stage","adult")!="adult" or not PRIMARY.has(mode):return {}
- var key:String=PRIMARY[mode];var before:float=HorseStats.read(horse)[key]
- var counts:Dictionary=horse.get("growth251",{}).duplicate(true);counts[key]=int(counts.get(key,0))+1;horse.growth251=counts
+ var keys:Array=["handling","calm"] if mode=="duel" else ["dodge","handling","calm"] if mode=="joust" else [PRIMARY[mode]]
+ var before_stats:=HorseStats.read(horse)
+ var counts:Dictionary=horse.get("growth251",{}).duplicate(true)
+ for key in keys:counts[key]=int(counts.get(key,0))+1
+ horse.growth251=counts
  var wins:Dictionary=horse.get("mode_wins251",{}).duplicate(true);wins[mode]=int(wins.get(mode,0))+1;horse.mode_wins251=wins
- var after:float=HorseStats.read(horse)[key]
- for spec in HorseSummary185.STATS:
-  if spec[1]==key:return {"horse":horse.duplicate(true),"id":id,"mode":mode,"key":key,"title":spec[0],"before":before,"after":after,"low":spec[2],"high":maxf(spec[3],after+(spec[3]-spec[2])*.1)}
- return {}
+ var after_stats:=HorseStats.read(horse);var changes:Array=[]
+ # Primary first preserves the existing reward envelope and single-row callers.
+ keys.erase(PRIMARY[mode]);keys.push_front(PRIMARY[mode])
+ for key in keys:
+  for spec in HorseSummary185.STATS:
+   if spec[1]!=key:continue
+   changes.append({"key":key,"title":spec[0],"before":before_stats[key],"after":after_stats[key],"low":spec[2],"high":spec[3],"points":(after_stats[key]-before_stats[key])/(spec[3]-spec[2])*100.})
+ var result:Dictionary=changes[0].duplicate(true);result.merge({"horse":horse.duplicate(true),"id":id,"mode":mode,"changes254":changes})
+ return result
+static func delta_text254(change:Dictionary)->String:
+ var points:float=change.get("points",(change.after-change.before)/(change.high-change.low)*100.)
+ var text_:String=String.num(points,2 if points>=.1 else 4)
+ if text_.contains("."):text_=text_.rstrip("0").rstrip(".")
+ return "+"+text_.replace(".",",")+" pts"
 static func bonus(key:String,count:int)->float:
  for spec in HorseSummary185.STATS:
   if spec[1]==key:return (spec[3]-spec[2])*.02*sqrt(float(maxi(count,0)))
