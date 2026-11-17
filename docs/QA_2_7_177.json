@@ -1,0 +1,26 @@
+{
+  "version": "2.7.177",
+  "code": 436,
+  "package": "com.example.rancho.review",
+  "sha256": "60e1161f0ed5b5aed605f31f5550411a65b97175246c02951eaf82b0489a10f0",
+  "bytes": 82718634,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "passed": 204,
+    "total": 204,
+    "assertions": 37504,
+    "scripts": 32,
+    "deprecations": 4,
+    "warnings": "2 ObjectDB instances at full suite shutdown; isolated network integration exits clean"
+  },
+  "physical_android": false,
+  "visual_cases": [
+    "before/after same recommendation",
+    "intermediate village",
+    "relayed missing saddler message",
+    "genuine completion after all office messages"
+  ],
+  "migration": "No inferred conversations from visited villages; old unrecorded messages may repeat once",
+  "performance": "No new performance changes; prior mobile result recorded without sole-cause attribution",
+  "save_cadence": "Unchanged 4 s active autosave plus action saves"
+}

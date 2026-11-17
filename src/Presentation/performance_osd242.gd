@@ -24,7 +24,8 @@ func _physics_process(_delta:float):
   physics_steps246+=1;physics_sum246+=Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000.
 func _process(delta:float):
  var enabled:bool=GameState.trial_tools_enabled() and (SaveData.debug_mode or GameState.performance_osd245)
- label.visible=enabled and not get_tree().paused
+ var world:Node=_find_world242(get_tree().current_scene)
+ label.visible=enabled and not get_tree().paused and not _reading247(world)
  if not enabled:clock=0.;frame_sum=0.;frame_count=0;frame_max=0.;physics_steps246=0;physics_sum246=0.;idle_sum246=0.;wall246=0;return
  var now_:int=Time.get_ticks_usec()
  var actual_:float=(now_-wall246)/1000000. if wall246>0 else delta
@@ -44,7 +45,6 @@ func _process(delta:float):
   Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.,video,
   int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)),int(Performance.get_monitor(Performance.OBJECT_COUNT)),
   sv.calls,sv.failures,sv.last_usec/1000.,sv.max_usec/1000.,sv.last_bytes/1024.,io]
- var world:Node=_find_world242(get_tree().current_scene)
  label.text+='\nFísica %.1f pasos/frame · %.1f ms muestreados/frame'%[float(physics_steps246)/maxi(1,frame_count),physics_sum246/maxi(1,frame_count)]
  if world!=null:
   label.text+='\nFrontera: %d chunks · %d cola | mapa %d rebuilds | flores mapa 0'%[world._chunks.size(),world._build_queue.size(),world._map_overlay.terrain_rebuilds]
@@ -92,3 +92,14 @@ func _process_io242()->String:
   if pair.size()==2:values[pair[0]]=int(pair[1].strip_edges())
  if not values.has('write_bytes'):return 'N/D'
  return 'R %.1f / W %.1f MiB'%[float(values.get('read_bytes',0))/1048576.,float(values.write_bytes)/1048576.]
+
+func _reading247(world:Node)->bool:
+ if not is_instance_valid(world):return false
+ for field in ['_npc_dialog','_journal140','_note_dialog106','_navigation','_note_editor106']:
+  var panel:Variant=world.get(field)
+  if is_instance_valid(panel) and (not panel is CanvasItem or panel.is_visible_in_tree()):return true
+ if world.get('_map_overlay')!=null and world._map_overlay.expanded:return true
+ if world.get('_quest_panel')!=null and world._quest_panel.visible:return true
+ if world.get('garden212')!=null and is_instance_valid(world.garden212.panel):return true
+ if world.get('_travel144')!=null and is_instance_valid(world._travel144.panel):return true
+ return false

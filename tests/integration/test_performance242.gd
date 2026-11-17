@@ -38,3 +38,12 @@ func test_roster_cache_updates_on_focus_change_without_changing_quest_state():
  assert_gt(a.size(),4);assert_eq(a,world._npcs98())
  TownNetwork234.ensure_near(752026,Vector2(120000,1000));var b:Array=world._npcs98()
  assert_ne(a,b);assert_eq(SaveData.world_quests,quests);world.free()
+
+func test_osd_yields_to_reading_panels_without_changing_the_toggle():
+ var osd=load('res://src/Presentation/performance_osd242.gd').new();add_child_autofree(osd)
+ var world=load('res://src/Presentation/frontier_world.gd').new()
+ assert_false(osd._reading247(world))
+ var panel:=Panel.new();add_child_autofree(panel);world._npc_dialog=panel
+ assert_true(osd._reading247(world));panel.hide();assert_false(osd._reading247(world))
+ panel.show();world._npc_dialog=null;world._journal140=panel;assert_true(osd._reading247(world))
+ world.free()

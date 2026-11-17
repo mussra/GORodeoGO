@@ -1603,7 +1603,10 @@ func _open_town234(data:Dictionary):
 	_sync_mount237()
 	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>180.:return
 	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false)
-	var dialog:=TownDialog234.new();dialog.town=data.town234;dialog.role=data.role234;dialog.energy237=_stamina.duplicate(true);_hud.add_child(dialog);_npc_dialog=dialog
+	var conversation247:Dictionary=TownMessages247.open(SaveData.world_seed,SaveData.world_cousins140,data.town234,data.role234)
+	if conversation247.state!=SaveData.world_cousins140:
+		if not SaveData.commit_cousins140(conversation247.state,player.position):_toast("El recado no se ha guardado. Podrás volver a escucharlo.")
+	var dialog:=TownDialog234.new();dialog.town=data.town234;dialog.role=data.role234;dialog.energy237=_stamina.duplicate(true);dialog.conversation247=conversation247;_hud.add_child(dialog);_npc_dialog=dialog
 	dialog.closed.connect(_close_npc)
 	dialog.recommend_requested.connect(func(target:String):
 		var next:=SaveData.world_cousins140.duplicate(true);next.revealed215[target]=true;next.known[data.town234]=true;next.hint215=target
