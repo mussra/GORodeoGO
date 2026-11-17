@@ -1,0 +1,36 @@
+{
+  "version": "2.7.183",
+  "code": 442,
+  "package": "com.example.rancho.review",
+  "sha256": "e9af09579a826e5f0844674bdc5d7aa6ef6c0c75b5c922ebda57fa223a82a261",
+  "bytes": 82764601,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "passed": 265,
+    "total": 265,
+    "assertions": 44128,
+    "scripts": 45,
+    "deprecations": 4
+  },
+  "visual_change": {
+    "rounded_base_and_increment": true,
+    "radius": "minimum of 5 px and half segment width/height",
+    "star_origin": "center of exact earned interval",
+    "rays_extend_outside_bar": true,
+    "fade_after_growth_seconds": 1,
+    "new_nodes": 0,
+    "reward_values_unchanged": true
+  },
+  "physical_android": false,
+  "visual_review": [
+    "effect detail",
+    "rounded detail after fade",
+    "full card",
+    "animation video"
+  ],
+  "warnings": [
+    "Visual harness: two ObjectDB at exit",
+    "GUT font UID fallback",
+    "Intentional save-error rollback logs"
+  ]
+}

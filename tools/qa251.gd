@@ -16,7 +16,7 @@ func run():
   await get_tree().create_timer(.05).timeout;await capture("anim-%02d"%i)
   if i==5:await capture("reward-start")
   if i==12:await capture("reward-stars")
- await capture("reward-end")
+ await get_tree().create_timer(.9).timeout;await capture("reward-end")
  var view:HorseVictory251=get_children().filter(func(c):return c is HorseVictory251)[0]
  print("GROWTH_ANIMATION ",JSON.stringify({"progress":view.progress,"bar":view.bar.value,"nodes":Performance.get_monitor(Performance.OBJECT_NODE_COUNT),"memory_mib":Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.}))
  var close:Button=view.canvas.get_node("Continue251")

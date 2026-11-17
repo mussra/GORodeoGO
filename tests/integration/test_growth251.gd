@@ -96,6 +96,16 @@ func test_increment_color_and_glints_stay_only_in_added_bar_interval():
   var now:float=VictoryGrowth251.visual(spec,lerpf(view.reward.before,view.reward.after,phase))
   assert_almost_eq(view.spark.old_x,(view.bar.size.x-2.)*old,.001)
   assert_almost_eq(view.spark.current_x-view.spark.old_x,(view.bar.size.x-2.)*(now-old),.001)
-  assert_true(view.spark.clip_contents);assert_same(view.spark.get_parent(),view.bar)
+  assert_false(view.spark.clip_contents);assert_same(view.spark.get_parent(),view.bar)
  assert_ne(view.spark.INCREMENT_COLOR,view.spark.BASE_COLOR)
+ view.free()
+
+func test_increment_rounded_and_visible_star_rooted_at_earned_segment():
+ var style:=HorseVictory251.GrowthSpark251.rounded253(Color.WHITE,4.,16.)
+ assert_eq(style.corner_radius_top_left,2);assert_eq(style.corner_radius_bottom_right,2)
+ var view:=HorseVictory251.new();view.reward=VictoryGrowth251.apply(sut.horse_collection,"original","race");add_child(view);await wait_process_frames(3);view._advance(.5)
+ var origin:Vector2=view.spark.star_origin253()
+ assert_gte(origin.x,view.spark.old_x);assert_lte(origin.x,view.spark.current_x);assert_almost_eq(origin.y,view.spark.size.y*.5,.001)
+ assert_eq(view.spark.effect_alpha,1.)
+ view._fade_effect253(0.);assert_eq(view.spark.effect_alpha,0.)
  view.free()

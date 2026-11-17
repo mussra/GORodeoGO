@@ -33,10 +33,10 @@ func _ready()->void:
  if reward.get("fallback",false):message+="\nLa propiedad de este modo ya estaba al máximo."
  _label(message,Vector2(198,477),20,Color("d5e3dd"))
  var close:=Button.new();close.name="Continue251";close.text="Continuar";close.position=Vector2(738,558);close.size=Vector2(310,60);canvas.add_child(close);close.pressed.connect(queue_free)
- spark=GrowthSpark251.new();spark.name="GrowthIncrement252";spark.mouse_filter=Control.MOUSE_FILTER_IGNORE;spark.clip_contents=true;bar.add_child(spark)
+ spark=GrowthSpark251.new();spark.name="GrowthIncrement252";spark.mouse_filter=Control.MOUSE_FILTER_IGNORE;spark.clip_contents=false;bar.add_child(spark)
  _advance.call_deferred(0.)
  if not reward.get("maxed",false):
-  var tween:=create_tween();tween.tween_interval(.35);tween.tween_method(_advance,0.,1.,1.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT);tween.tween_callback(func():_advance(1.))
+  var tween:=create_tween();tween.tween_interval(.35);tween.tween_method(_advance,0.,1.,1.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT);tween.tween_callback(func():_advance(1.));tween.tween_method(_fade_effect253,1.,0.,1.0)
  else:spark.hide()
 func _advance(value:float)->void:
  progress=value
@@ -49,6 +49,8 @@ func _advance(value:float)->void:
  spark.size=Vector2(inner_width,maxf(0.,bar.size.y-2.))
  spark.old_x=inner_width*before;spark.current_x=inner_width*current
  spark.phase=value;spark.queue_redraw()
+func _fade_effect253(value:float)->void:
+ spark.effect_alpha=value;spark.queue_redraw()
 func base_high251()->float:
  for spec in HorseSummary185.STATS:
   if spec[1]==reward.key:return spec[3]
@@ -67,16 +69,24 @@ class GrowthSpark251 extends Control:
  var phase:float=0.
  var old_x:float=0.
  var current_x:float=0.
+ var effect_alpha:float=1.
+ static func rounded253(color:Color,width:float,height:float)->StyleBoxFlat:
+  var style:=StyleBoxFlat.new();style.bg_color=color;style.set_corner_radius_all(int(minf(5.,minf(width,height)*.5)));return style
+ func star_origin253()->Vector2:return Vector2((old_x+current_x)*.5,size.y*.5)
  func _draw():
-  draw_rect(Rect2(Vector2.ZERO,Vector2(old_x,size.y)),BASE_COLOR)
   var width:float=maxf(0.,current_x-old_x)
+  if current_x>0.:draw_style_box(rounded253(BASE_COLOR,current_x,size.y),Rect2(Vector2.ZERO,Vector2(current_x,size.y)))
   if width<=0.:return
-  draw_rect(Rect2(Vector2(old_x,0),Vector2(width,size.y)),INCREMENT_COLOR)
-  # Endpoints are clamped to the exact new interval, never the old fill.
-  for i in 5:
-   var x:float=old_x+width*(float(i)+.5)/5.
-   var y:float=size.y*(.22+.56*fposmod(float(i)*.618+phase,1.))
-   var extent:float=2.+sin(phase*PI)*3.
-   var color:=Color(1.,1.,.86,sin(phase*PI))
-   draw_line(Vector2(maxf(old_x,x-extent),y),Vector2(minf(current_x,x+extent),y),color,1.,false)
-   draw_line(Vector2(x,maxf(0.,y-extent)),Vector2(x,minf(size.y,y+extent)),color,1.,false)
+  draw_style_box(rounded253(INCREMENT_COLOR,width,size.y),Rect2(Vector2(old_x,0),Vector2(width,size.y)))
+  # The burst is rooted at the earned interval. Rays may extend outside the
+  # narrow bar so even a small real improvement has a readable visual effect.
+  var center:=star_origin253();var alpha:float=effect_alpha*minf(1.,phase*5.)
+  var radius:float=5.+sin(phase*PI)*5.
+  draw_circle(center,radius*1.8,Color(.40,1.,.84,alpha*.16))
+  draw_circle(center,radius*1.2,Color(.65,1.,.91,alpha*.3))
+  var points:=PackedVector2Array()
+  for i in 8:
+   var angle:float=-PI*.5+i*PI*.25;var r:float=radius if i%2==0 else radius*.24
+   points.append(center+Vector2(cos(angle),sin(angle))*r)
+  draw_colored_polygon(points,Color(1.,1.,.91,alpha))
+  draw_line(center-Vector2(0,radius*1.65),center+Vector2(0,radius*1.65),Color(.76,1.,.96,alpha*.7),1.5,true)
