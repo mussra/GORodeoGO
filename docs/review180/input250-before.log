@@ -1,0 +1,20 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 23.2.1-1ubuntu3.1~22.04.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 15.0.7, 256 bits)
+
+TAP Navigate_bulls disabled=false at=(390.0, 232.5)
+LOCKED result old_valid=false new=true
+TAP Navigate_race disabled=false at=(800.0, 232.5)
+LOCKED result old_valid=false new=true
+TAP Navigate_duel disabled=false at=(1210.0, 232.5)
+LOCKED result old_valid=false new=true
+TAP Navigate_joust disabled=false at=(390.0, 432.5)
+LOCKED result old_valid=false new=true
+TAP Navigate_memory disabled=false at=(800.0, 432.5)
+LOCKED result old_valid=false new=true
+TAP Navigate_crowns240 disabled=false at=(1210.0, 432.5)
+CROWNS 1
+TAP NavigationBack disabled=false at=(1310.0, 48.0)
+TAP NavigationBack disabled=false at=(1310.0, 48.0)
+BACK sheet_exists=false

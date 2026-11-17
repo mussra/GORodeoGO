@@ -1,0 +1,35 @@
+{
+  "version": "2.7.180",
+  "code": 439,
+  "package": "com.example.rancho.review",
+  "sha256": "39dd9b9190b424341b98b6532ff97d6c6cce0d24cae8e119275202c2c6aa6798",
+  "bytes": 82747847,
+  "certificate": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "total": 252,
+    "passed": 252,
+    "assertions": 41845,
+    "scripts": 44,
+    "deprecations": 4
+  },
+  "input": {
+    "kind": "InputEventScreenTouch via input pipeline, desktop window, mouse emulation enabled",
+    "blocked_modes": 5,
+    "unlocked_destinations": 5,
+    "crowns_and_both_back_buttons": true,
+    "before": "Blocked selection destroyed and reopened identical sheet; crowns and back worked",
+    "after": "Blocked selection retains sheet and displays specific prerequisite"
+  },
+  "physical_android": false,
+  "visual_review": [
+    "locked icons and requirements",
+    "specific gold feedback after touch",
+    "unlocked six cards"
+  ],
+  "warnings": [
+    "GUT font UID fallback",
+    "Intentional save failure logs in rollback tests",
+    "Touch harness: two ObjectDB instances at exit"
+  ],
+  "no_main_or_store": true
+}
