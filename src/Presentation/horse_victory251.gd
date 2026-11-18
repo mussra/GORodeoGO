@@ -53,7 +53,7 @@ func _advance(value:float)->void:
   var current:float=VictoryGrowth251.visual(row.spec,lerpf(change.before,change.after,value))
   current_bar.value=current
   var width:float=maxf(0.,current_bar.size.x-2.)
-  effect.position=Vector2(1.,13.);effect.size=Vector2(width,maxf(0.,current_bar.size.y-15.))
+  effect.position=Vector2(1.,1.);effect.size=Vector2(width,maxf(0.,current_bar.size.y-3.))
   (current_bar as AttributeBar306).baseline306=before
   effect.old_x=width*before;effect.current_x=width*current;effect.phase=value;effect.queue_redraw()
 func _fade_effect253(value:float)->void:

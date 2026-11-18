@@ -2,7 +2,6 @@ class_name AttributeBar306
 extends ProgressBar
 ## Shared five-sector scale. Gold is the current property; mint is an improvement.
 var baseline306:float=-1.0
-var ends306:bool=true
 var fill306:Color=Color("e8c16f")
 func _ready()->void:
  show_percentage=false;mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -11,7 +10,7 @@ func _ready()->void:
 func _draw()->void:
  var fraction:float=clampf((value-min_value)/maxf(.0001,max_value-min_value),0.,1.)
  var baseline:float=baseline306 if baseline306>=0. else fraction
- var top:float=13. if ends306 else 1.
+ var top:float=1.
  var height:float=maxf(7.,size.y-top-2.)
  var gap:float=4.;var width:float=(size.x-gap*4.)/5.
  for i in AttributeRanges306.SECTORS:
@@ -24,7 +23,3 @@ func _draw()->void:
  if baseline306>=0.:
   var marker:float=clampf(baseline306,0.,1.)*size.x
   draw_line(Vector2(marker,top-2),Vector2(marker,top+height+2),Color("fff1d2"),2.)
- if ends306:
-  var font:=ThemeDB.fallback_font
-  draw_string(font,Vector2(0,10),'Peor',HORIZONTAL_ALIGNMENT_LEFT,-1,11,RanchTheme.CREAM)
-  draw_string(font,Vector2(size.x-38,10),'Mejor',HORIZONTAL_ALIGNMENT_LEFT,-1,11,RanchTheme.CREAM)

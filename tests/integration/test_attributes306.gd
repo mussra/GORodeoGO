@@ -4,7 +4,9 @@ func test_all_equipment_properties_share_bounded_five_sector_component():
   for spec in EquipmentAttributes306.specs(id):
    assert_gt(float(spec[3]),float(spec[2]));assert_gte(float(spec[1]),float(spec[2]));assert_lte(float(spec[1]),float(spec[3]))
  var bar:=AttributeBar306.new();bar.min_value=0;bar.max_value=1;bar.value=.6;add_child_autofree(bar)
- assert_false(bar.show_percentage);assert_true(bar.ends306)
+ assert_false(bar.show_percentage)
+ var script:String=FileAccess.get_file_as_string("res://src/Presentation/attribute_bar306.gd")
+ assert_false(script.contains("Peor"));assert_false(script.contains("Mejor"))
 func test_purchase_properties_and_costs_are_visible_without_technical_dimensions():
  var old_path:String=SaveData.save_path;var owned=SaveData.equipment_owned.duplicate();var equipped=SaveData.equipment_equipped.duplicate(true);var points:int=SaveData.equipment_points;var trial:bool=SaveData.trial_session_active
  SaveData.trial_session_active=false;SaveData.equipment_points=10000;SaveData.equipment_owned.clear();SaveData.equipment_equipped.clear()
