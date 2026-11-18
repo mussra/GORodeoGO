@@ -1,0 +1,27 @@
+{
+  "version": "2.7.194",
+  "version_code": 453,
+  "tests": 381,
+  "passed": 381,
+  "assertions": 54433,
+  "scripts": 62,
+  "warnings": 1,
+  "deprecated": 18,
+  "scene": "shared loading parade only",
+  "frontier_people": [
+    "farmer",
+    "florist",
+    "Loco",
+    "Juanito",
+    "Alma",
+    "musician"
+  ],
+  "distant_visible_height": 46,
+  "distant_feet_y": [
+    418,
+    421
+  ],
+  "main_feet_y": 490,
+  "physical_android": false,
+  "screenshots_inspected": true
+}

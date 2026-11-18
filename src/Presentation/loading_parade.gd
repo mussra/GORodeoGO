@@ -6,6 +6,16 @@ var age:float=0.0
 var rng=RandomNumberGenerator.new()
 var rider:AnimatedSprite2D
 var actors:Array=[]
+var frontier_people267:Array[Sprite2D]=[]
+const DISTANT_FLOOR267:float=418.
+const DISTANT_HEIGHT267:float=46.
+const FRONTIER_PEOPLE267:Array=[
+ ["Granjero","res://art/npc/farmer.png"],
+ ["Florista","res://art/npc/florist.png"],
+ ["Loco","res://art/npc/loco-normal140.png"],
+ ["Juanito","res://art/breeding256/juanito.png"],
+ ["Alma","res://art/breeding256/alma.png"],
+ ["Músico","res://art/npc/ganjo_musician205.png"]]
 var cycle:float=10.8
 var ready_age:float=-1.0
 var prepared:bool=false
@@ -45,23 +55,22 @@ func actor(kind:String,sizing:float)->AnimatedSprite2D:
   var reference:float=feet[0]
   sprite.offset.y=frames.get_frame_texture("side",0).get_height()*.5-reference
   sprite.frame_changed.connect(func():sprite.offset.y=frames.get_frame_texture("side",sprite.frame).get_height()*.5-float(feet[sprite.frame]))
- add_child(sprite);return sprite
+ sprite.z_index=2;add_child(sprite);return sprite
 func _ready():
  prepare.call_deferred()
 func prepare():
  rng.randomize()
  rider=await actor("rider",MOUNT_SCALE228)
- var lineup=[["pig",.68],["goat",.74],["farmer",1.0],["horse",MOUNT_SCALE228]]
- for i in range(3,0,-1):
+ var lineup=[["pig",.68],["goat",.74],["horse",MOUNT_SCALE228]]
+ for i in range(lineup.size()-1,0,-1):
   var j=rng.randi_range(0,i);var tmp=lineup[i];lineup[i]=lineup[j];lineup[j]=tmp
  var delay=0.0
  for data in lineup:
-  var figure:Node2D
-  if data[0]=="farmer":
-   figure=Sprite2D.new();figure.visible=false;figure.texture=load("res://art/npc/farmer.png");NpcScale214.apply(figure,figure.texture,NpcScale214.ADULT*WorldActorScale.HORSE);add_child(figure)
-  else:
-   figure=await actor(data[0],data[1]);figure.flip_h=true
+  var figure:AnimatedSprite2D=await actor(data[0],data[1]);figure.flip_h=true
   actors.append({"sprite":figure,"delay":delay,"kind":data[0]});delay+=rng.randf_range(2.4,3.1)
+ for entry in FRONTIER_PEOPLE267:
+  var figure:=Sprite2D.new();figure.texture=load(entry[1]);figure.name="Distant"+str(frontier_people267.size());figure.set_meta("frontier_role267",entry[0]);figure.z_index=1
+  NpcScale214.apply(figure,figure.texture,DISTANT_HEIGHT267);add_child(figure);frontier_people267.append(figure)
  cycle=delay
  prepared=true;age=0.0;preparation_finished.emit()
 func finish():
@@ -86,14 +95,16 @@ func _process(delta:float):
  rider.visible=true
  age+=delta
  var t=fposmod(age,cycle)
+ for i in frontier_people267.size():
+  var figure:Sprite2D=frontier_people267[i]
+  figure.position=Vector2(fposmod(180.+i*216.-age*14.,1420.)-70.,DISTANT_FLOOR267+float(i%2)*3.)
+  figure.rotation=sin(age*.9+float(i))*.008
  rider.position=Vector2(drift_x(age if ready_age<0 else ready_age),FLOOR228)
  for a in actors:
   var local=fposmod(t-a.delay,cycle)
   a.sprite.visible=local<7.8
   if not a.sprite.visible:continue
   a.sprite.position=Vector2(lerpf(1420,-140,local/7.8),FLOOR228)
-  if a.kind=="farmer":
-   a.sprite.rotation=sin(local*4.0)*.018
  if ready_age>=0:
   var exit_time=age-ready_age
   rider.speed_scale=1.05
