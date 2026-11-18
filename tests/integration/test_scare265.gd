@@ -9,7 +9,7 @@ func after_each():
 func test_button_larger_clock_no_overlap_and_cooldown():
  var player=load("res://src/Presentation/world_player.gd").new();add_child(player)
  var button:=ScareButton265.new();button.player=player;add_child(button);await wait_process_frames(2)
- assert_gt(button.size.x,76.);assert_false(button.get_rect().intersects(Rect2(956,636,76,76)));assert_false(button.get_rect().intersects(Rect2(1046,636,76,76)))
+ assert_eq(button.position,Vector2(1150,510));assert_lte(button.position.x+button.size.x,1280.);assert_false(button.get_rect().intersects(Rect2(1214,636,76,76)));assert_gt(button.size.x,76.);assert_false(button.get_rect().intersects(Rect2(956,636,76,76)));assert_false(button.get_rect().intersects(Rect2(1046,636,76,76)))
  assert_true(button.can_activate265());button.activate265();assert_eq(button.cooldown265,5.);assert_false(button.can_activate265());button.activate265();assert_eq(button.cooldown265,5.)
  player.set_physics_process(false);button.cooldown265=0;assert_false(button.can_activate265());button.free();player.free()
 func test_wild_animals_flee_held_animals_unchanged_and_range():

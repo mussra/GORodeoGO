@@ -1,0 +1,20 @@
+{
+  "version": "2.7.198",
+  "version_code": 457,
+  "tests": 402,
+  "passed": 402,
+  "assertions": 54554,
+  "scripts": 64,
+  "button_position": [
+    1150,
+    510
+  ],
+  "button_size": [
+    112,
+    112
+  ],
+  "physical_android": false,
+  "screenshots_inspected": true,
+  "new_audio_downloaded": false,
+  "new_audio_integrated": false
+}

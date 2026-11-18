@@ -8,7 +8,7 @@ var pulse265:float=0.
 var affected265:int=0
 var audio265:AudioStreamPlayer
 func _ready():
- name="ScareButton265";position=Vector2(818,602);size=Vector2(112,112);custom_minimum_size=size;focus_mode=Control.FOCUS_NONE;QuestButtonStyle.apply(self);add_theme_font_size_override("font_size",18)
+ name="ScareButton265";position=Vector2(1150,510);size=Vector2(112,112);custom_minimum_size=size;focus_mode=Control.FOCUS_NONE;QuestButtonStyle.apply(self);add_theme_font_size_override("font_size",18)
  pressed.connect(activate265)
  audio265=AudioStreamPlayer.new();audio265.stream=load("res://audio/scare265.wav");add_child(audio265)
  _refresh265()
