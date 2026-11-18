@@ -47,6 +47,7 @@ func _wire(node:Node)->void:
  for child in node.get_children():
   if child is Control and child!=panel and child.has_meta("ui_modal"):continue
   if child is BaseButton and not wired.has(child):
+   if panel.has_meta("background300") and child is Button and not child.get_meta("skin272",false) and not child is CheckBox and not child is CheckButton:ButtonSkin272.apply(child)
    wired[child]=true
    child.pressed.connect(_pressed.bind(child))
   _wire(child)

@@ -96,7 +96,7 @@ func test_panel_lists_every_item_and_keeps_whip_behavior()->void:
 	await wait_physics_frames(1)
 	for id in EquipmentCatalog.ORDER:
 		assert_true(panel._buy.has(id) and panel._equip.has(id),"panel has a row for %s"%id)
-	assert_eq(panel._equip["whip_long"].get_node("Caption229").text,tr("UI_061"))
+	assert_eq(panel._equip["whip_long"].get_node("Caption229").text,"✓ EQUIPADO")
 	assert_true(panel._equip["whip_long"].disabled)
 	assert_eq(panel._buy["whip_long"].get_node("Caption229").text,"Conseguido")
 	assert_eq(panel._buy["spurs_basic"].get_node("Caption229").text,"Conseguir")

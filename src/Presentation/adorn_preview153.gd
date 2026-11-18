@@ -6,7 +6,7 @@ var frame_id:int=-1
 var runners:Array[TextureRect]=[]
 var small_runners:Array[TextureRect]=[]
 func _ready():
- MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=70
+ set_meta("background300","content");MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=70
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas)
  _text("Adornos de patas y botas · prueba visual",Vector2(30,16),29)

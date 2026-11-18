@@ -1,0 +1,24 @@
+{
+  "version": "3.0.2",
+  "code": 462,
+  "sha256": "9e0a0a4c18eb8b5a53b9929d6fc45cc590e8c67484100d5427826bd646d306ae",
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 69,
+  "tests_passed": 432,
+  "assertions": 55050,
+  "physical_android": false,
+  "full_historical_suite": false,
+  "red_test": "purchase and upgrade leave alpha0.45 while equip is already enabled; two failed assertions before fix",
+  "green_test": "native ConfirmationDialog OK pressed; purchased item and upgrade equip enabled alpha1; purchase does not auto-equip; click equips and badge/face change",
+  "route_fixture_update": "old test expected5 cards before crowns existed and assumed all modes unlocked; now6 and isolated debug fixture, viewport restored",
+  "screenshots": "Godot desktop renderer. Frontera captured from actual loaded world pause menu; other screens are their real menu components. Isolated QA profile. No Android physical test.",
+  "warnings": [
+    "1 GUT resource UID warning",
+    "21 deprecated calls",
+    "2 ObjectDB references seen in small targeted runs",
+    "intentional SaveData failure/rollback tests log error7",
+    "Android build-tools35 fallback for target36"
+  ],
+  "icon_scope": "only reuses existing Ant art; dedicated new sheet not generated or integrated yet"
+}

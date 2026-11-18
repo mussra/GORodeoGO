@@ -1,17 +1,22 @@
 class_name MenuNavigation
 extends RefCounted
 ## Shared header and large entry cards. Sections never repeat their parent tabs.
+const ICONS302={"editor":"res://art/ui/ant_icons187/05.png","book256":"res://art/breeding256/book-cover.png","crowns240":"res://art/ui/ant_icons187/30.png","rodeo240":"res://art/ui/ant_icons187/32.png","debug213":"res://art/ui/ant_icons187/05.png","performance245":"res://art/ui/ant_icons187/03.png","modular_preview":"res://art/ui/ant_icons187/05.png","country146":"res://art/ui/menu_entries189/atlas.png","country_saved152":"res://art/ui/menu_entries189/atlas.png","mode":"res://art/ui/ant_icons187/05.png","tools":"res://art/ui/icons300/horse.png"}
 static func header(host:Control,title:String,back:Callable)->void:
  var heading:=Label.new();heading.text=title;heading.position=Vector2(30,22);heading.add_theme_font_size_override("font_size",30);host.add_child(heading);TextFit181.fixed(heading,Vector2(990,48),30,22)
- var button:=Button.new();button.name="NavigationBack";button.text="VOLVER";button.position=Vector2(1050,20);button.size=Vector2(200,56);button.pressed.connect(back);host.add_child(button)
+ var button:=Button.new();button.name="NavigationBack";button.text="VOLVER";button.position=Vector2(1050,20);button.size=Vector2(200,56);button.pressed.connect(back);host.add_child(button);ButtonSkin272.apply(button);button.icon=EquipmentIcon229.texture300("back");button.expand_icon=true;button.add_theme_constant_override("icon_max_width",34)
 static func cards(host:Control,entries:Array,selected:Callable)->void:
  var cols:int=2 if entries.size()==4 else 3
  var width:float=560 if cols==2 else 380
  var gap:float=600 if cols==2 else 410
  for i in entries.size():
-  var entry:Dictionary=entries[i];var button:=Button.new();button.name="Navigate_"+str(entry.id);button.tooltip_text=str(entry.title);button.position=Vector2(40+i%cols*gap,150+int(i/cols)*200);button.size=Vector2(width,165);button.pressed.connect(selected.bind(str(entry.id)));host.add_child(button)
+  var entry:Dictionary=entries[i].duplicate();
+  if not entry.has("icon223") and ICONS302.has(str(entry.id)):
+   entry.icon223=ICONS302[str(entry.id)];entry.compact250=true
+  var button:=Button.new();button.name="Navigate_"+str(entry.id);button.tooltip_text=str(entry.title);button.position=Vector2(40+i%cols*gap,150+int(i/cols)*200);button.size=Vector2(width,165);button.pressed.connect(selected.bind(str(entry.id)));host.add_child(button)
   for state in ["normal","hover","pressed","focus"]:
    var box:=StyleBoxFlat.new();box.bg_color=Color("1b3d49") if state=="normal" else Color("285a68");box.border_color=Color("478b9a") if state=="normal" else Color("a1f1ef");box.set_border_width_all(2 if state!="focus" else 3);box.set_corner_radius_all(16);button.add_theme_stylebox_override(state,box)
+  ButtonSkin272.apply(button)
   if entry.has("icon223") and entry.get("compact250",false):
    var icon:=TextureRect.new();icon.name="GameIcon223";icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;icon.texture=load(str(entry.icon223));icon.position=Vector2(12,39);icon.size=Vector2(82,82);icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;icon.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(icon)
    var title:=Label.new();title.name="GameName223";title.text=str(entry.title);title.position=Vector2(104,20);title.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(title);TextFit181.fixed(title,Vector2(width-116,54),24,20,2)

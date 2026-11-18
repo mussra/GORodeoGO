@@ -7,7 +7,7 @@ var runners:Array[TextureRect]=[]
 var pose_specs:Array[Dictionary]=FinishPose168.specs()
 var pose_index:int=0
 func _ready():
- MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=65
+ set_meta("background300","content");MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=65
  var background:=ColorRect.new();background.color=Color("10252d");background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(background)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas)
  _text("Acabados · estudio de todas las poses",Vector2(35,20),30)

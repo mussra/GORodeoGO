@@ -9,7 +9,7 @@ var title:String="Filtros"
 var show_clear:bool=true
 var confirm_text:String="Ver resultados"
 func _ready()->void:
- MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=150
+ set_meta("background300","content");MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=150
  var shade:=ColorRect.new();shade.color=Color("10252d");shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(layout);layout()
  var bg:=ColorRect.new();bg.color=Color("15343e");bg.position=Vector2(220,85);bg.size=Vector2(840,590);canvas.add_child(bg)

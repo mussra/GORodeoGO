@@ -6,6 +6,8 @@ var _balance:Label
 var _state:Label
 var _buy:Dictionary={}
 var _equip:Dictionary={}
+var _rows302:Dictionary={}
+var _badges302:Dictionary={}
 var _horses:HorsePanel
 var _confirm:ConfirmationDialog
 var _pending_purchase:String=""
@@ -48,6 +50,8 @@ func _item_row(id:String)->Panel:
  if not diff.is_empty():_row_label(panel,diff,Vector2(126,65),15)
  var price_text:String=("Mejora: +%d puntos"%int(item.price)) if item.has("requires") else ("%d puntos"%int(item.price))
  _row_label(panel,price_text,Vector2(126,85),17)
+ _rows302[id]=panel
+ var badge:=Label.new();badge.position=Vector2(530,86);badge.size=Vector2(255,25);badge.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;badge.add_theme_font_size_override("font_size",16);badge.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(badge);_badges302[id]=badge
  _buy[id]=_row_card(panel,"Conseguir","buy",Vector2(800,20),Vector2(170,84),func():
   _confirm_purchase(id))
  _equip[id]=_row_card(panel,"Equipar","equip",Vector2(985,20),Vector2(170,84),func():
@@ -112,14 +116,24 @@ func refresh()->void:
   var slot:String=str(item.get("slot",""))
   var owned:bool=state.owned.has(id)
   _buy[id].get_node("Caption229").text="Pendiente" if item.get("blocked",false) else ("Conseguido" if owned else ("Mejorar" if item.has("requires") else "Conseguir"))
-  MenuInputGuard.set_button_disabled(_buy[id],not state.can_buy(id,EquipmentCatalog.ITEMS))
-  _buy[id].modulate=Color(1,1,1,.45) if _buy[id].disabled else Color.WHITE
+  var can_buy302:bool=state.can_buy(id,EquipmentCatalog.ITEMS)
+  MenuInputGuard.set_button_disabled(_buy[id],not can_buy302)
+  _buy[id].modulate=Color.WHITE if can_buy302 else Color(1,1,1,.45)
   var selected:bool=state.equipped.get(slot,"")==id
   _equip[id].get_node("Caption229").text=("Quitar" if item.get("cosmetic",false) else tr("UI_061")) if selected else tr("UI_059")
-  MenuInputGuard.set_button_disabled(_equip[id],(selected and not item.get("cosmetic",false)) or not owned)
-  _equip[id].modulate=Color(1,1,1,.45) if _equip[id].disabled else Color.WHITE
+  var can_equip302:bool=owned and (not selected or item.get("cosmetic",false))
+  MenuInputGuard.set_button_disabled(_equip[id],not can_equip302)
+  # Business state is not the temporary input lock while the dialog is closing.
+  _equip[id].modulate=Color.WHITE if owned else Color(1,1,1,.45)
+  _equip[id].add_theme_stylebox_override("disabled",ButtonSkin272.style("pressed" if selected else "disabled"))
+  _equip[id].get_node("Caption229").text=("✓ EQUIPADO" if selected else "EQUIPAR") if not item.get("cosmetic",false) else ("QUITAR" if selected else "EQUIPAR")
+  _badges302[id].text="✓ EQUIPADO" if selected else ("SIN EQUIPAR" if owned else "NO CONSEGUIDO")
+  _badges302[id].add_theme_color_override("font_color",Color("ffe09a") if selected else Color("fff1d2") if owned else Color("9caaa9"))
+  var face302:=ButtonSkin272.style("normal").duplicate() as StyleBoxTexture
+  face302.modulate_color=Color("ffe3a0") if selected else Color.WHITE
+  _rows302[id].add_theme_stylebox_override("panel",face302)
  var selected_whip:String=state.equipped.get("whip","")
- _state.text=tr("UI_057")+(tr(EquipmentCatalog.ITEMS[selected_whip]["name"]) if EquipmentCatalog.ITEMS.has(selected_whip) else tr("UI_058"))
+ _state.text="FUSTA DE REGATE: "+(tr(EquipmentCatalog.ITEMS[selected_whip]["name"]) if EquipmentCatalog.ITEMS.has(selected_whip) else tr("UI_058"))
 
 func _confirm_purchase(id:String)->void:
  if not SaveData.equipment_state().can_buy(id,EquipmentCatalog.ITEMS):return

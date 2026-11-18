@@ -8,7 +8,7 @@ var notes:Dictionary={}
 var canvas:Control
 var rows:VBoxContainer
 func _ready()->void:
- set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=180;mouse_filter=Control.MOUSE_FILTER_STOP;MenuInputGuard.install(self)
+ set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=180;mouse_filter=Control.MOUSE_FILTER_STOP;set_meta("background300","content");MenuInputGuard.install(self)
  var background:=ColorRect.new();background.color=Color("10252d");background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(background)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(layout);layout()
  var title:=Label.new();title.text="NOTAS DEL MAPA";title.position=Vector2(44,26);title.add_theme_font_size_override("font_size",30);canvas.add_child(title)

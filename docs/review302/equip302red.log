@@ -1,0 +1,102 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[INFO]:  using [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+
+
+res://tests/integration/test_equipment302.gd
+* test_purchase_and_upgrade_immediately_show_enabled_equip
+    [Passed]:  scare_whip265 purchased
+    [Passed]:  scare_whip265 equip immediately enabled
+    [Failed]:  [COLOR(1.0, 1.0, 1.0, 0.45)] expected to equal [COLOR(1.0, 1.0, 1.0, 1.0)]:  scare_whip265 not visually disabled
+      at line 11
+    [Passed]:  scare_whip_plus265 purchased
+    [Passed]:  scare_whip_plus265 equip immediately enabled
+    [Failed]:  [COLOR(1.0, 1.0, 1.0, 0.45)] expected to equal [COLOR(1.0, 1.0, 1.0, 1.0)]:  scare_whip_plus265 not visually disabled
+      at line 11
+* test_victory_repeats_purchase_equip_reload_and_player_effect
+    [Passed] 
+    [Passed]:  [3665] expected to equal [3665]:  
+    [Passed]:  points do not auto-equip a fusta
+    [Passed]:  [3675] expected to equal [3675]:  
+    [Passed]:  [3675] expected to equal [3675]:  duplicate win trigger cannot double credit
+    [Passed] 
+    [Passed]:  [10] expected to equal [10]:  a later separate win still earns
+    [Passed]:  [3685] expected to equal [3685]:  
+    [Passed] 
+    [Passed]:  [2685] expected to equal [2685]:  
+    [Passed]:  [0.0] expected to equal [0.0]:  buy separate from equip
+    [Passed] 
+    [Passed]:  [260.0] expected to equal [260.0]:  
+    [Passed] 
+    [Passed] 
+    [Passed]:  [685] expected to equal [685]:  
+    [Passed]:  [420.0] expected to equal [420.0]:  
+    [Passed]:  [10] expected to equal [10]:  
+    [Passed] 
+    [Passed] 
+    [Passed] 
+    [Passed]:  [420.0] expected to equal [420.0]:  
+    [Passed]:  ["EQUIPPED"] expected to equal ["EQUIPPED"]:  
+    [Passed] 
+* test_new_profile_gets_ten_points_first_win_and_only_next_level
+    [Passed]:  [10] expected to equal [10]:  
+    [Passed]:  [1] expected to equal [1]:  
+    [Passed]:  [10] expected to equal [10]:  
+    [Passed] 
+    [Passed] 
+    [Passed] 
+2/3 passed.
+
+
+
+
+==============================================
+= Run Summary
+==============================================
+
+res://tests/integration/test_equipment302.gd
+- test_purchase_and_upgrade_immediately_show_enabled_equip
+    [Failed]:  [COLOR(1.0, 1.0, 1.0, 0.45)] expected to equal [COLOR(1.0, 1.0, 1.0, 1.0)]:  scare_whip265 not visually disabled
+          at line 11
+    [Failed]:  [COLOR(1.0, 1.0, 1.0, 0.45)] expected to equal [COLOR(1.0, 1.0, 1.0, 1.0)]:  scare_whip_plus265 not visually disabled
+          at line 11
+
+Totals
+------
+Scripts               1
+Tests                 3
+Passing Tests         2
+Failing Tests         1
+Asserts           34/36
+Time              1.68s
+
+
+---- 1 failing tests ----
+
+[INFO]:  Exiting with code 1
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

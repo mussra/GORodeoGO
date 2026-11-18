@@ -11,7 +11,7 @@ const GOLD=Color("d7b56f")
 const PAPER=Color("f7e8bf")
 func _ready():
  layer=125;process_mode=Node.PROCESS_MODE_ALWAYS
- shell=Control.new();shell.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shell);MenuInputGuard.install(shell)
+ shell=Control.new();shell.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shell);shell.set_meta("background300","content");MenuInputGuard.install(shell)
  var shade:=ColorRect.new();shade.color=Color("051c24ee");shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);shell.add_child(shade)
  canvas=Control.new();canvas.size=Vector2(1280,720);shell.add_child(canvas)
  get_viewport().size_changed.connect(_fit);_fit();show_page(page)

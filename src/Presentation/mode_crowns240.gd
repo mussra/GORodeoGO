@@ -9,7 +9,7 @@ var style_button241:Button
 var canvas:Control
 var notice:Label
 func _ready()->void:
- MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=180;theme=RanchTheme.create()
+ set_meta("background300","content");MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=180;theme=RanchTheme.create()
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(_layout);_layout()
  MenuNavigation.header(canvas,"CORONAS Y VICTORIAS",queue_free)
@@ -21,7 +21,7 @@ func _ready()->void:
  for i in ModeVictories240.MODES.size():
   var mode:String=ModeVictories240.MODES[i];var count:int=SaveData.victories240.wins.get(mode,0)
   var obtained:bool=cup_complete if mode=="cup" else count>=ModeVictories240.CROWN_WINS
-  var card:=Panel.new();card.position=Vector2(40+i%3*410,136+int(i/3)*232);card.size=Vector2(380,214);card.add_theme_stylebox_override("panel",RanchTheme.box(Color("1b3d49"),Color("478b9a"),16));canvas.add_child(card)
+  var card:=Panel.new();card.position=Vector2(40+i%3*410,136+int(i/3)*232);card.size=Vector2(380,214);card.add_theme_stylebox_override("panel",RanchTheme.box(Color("1b3d49"),Color("478b9a"),16));canvas.add_child(card);ButtonSkin272.panel(card)
   var wreath:=TextureRect.new();wreath.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;wreath.name="Crown_"+mode;wreath.set_meta("obtained241",obtained);wreath.texture=_texture241(mode,obtained);wreath.position=card.position+Vector2(10,8);wreath.size=Vector2(126,114);wreath.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;wreath.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;wreath.mouse_filter=Control.MOUSE_FILTER_IGNORE;canvas.add_child(wreath)
   _label(TITLES[i],card.position+Vector2(144,20),22,Color.WHITE)
   _label(FLOWERS[i],card.position+Vector2(144,53),20,COLORS[i])

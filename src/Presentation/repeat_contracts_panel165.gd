@@ -13,7 +13,7 @@ static func summary()->String:
  if state.active:return "Encargo del rancho: %d/5 %s"%[state.events.size(),animal]
  return "Encargos del rancho: habla con el granjero"
 func _ready():
- MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=150
+ set_meta("background300","content");MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=150
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas)
  _label("ENCARGOS DEL RANCHO",Vector2(60,35),32)

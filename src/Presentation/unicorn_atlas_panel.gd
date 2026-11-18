@@ -7,7 +7,7 @@ const SHADE=Color("263b49")
 var canvas:Control
 var catalog:Array[Dictionary]=[]
 func _ready()->void:
- MenuInputGuard.install(self)
+ set_meta("background300","content");MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  var bg=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(_layout);_layout()

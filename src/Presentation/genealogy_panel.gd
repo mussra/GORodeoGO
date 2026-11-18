@@ -30,7 +30,7 @@ var item_pager:ItemPager
 func _exit_tree()->void:
  if motion!=null:motion.kill()
 func _ready()->void:
- MenuInputGuard.install(self)
+ set_meta("background300","content");MenuInputGuard.install(self)
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=110
  collection=SaveData.horse_collection
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)

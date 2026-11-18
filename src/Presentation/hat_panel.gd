@@ -11,7 +11,7 @@ var _finish_ids:Array[int]=[0,1,2,3,4,5,6,7,8,9,10,11,20,21,22,23,24,25,13,14]
 var _apply:Button
 var _pending:String="original"
 func _ready()->void:
- MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=60
+ set_meta("background300","content");MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=60
  var bg=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  _canvas=Control.new();_canvas.size=Vector2(1280,720);add_child(_canvas)
  _label("Sombrero del vaquero",Vector2(40,30),32)
