@@ -295,6 +295,12 @@ func _show_settings()->void:
 	for text in [tr("UI_037"),"Español","English"]:pick.add_item(text)
 	pick.selected=["auto","es","en"].find(Localization.choice)
 	var note:=Label.new();note.text=tr("UI_040");box.add_child(note)
+	var movement_title:=Label.new();movement_title.text="Control de movimiento";box.add_child(movement_title)
+	var movement:=OptionButton.new();movement.name="MovementMode258";movement.custom_minimum_size=Vector2(700,56);movement.add_item("Actual · el mando sigue al dedo");movement.add_item("Anclado · centro fijo donde tocas");movement.selected=1 if GameState.anchored_movement258 else 0;box.add_child(movement)
+	var movement_note:=Label.new();movement_note.text="Anclado: arrastra desde el toque inicial. Suelta para parar.
+El lazo sigue disponible con el otro dedo.";box.add_child(movement_note)
+	movement.item_selected.connect(func(i:int):
+		if not GameState.set_movement258(i==1):movement_note.text="No se pudo guardar el control. Inténtalo de nuevo.")
 	if GameState.trial_tools_enabled():
 		var osd:=CheckButton.new();osd.name="PerformanceToggle245";osd.text="Mostrar rendimiento (OSD)";osd.custom_minimum_size.y=56;osd.button_pressed=GameState.performance_osd245;box.add_child(osd);osd.toggled.connect(GameState.set_performance_osd245)
 		var debug:=Button.new();debug.text="Herramientas DEBUG";debug.custom_minimum_size.y=56;box.add_child(debug);debug.pressed.connect(_show_debug213)

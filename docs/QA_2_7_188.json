@@ -1,0 +1,12 @@
+{
+  "version": "2.7.188",
+  "versionCode": 447,
+  "tests": 329,
+  "asserts": 53787,
+  "scripts": 52,
+  "default_control": "following",
+  "optional_control": "anchored dynamic",
+  "saved_on_device": true,
+  "android_physical": false,
+  "sha256": "c7dfb9a4b5ba2759db2f32dac84c62d181029f5853a3397ed946717d4caca331"
+}

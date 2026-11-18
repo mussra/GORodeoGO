@@ -23,8 +23,19 @@ func set_performance_osd245(enabled:bool)->void:
  performance_osd245=enabled
  var cfg:=ConfigFile.new();cfg.set_value("performance","visible",enabled);cfg.save("user://performance245.cfg")
 
+const CONTROL_PREF258="user://movement258.cfg"
+var anchored_movement258:bool=false
+func load_movement258()->void:
+ var cfg:=ConfigFile.new();anchored_movement258=false
+ if cfg.load(CONTROL_PREF258)==OK:anchored_movement258=bool(cfg.get_value("movement","anchored",false))
+func set_movement258(anchored:bool)->bool:
+ var cfg:=ConfigFile.new();cfg.set_value("movement","anchored",anchored)
+ if cfg.save(CONTROL_PREF258)!=OK:return false
+ anchored_movement258=anchored
+ return true
 var _exit_dialog:ConfirmationDialog
 func _ready()->void:
+ load_movement258()
  var cfg:=ConfigFile.new()
  if cfg.load("user://performance245.cfg")==OK:performance_osd245=bool(cfg.get_value("performance","visible",false))
  var osd:Node=load("res://src/Presentation/performance_osd242.gd").new();osd.name="PerformanceOSD242";add_child.call_deferred(osd)

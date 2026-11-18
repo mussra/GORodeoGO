@@ -35,6 +35,9 @@ static func apply(level:Node)->void:
  if needs_textures and not cache.has(key):cache[key]=[texture_for(traits,false),texture_for(traits,true)]
  for v in sticks:
   v.joystick_size=160.;v.tip_size=48.
+  if v==sticks[0]:
+   v.joystick_mode=VirtualJoystick.JOYSTICK_DYNAMIC if GameState.anchored_movement258 else VirtualJoystick.JOYSTICK_FOLLOWING
+   if GameState.anchored_movement258:v.joystick_size=120.
   var knob:=StyleBoxFlat.new();knob.bg_color=Color("ffd66a",.56)
   knob.border_color=Color("714e25",.8);knob.set_border_width_all(2);knob.set_corner_radius_all(30)
   v.add_theme_stylebox_override("normal_tip",knob);v.add_theme_stylebox_override("pressed_tip",knob)
