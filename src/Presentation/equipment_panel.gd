@@ -26,6 +26,8 @@ func _ready()->void:
  _card("Adornos","adorn",Vector2(660,125),Vector2(270,145),func():add_child(AdornShop169.new()))
  _card("Acabados","finish",Vector2(970,125),Vector2(270,145),func():add_child(FinishShop168.new()))
  var scroll:=ScrollContainer.new();scroll.position=Vector2(40,292);scroll.size=Vector2(1200,352);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;_canvas.add_child(scroll)
+ scroll.name="EquipmentList257";scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_ALWAYS;scroll.get_v_scroll_bar().custom_minimum_size.x=24
+ var gesture:=EquipmentScroll257.new();gesture.scroll=scroll;add_child(gesture)
  var list:=VBoxContainer.new();list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;list.add_theme_constant_override("separation",8);scroll.add_child(list)
  for id in EquipmentCatalog.ORDER:
   if not EquipmentCatalog.ITEMS.has(id):continue
@@ -64,6 +66,7 @@ func _row_card(panel:Panel,caption:String,kind:String,pos:Vector2,extent:Vector2
  return button
 func _effect_text(id:String)->String:
  var item:Dictionary=EquipmentCatalog.ITEMS[id]
+ if item.has("small_lasso_range"):return "Cerdos/cabras: alcance +50%, margen 58 → 80 px; toros sin cambios"
  if item.has("reach"):return "Trazo de regate: %d px"%int(item.reach)
  if item.has("running_drain_mult"):return "Al correr: -%d%% de gasto de resistencia"%int(round((1.0-float(item.running_drain_mult))*100.0))
  if item.has("dodge_recharge_mult"):return "Regate: recarga -%d%%"%int(round((1.0-float(item.dodge_recharge_mult))*100.0))

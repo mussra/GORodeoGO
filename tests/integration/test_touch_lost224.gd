@@ -30,8 +30,9 @@ func test_reused_index_after_lost_release_can_take_new_control_and_stop():
  touch(Vector2(260,400),false);await wait_physics_frames(20);assert_eq(moving(),Vector2.ZERO);assert_lt(player.velocity.length(),1.)
 func test_pause_clears_old_hold_even_without_release():
  await start();get_tree().paused=true;await wait_process_frames(4);get_tree().paused=false;await wait_physics_frames(20);assert_eq(moving(),Vector2.ZERO);assert_lt(player.velocity.length(),1.)
-func test_pointer_leaves_screen_cancels_ordinary_movement():
- await start();drag(Vector2(-30,420));await wait_physics_frames(20);assert_eq(moving(),Vector2.ZERO);assert_lt(player.velocity.length(),1.)
+func test_pointer_leaves_screen_keeps_hold_until_release():
+ await start();drag(Vector2(-30,420));await wait_physics_frames(20);assert_gt(moving().length(),.1)
+ touch(Vector2(-30,420),false);await wait_physics_frames(20);assert_eq(moving(),Vector2.ZERO)
 func test_canceled_aim_never_throws_or_commits_a_regate():
  await start();touch(Vector2(900,400),true,1);await wait_physics_frames(2);drag(Vector2(980,400),1);await wait_physics_frames(2)
  assert_true(player.lasso.is_charging());touch(Vector2(30,420),false,0,true);await wait_physics_frames(3)
@@ -55,5 +56,8 @@ func test_drawn_regate_can_still_extend_at_edge_and_execute_on_release():
  drag(Vector2(-10,400));await wait_physics_frames(2);assert_true(player.dodge.drawing)
  touch(Vector2(-10,400),false);await wait_physics_frames(2);assert_false(player.dodge.path.is_empty());assert_eq(Engine.time_scale,1.)
 
-func test_last_reported_point_exactly_on_edge_cancels_before_touch_disappears():
- await start();drag(Vector2(0,420));await wait_physics_frames(20);assert_eq(moving(),Vector2.ZERO);assert_lt(player.velocity.length(),1.)
+func test_hold_survives_every_edge_and_release_stops():
+ for edge in [Vector2(0,420),Vector2(1279,420),Vector2(150,0),Vector2(150,719)]:
+  await start();drag(edge);await wait_physics_frames(15);assert_gt(moving().length(),.1)
+  touch(edge,false);await wait_physics_frames(15);assert_eq(moving(),Vector2.ZERO)
+  await wait_seconds(.5)

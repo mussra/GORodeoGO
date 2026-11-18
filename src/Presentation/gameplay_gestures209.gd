@@ -92,9 +92,8 @@ func _input(event:InputEvent)->void:
     _send(state.press,Vector2.ZERO,false);_send(event,Vector2.ZERO,false)
  elif event is InputEventScreenDrag and touches.has(event.index):
   var state:Dictionary=touches[event.index];state.last=event.position
-  # Drawing deliberately extends a trace at the screen edge. Ordinary holds do not.
-  if not get_viewport().get_visible_rect().grow(-2.).has_point(event.position) and not game.player.dodge.drawing:
-   _cancel_touches224();get_viewport().set_input_as_handled();return
+  # Edge contact is still an active hold. Only release, cancellation, focus loss
+  # or a modal stops it; a long chase must not require lifting at the bezel.
   get_viewport().set_input_as_handled()
   if state.get("scroll249")!=null:
    _scroll_drag249(state,event.position);return

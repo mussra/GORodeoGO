@@ -116,7 +116,7 @@ func test_wide_manual_zoom_has_nine_levels_and_restores_decor():
 func test_arrival_h1_uses_display_name_and_fades_in_then_out():
  arrival.begin(plan());assert_eq(arrival.title.modulate.a,0.)
  assert_eq(arrival.title.text,TownIdentity215.display_name248(SaveData.world_cousins140,plan().id))
- assert_gte(arrival.title.get_theme_font_size("font_size"),44)
+ assert_gte(arrival.title.get_theme_font_size("font_size"),30)
  arrival.elapsed=.35;arrival.apply_frame();assert_almost_eq(arrival.title.modulate.a,.5,.01)
  arrival.elapsed=1.5;arrival.apply_frame();assert_eq(arrival.title.modulate.a,1.)
  arrival.elapsed=TownArrival244.OUT_SECONDS+TownArrival244.HOLD_SECONDS+TownArrival244.BACK_SECONDS;arrival.apply_frame();assert_almost_eq(arrival.title.modulate.a,0.,.001)

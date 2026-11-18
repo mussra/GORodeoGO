@@ -37,3 +37,5 @@ static func spurs()->Dictionary:
 ## Cosmetics: appearance only, no gameplay advantage.
 static func cosmetic_equipped(slot:String)->bool:
 	return not equipped_id(slot).is_empty()
+
+static func small_lasso257()->bool:return not _equipped_item("lasso").is_empty()

@@ -1,0 +1,18 @@
+{
+  "version": "2.7.187",
+  "versionCode": 446,
+  "tests": 314,
+  "asserts": 53717,
+  "scripts": 51,
+  "android_physical": false,
+  "synthetic_touch": true,
+  "sha256": "529584c2b0bf0e2574927cf0352071c326f159043985bf305dfc8bd839d6db48",
+  "lasso": {
+    "price_game_points": 200,
+    "equipped_required": true,
+    "world_range_multiplier": 1.5,
+    "pig_goat_radius": 80,
+    "default_radius": 58
+  },
+  "main_changed": false
+}

@@ -39,6 +39,13 @@ func charge_origin_local()->Vector2:
 func flight_origin_global()->Vector2:
 	return get_parent().to_global(visual_hand.call() if visual_hand.is_valid() else Vector2(8,-12))
 
+var small_animal_context257:bool=false
+func effective_distance257()->float:
+	return max_throw_distance*(1.5 if small_animal_context257 and EquipmentEffects.small_lasso257() else 1.)
+
+func effective_radius257()->float:
+	return 80. if small_animal_context257 and EquipmentEffects.small_lasso257() else capture_area_visual_radius
+
 var aim_direction: Vector2 = Vector2.RIGHT
 ## Velocity in game-world units/sec, same clock as rope tween and rider physics.
 var rider_velocity:Callable=func()->Vector2:return Vector2.ZERO
@@ -113,7 +120,7 @@ func _on_aim_released(input_vector: Vector2) -> void:
 	if not _touch_aim_active:
 		return
 	_touch_aim_active = false
-	var decision: Dictionary = _lasso_gesture.release(input_vector, _now_seconds(), _is_charging, max_throw_distance)
+	var decision: Dictionary = _lasso_gesture.release(input_vector, _now_seconds(), _is_charging, effective_distance257())
 	if decision.double_tap:
 		release_requested.emit()
 	if not _is_charging:
@@ -134,9 +141,9 @@ func process_throw_input(delta: float) -> void:
 		if aim_vec.length() > 0.0:
 			aim_direction = aim_vec.normalized()
 		if _touch_aim_active:
-			_charge_distance = LassoAim.throw_distance(aim_vec, max_throw_distance)
+			_charge_distance = LassoAim.throw_distance(aim_vec, effective_distance257())
 		else:
-			_charge_distance = minf(max_throw_distance, _charge_distance + charge_speed * delta)
+			_charge_distance = minf(effective_distance257(), _charge_distance + charge_speed * delta)
 		_update_charge_visual()
 		if Input.is_action_just_released("throw_lasso"):
 			_release_throw()
@@ -174,8 +181,8 @@ func draw_charge_aim(canvas: Node2D) -> void:
 	var target: Vector2 = inherited_landing(Vector2.ZERO,aim_direction,charge_distance(),rider_velocity.call(),lasso_travel_time)
 	if _charge_visual != null and _charge_visual.points.size() == 2:
 		target = _charge_visual.points[1]
-	canvas.draw_circle(target, capture_area_visual_radius, Color(1.0, 0.84, 0.38, 0.12))
-	canvas.draw_arc(target, capture_area_visual_radius, 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
+	canvas.draw_circle(target, effective_radius257(), Color(1.0, 0.84, 0.38, 0.12))
+	canvas.draw_arc(target, effective_radius257(), 0.0, TAU, 48, Color(1.0, 0.86, 0.44, 0.85), 2.0, true)
 	canvas.draw_circle(target, 3.0, Color(1.0, 0.92, 0.7))
 
 func cancel_input() -> void:
@@ -215,7 +222,7 @@ func _release_throw(final_vector: Vector2 = Vector2.ZERO) -> void:
 		return
 	if final_vector.length() > 0.0:
 		aim_direction = final_vector.normalized()
-		_charge_distance = LassoAim.throw_distance(final_vector, max_throw_distance)
+		_charge_distance = LassoAim.throw_distance(final_vector, effective_distance257())
 
 	var landing_point: Vector2 = inherited_landing(get_parent().global_position,aim_direction,_charge_distance,rider_velocity.call(),lasso_travel_time)
 	var throw_origin: Vector2 = get_parent().global_position
@@ -256,6 +263,7 @@ func resolve_capture(landing_point: Vector2) -> Node2D:
 	var candidates: Array = prey_provider.call().duplicate()
 	candidates.sort_custom(func(a, b): return landing_point.distance_to(a.global_position) < landing_point.distance_to(b.global_position))
 	for prey in candidates:
+		if small_animal_context257 and EquipmentEffects.small_lasso257() and not prey.has_method("small_lasso_target257") and get_parent().global_position.distance_to(landing_point)>max_throw_distance+capture_area_visual_radius:continue
 		if prey.try_capture(landing_point):
 			prey_captured.emit(prey)
 			return prey
@@ -270,7 +278,7 @@ func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> voi
 	rope.origin_provider=flight_origin_global
 	rope.start=flight_origin_global() if visual_hand.is_valid() else throw_origin
 	rope.landing=landing_point
-	rope.landing_radius=capture_area_visual_radius
+	rope.landing_radius=effective_radius257()
 	rope_parent.call().add_child(rope)
 	var tween:Tween=create_tween()
 	_flight_tween=tween
@@ -280,7 +288,7 @@ func _animate_lasso_flight(throw_origin: Vector2, landing_point: Vector2) -> voi
 ## Shows the lasso's effective capture area as a translucent circle where it lands, fading out.
 func _flash_landing_area(landing_point: Vector2) -> void:
 	var marker := Polygon2D.new()
-	marker.polygon = _circle_points(capture_area_visual_radius, 24)
+	marker.polygon = _circle_points(effective_radius257(), 24)
 	marker.color = Color(0.85, 0.65, 0.2, 0.35)
 	rope_parent.call().add_child(marker)
 	marker.global_position = landing_point

@@ -113,10 +113,12 @@ func _draw() -> void:
 func try_capture(landing_point: Vector2) -> bool:
 	if roped:
 		return false
-	return global_position.distance_to(landing_point) <= LassoController.PREY_HIT_RADIUS + LassoController.PREY_CAPTURE_TOLERANCE
+	return global_position.distance_to(landing_point) <= (80.0 if EquipmentEffects.small_lasso257() else LassoController.PREY_HIT_RADIUS + LassoController.PREY_CAPTURE_TOLERANCE)
 
 func _heading249(motion:Vector2,delta:float)->void:
 	var desired:bool=WildHeading129.flip(motion,flip_h)
 	if desired==flip_h:_flip_pending249=0.;return
 	_flip_pending249+=maxf(0.,delta)
 	if _flip_pending249>=WildHeading129.VIEW_HOLD:flip_h=desired;_flip_pending249=0.
+
+func small_lasso_target257()->bool:return true

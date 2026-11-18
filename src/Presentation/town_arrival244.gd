@@ -35,7 +35,9 @@ func _ready()->void:
  title.add_theme_color_override('font_color',Color('fff2c5'))
  title.add_theme_color_override('font_shadow_color',Color('091c24'))
  title.add_theme_constant_override('shadow_offset_x',3);title.add_theme_constant_override('shadow_offset_y',4)
- title.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+ title.autowrap_mode=TextServer.AUTOWRAP_OFF
+ title.clip_text=true
+ title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
  title.add_theme_stylebox_override('normal',RanchTheme.box(Color('183c30ee'),Color('d9ab58'),6))
  layer.add_child(title);title.hide()
 func key(id:String)->String:return '%s|%d|%d|%s'%[SaveData.save_path,SaveData.world_seed,SaveData.world_generator_version,id]
@@ -75,7 +77,8 @@ func begin(candidate:Dictionary)->void:
  preview=load('res://src/Presentation/town_arrival_view244.gd').new();preview.plan=plan;preview.world=world;world.add_child(preview)
  title.text=TownIdentity215.display_name248(SaveData.world_cousins140,plan.id)
  var extent:Vector2=get_viewport().get_visible_rect().size
- title.size=Vector2(minf(1000.,extent.x-80.),110.);title.position=Vector2((extent.x-title.size.x)*.5,112.);title.show()
+ title.reset_size();var measured:Vector2=title.get_theme_font('font').get_string_size(title.text,HORIZONTAL_ALIGNMENT_LEFT,-1,32)
+ title.add_theme_font_size_override('font_size',32);title.size=Vector2(minf(measured.x+36.,extent.x-80.),54.);title.position=Vector2((extent.x-title.size.x)*.5,76.);title.show()
  apply_frame()
 static func cinematic_curve(t:float)->float:
  var x:float=clampf(t,0.,1.)

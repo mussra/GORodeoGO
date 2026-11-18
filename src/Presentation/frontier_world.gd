@@ -1055,6 +1055,7 @@ func _build_hud() -> void:
 	player.stunned.connect(func(): _audio.play("stun"))
 	player.lasso.lasso_thrown.connect(func(_o: Vector2, _p: Vector2): _audio.play("throw"))
 	player.lasso.prey_captured.connect(func(_p: Node2D): _audio.play("capture"))
+	player.lasso.small_animal_context257=true
 	player.lasso.prey_provider = func() -> Array:
 		var out: Array = []
 		for key in _herd_horses:
