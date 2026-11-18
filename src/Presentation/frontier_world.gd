@@ -1255,7 +1255,12 @@ func _setup_npcs()->void:
 	_story_flower=Sprite2D.new();_story_flower.texture=DecorScript.FLOWER_TEXS[14];_story_flower.scale=Vector2.ONE*30.0/_story_flower.texture.get_height();_story_flower.visible=false;add_child(_story_flower)
 	_flower_button=Button.new();_flower_button.position=Vector2(475,500);_flower_button.size=Vector2(330,56);QuestButtonStyle.contextual180(_flower_button);_flower_button.text="Recoger flor del este";_flower_button.visible=false;_hud.add_child(_flower_button)
 	_flower_button.pressed.connect(_collect_story_flower)
+var _interior262:FloristRoom262
+func _home_florist262(data:Dictionary)->bool:
+	return data.id=="florist" or (data.get("town234","")=="home" and data.get("role234","")=="florist")
 func _open_npc(data:Dictionary)->void:
+	if _home_florist262(data) and not is_instance_valid(_interior262):
+		_open_florist262(data);return
 	if data.id=="workshop256" or (data.get("town234","")=="home" and data.get("role234","")=="saddler"):
 		_open_workshop256(data.position);return
 	if data.id=="mentor256":
@@ -1275,6 +1280,7 @@ func _open_npc(data:Dictionary)->void:
 	else:
 		_npc_dialog=NpcDialog.new();_npc_dialog.setup(data,SaveData.world_quests)
 	_hud.add_child(_npc_dialog)
+	if is_instance_valid(_interior262):_npc_dialog.reparent(_interior262)
 	if garden212!=null:garden212.attach(_npc_dialog,data)
 	if _npc_dialog is NpcDialog:_npc_dialog.contracts_requested165.connect(func():
 		_close_npc();player.cancel_input();player.set_physics_process(false)
@@ -1297,7 +1303,8 @@ func _open_npc(data:Dictionary)->void:
 func _close_npc()->void:
 	if is_instance_valid(_npc_dialog):_npc_dialog.queue_free()
 	if is_instance_valid(_npc_block):_npc_block.queue_free()
-	_npc_dialog=null;player.set_physics_process(true);_refresh_quest_hud();_refresh_missions()
+	_npc_dialog=null;player.set_physics_process(not is_instance_valid(_interior262));_refresh_quest_hud();_refresh_missions()
+	if is_instance_valid(_interior262):_restore_interior262.call_deferred()
 func _quest_event(kind:String,target:String,event_id:String)->void:
 	for id in NpcQuests.record(SaveData.world_quests,kind,target,event_id):
 		var q:Dictionary=NpcQuests.QUESTS[id];var state:Dictionary=NpcQuests.state(SaveData.world_quests,id)
@@ -1324,7 +1331,7 @@ func _refresh_quest_hud()->void:
 func _tick_npcs()->void:
 	var nearest:Dictionary=_nearest_npc105()
 	_npc_button.visible=player.position.distance_to(nearest.position)<155.0
-	_npc_button.text="Entrar al taller" if (nearest.id=="workshop256" or (nearest.get("town234","")=="home" and nearest.get("role234","")=="saddler")) else "Hablar con "+str(nearest.name).to_lower()
+	_npc_button.text="Entrar a la floristería" if _home_florist262(nearest) else "Entrar al taller" if (nearest.id=="workshop256" or (nearest.get("town234","")=="home" and nearest.get("role234","")=="saddler")) else "Hablar con "+str(nearest.name).to_lower()
 	_tick_flowers105()
 	_tick_jobs249()
 	if SaveData.world_generator_version<6:_tick_flora138()
@@ -1375,7 +1382,7 @@ func _npcs98()->Array:
 	if key==_npc_roster_key242 and not _npc_roster242.is_empty():return _npc_roster242
 	var entries:Array=[]
 	for node in TownNetwork234.nodes(SaveData.world_seed).values():
-		for role in node.roles:entries.append({"id":"town234:"+node.id+":"+role,"town234":node.id,"role234":role,"name":TownNetwork234.npc_name(node.id,role),"position":TownNetwork234.point(SaveData.world_seed,node.id,role),"quests":[]})
+		for role in node.roles:entries.append({"id":"town234:"+node.id+":"+role,"town234":node.id,"role234":role,"name":TownNetwork234.npc_name(node.id,role),"position":FloristJourney138.home_door(SaveData.world_seed) if node.id=="home" and role=="florist" else TownNetwork234.point(SaveData.world_seed,node.id,role),"quests":[]})
 	_npc_roster_key242=key;_npc_roster242=entries
 	return entries
 func _legacy_npcs234()->Array:
@@ -1384,8 +1391,8 @@ func _legacy_npcs234()->Array:
 		for npc in data:npc["regional_close123"]=true
 	if WorldNominal98.enabled():
 		data[0].position=WorldNominal98.home()+Vector2(100,10)
-		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)+Vector2(110,-20)
-	else:data[1].position=WorldFloristShop.FLORIST_FEET
+		data[1].position=ModularWorldLayout93.world(WorldNominal98.doors().florist)
+	else:data[1].position=WorldFloristShop.DOOR
 	if SaveData.world_generator_version>=3 and SaveData.world_generator_version<6 and not SaveData.world_flora138.is_empty():data.append({"id":"florist_east138","name":"Florista de "+TownIdentity215.title(SaveData.world_cousins140,"east138"),"position":FloristJourney138.door(SaveData.world_flora138)+Vector2(110,32),"quests":[]})
 	if SaveData.world_generator_version>=3 and not SaveData.world_cousins140.is_empty():
 		for id in TownEnclosures227.cousin_ids231():data.append({"id":"cousin140:"+id,"name":"Loco del pueblo","position":VillageCousins140.point(SaveData.world_cousins140,id),"cousin140":id,"quests":[]})
@@ -1639,6 +1646,7 @@ func _open_town234(data:Dictionary):
 	if conversation247.state!=SaveData.world_cousins140:
 		if not SaveData.commit_cousins140(conversation247.state,player.position):_toast("El recado no se ha guardado. Podrás volver a escucharlo.")
 	var dialog:=TownDialog234.new();dialog.town=data.town234;dialog.role=data.role234;dialog.energy237=_stamina.duplicate(true);dialog.conversation247=conversation247;_hud.add_child(dialog);_npc_dialog=dialog
+	if is_instance_valid(_interior262):dialog.reparent(_interior262)
 	dialog.closed.connect(_close_npc)
 	dialog.job_action249.connect(func(action:String):
 		var q:=TownJobs249.job(SaveData.world_seed,data.town234,data.role234)
@@ -1711,3 +1719,17 @@ func _open_workshop256(door:Vector2)->void:
 	if is_instance_valid(_npc_dialog) or player.position.distance_to(door)>180.:return
 	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false)
 	var room:=SaddleryRoom256.new();_npc_dialog=room;_hud.add_child(room);room.closed.connect(_close_npc)
+
+func _restore_interior262():
+	if is_instance_valid(_interior262) and not is_instance_valid(_npc_dialog):_npc_dialog=_interior262
+func _open_florist262(data:Dictionary):
+	if is_instance_valid(_npc_dialog) or player.position.distance_to(data.position)>180.:return
+	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false)
+	var room:=FloristRoom262.new();room.use_existing_conversation=true;_interior262=room;_npc_dialog=room;_hud.add_child(room)
+	room.conversation_requested.connect(func():
+		if _npc_dialog!=room:return
+		_npc_dialog=null
+		_open_npc(data))
+	room.closed.connect(func():
+		if is_instance_valid(_npc_dialog) and _npc_dialog!=room:_npc_dialog.queue_free()
+		_npc_dialog=null;_interior262=null;player.cancel_input();player.set_physics_process(true);_refresh_quest_hud();_refresh_missions())

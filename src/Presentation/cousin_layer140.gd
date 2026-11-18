@@ -27,8 +27,8 @@ func _build(id:String,point:Vector2)->Node2D:
  if SaveData.world_generator_version<5 and id in ["west140","east140"]:
   var door:Vector2=SaveData.world_cousins140.doors[id]
   for side in [-1,1]:
-   var house:=Sprite2D.new();house.texture=WorldTestZone.HOUSE_TEX;house.position=door+Vector2(side*210,-48);house.offset=Vector2(0,-house.texture.get_height()/2.);house.scale=Vector2.ONE*116./house.texture.get_height();root.add_child(house)
-   WorldPhysics.add_box(root,Rect2(house.position+Vector2(-58,-50),Vector2(116,30)))
+   var house:=Sprite2D.new();house.texture=WorldTestZone.HOUSE_TEX;house.position=door+Vector2(side*210,-48);house.offset=Vector2(0,-house.texture.get_height()/2.);house.scale=Vector2.ONE*116./house.texture.get_height();house.position.y-=20.;house.offset.y+=20./house.scale.y;root.add_child(house)
+   WorldPhysics.add_box(root,Rect2(house.position+Vector2(-58,-30),Vector2(116,30)))
   var sign:=Label.new();sign.text=TownIdentity215.title(SaveData.world_cousins140,id);sign.position=door+Vector2(-170,-220);sign.add_theme_font_size_override("font_size",20);root.add_child(sign)
  return root
 func _exit_tree():

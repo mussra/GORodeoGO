@@ -12,8 +12,8 @@ func _process(_delta:float):
 func build(id:String,door:Vector2)->Node2D:
  var root:=Node2D.new();root.name="Service231_"+id;root.y_sort_enabled=true;world.add_child(root)
  for side in [-1,1]:
-  var house:=Sprite2D.new();house.texture=WorldTestZone.HOUSE_TEX;house.position=door+Vector2(side*210,-48);house.offset=Vector2(0,-house.texture.get_height()/2.);house.scale=Vector2.ONE*116./house.texture.get_height();root.add_child(house)
-  WorldPhysics.add_box(root,Rect2(house.position+Vector2(-58,-50),Vector2(116,30)))
+  var house:=Sprite2D.new();house.texture=WorldTestZone.HOUSE_TEX;house.position=door+Vector2(side*210,-48);house.offset=Vector2(0,-house.texture.get_height()/2.);house.scale=Vector2.ONE*116./house.texture.get_height();house.position.y-=20.;house.offset.y+=20./house.scale.y;root.add_child(house)
+  WorldPhysics.add_box(root,Rect2(house.position+Vector2(-58,-30),Vector2(116,30)))
  var figure:=Sprite2D.new();figure.texture=WorldNpc.PORTRAIT;figure.position=door+Vector2(110,32);NpcScale214.apply(figure,figure.texture);figure.modulate=Color("b8d9ff") if id=="west140" else Color("f0d39d");root.add_child(figure)
  # Reuse the farmer art as a labelled stand-in; the service has no fake identity.
  var label:=Label.new();label.text=TownEnclosures227.role231(id)+" · arte provisional";label.position=figure.position+Vector2(-150,16);label.add_theme_font_size_override("font_size",17);root.add_child(label)

@@ -1,0 +1,19 @@
+{
+  "version": "2.7.190",
+  "version_code": 449,
+  "suite": {
+    "selected_scripts": 56,
+    "tests": 347,
+    "passed": 347,
+    "assertions": 54008,
+    "warnings": 1,
+    "deprecated": 14,
+    "exit_leaks": 2
+  },
+  "florist_scope": "home/ranch shop only; remote florists unchanged",
+  "world_test": "door > existing legacy quest > accept > return room > exit, same exterior position",
+  "depth": "saddlery before/after pixels inspected; facade sort origin adjusted across shared modular and legacy sprite constructors",
+  "not_tested": "physical Android; exhaustive pixel inspection of every legacy building at all positions",
+  "houses": "design and prompts only, not connected",
+  "money": "no new purchases or gifts"
+}

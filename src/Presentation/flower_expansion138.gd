@@ -120,13 +120,13 @@ func _remote_tick()->void:
   var path=load("res://src/Presentation/world_draw_node.gd").new();path.z_index=-5;path.draw_fn=func(n):
    for points in FloristJourney138.lanes(SaveData.world_flora138):ContinuousRoadArt.access(n,points,32.)
   remote.add_child(path)
-  var shop:=Sprite2D.new();shop.texture=WorldFloristShop.SHOP;shop.position=door+Vector2(-20,2);shop.scale=Vector2.ONE*200./shop.texture.get_height();shop.offset=Vector2(0,-shop.texture.get_height()/2.);remote.add_child(shop)
+  var shop:=Sprite2D.new();shop.texture=WorldFloristShop.SHOP;shop.position=door+Vector2(-20,2);shop.scale=Vector2.ONE*200./shop.texture.get_height();shop.offset=Vector2(0,-shop.texture.get_height()/2.);shop.position.y-=30.;shop.offset.y+=30./shop.scale.y;remote.add_child(shop)
   WorldPhysics.add_box(remote,Rect2(door+Vector2(-130,-113),Vector2(235,85)))
   var npc:=Sprite2D.new();npc.texture=WorldFloristShop.FLORIST;npc.position=door+Vector2(110,32);NpcScale214.apply(npc,npc.texture);remote.add_child(npc);NpcActivity218.attach(world,npc)
   var label:=Label.new();label.text="Floristería · "+TownIdentity215.title(SaveData.world_cousins140,"east138");label.position=door+Vector2(-150,-238);label.add_theme_font_size_override("font_size",20);remote.add_child(label)
   for side in [-1,1]:
-   var home:=Sprite2D.new();home.texture=WorldTestZone.HOUSE_TEX;home.position=door+Vector2(side*550,-260);home.scale=Vector2.ONE*116./home.texture.get_height();home.offset=Vector2(0,-home.texture.get_height()/2.);remote.add_child(home)
-   WorldPhysics.add_box(remote,Rect2(home.position+Vector2(-58,-50),Vector2(116,30)))
+   var home:=Sprite2D.new();home.texture=WorldTestZone.HOUSE_TEX;home.position=door+Vector2(side*550,-260);home.scale=Vector2.ONE*116./home.texture.get_height();home.offset=Vector2(0,-home.texture.get_height()/2.);home.position.y-=20.;home.offset.y+=20./home.scale.y;remote.add_child(home)
+   WorldPhysics.add_box(remote,Rect2(home.position+Vector2(-58,-30),Vector2(116,30)))
   _make_gardens(remote,door)
  if not near and is_instance_valid(remote):remote.queue_free();remote=null
 func _make_gardens(parent:Node2D,door:Vector2)->void:

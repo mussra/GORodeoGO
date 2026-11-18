@@ -35,3 +35,9 @@ Con el fondo de floristería: revisar perspectiva y espacio útil, integrar imag
 ## Ajuste de tono de Ant (18 de noviembre, 08:39-08:40)
 
 La florista y los demás personajes no anuncian regalos al recibir al jugador. Invitan a hablar si algo le interesa. La decisión de vender o regalar corresponde al personaje, no a un selector del jugador. Las reglas de guardado anteriores se aplicarán a una oferta del personaje ya definida.
+
+## Actualización 2.7.190
+
+Ant ha entregado el fondo final de la floristería. Se integra en art/interiors262/florist-room.png. La floristería del rancho ya usa su puerta, personaje dentro y los diálogos/encargos existentes. Las floristas de pueblos remotos aún conservan su comportamiento anterior hasta que se conecten sus edificios. No hay productos ni regalos nuevos en esta versión.
+
+Casas: algunas abiertas por invitación del vecino; otras cerradas con mensaje claro de que el vecino no está. No se fuerzan puertas ni se presume permiso por entrar. Este diseño está decidido, pero las casas todavía no tienen puertas nuevas implementadas.
