@@ -179,9 +179,10 @@ func _setup_art() -> void:
 
 func _fit_camera() -> void:
 	var size: Vector2 = get_viewport_rect().size
-	var factor: float = minf((size.x - 48.0) / 1046.0, (size.y - 136.0) / 626.0)
+	var factor: float = minf((size.x - 176.0) / 1046.0, (size.y - 136.0) / 626.0)
 	$Camera2D.zoom = Vector2.ONE * maxf(factor, 0.1)
-	$Camera2D.offset = Vector2(0, -24.0 / maxf(factor, 0.1))
+	var right_gutter301:float=(size.x-1046.*factor)*.5
+	$Camera2D.offset = Vector2(maxf(0.,144.-right_gutter301)/maxf(factor,.1), -24.0 / maxf(factor, 0.1))
 
 func _spawn_obstacles(rects: Array) -> void:
 	for rect: Rect2 in rects:

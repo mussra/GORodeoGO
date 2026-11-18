@@ -1,0 +1,34 @@
+{
+  "version": "3.0.1",
+  "code": 461,
+  "sha256": "7cf29914c6666c55e9ad7901aabd607bb11af61db6ee8434c29a05443700175c",
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 66,
+  "tests_passed": 425,
+  "assertions": 54830,
+  "scope": "right-edge whip layout, independent multitouch, explicit no-harm explanation",
+  "physical_android": false,
+  "full_historical_suite": false,
+  "two_finger_capture": {
+    "movement_vector": [
+      -0.986394,
+      0.164399
+    ],
+    "cooldown": 4.90138888888889,
+    "lasso_charging": false,
+    "lasso_flying": false,
+    "touch_drift_px": [
+      18,
+      3
+    ]
+  },
+  "warnings": [
+    "1 GUT resource UID warning",
+    "21 deprecated calls across GUT run",
+    "2 ObjectDB instances leaked on exit",
+    "build tools35 fallback for target36",
+    "SaveData error7 output belongs to deliberate failure/rollback tests"
+  ],
+  "screenshots": "Real Godot desktop renderer, isolated save; touch events injected, not physical Android. Resolutions:1600x720,1280x720,1280x960."
+}

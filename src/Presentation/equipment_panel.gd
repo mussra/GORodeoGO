@@ -67,8 +67,9 @@ func _row_card(panel:Panel,caption:String,kind:String,pos:Vector2,extent:Vector2
  return button
 func _effect_text(id:String)->String:
  var item:Dictionary=EquipmentCatalog.ITEMS[id]
+ if str(item.get("slot",""))=="scare_whip":return "Solo ruido: no toca ni daña a ningún animal"
  if item.has("small_lasso_range"):return "Cerdos/cabras: alcance +50%, margen 58 → 80 px; toros sin cambios"
- if item.has("reach"):return "Trazo de regate: %d px"%int(item.reach)
+ if item.has("reach"):return "Regate: señal sin golpes ni daño · trazo %d px"%int(item.reach)
  if item.has("running_drain_mult"):return "Al correr: -%d%% de gasto de resistencia"%int(round((1.0-float(item.running_drain_mult))*100.0))
  if item.has("dodge_recharge_mult"):return "Regate: recarga -%d%%"%int(round((1.0-float(item.dodge_recharge_mult))*100.0))
  if item.has("stun_mult"):return "Aturdimiento tras golpe: -%d%%"%int(round((1.0-float(item.stun_mult))*100.0))
@@ -80,6 +81,7 @@ func _upgrade_diff_text(id:String)->String:
  var item:Dictionary=EquipmentCatalog.ITEMS[id]
  var base_id:String=str(item.get("requires",""))
  if base_id.is_empty() or not EquipmentCatalog.ITEMS.has(base_id):return ""
+ if str(item.get("slot",""))=="scare_whip":return "Chasquido al aire para avisar; nunca golpea al caballo"
  if item.has("reach"):return "Básica: 260 px → mejorada: 420 px; sin más velocidad"
  if item.has("running_drain_mult"):return "Básica: ahorro 5% → mejorada: ahorro 10%"
  if item.has("dodge_recharge_mult"):return "Básica: recarga -5% → mejorada: recarga -10%"
@@ -126,4 +128,5 @@ func _confirm_purchase(id:String)->void:
  var basic:String=str(item.get("requires",""))
  var total:int=int(item.price)+(int(EquipmentCatalog.ITEMS[basic].price) if not basic.is_empty() else 0)
  _confirm.dialog_text="%s\n%s\n\n%s\nCoste ahora: %d puntos\nCoste total (básico + mejora): %d puntos\nSaldo después: %d puntos\n\nCompra única. Equipar después es gratis. Sin dinero real."%[item.name,_effect_text(id),_upgrade_diff_text(id),int(item.price),total,SaveData.equipment_points-int(item.price)]
+ if str(item.get("slot","")) in ["scare_whip","whip"]:_confirm.dialog_text+="\n\nSolo ruido o señal: no toca ni daña a ningún animal."
  _confirm.popup_centered(Vector2i(700,340))

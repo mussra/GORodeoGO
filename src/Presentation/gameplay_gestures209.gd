@@ -46,6 +46,10 @@ func _ui_at(_node:Node,point:Vector2)->bool:
  for control in controls209:
   if is_instance_valid(control) and control.is_visible_in_tree() and control.mouse_filter!=Control.MOUSE_FILTER_IGNORE and control.get_global_rect().has_point(point):return true
  return false
+func _action_at301(point:Vector2)->BaseButton:
+ for control in controls209:
+  if is_instance_valid(control) and control is BaseButton and control.get_meta("independent_touch301",false) and control.is_visible_in_tree() and control.get_global_rect().has_point(point):return control
+ return null
 func _scroll_at249(point:Vector2)->ScrollContainer:
  for control in controls209:
   if is_instance_valid(control) and control is ScrollContainer and control.is_visible_in_tree() and control.get_global_rect().has_point(point):return control
@@ -75,6 +79,10 @@ func _input(event:InputEvent)->void:
    if native_scroll!=null and native_scroll.has_meta("shared_scroll260"):return
    if not _can_begin():return
    if touches.has(event.index):_cancel_touches224()
+   var action:=_action_at301(event.position)
+   if action!=null:
+    touches[event.index]={"action301":action,"press":event.duplicate(),"last":event.position,"ui":true,"play":false}
+    get_viewport().set_input_as_handled();return
    var ui:=_ui_at(game,event.position)
    touches[event.index]={"press":event.duplicate(),"ui":ui,"play":not ui,"offset":Vector2.ZERO,"last":event.position,"scroll249":_scroll_at249(event.position) if ui else null}
    if touches[event.index].scroll249!=null:
@@ -85,6 +93,10 @@ func _input(event:InputEvent)->void:
   elif touches.has(event.index):
    var state:Dictionary=touches[event.index];touches.erase(event.index)
    get_viewport().set_input_as_handled()
+   if state.has("action301"):
+    var action:BaseButton=state.action301
+    if not event.canceled and _can_begin() and is_instance_valid(action) and action.is_visible_in_tree() and not action.disabled and action.get_global_rect().has_point(event.position):action.pressed.emit()
+    return
    if event.canceled:
     _cancel_touches224()
     return
@@ -94,6 +106,8 @@ func _input(event:InputEvent)->void:
     _send(state.press,Vector2.ZERO,false);_send(event,Vector2.ZERO,false)
  elif event is InputEventScreenDrag and touches.has(event.index):
   var state:Dictionary=touches[event.index];state.last=event.position
+  if state.has("action301"):
+   get_viewport().set_input_as_handled();return
   # Edge contact is still an active hold. Only release, cancellation, focus loss
   # or a modal stops it; a long chase must not require lifting at the bezel.
   get_viewport().set_input_as_handled()
