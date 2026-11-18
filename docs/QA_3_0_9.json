@@ -1,0 +1,32 @@
+{
+  "version": "3.0.9",
+  "code": 469,
+  "package": "com.example.rancho.review",
+  "sha256": "a93af64127848e375be62edbcd30752dc525fcf763e985591c5a7d0b8dcb9d0c",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 76,
+  "tests": 457,
+  "passing": 457,
+  "assertions": 55490,
+  "visual_screenshots": [
+    "309-victoria",
+    "309-tienda-latigos",
+    "309-caballo-atributos"
+  ],
+  "caveats": [
+    "Desktop Godot only, no physical Android",
+    "Known deprecated test APIs and two ObjectDB exit instances"
+  ],
+  "gameplay_changes": false,
+  "size_comparison": {
+    "before_bytes": 92162194,
+    "after_bytes": 77848540,
+    "saved_bytes": 14313654,
+    "preserved_originals": 27,
+    "removed_export_entries": 54,
+    "byte_identical_retained_media": 2727,
+    "sha256": "a93af64127848e375be62edbcd30752dc525fcf763e985591c5a7d0b8dcb9d0c",
+    "percent_saved": 15.530938857640477
+  },
+  "exported_resource_smoke": true
+}

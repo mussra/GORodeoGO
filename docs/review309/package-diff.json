@@ -1,0 +1,232 @@
+{
+  "before_bytes": 92162194,
+  "after_bytes": 77848540,
+  "removed": [
+    {
+      "path": "assets/art/npc/source/farmer-ant-20261111.jpg.import",
+      "bytes": 168
+    },
+    {
+      "path": "assets/.godot/imported/original_sheet.png-788c8274b459dd10bbdaaad592be769b.ctex",
+      "bytes": 84860
+    },
+    {
+      "path": "assets/.godot/imported/running-four-views.jpg-6623efd04d18fdf4e5f6b7f7c284ea87.ctex",
+      "bytes": 913414
+    },
+    {
+      "path": "assets/.godot/imported/original_diag_up_sheet.png-9f9758f894c805f6f013181e2b43e3fb.ctex",
+      "bytes": 28092
+    },
+    {
+      "path": "assets/art/experimental/pixellab/bull/original_diag_down_sheet.png.import",
+      "bytes": 175
+    },
+    {
+      "path": "assets/art/experimental/pixellab/pig/original_up_sheet.png.import",
+      "bytes": 172
+    },
+    {
+      "path": "assets/.godot/imported/zumbel_source.png-f92964d1a8d899ce08e19c1d2b631575.ctex",
+      "bytes": 853084
+    },
+    {
+      "path": "assets/.godot/imported/original_up_sheet.png-3a7983745e69c1ee60307a1c54ba44b5.ctex",
+      "bytes": 23230
+    },
+    {
+      "path": "assets/art/experimental/pixellab/pig/original_down_sheet.png.import",
+      "bytes": 170
+    },
+    {
+      "path": "assets/art/world/goats/source/running-four-views.jpg.import",
+      "bytes": 170
+    },
+    {
+      "path": "assets/art/experimental/drink_preview83/source_ant.png.import",
+      "bytes": 163
+    },
+    {
+      "path": "assets/.godot/imported/ant-road-grass-sheet-20261111.png-935450d6bc849988fb646bf9eea6d5b5.ctex",
+      "bytes": 1115924
+    },
+    {
+      "path": "assets/art/npc/source/primos140/loco-sorpresa-original.png.import",
+      "bytes": 173
+    },
+    {
+      "path": "assets/art/experimental/pixellab/bull/original_side_sheet.png.import",
+      "bytes": 169
+    },
+    {
+      "path": "assets/art/world/pigs/source/running-sheet.jpg.import",
+      "bytes": 170
+    },
+    {
+      "path": "assets/art/experimental/pixellab/goat/original_side_sheet.png.import",
+      "bytes": 172
+    },
+    {
+      "path": "assets/.godot/imported/original_side_sheet.png-57cb9c315bdabc4d57ee43372e2b10f3.ctex",
+      "bytes": 34232
+    },
+    {
+      "path": "assets/art/experimental/pixellab/bull/original_diag_up_sheet.png.import",
+      "bytes": 172
+    },
+    {
+      "path": "assets/.godot/imported/source.png-ba2a0b456ded3ed321aff2a1e2923bb0.ctex",
+      "bytes": 1335766
+    },
+    {
+      "path": "assets/art/ui/ant_icons187/source.png.import",
+      "bytes": 158
+    },
+    {
+      "path": "assets/art/world/pigs/source/running-front-back.jpg.import",
+      "bytes": 175
+    },
+    {
+      "path": "assets/art/world/modular87/source/ant-road-grass-sheet-20261111.png.import",
+      "bytes": 178
+    },
+    {
+      "path": "assets/.godot/imported/original_down_sheet.png-f91ea1db49f663372ab2324f8f30199a.ctex",
+      "bytes": 25854
+    },
+    {
+      "path": "assets/.godot/imported/loco-normal-original.png-d51850989b823af9c141fd636bea44f7.ctex",
+      "bytes": 973062
+    },
+    {
+      "path": "assets/brand/zumbel_source.png.import",
+      "bytes": 167
+    },
+    {
+      "path": "assets/.godot/imported/source.png-0e021ebf497deb563c71bdfe91ce9840.ctex",
+      "bytes": 768066
+    },
+    {
+      "path": "assets/.godot/imported/source_ant.png-6e86aad30f7538ecb788d02b5b2d3cf9.ctex",
+      "bytes": 1094012
+    },
+    {
+      "path": "assets/.godot/imported/original_diag_down_sheet.png-f753c2686926e00b0f1a30446f1689ad.ctex",
+      "bytes": 36714
+    },
+    {
+      "path": "assets/.godot/imported/original_down_sheet.png-3287441d1e1e9f8a58290b8a019c1830.ctex",
+      "bytes": 62928
+    },
+    {
+      "path": "assets/art/world/modular86/source/ant-road-sheet-20261111.png.import",
+      "bytes": 174
+    },
+    {
+      "path": "assets/art/experimental/pixellab/bull/original_up_sheet.png.import",
+      "bytes": 169
+    },
+    {
+      "path": "assets/.godot/imported/loco-sorpresa-original.png-d87084494b8c90d8dd5a47ee1bcf65f5.ctex",
+      "bytes": 1079744
+    },
+    {
+      "path": "assets/art/world/alternative92/source.jpg.import",
+      "bytes": 162
+    },
+    {
+      "path": "assets/.godot/imported/source.png-1d1fce78a40a37ac214652d29e7aa49b.ctex",
+      "bytes": 935164
+    },
+    {
+      "path": "assets/.godot/imported/original_side_sheet.png-1b86fb4a35ab9dc1d68d3f223b206bb4.ctex",
+      "bytes": 64930
+    },
+    {
+      "path": "assets/.godot/imported/ant-road-sheet-20261111.png-65a13c5461001d760604b246b517708d.ctex",
+      "bytes": 819774
+    },
+    {
+      "path": "assets/.godot/imported/running-sheet.jpg-55f9364ae26f2601911007a45496fbf3.ctex",
+      "bytes": 349106
+    },
+    {
+      "path": "assets/.godot/imported/original_down_sheet.png-41bc7d4b17437e2b2417f21a2e659109.ctex",
+      "bytes": 65194
+    },
+    {
+      "path": "assets/art/experimental/pixellab/pig/original_sheet.png.import",
+      "bytes": 169
+    },
+    {
+      "path": "assets/art/npc/source/primos140/loco-normal-original.png.import",
+      "bytes": 172
+    },
+    {
+      "path": "assets/art/experimental/pixellab/bull/original_down_sheet.png.import",
+      "bytes": 170
+    },
+    {
+      "path": "assets/.godot/imported/source.jpg-86ba744594f876ad7dd597663d08a9c5.ctex",
+      "bytes": 671894
+    },
+    {
+      "path": "assets/art/experimental/pixellab/goat/original_down_sheet.png.import",
+      "bytes": 170
+    },
+    {
+      "path": "assets/art/ui/menu_entries189/source.png.import",
+      "bytes": 160
+    },
+    {
+      "path": "assets/.godot/imported/original_up_sheet.png-24456f7622e1d1592b9cdc5b12553238.ctex",
+      "bytes": 51234
+    },
+    {
+      "path": "assets/.godot/imported/straight-source.png-4d7074f936ed0a675c8e6f246d231094.ctex",
+      "bytes": 92414
+    },
+    {
+      "path": "assets/art/experimental/pixellab/goat/original_up_sheet.png.import",
+      "bytes": 171
+    },
+    {
+      "path": "assets/art/world/derived88/straight-source.png.import",
+      "bytes": 170
+    },
+    {
+      "path": "assets/art/ui/skills/source/ant-skill-clocks-20261111.png.import",
+      "bytes": 178
+    },
+    {
+      "path": "assets/.godot/imported/running-front-back.jpg-f55b48753f05c5b7ff62c4f1a1948761.ctex",
+      "bytes": 825860
+    },
+    {
+      "path": "assets/.godot/imported/original_up_sheet.png-91e390ff1c763b3f426ad59a81825b86.ctex",
+      "bytes": 56904
+    },
+    {
+      "path": "assets/.godot/imported/farmer-ant-20261111.jpg-c19b910a3b7e221103daa50f65938e9e.ctex",
+      "bytes": 648262
+    },
+    {
+      "path": "assets/art/ui/ant_icons188/source.png.import",
+      "bytes": 160
+    },
+    {
+      "path": "assets/.godot/imported/ant-skill-clocks-20261111.png-86c07c4fb05d2e32b8d7a15179385b46.ctex",
+      "bytes": 1278878
+    }
+  ],
+  "changed": [
+    "META-INF/MANIFEST.MF",
+    "META-INF/ANDROIDD.SF",
+    "AndroidManifest.xml",
+    "META-INF/ANDROIDD.RSA",
+    "assets/.godot/global_script_class_cache.cfg",
+    "assets/.godot/uid_cache.bin",
+    "assets/assets.sparsepck"
+  ],
+  "added": []
+}

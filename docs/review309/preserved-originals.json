@@ -1,0 +1,137 @@
+[
+  {
+    "path": "art/experimental/drink_preview83/source_ant.png",
+    "sha256": "15ba041bbad96470af1431af6182f949ecdc8be130199bf0e025386eef6803aa",
+    "apk_bytes": 1094012
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_diag_down_sheet.png",
+    "sha256": "518f98cba253a5344bef37ccc3da0ebcdfb0cc614ea9822e84275c23ca449591",
+    "apk_bytes": 36714
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_diag_up_sheet.png",
+    "sha256": "c6842c53db9689b2d583bf64a10871c1aca232f08c022b0cf800e36528a5cb9a",
+    "apk_bytes": 28092
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_down_sheet.png",
+    "sha256": "bde62712c47dc7730843ff960f1f9b373ceaa8bbe27068ee6481dae914cf4571",
+    "apk_bytes": 25854
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_side_sheet.png",
+    "sha256": "a53a68f4f4487a99eb5c9f874cbf8c214fca596c2ae80f2ee75569cee868de66",
+    "apk_bytes": 34232
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_up_sheet.png",
+    "sha256": "ed49e5d6d6542cc8f65a5adc7aeff726a32c88ef16f196841fb711a71a369519",
+    "apk_bytes": 23230
+  },
+  {
+    "path": "art/experimental/pixellab/goat/original_down_sheet.png",
+    "sha256": "64112397b80a3029c0767b6b1fe2c9eda9a1dcb057ba04ebbb4008855f673e2d",
+    "apk_bytes": 62928
+  },
+  {
+    "path": "art/experimental/pixellab/goat/original_side_sheet.png",
+    "sha256": "fdec86723a9d6bebe210e6fc77ac0f97e0388a2e2f6a86016b4c2a78c2bd84bd",
+    "apk_bytes": 64930
+  },
+  {
+    "path": "art/experimental/pixellab/goat/original_up_sheet.png",
+    "sha256": "5cd710b0154552079933bc512bb5c53bbc8e830720114ae2da3fde88b9d8e0f0",
+    "apk_bytes": 51234
+  },
+  {
+    "path": "art/experimental/pixellab/pig/original_down_sheet.png",
+    "sha256": "808cba5aca91877a042f76fc6c3ea548e6c5dbc7fae25f687a24efa54b21cb54",
+    "apk_bytes": 65194
+  },
+  {
+    "path": "art/experimental/pixellab/pig/original_sheet.png",
+    "sha256": "365f4d8874f7c15c15dcb58f4dbbbf5e41c8fef30ce70ad422824400e772e8c1",
+    "apk_bytes": 84860
+  },
+  {
+    "path": "art/experimental/pixellab/pig/original_up_sheet.png",
+    "sha256": "9650c2e81b7d5af0260c4a756d9429f20df738aa362ade33b410461b2065f8ff",
+    "apk_bytes": 56904
+  },
+  {
+    "path": "art/npc/source/primos140/loco-normal-original.png",
+    "sha256": "482aeda8af336c3742d1dd0380224a4100ff3b3b94783ab22c2061dd08ac35be",
+    "apk_bytes": 973062
+  },
+  {
+    "path": "art/npc/source/primos140/loco-sorpresa-original.png",
+    "sha256": "c9236430f94cb8c1e4a9b85553f3bf6c4c9e103966715ea57f64f56994b41752",
+    "apk_bytes": 1079744
+  },
+  {
+    "path": "art/npc/source/farmer-ant-20261111.jpg",
+    "sha256": "ce2b663e2a0883bf9107ac627ab3878ce7818981feee0cbe5c2bee077424cd18",
+    "apk_bytes": 648262
+  },
+  {
+    "path": "art/ui/ant_icons187/source.png",
+    "sha256": "825c626ac648357714f49e49ba8723cdec4ba0832e467eb09326eb8fe634323f",
+    "apk_bytes": 1335766
+  },
+  {
+    "path": "art/ui/ant_icons188/source.png",
+    "sha256": "a54b86f8c2167912676fa69a4e5c014b3f12bebd02ac64d8e3cb668860103bb6",
+    "apk_bytes": 935164
+  },
+  {
+    "path": "art/ui/menu_entries189/source.png",
+    "sha256": "4f7b5c3a12345ffbca23bca767b225b15d08ce2afc0f6b7dbedc70d0c8b9a40d",
+    "apk_bytes": 768066
+  },
+  {
+    "path": "art/ui/skills/source/ant-skill-clocks-20261111.png",
+    "sha256": "a8233179ba34908889ce330d1e289a064250bd4d494219f3f8b27d638700ff39",
+    "apk_bytes": 1278878
+  },
+  {
+    "path": "art/world/alternative92/source.jpg",
+    "sha256": "0dad5675ecd9c2f15f6b2e990535f9f03baed4996aaec9e607f1e7f74eb8e242",
+    "apk_bytes": 671894
+  },
+  {
+    "path": "art/world/derived88/straight-source.png",
+    "sha256": "078dbbb4104c5e5d3c2e0bed103bcb580cb66a8b19967c3696637c401109c493",
+    "apk_bytes": 92414
+  },
+  {
+    "path": "art/world/goats/source/running-four-views.jpg",
+    "sha256": "f33de99a8bc4cb3c2fcd8994317491e9594c6eb6545e353ccf5c4f498dbdc0b4",
+    "apk_bytes": 913414
+  },
+  {
+    "path": "art/world/modular86/source/ant-road-sheet-20261111.png",
+    "sha256": "8ec14c4218321fb973939131952b40af2798adcd09fd726e4df595611cb8f48b",
+    "apk_bytes": 819774
+  },
+  {
+    "path": "art/world/modular87/source/ant-road-grass-sheet-20261111.png",
+    "sha256": "33792bbe0b7874955f1490c8a191988cf8773e12621c971389f143e0f4ce4066",
+    "apk_bytes": 1115924
+  },
+  {
+    "path": "art/world/pigs/source/running-front-back.jpg",
+    "sha256": "7c0ea662c36f468c8c4e416d50bd1ec306a548106b8ba1eafdae4eae21c8807f",
+    "apk_bytes": 825860
+  },
+  {
+    "path": "art/world/pigs/source/running-sheet.jpg",
+    "sha256": "623cf2a75061623a04102a3ddf63905d000322ed908f756e0b26b2b49af1ea7d",
+    "apk_bytes": 349106
+  },
+  {
+    "path": "brand/zumbel_source.png",
+    "sha256": "ba48693cec55ed7f0e579df4873e75403b495b38ccc7f1dfcb5307ba1f34b2c2",
+    "apk_bytes": 853084
+  }
+]

@@ -1,0 +1,191 @@
+[
+  {
+    "path": "art/experimental/drink_preview83/source_ant.png",
+    "apk_path": "assets/.godot/imported/source_ant.png-6e86aad30f7538ecb788d02b5b2d3cf9.ctex",
+    "type": "texture",
+    "bytes": 1094012,
+    "uncompressed": 1094012
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_diag_down_sheet.png",
+    "apk_path": "assets/.godot/imported/original_diag_down_sheet.png-f753c2686926e00b0f1a30446f1689ad.ctex",
+    "type": "texture",
+    "bytes": 36714,
+    "uncompressed": 36714
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_diag_up_sheet.png",
+    "apk_path": "assets/.godot/imported/original_diag_up_sheet.png-9f9758f894c805f6f013181e2b43e3fb.ctex",
+    "type": "texture",
+    "bytes": 28092,
+    "uncompressed": 28092
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_down_sheet.png",
+    "apk_path": "assets/.godot/imported/original_down_sheet.png-f91ea1db49f663372ab2324f8f30199a.ctex",
+    "type": "texture",
+    "bytes": 25854,
+    "uncompressed": 25854
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_side_sheet.png",
+    "apk_path": "assets/.godot/imported/original_side_sheet.png-57cb9c315bdabc4d57ee43372e2b10f3.ctex",
+    "type": "texture",
+    "bytes": 34232,
+    "uncompressed": 34232
+  },
+  {
+    "path": "art/experimental/pixellab/bull/original_up_sheet.png",
+    "apk_path": "assets/.godot/imported/original_up_sheet.png-3a7983745e69c1ee60307a1c54ba44b5.ctex",
+    "type": "texture",
+    "bytes": 23230,
+    "uncompressed": 23230
+  },
+  {
+    "path": "art/experimental/pixellab/goat/original_down_sheet.png",
+    "apk_path": "assets/.godot/imported/original_down_sheet.png-3287441d1e1e9f8a58290b8a019c1830.ctex",
+    "type": "texture",
+    "bytes": 62928,
+    "uncompressed": 62928
+  },
+  {
+    "path": "art/experimental/pixellab/goat/original_side_sheet.png",
+    "apk_path": "assets/.godot/imported/original_side_sheet.png-1b86fb4a35ab9dc1d68d3f223b206bb4.ctex",
+    "type": "texture",
+    "bytes": 64930,
+    "uncompressed": 64930
+  },
+  {
+    "path": "art/experimental/pixellab/goat/original_up_sheet.png",
+    "apk_path": "assets/.godot/imported/original_up_sheet.png-24456f7622e1d1592b9cdc5b12553238.ctex",
+    "type": "texture",
+    "bytes": 51234,
+    "uncompressed": 51234
+  },
+  {
+    "path": "art/experimental/pixellab/pig/original_down_sheet.png",
+    "apk_path": "assets/.godot/imported/original_down_sheet.png-41bc7d4b17437e2b2417f21a2e659109.ctex",
+    "type": "texture",
+    "bytes": 65194,
+    "uncompressed": 65194
+  },
+  {
+    "path": "art/experimental/pixellab/pig/original_sheet.png",
+    "apk_path": "assets/.godot/imported/original_sheet.png-788c8274b459dd10bbdaaad592be769b.ctex",
+    "type": "texture",
+    "bytes": 84860,
+    "uncompressed": 84860
+  },
+  {
+    "path": "art/experimental/pixellab/pig/original_up_sheet.png",
+    "apk_path": "assets/.godot/imported/original_up_sheet.png-91e390ff1c763b3f426ad59a81825b86.ctex",
+    "type": "texture",
+    "bytes": 56904,
+    "uncompressed": 56904
+  },
+  {
+    "path": "art/npc/source/primos140/loco-normal-original.png",
+    "apk_path": "assets/.godot/imported/loco-normal-original.png-d51850989b823af9c141fd636bea44f7.ctex",
+    "type": "texture",
+    "bytes": 973062,
+    "uncompressed": 973062
+  },
+  {
+    "path": "art/npc/source/primos140/loco-sorpresa-original.png",
+    "apk_path": "assets/.godot/imported/loco-sorpresa-original.png-d87084494b8c90d8dd5a47ee1bcf65f5.ctex",
+    "type": "texture",
+    "bytes": 1079744,
+    "uncompressed": 1079744
+  },
+  {
+    "path": "art/npc/source/farmer-ant-20261111.jpg",
+    "apk_path": "assets/.godot/imported/farmer-ant-20261111.jpg-c19b910a3b7e221103daa50f65938e9e.ctex",
+    "type": "texture",
+    "bytes": 648262,
+    "uncompressed": 648262
+  },
+  {
+    "path": "art/ui/ant_icons187/source.png",
+    "apk_path": "assets/.godot/imported/source.png-ba2a0b456ded3ed321aff2a1e2923bb0.ctex",
+    "type": "texture",
+    "bytes": 1335766,
+    "uncompressed": 1335766
+  },
+  {
+    "path": "art/ui/ant_icons188/source.png",
+    "apk_path": "assets/.godot/imported/source.png-1d1fce78a40a37ac214652d29e7aa49b.ctex",
+    "type": "texture",
+    "bytes": 935164,
+    "uncompressed": 935164
+  },
+  {
+    "path": "art/ui/menu_entries189/source.png",
+    "apk_path": "assets/.godot/imported/source.png-0e021ebf497deb563c71bdfe91ce9840.ctex",
+    "type": "texture",
+    "bytes": 768066,
+    "uncompressed": 768066
+  },
+  {
+    "path": "art/ui/skills/source/ant-skill-clocks-20261111.png",
+    "apk_path": "assets/.godot/imported/ant-skill-clocks-20261111.png-86c07c4fb05d2e32b8d7a15179385b46.ctex",
+    "type": "texture",
+    "bytes": 1278878,
+    "uncompressed": 1278878
+  },
+  {
+    "path": "art/world/alternative92/source.jpg",
+    "apk_path": "assets/.godot/imported/source.jpg-86ba744594f876ad7dd597663d08a9c5.ctex",
+    "type": "texture",
+    "bytes": 671894,
+    "uncompressed": 671894
+  },
+  {
+    "path": "art/world/derived88/straight-source.png",
+    "apk_path": "assets/.godot/imported/straight-source.png-4d7074f936ed0a675c8e6f246d231094.ctex",
+    "type": "texture",
+    "bytes": 92414,
+    "uncompressed": 92414
+  },
+  {
+    "path": "art/world/goats/source/running-four-views.jpg",
+    "apk_path": "assets/.godot/imported/running-four-views.jpg-6623efd04d18fdf4e5f6b7f7c284ea87.ctex",
+    "type": "texture",
+    "bytes": 913414,
+    "uncompressed": 913414
+  },
+  {
+    "path": "art/world/modular86/source/ant-road-sheet-20261111.png",
+    "apk_path": "assets/.godot/imported/ant-road-sheet-20261111.png-65a13c5461001d760604b246b517708d.ctex",
+    "type": "texture",
+    "bytes": 819774,
+    "uncompressed": 819774
+  },
+  {
+    "path": "art/world/modular87/source/ant-road-grass-sheet-20261111.png",
+    "apk_path": "assets/.godot/imported/ant-road-grass-sheet-20261111.png-935450d6bc849988fb646bf9eea6d5b5.ctex",
+    "type": "texture",
+    "bytes": 1115924,
+    "uncompressed": 1115924
+  },
+  {
+    "path": "art/world/pigs/source/running-front-back.jpg",
+    "apk_path": "assets/.godot/imported/running-front-back.jpg-f55b48753f05c5b7ff62c4f1a1948761.ctex",
+    "type": "texture",
+    "bytes": 825860,
+    "uncompressed": 825860
+  },
+  {
+    "path": "art/world/pigs/source/running-sheet.jpg",
+    "apk_path": "assets/.godot/imported/running-sheet.jpg-55f9364ae26f2601911007a45496fbf3.ctex",
+    "type": "texture",
+    "bytes": 349106,
+    "uncompressed": 349106
+  },
+  {
+    "path": "brand/zumbel_source.png",
+    "apk_path": "assets/.godot/imported/zumbel_source.png-f92964d1a8d899ce08e19c1d2b631575.ctex",
+    "type": "texture",
+    "bytes": 853084,
+    "uncompressed": 853084
+  }
+]
