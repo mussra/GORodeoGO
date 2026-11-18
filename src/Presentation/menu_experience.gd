@@ -18,13 +18,16 @@ func _setup()->void:
   if child is MenuBackdrop:has_backdrop=true
  if not has_backdrop:
   var backdrop:=MenuBackdrop.new();backdrop.name="SharedMenuAmbience"
+  backdrop.art_mode300=str(panel.get_meta("background300","legacy"))
   backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
   panel.add_child(backdrop);panel.move_child(backdrop,0)
   # Static landscape: same atmosphere without a redraw loop on every window.
   backdrop.set_process(false)
   for child in panel.get_children():
    if child is ColorRect and child.anchor_right==1.0 and child.anchor_bottom==1.0:
-    child.color.a=.88;break
+    if panel.has_meta("background300"):child.hide()
+    else:child.color.a=.88
+    break
  _visibility();_scan()
 func _visibility()->void:
  if panel.is_visible_in_tree():

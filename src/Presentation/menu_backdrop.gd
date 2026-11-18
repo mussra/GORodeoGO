@@ -1,12 +1,19 @@
 class_name MenuBackdrop
 extends Control
 var clock: float = 0.0
+var art_mode300:String="legacy"
+var art_texture300:Texture2D
 func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_IGNORE
 func _process(delta: float) -> void:
+	if art_mode300!="legacy":return
 	clock += delta
 	queue_redraw()
 func _draw() -> void:
 	var s: Vector2 = size
+	if art_mode300!="legacy":
+		if art_texture300==null:art_texture300=load("res://art/ui/background300/"+art_mode300+".png")
+		draw_texture_rect(art_texture300,Rect2(Vector2.ZERO,s),false)
+		return
 	draw_rect(Rect2(Vector2.ZERO, s), Color("0b1822"))
 	# Layered angular landscape, not an unrelated sci-fi wallpaper.
 	draw_polygon(PackedVector2Array([Vector2(s.x*0.43,0),Vector2(s.x,0),s,Vector2(s.x*0.26,s.y)]),PackedColorArray([Color("102d36")]))

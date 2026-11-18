@@ -11,6 +11,7 @@ var _confirm:ConfirmationDialog
 var _pending_purchase:String=""
 var _hats:HatPanel
 func _ready()->void:
+ set_meta("background300","content")
  MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=50
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  _canvas=Control.new();_canvas.size=Vector2(1280,720);add_child(_canvas)
@@ -39,14 +40,14 @@ func _ready()->void:
  resized.connect(_layout);_layout();refresh()
 func _item_row(id:String)->Panel:
  var item:Dictionary=EquipmentCatalog.ITEMS[id]
- var panel:=Panel.new();panel.custom_minimum_size=Vector2(1170,124);DetailCard179.style_panel(panel)
- var icon:=EquipmentIcon229.new();icon.kind=str(item.get("icon","whip"));icon.position=Vector2(14,14);icon.size=Vector2(96,96);panel.add_child(icon)
- _row_label(panel,str(item.name),Vector2(126,10),20)
+ var panel:=Panel.new();panel.custom_minimum_size=Vector2(1170,124);DetailCard179.style_panel(panel);ButtonSkin272.panel(panel)
+ var icon:=EquipmentIcon229.new();icon.kind=("long" if str(item.slot)=="lasso" else "whip" if str(item.get("icon","whip"))=="long" else str(item.get("icon","whip")));icon.position=Vector2(14,14);icon.size=Vector2(96,96);panel.add_child(icon)
+ _row_label(panel,str(item.name),Vector2(126,15),20)
  _row_label(panel,_effect_text(id),Vector2(126,42),17)
  var diff:String=_upgrade_diff_text(id)
- if not diff.is_empty():_row_label(panel,diff,Vector2(126,66),15)
+ if not diff.is_empty():_row_label(panel,diff,Vector2(126,65),15)
  var price_text:String=("Mejora: +%d puntos"%int(item.price)) if item.has("requires") else ("%d puntos"%int(item.price))
- _row_label(panel,price_text,Vector2(126,92),17)
+ _row_label(panel,price_text,Vector2(126,85),17)
  _buy[id]=_row_card(panel,"Conseguir","buy",Vector2(800,20),Vector2(170,84),func():
   _confirm_purchase(id))
  _equip[id]=_row_card(panel,"Equipar","equip",Vector2(985,20),Vector2(170,84),func():

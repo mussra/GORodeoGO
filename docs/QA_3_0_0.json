@@ -1,0 +1,20 @@
+{
+  "version": "3.0.0",
+  "code": 460,
+  "sha256": "d52ab359877767e2a21b01ec8c7e468e86ccc18410b8c97c4137725d5bcd7eb1",
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 65,
+  "tests_passed": 408,
+  "assertions": 54728,
+  "scope": "approved menu backgrounds, tiled buttons/panels and16 supplied equipment UI icons",
+  "physical_android": false,
+  "full_historical_suite": false,
+  "warnings": [
+    "GUT resource UID warning",
+    "21 deprecated calls across GUT run",
+    "2 ObjectDB instances leaked at exit",
+    "build tools35 fallback for target36"
+  ],
+  "screenshots": "Godot desktop renderer, isolated save. Pause shows real HUD instantiated alone, not gameplay on Android."
+}
