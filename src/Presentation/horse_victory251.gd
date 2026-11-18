@@ -15,7 +15,7 @@ func _ready()->void:
  var screen:=Control.new();screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(screen);MenuInputGuard.install(screen)
  var shade:=ColorRect.new();shade.color=Color(0.015,.04,.055,.9);shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);screen.add_child(shade)
  canvas=Control.new();canvas.size=Vector2(1280,720);screen.add_child(canvas);get_viewport().size_changed.connect(_layout);_layout()
- var panel:=Panel.new();panel.position=Vector2(150,72);panel.size=Vector2(980,576);panel.add_theme_stylebox_override("panel",RanchTheme.box(Color("14333d"),Color("dfbc74"),24));canvas.add_child(panel)
+ var panel:=Panel.new();panel.position=Vector2(150,72);panel.size=Vector2(980,576);ButtonSkin272.panel(panel);canvas.add_child(panel)
  _label("VICTORIA · TU CABALLO MEJORA",Vector2(198,101),29,Color("ffe1a1"))
  _label(str(reward.horse.name),Vector2(198,156),35,Color("fff3cf"))
  var portrait:=TextureRect.new();portrait.position=Vector2(196,228);portrait.size=Vector2(310,260);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.texture=PixelLabTrial.pose_texture("horse","side",0,reward.horse.traits,reward.horse);portrait.mouse_filter=Control.MOUSE_FILTER_IGNORE
@@ -27,19 +27,19 @@ func _ready()->void:
   for item in reward.get("changes254",[reward]):
    if item.key==spec[1]:change=item
   var active:bool=not change.is_empty();var y:float=234.+i*48.
-  _label(spec[0]+("  "+(VictoryGrowth251.delta_text254(change) if change.after>change.before else "Máximo") if active else ""),Vector2(528,y),20,Color("ffe1a1") if active else Color("a7bdc1"))
+  _label(spec[0]+(" · mejora" if active and change.after>change.before else " · máximo" if active else ""),Vector2(528,y),20,Color("ffe1a1") if active else Color("a7bdc1"))
   var line:=HorseStatBars.row(canvas,"",VictoryGrowth251.visual(spec,stats[spec[1]]),0.,1.,true);line.position=Vector2(748,y+4);line.size=Vector2(300,30);line.get_child(0).custom_minimum_size.x=0;line.get_child(0).hide()
   if active:
    var current_bar:ProgressBar=line.get_child(1);current_bar.step=0.;current_bar.add_theme_stylebox_override("fill",StyleBoxEmpty.new())
    var effect:=GrowthSpark251.new();effect.name="GrowthIncrement252";effect.mouse_filter=Control.MOUSE_FILTER_IGNORE;current_bar.add_child(effect)
    rows254.append({"bar":current_bar,"spark":effect,"change":change,"spec":spec})
    if change.key==reward.key:bar=current_bar;spark=effect
- var message:String="Mejoras guardadas · puntos de propiedad"
+ var message:String="Mejoras guardadas"
  if reward.has("new_horse"):message+="\nNuevo caballo en tu cuadra: "+str(reward.new_horse.name)
  if reward.has("champion"):message+="\nLinaje maestro: "+str(reward.champion.name)
  if reward.get("fallback",false):message+="\nLa propiedad de este modo ya estaba al máximo."
  _label(message,Vector2(198,477),20,Color("d5e3dd"))
- var close:=Button.new();close.name="Continue251";close.text="Continuar";close.position=Vector2(738,558);close.size=Vector2(310,60);canvas.add_child(close);close.pressed.connect(queue_free)
+ var close:=Button.new();close.name="Continue251";close.text="Continuar";close.position=Vector2(738,558);close.size=Vector2(310,60);canvas.add_child(close);ButtonSkin272.apply(close);close.pressed.connect(queue_free)
  _advance.call_deferred(0.)
  if not reward.get("maxed",false):
   var tween:=create_tween();tween.tween_interval(.35);tween.tween_method(_advance,0.,1.,1.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT);tween.tween_callback(func():_advance(1.));tween.tween_method(_fade_effect253,1.,0.,1.0)
@@ -53,7 +53,8 @@ func _advance(value:float)->void:
   var current:float=VictoryGrowth251.visual(row.spec,lerpf(change.before,change.after,value))
   current_bar.value=current
   var width:float=maxf(0.,current_bar.size.x-2.)
-  effect.position=Vector2(1.,1.);effect.size=Vector2(width,maxf(0.,current_bar.size.y-2.))
+  effect.position=Vector2(1.,13.);effect.size=Vector2(width,maxf(0.,current_bar.size.y-15.))
+  (current_bar as AttributeBar306).baseline306=before
   effect.old_x=width*before;effect.current_x=width*current;effect.phase=value;effect.queue_redraw()
 func _fade_effect253(value:float)->void:
  for row in rows254:row.spark.effect_alpha=value;row.spark.queue_redraw()
@@ -84,6 +85,7 @@ class GrowthSpark251 extends Control:
   if current_x>0.:draw_style_box(rounded253(BASE_COLOR,current_x,size.y),Rect2(Vector2.ZERO,Vector2(current_x,size.y)))
   if width<=0.:return
   draw_style_box(rounded253(INCREMENT_COLOR,width,size.y),Rect2(Vector2(old_x,0),Vector2(width,size.y)))
+  for sector in range(1,5):draw_line(Vector2(size.x*sector/5.,0),Vector2(size.x*sector/5.,size.y),Color("183b46"),4.)
   # The burst is rooted at the earned interval. Rays may extend outside the
   # narrow bar so even a small real improvement has a readable visual effect.
   var center:=star_origin253();var alpha:float=effect_alpha*minf(1.,phase*5.)

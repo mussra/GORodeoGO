@@ -19,7 +19,7 @@ func _ready():
   var portrait:=_view(HorsePortrait.ART,Vector2(x+61,146),Vector2(267,280));portrait.material=AdornStudy153.material(AdornStudy153.IDS[i]);portrait.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
   var runner:=_view(AdornStudy153.frame(0),Vector2(x+23,414),Vector2(192,192));runners.append(runner)
   var small:=_view(AdornStudy153.frame(0),Vector2(x+266,496),Vector2(96,96));small_runners.append(small)
-  _text("×2",Vector2(x+93,592),17);_text("96 px",Vector2(x+285,592),17)
+  _text("×2",Vector2(x+93,592),17);_text("Vista de juego",Vector2(x+285,592),17)
  _text("Solo retrato y galope lateral · faltan otras poses · precio y obtención pendientes",Vector2(30,653),21)
  _text("Sin estadísticas, genética ni cambios de silueta.",Vector2(30,686),19)
  resized.connect(_layout);_layout();_advance()

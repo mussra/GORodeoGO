@@ -1,0 +1,503 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/unit/test_equipment_effects243.gd
+[0m* test_catalog_matches_approved_proposal
+* test_defaults_are_neutral_without_equipment
+* test_equipped_basic_and_improved_values
+* test_equip_requires_ownership
+* test_stamina_tick_applies_saddle
+* test_upgrade_rules_in_points_state
+* test_horseshoes_blocked_without_terrain_mechanic
+[1m7/7 passed.
+[0m[4m
+
+res://tests/integration/test_equipment_juanito243.gd
+[0m* test_buy_upgrade_equip_and_persist_all_items
+* test_upgrade_blocked_without_basic_and_without_points
+* test_spurs_activation_guards_and_cost
+* test_spurs_speed_and_cooldown_tick_down
+* test_panel_lists_every_item_and_keeps_whip_behavior
+* test_stamina_tick_consumes_spur_cost
+* test_spurs_measured_speed_restrictions_and_no_race_effect
+* test_save_failure_rolls_back_points_ownership_and_equipped
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:162)
+       [1] save_progress (res://src/Application/save_data.gd:99)
+       [2] buy_equipment (res://src/Application/save_data.gd:329)
+       [3] test_save_failure_rolls_back_points_ownership_and_equipped (res://tests/integration/test_equipment_juanito243.gd:161)
+       [4] _run_test (res://addons/gut/gut.gd:622)
+       [5] _test_the_scripts (res://addons/gut/gut.gd:835)
+       [6] _run_test (res://addons/gut/gut.gd:650)
+       [7] test_stamina_tick_consumes_spur_cost (res://tests/integration/test_equipment_juanito243.gd:123)
+       [8] _end_wait (res://addons/gut/awaiter.gd:126)
+       [9] _on_tree_physics_frame (res://addons/gut/awaiter.gd:78)
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:162)
+       [1] save_progress (res://src/Application/save_data.gd:99)
+       [2] equip_item (res://src/Application/save_data.gd:339)
+       [3] test_save_failure_rolls_back_points_ownership_and_equipped (res://tests/integration/test_equipment_juanito243.gd:165)
+       [4] _run_test (res://addons/gut/gut.gd:622)
+       [5] _test_the_scripts (res://addons/gut/gut.gd:835)
+       [6] _run_test (res://addons/gut/gut.gd:650)
+       [7] test_stamina_tick_consumes_spur_cost (res://tests/integration/test_equipment_juanito243.gd:123)
+       [8] _end_wait (res://addons/gut/awaiter.gd:126)
+       [9] _on_tree_physics_frame (res://addons/gut/awaiter.gd:78)
+[34m[ExpectedError][0m
+* test_reins_whip_and_stirrups_apply_without_new_abilities
+* test_confirmation_does_not_spend_until_confirmed_and_cosmetics_can_be_removed
+* test_cosmetic_frames_keep_size_and_alpha_without_changing_stats
+[1m11/11 passed.
+[0m[4m
+
+res://tests/integration/test_equipment_flow.gd
+[0m* test_victory_repeats_purchase_equip_reload_and_player_effect
+* test_new_profile_gets_ten_points_first_win_and_only_next_level
+[1m2/2 passed.
+[0m[4m
+
+res://tests/integration/test_equipment_icons229.gd
+[0m* test_actions_keep_large_touch_targets_with_icon_above_small_caption
+[1m1/1 passed.
+[0m[4m
+
+res://tests/unit/test_world_stamina.gd
+[0m* test_gallop_drains_trot_sips
+* test_worst_horse_lasts_double
+* test_walk_and_idle_recover
+* test_empty_forces_a_breather_then_recovers
+* test_galope_blocked_below_min_but_trot_allowed
+* test_better_horse_lasts_longer_and_never_below_base
+[1m6/6 passed.
+[0m[4m
+
+res://tests/unit/test_equipment_points.gd
+[0m* test_repeats_award_points_but_duplicate_result_does_not
+* test_purchase_and_equip_are_separate_and_cannot_double_spend
+* test_free_original_and_single_slot_selection
+* test_invalid_entries_never_grant_or_spend_points
+* test_upgrade_needs_basic_whip_and_replaces_slot_without_stacking
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_skill_clocks84.gd
+[0m* test_three_supplied_textures_have_transparent_outside_and_small_ui_size
+* test_states_remain_dynamic_and_unavailable_skill_hidden
+* test_unfilled_sector_shrinks_clockwise_as_charge_increases
+[1m3/3 passed.
+[0m[4m
+
+res://tests/integration/test_touch154.gd
+[0m* test_country_clocks_show_owned_abilities_and_tick_shared_stamina
+* test_only_interactive_hud_controls_block_touch_and_layer_is_above_sticks
+* test_owned_ability_clocks_follow_same_rules_and_cooldown_as_frontier
+* test_new_country_road_uses_same_stamina_discount_and_no_drain_during_map
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_services231.gd
+[0m* test_v5_has_one_loco_two_service_accesses_and_horse_panel_resumes_play_on_back
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+LOAD_FRAME_PROFILE {"frames":201,"max_ms":138.395,"over_100ms":1,"over_50ms":2,"p50_ms":10.415,"p95_ms":15.675,"version":"2.7.82+preview83","worst_phase":"reveal"}
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+* test_v4_keeps_four_loco_and_has_no_service_relocation
+* test_discovered_legacy_herd_is_updated_on_world_load_without_respawning_captured_sibling
+LOAD_FRAME_PROFILE {"frames":52,"max_ms":165.173,"over_100ms":1,"over_50ms":1,"p50_ms":7.042,"p95_ms":32.101,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_roaming_horse_prepares_origin_even_when_its_origin_chunk_is_not_loaded
+LOAD_FRAME_PROFILE {"frames":45,"max_ms":178.244,"over_100ms":1,"over_50ms":1,"p50_ms":7.584,"p95_ms":16.555,"version":"2.7.82+preview83","worst_phase":"reveal"}
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_dodge.gd
+[0m* test_double_movement_gesture_dodges_without_releasing_capture
+* test_double_tap_then_drag_records_path_but_normal_drag_does_not
+* test_trace_transitions_immediately_to_normal_running
+* test_finish_preserves_endpoint_tangent_and_dual_capture_speed
+* test_trace_hits_obstacle_instead_of_crossing_it
+LOAD_FRAME_PROFILE {"frames":67,"max_ms":51.046,"over_100ms":0,"over_50ms":1,"p50_ms":6.829,"p95_ms":16.608,"version":"2.7.82+preview83","worst_phase":"reveal"}
+[33m    --- Awaiting 40 physics frames  ---
+[0m* test_long_stationary_hold_does_not_arm_next_touch_as_double_tap
+* test_freeform_s_retains_all_waypoints_and_stun_cancels_soft_stop
+[33m    --- Awaiting 30 physics frames  ---
+[0m* test_handoff_has_no_stationary_frame_at_30_60_120_fps
+* test_running_hold_release_and_single_repress_arms_dodge
+* test_running_repress_after_window_is_normal_movement
+* test_stationary_start_still_requires_two_quick_presses
+* test_cancel_clears_running_release_and_cooldown_blocks_repress
+[1m12/12 passed.
+[0m[4m
+
+res://tests/integration/test_arrival244.gd
+[0m* test_full_bounds_fit_with_hud_margin_for_all_shapes
+* test_hold_center_is_fixed_one_second_while_player_still_moves
+* test_first_completed_arrival_is_persisted_with_seed_and_save_scope
+* test_manual_zoom_cancels_and_prevents_immediate_retry
+[33m    --- Awaiting 0.5 seconds  ---
+[0m* test_map_or_lasso_interrupt_restores_without_committing_seen
+* test_lod_hides_drawing_only_and_restores_previous_visibility
+* test_nearby_check_runs_four_times_per_second_and_not_when_map_open
+* test_approach_from_each_wall_segment_triggers_without_opening_gate
+* test_camera_panorama_does_not_change_plan_collision_or_actor_counts
+* test_completed_town_is_skipped_on_following_check
+* test_exit_restores_zoom_offset_and_lod
+* test_cinematic_curve_has_slow_ends_and_zero_endpoint_acceleration
+* test_osd_toggle_keeps_same_save_and_mode
+* test_main_menu_has_games_catalog_not_a_second_world_shortcut
+* test_wide_manual_zoom_has_nine_levels_and_restores_decor
+* test_arrival_h1_uses_display_name_and_fades_in_then_out
+[1m16/16 passed.
+[0m[4m
+
+res://tests/integration/test_camera243.gd
+[0m* test_steps_clamp_and_reset_do_not_change_physics
+* test_minimum_covers_loaded_chunks_at_edges_and_ultrawide
+* test_only_noncolliding_decorative_flower_lod_changes
+* test_preference_is_separate_and_reloaded
+* test_zoom_uses_bounded_spawn_radius_not_inverse_zoom_simulation
+[1m5/5 passed.
+[0m[4m
+
+res://tests/integration/test_camera_touch243.gd
+[0m* test_camera_tap_is_ui_not_lasso_and_keeps_held_move
+* test_camera_reset_tap_restores_one_without_moving_or_throwing
+* test_wall_collision_has_same_world_contact_at_both_zooms
+* test_outside_release_stops
+* test_focus_out_stops_native_stick_and_actions
+* test_reused_index_after_lost_release_can_take_new_control_and_stop
+* test_pause_clears_old_hold_even_without_release
+* test_pointer_leaves_screen_keeps_hold_until_release
+* test_canceled_aim_never_throws_or_commits_a_regate
+* test_fresh_touch_after_edge_cancel_controls_again
+* test_stationary_long_hold_is_not_cut_off_by_inactivity_timer
+[33m    --- Awaiting 1.0 seconds  ---
+[0m* test_disabling_player_cancels_old_touch_without_launching
+* test_pending_release_is_invalidated_when_focus_is_lost
+* test_drawn_regate_can_still_extend_at_edge_and_execute_on_release
+* test_hold_survives_every_edge_and_release_stops
+[33m    --- Awaiting 0.5 seconds  ---
+[0m[33m    --- Awaiting 0.5 seconds  ---
+[0m[33m    --- Awaiting 0.5 seconds  ---
+[0m[33m    --- Awaiting 0.5 seconds  ---
+[0m[1m15/15 passed.
+[0m[4m
+
+res://tests/integration/test_performance242.gd
+[0m* test_osd_gated_to_debug_and_never_consumes_touch
+* test_save_metrics_success_failure_and_trial_never_fake_writes
+* test_map_raster_cache_is_separate_and_reuses_texture
+* test_roster_cache_updates_on_focus_change_without_changing_quest_state
+* test_osd_yields_to_reading_panels_without_changing_the_toggle
+[1m5/5 passed.
+[0m[4m
+
+res://tests/integration/test_mode_progress240.gd
+[0m* test_win_atomic_roundtrip_duplicate_and_course_facts
+* test_failed_save_is_recoverable_once_and_blocks_new_run
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:162)
+       [1] save_progress (res://src/Application/save_data.gd:99)
+       [2] record_mode_victory240 (res://src/Application/save_data.gd:885)
+       [3] test_failed_save_is_recoverable_once_and_blocks_new_run (res://tests/integration/test_mode_progress240.gd:20)
+       [4] _run_test (res://addons/gut/gut.gd:622)
+       [5] _test_the_scripts (res://addons/gut/gut.gd:835)
+[34m[ExpectedError][0m
+* test_trial_and_debug_switch_cannot_write_results
+* test_first_mission_requires_quest_and_atomic_acceptance
+* test_justa_is_not_also_a_duel
+[1m5/5 passed.
+[0m[4m
+
+res://tests/integration/test_mode_hooks240.gd
+[0m* test_completed_duel_records_once_not_per_manga
+* test_justa_records_as_justa_never_duel
+* test_rival_win_never_counts
+* test_first_race_win_records_course_and_reopening_finish_is_not_two_wins
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_chain_touch241.gd
+[0m* test_locked_race_touch_does_not_start_game_and_keeps_requirements
+* test_touch_opens_and_closes_crowns_without_launching_mode
+* test_supplied_crown_icons_fit_their_cards_and_pending_uses_separate_assets
+* test_closed_crowns_are_the_only_style_and_have_no_toggle
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_rodeo_save241.gd
+[0m* test_failed_win_retries_without_duplicate_points_horses_or_victories
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:162)
+       [1] save_progress (res://src/Application/save_data.gd:99)
+       [2] record_victory (res://src/Application/save_data.gd:383)
+       [3] _save_win241 (res://src/Presentation/level_0.gd:567)
+       [4] _trigger_win (res://src/Presentation/level_0.gd:560)
+       [5] test_failed_win_retries_without_duplicate_points_horses_or_victories (res://tests/integration/test_rodeo_save241.gd:23)
+       [6] _run_test (res://addons/gut/gut.gd:622)
+       [7] _test_the_scripts (res://addons/gut/gut.gd:835)
+[34m[ExpectedError][0m
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:162)
+       [1] save_progress (res://src/Application/save_data.gd:99)
+       [2] record_victory (res://src/Application/save_data.gd:383)
+       [3] _save_win241 (res://src/Presentation/level_0.gd:567)
+       [4] _on_restart_requested (res://src/Presentation/level_0.gd:623)
+       [5] test_failed_win_retries_without_duplicate_points_horses_or_victories (res://tests/integration/test_rodeo_save241.gd:30)
+       [6] _run_test (res://addons/gut/gut.gd:622)
+       [7] _test_the_scripts (res://addons/gut/gut.gd:835)
+[34m[ExpectedError][0m
+[33m    1 Orphans[0m
+[33m        * [@Label@9001:<Label#2636505943622>][0m
+* test_successful_save_shows_confirmation
+[33m    1 Orphans[0m
+[33m        * [@Label@9066:<Label#2688146214628>][0m
+* test_touch_retry_button_recovers_the_same_victory
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:162)
+       [1] save_progress (res://src/Application/save_data.gd:99)
+       [2] record_victory (res://src/Application/save_data.gd:383)
+       [3] _save_win241 (res://src/Presentation/level_0.gd:567)
+       [4] _trigger_win (res://src/Presentation/level_0.gd:560)
+       [5] test_touch_retry_button_recovers_the_same_victory (res://tests/integration/test_rodeo_save241.gd:44)
+       [6] _run_test (res://addons/gut/gut.gd:622)
+       [7] _test_the_scripts (res://addons/gut/gut.gd:835)
+[34m[ExpectedError][0m
+[1m3/3 passed.
+[0m[4m
+
+res://tests/unit/test_mode_progress240.gd
+[0m* test_victory_facts_and_duplicates
+* test_corrupt_history_is_not_accepted
+* test_chain_from_empty_to_every_mode
+* test_debug_opens_all_without_faking_wins
+* test_real_v6_village_visits_survive_reload_and_open_races
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_save_data.gd
+[0m* test_is_new_record_true_when_higher
+* test_is_new_record_false_when_lower_or_equal
+* test_record_rejects_levels_outside_the_campaign
+* test_atomic_save_roundtrip_on_an_isolated_path
+* test_dual_lasso_intro_flag_roundtrip_on_an_isolated_path
+* test_dual_lasso_intro_flag_defaults_false_without_save_file
+* test_corrupt_or_missing_save_resets_only_the_test_instance
+[1m7/7 passed.
+[0m[4m
+
+res://tests/unit/test_wall_art242.gd
+[0m* test_chains_join_unsorted_segments_at_both_ends_without_changing_source
+* test_six_town_shapes_have_closed_visual_corners_without_mutating_physics
+* test_visual_gap_at_gate_is_not_filled
+[1m3/3 passed.
+[0m[4m
+
+res://tests/unit/test_town_enclosures227.gd
+[0m* test_all_shapes_enclose_all_owned_contents_and_have_one_walkable_entrance
+* test_towns_are_separated_and_seeded_not_rerolled_on_reload
+* test_legacy_terrain_and_registry_are_unchanged_and_v4_registry_matches_geometry
+* test_wild_populations_and_decor_are_not_generated_inside_new_towns
+* test_flower_samples_and_road_routes_stay_outside_owned_enclosure_and_do_not_cross_walls
+* test_circles_are_round_and_map_access_roads_are_clipped_to_discovered_chunk
+* test_new_policy_includes_seen_roaming_origins_and_keeps_stats
+* test_distance_blending_and_no_remote_changes
+* test_visit_order_real_second_town_and_legacy_next_new_not_pin
+* test_policy_save_is_atomic_future_version_blocks_load_and_collection_unchanged
+* test_distant_herds_do_not_write_unchanged_genetics_and_bad_eyes_are_rejected
+* test_explanation_names_actual_pattern_and_only_describes_local_wild_horses
+* test_second_and_third_visited_towns_have_separate_persistent_messages
+* test_far_from_all_towns_keeps_unbiased_original_random_population
+[1m14/14 passed.
+[0m[4m
+
+res://tests/unit/test_road_index246.gd
+[0m* test_index_matches_original_roads_across_edges_and_focus_changes
+* test_local_queries_check_only_nearby_segments_and_cache_stays_bounded
+* test_map_is_opaque_and_flower_source_empty
+* test_old_frame_cache_evicts_only_cache_ownership_not_live_resource
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_road_rules94.gd
+[0m* test_road_consumes_less_at_trot_and_gallop_but_same_regen
+* test_modular_actual_soil_all_pieces_both_art_sets
+* test_old_world_trunks_access_and_no_fake_wide_shoulder
+* test_no_spawn_or_tunneling_on_road_and_no_provider_keeps_levels_same
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_roads230.gd
+[0m* test_t_cross_corner_and_diagonal_fork_are_single_merged_road_surfaces
+* test_road_geometry_is_deterministic_and_never_mutates_save_or_existing_routes
+* test_chunk_boundary_union_has_no_gap_at_grid_edge_for_v2_v3_and_v4
+* test_new_policy_includes_seen_roaming_origins_and_keeps_stats
+* test_distance_blending_and_no_remote_changes
+* test_visit_order_real_second_town_and_legacy_next_new_not_pin
+* test_policy_save_is_atomic_future_version_blocks_load_and_collection_unchanged
+* test_distant_herds_do_not_write_unchanged_genetics_and_bad_eyes_are_rejected
+* test_explanation_names_actual_pattern_and_only_describes_local_wild_horses
+* test_second_and_third_visited_towns_have_separate_persistent_messages
+* test_far_from_all_towns_keeps_unbiased_original_random_population
+[1m11/11 passed.
+[0m[4m
+
+res://tests/integration/test_shared_map159.gd
+[0m* test_frontier_alias_and_country_use_one_map_class_with_same_controls
+* test_shared_native_long_press_country_note_save_reload_delete_and_frontier_isolation
+* test_failed_note_save_retains_dialog_and_disk_then_retry_succeeds
+* test_temporary_country_notes_never_write_frontier_or_persistent_country
+* test_collapsing_and_resizing_invalidates_terrain_immediately_and_back_closes_note_first
+* test_failed_photo_then_retry_without_photo_never_persists_deleted_file
+* test_requested_photo_without_available_capture_does_not_silently_save_text_only
+* test_shared_photo_selection_shows_live_preview_and_large_gold_icons
+* test_remote_edit_blocks_photo_in_ui_and_save_preserves_original_image_and_text_edit
+* test_new_remote_note_also_cannot_attach_photo_from_another_place
+* test_shared_list_centers_note_without_moving_horse_and_keeps_dates_after_reload
+* test_empty_list_and_legacy_note_without_photo_are_read_only
+* test_list_scroll_and_back_do_not_move_or_write_and_old_date_stays_unknown
+* test_remote_capture_disabled_style_is_gray_and_close_capture_is_gold_and_saveable
+[1m14/14 passed.
+[0m[4m
+
+res://tests/unit/test_clean_navigation.gd
+[0m* test_hub_has_six_large_entries_and_no_permanent_tabs
+* test_detail_back_returns_to_origin_and_preserves_filters_page
+* test_filters_are_hidden_and_modal_repeatedly_restore_back
+* test_atlas_and_market_use_same_filter_drawer
+* test_genealogy_hides_all_filter_choices_in_same_drawer
+[33m    32 Orphans[0m
+[33m        * [@Control@11869:<Control#4372712920448>] + 9
+        * [@Control@11742:<Control#4344174877197>] + 9
+        * [@Control@11859:<Control#4372259937390>] + 9
+        * [@Control@11879:<Control#4373165907123>] + 1[0m
+* test_shared_map_floor_is_opaque_so_world_flowers_do_not_show_through
+* test_common_menu_finish_respects_mute_and_wires_new_controls
+* test_atlas_variant_page_preserves_return_and_cannot_buy_preview
+[1m8/8 passed.
+[0m[4m
+
+res://tests/integration/test_repeat_contract167.gd
+[0m* test_farmer_entry_accept_claim_next_species_and_back_preserve_old_quests
+* test_contract_state_is_visible_in_hud_and_no_legacy_reward_is_claimed
+* test_repeat_goat_contract_allows_real_lasso_and_capture_without_old_goat_quest
+LOAD_FRAME_PROFILE {"frames":175,"max_ms":173.072,"over_100ms":3,"over_50ms":3,"p50_ms":11.611,"p95_ms":20.692,"version":"2.7.82+preview83","worst_phase":"reveal"}
+[1m3/3 passed.
+[0m[4m
+
+res://tests/integration/test_board225.gd
+[0m* test_accept_from_farmer_visible_in_board_and_capture_enabled
+LOAD_FRAME_PROFILE {"frames":55,"max_ms":187.869,"over_100ms":1,"over_50ms":1,"p50_ms":10.536,"p95_ms":24.562,"version":"2.7.82+preview83","worst_phase":"prepare"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0mLOAD_FRAME_PROFILE {"frames":72,"max_ms":48.432,"over_100ms":0,"over_50ms":0,"p50_ms":6.867,"p95_ms":10.809,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_board_keeps_existing_herd_and_shows_new_farmer_objective
+LOAD_FRAME_PROFILE {"frames":68,"max_ms":25.055,"over_100ms":0,"over_50ms":0,"p50_ms":6.898,"p95_ms":8.024,"version":"2.7.82+preview83","worst_phase":"reveal"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0m* test_repeat_contract_refreshes_counter_and_board
+LOAD_FRAME_PROFILE {"frames":75,"max_ms":29.594,"over_100ms":0,"over_50ms":0,"p50_ms":6.873,"p95_ms":15.222,"version":"2.7.82+preview83","worst_phase":"prepare"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0m* test_repeat_accept_via_farmer_panel_updates_on_return_and_capture_progress
+LOAD_FRAME_PROFILE {"frames":76,"max_ms":35.102,"over_100ms":0,"over_50ms":0,"p50_ms":6.909,"p95_ms":16.763,"version":"2.7.82+preview83","worst_phase":"prepare"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0m* test_unknown_animals_do_not_get_an_invented_direction
+LOAD_FRAME_PROFILE {"frames":67,"max_ms":44.898,"over_100ms":0,"over_50ms":0,"p50_ms":6.887,"p95_ms":8.058,"version":"2.7.82+preview83","worst_phase":"reveal"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0m* test_finished_farmer_objective_waits_for_thanks_without_adding_a_herd
+LOAD_FRAME_PROFILE {"frames":72,"max_ms":40.548,"over_100ms":0,"over_50ms":0,"p50_ms":6.904,"p95_ms":29.769,"version":"2.7.82+preview83","worst_phase":"reveal"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0m* test_saved_accept_and_progress_reopen_on_board_after_reload
+LOAD_FRAME_PROFILE {"frames":78,"max_ms":34.911,"over_100ms":0,"over_50ms":0,"p50_ms":6.917,"p95_ms":17.435,"version":"2.7.82+preview83","worst_phase":"prepare"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0m* test_flower_route_and_finished_story_do_not_send_to_the_wrong_npc
+LOAD_FRAME_PROFILE {"frames":71,"max_ms":47.468,"over_100ms":0,"over_50ms":0,"p50_ms":6.883,"p95_ms":26.686,"version":"2.7.82+preview83","worst_phase":"prepare"}
+[33m    --- Awaiting 0.5 seconds  ---
+[0m[1m8/8 passed.
+[0m[4m
+
+res://tests/unit/test_town_messages247.gd
+[0m* test_terminal_relays_first_pending_and_points_to_next_without_completing_all
+* test_repeated_leaf_eventually_recounts_every_missing_message_then_finishes
+* test_known_and_revealed_are_not_conversations_and_invalid_records_are_removed
+* test_normal_forward_recommendation_is_preserved
+* test_just_one_missing_is_told_here_without_sending_back
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_town_network234.gd
+[0m* test_fifty_seeds_form_cardinal_trees_with_four_distinct_root_recommendations
+* test_all_visual_roads_clear_walls_and_services_are_inside_for_three_seeds
+* test_infinite_far_coordinates_reproduce_positions_identity_offices_and_variable_distances
+[1m3/3 passed.
+[0m[4m
+
+res://tests/integration/test_network234.gd
+[0m* test_v6_recommendation_roundtrip_and_multiple_offices_per_town
+* test_far_village_discovery_persists_after_focus_moves_and_mount_speed_energy_change
+LOAD_FRAME_PROFILE {"frames":55,"max_ms":178.824,"over_100ms":1,"over_50ms":1,"p50_ms":6.894,"p95_ms":21.579,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_terminal_recommends_a_real_pending_office_without_relaying_its_job
+* test_discovered_legacy_herd_is_updated_on_world_load_without_respawning_captured_sibling
+LOAD_FRAME_PROFILE {"frames":54,"max_ms":168.296,"over_100ms":1,"over_50ms":1,"p50_ms":6.944,"p95_ms":23.31,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_roaming_horse_prepares_origin_even_when_its_origin_chunk_is_not_loaded
+[1m5/5 passed.
+[0mLOAD_FRAME_PROFILE {"frames":66,"max_ms":57.788,"over_100ms":0,"over_50ms":1,"p50_ms":6.904,"p95_ms":25.556,"version":"2.7.82+preview83","worst_phase":"reveal"}
+
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Deprecated            4
+
+Scripts              32
+Tests               206
+Passing Tests       206
+Asserts           37569
+Time              49.057s
+
+
+[32m---- All tests passed! ----
+[0m
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

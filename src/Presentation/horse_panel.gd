@@ -209,16 +209,18 @@ func detail_view()->void:
  var box:=VBoxContainer.new();box.custom_minimum_size=Vector2(735,0);box.add_theme_constant_override("separation",12);scroll.add_child(box)
  if owned:
   if CupRewards195.has_temper(h):
-   var temper:=Label.new();temper.name="CupTemper195";temper.text="Temple de cruce · heredable\nRoce del molino: 0,52 s en vez de 0,65 s. No cambia la velocidad. Se transmite con un progenitor portador.";temper.add_theme_font_size_override("font_size",20);TextFit181.flow(temper,735);box.add_child(temper)
+   HorseStatBars.row(box,"Temple de cruce",.65-.52,AttributeRanges306.RANGES.crossing_calm[0],AttributeRanges306.RANGES.crossing_calm[1])
+   var temper:=Label.new();temper.name="CupTemper195";temper.text="Temple de cruce · heredable\nMejor recuperación al rozar el molino. No cambia la velocidad. Se transmite con un progenitor portador.";temper.add_theme_font_size_override("font_size",20);TextFit181.flow(temper,735);box.add_child(temper)
   if GalaxyPure143.is_pure(h):
    var pure:=Label.new();pure.name="GalaxyPureBadge143";pure.text=GalaxyPure143.BADGE+"\nDos padres Galaxy al nacer · todavía no es un unicornio";pure.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;pure.add_theme_font_size_override("font_size",22);pure.modulate=RanchTheme.GOLD;TextFit181.flow(pure,735);box.add_child(pure)
   var completed:=Label.new();completed.text=("Linaje maestro · brillo activo\n" if h.get("master251",false) else "")+(HorseMastery.level_text(h) if h.traits.get("finish","")=="galaxy" else "Niveles de toros superados: "+str(HorseMastery.levels(h)))+"\n"+VictoryGrowth251.family_text(SaveData.horse_collection,h);completed.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;completed.add_theme_font_size_override("font_size",20);TextFit181.flow(completed,735);box.add_child(completed)
   HorseSummaryBar185.create(box,h,700)
+  HorseStatBars.row(box,"Maestría",HorseMastery.percent(h))
   var family_progress:=VictoryGrowth251.family_progress(SaveData.horse_collection,h)
   var family_percent:float=(minf(family_progress.levels/6.,1.)+minf(family_progress.courses/2.,1.)+family_progress.modes.size()/3.)/3.*100.
-  HorseStatBars.row(box,"Linaje familiar · %d%%"%roundi(family_percent),family_percent)
+  HorseStatBars.row(box,"Linaje familiar",family_percent)
   if h.traits.get("finish","")=="galaxy":
-   var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: supera 36-40 con este caballo (%d%%)"%roundi(HorseMastery.GALAXY_MASTER_THRESHOLD);galaxy.add_theme_font_size_override("font_size",20);TextFit181.flow(galaxy,735);box.add_child(galaxy)
+   var galaxy:=Label.new();galaxy.text="Galaxy maestro" if HorseMastery.galaxy_master(h) else "Galaxy maestro: completa su barra en los niveles 36-40";galaxy.add_theme_font_size_override("font_size",20);TextFit181.flow(galaxy,735);box.add_child(galaxy)
  for text in HorseValues.visual(t)+(HorseValues.hidden_genes(t) if owned else [])+(["Rareza: "+HorseCollection.RARITIES[HorseMarket.tier(h)]] if owned else []):
   var line:=Label.new();line.text=text;line.add_theme_font_size_override("font_size",22);TextFit181.flow(line,735);box.add_child(line)
  HorseStatBars.create(box,h,owned)
@@ -371,6 +373,10 @@ func confirm_trade(h:Dictionary,selling:bool)->void:
  dialog.confirmed.connect(func():
   var ok:bool=SaveData.sell_market_horse(str(h.id)) if selling else SaveData.buy_market_horse(h)
   message=tr("MARKET_OK") if ok else tr("MARKET_FAILED");page="collection";refresh();dialog.queue_free())
+ if selling:
+  var summary:=VBoxContainer.new();summary.custom_minimum_size.x=650.;dialog.add_child(summary)
+  var question:=Label.new();question.custom_minimum_size.x=650.;question.text=dialog.dialog_text;question.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;summary.add_child(question);dialog.dialog_text=""
+  HorseStatBars.create(summary,h,true,true)
  dialog.canceled.connect(dialog.queue_free);dialog.popup_centered()
 
 func entries_empty()->bool:return atlas_entries().is_empty()

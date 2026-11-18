@@ -5,9 +5,6 @@ const BASIC:Dictionary={"radius":240.,"cooldown":5.,"seconds":1.1}
 const IMPROVED:Dictionary={"radius":310.,"cooldown":4.,"seconds":1.4}
 static func for_quality305(level:int)->Dictionary:
  return IMPROVED if level>=2 else BASIC
-static func caption305(level:int)->String:
- var spec:=for_quality305(level)
- return ("Radio %d px · efecto %.1f s · recarga %.0f s"%[spec.radius,spec.seconds,spec.cooldown]).replace(".",",")
 static func away(origin:Vector2,target:Vector2)->Vector2:
  var direction:=target-origin
  return direction.normalized() if direction.length_squared()>1. else Vector2.RIGHT

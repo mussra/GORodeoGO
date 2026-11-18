@@ -25,7 +25,7 @@ func test_single_known_skill_bar_is_full_green_without_changing_mastery():
  for index in [5,6]:
   assert_eq(bars.get_child(index).get_child(0).text,"Salto" if index==5 else "Esquiva")
   assert_eq(bars.get_child(index).get_child(1).value,1.0)
-  assert_eq(bars.get_child(index).get_child(1).get_theme_stylebox("fill").bg_color,Color("74c9a0"))
+  assert_eq(bars.get_child(index).get_child(1).fill306,Color("74c9a0"))
  assert_eq(h,before);assert_eq(HorseTraining.recovery(h,"jump"),1.0)
 func test_unknown_and_legacy_skills_keep_actual_learning_and_default_capability():
  assert_eq(HorseStatBars.learned_value({"learning":{"jump":42},"can_jump":false},"jump"),42.0)

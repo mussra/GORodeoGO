@@ -37,16 +37,16 @@ func build()->void:
  if HorseTraining.valid(c,mentor,learner,skill):
   var m:Dictionary=c.find(mentor);var l:Dictionary=c.find(learner);var affinity:float=float(c.affinities.get(HorseTraining.pair_key(mentor,learner),0))
   var stats:=VBoxContainer.new();stats.position=Vector2(35,310);stats.size.x=1140;content.add_child(stats)
-  HorseStatBars.row(stats,"Mentor · dominio",HorseTraining.mastery(m,skill),0,100,true)
-  HorseStatBars.row(stats,"Aprendiz · aprendizaje",HorseStatBars.learned_value(l,skill),0,100,true)
-  HorseStatBars.row(stats,"Aprendiz · dominio",HorseTraining.mastery(l,skill),0,100,true)
-  HorseStatBars.row(stats,"Afinidad",affinity,0,100,true)
-  label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else "El aprendiz desbloquea la técnica al llenar la barra. El mentor conserva la suya.",Vector2(35,420),20)
+  HorseStatBars.row(stats,"Mentor · dominio",HorseTraining.mastery(m,skill),AttributeRanges306.LOW,AttributeRanges306.HIGH,true)
+  HorseStatBars.row(stats,"Aprendiz · aprendizaje",HorseStatBars.learned_value(l,skill),AttributeRanges306.LOW,AttributeRanges306.HIGH,true)
+  HorseStatBars.row(stats,"Aprendiz · dominio",HorseTraining.mastery(l,skill),AttributeRanges306.LOW,AttributeRanges306.HIGH,true)
+  HorseStatBars.row(stats,"Afinidad",affinity,AttributeRanges306.LOW,AttributeRanges306.HIGH,true)
+  label(tr("TRAIN_KNOWN") if HorseTraining.knows(l,skill) else "El aprendiz desbloquea la técnica al llenar la barra. El mentor conserva la suya.",Vector2(35,470),20)
 
- button(tr("TRAIN_STOP"),Vector2(655,455),func():note=tr("TRAIN_STOPPED") if SaveData.clear_training_pair() else tr("MARKET_FAILED");refresh())
+ button(tr("TRAIN_STOP"),Vector2(655,510),func():note=tr("TRAIN_STOPPED") if SaveData.clear_training_pair() else tr("MARKET_FAILED");refresh())
  var active:Dictionary=c.training_pair
- label(tr("TRAIN_ACTIVE")%[c.known_record(str(active.get("mentor",""))).get("name","-"),c.known_record(str(active.get("learner",""))).get("name","-")] if not active.is_empty() else tr("TRAIN_NONE"),Vector2(35,525),21)
- label(tr("TRAIN_RULES"),Vector2(35,570),18);label(note,Vector2(35,650),20)
+ label(tr("TRAIN_ACTIVE")%[c.known_record(str(active.get("mentor",""))).get("name","-"),c.known_record(str(active.get("learner",""))).get("name","-")] if not active.is_empty() else tr("TRAIN_NONE"),Vector2(35,570),21)
+ label(tr("TRAIN_RULES"),Vector2(35,610),18);label(note,Vector2(35,650),20)
 func save_selection()->void:
  var c:HorseCollection=SaveData.horse_collection
  if not HorseTraining.valid(c,mentor,learner,skill):note=tr("TRAIN_AUTO_INVALID");return

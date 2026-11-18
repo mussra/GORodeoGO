@@ -1,0 +1,37 @@
+{
+  "version": "3.0.6",
+  "code": 466,
+  "package": "com.example.rancho.review",
+  "sha256": "5c5639b2cc0580ecdfb0b92aa423d54873f6cedbc609f96ad5a4a2b934493459",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 76,
+  "tests": 456,
+  "passing": 456,
+  "assertions": 55482,
+  "visual_screenshots": [
+    "306-caballo-atributos",
+    "306-caballo-ficha",
+    "306-caballos-lista",
+    "306-confirmacion-basico",
+    "306-confirmacion-espuelas",
+    "306-confirmacion-mejora",
+    "306-cosmeticos",
+    "306-entrenamiento-juego",
+    "306-entrenamiento-resultado",
+    "306-entrenamiento",
+    "306-espuelas",
+    "306-estribos-herraduras",
+    "306-lazos-fustas",
+    "306-mercado",
+    "306-monturas-riendas",
+    "306-tienda-latigos",
+    "306-vender-caballo",
+    "306-victoria"
+  ],
+  "caveats": [
+    "Desktop Godot only, no physical Android",
+    "Known deprecated test APIs and two ObjectDB exit instances"
+  ],
+  "ranges_source": "src/Application/attribute_ranges306.gd",
+  "gameplay_changes": false
+}

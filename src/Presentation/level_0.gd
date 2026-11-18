@@ -362,6 +362,7 @@ func _apply_unlocked_upgrades() -> void:
 	_mounted_horse_id=SaveData.horse_collection.selected
 	_training_session=HorseTraining.session(SaveData.horse_collection)
 	_training_before=TrainingReport.snapshot(SaveData.horse_collection,_training_session)
+	if not _training_before.is_empty():_training_before.learning=HorseStatBars.learned_value(SaveData.horse_collection.find(_training_session.learner),_training_session.skill)
 	if not _training_session.is_empty():_show_training_companion()
 	player.dodge_path_limit=reach if reach>0 else 260.0
 	var horse_stats:Dictionary=HorseStats.read(SaveData.horse_collection.find(SaveData.horse_collection.selected))
@@ -756,7 +757,7 @@ func _spawn_jump_fences()->void:
 
 func _show_training_companion()->void:
 	var mentor:Dictionary=SaveData.horse_collection.find(_training_session.mentor)
-	var card:=Panel.new();card.name="TrainingStatus";card.position=Vector2(22,76);card.size=Vector2(390,150);card.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("77dbd5"),8));hud.add_child(card)
+	var card:=Panel.new();card.name="TrainingStatus";card.position=Vector2(22,76);card.size=Vector2(430,166);card.mouse_filter=Control.MOUSE_FILTER_IGNORE;card.add_theme_stylebox_override("panel",RanchTheme.box(Color("10252d"),Color("77dbd5"),8));hud.add_child(card)
 	var portrait:=TextureRect.new();portrait.position=Vector2(4,16);portrait.size=Vector2(78,100);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;HorsePortrait.apply(portrait,mentor.traits,SaveData.hat_color);card.add_child(portrait)
 	_training_status=Label.new();_training_status.position=Vector2(90,8);_training_status.size=Vector2(290,30);_training_status.add_theme_font_size_override("font_size",17);card.add_child(_training_status);_update_training_status()
 
@@ -767,8 +768,8 @@ func _update_training_status()->void:
 	_training_status.text=str(current.name).left(22)+" · "+("Salto" if current.skill=="jump" else "Esquiva")
 	var previous=_training_status.get_parent().get_node_or_null("TrainingBars")
 	if previous!=null:previous.free()
-	var bars:=VBoxContainer.new();bars.name="TrainingBars";bars.position=Vector2(90,40);bars.size.x=290;_training_status.get_parent().add_child(bars)
-	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],HorseStatBars.learned_value(SaveData.horse_collection.find(_training_session.learner),_training_session.skill) if spec[1]=="learning" else current[spec[1]],0,100,true)
+	var bars:=VBoxContainer.new();bars.name="TrainingBars";bars.position=Vector2(90,40);bars.size.x=330;_training_status.get_parent().add_child(bars)
+	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],HorseStatBars.learned_value(SaveData.horse_collection.find(_training_session.learner),_training_session.skill) if spec[1]=="learning" else current[spec[1]],AttributeRanges306.LOW,AttributeRanges306.HIGH,true)
 
 func _show_training_result()->void:
 	if _training_session.is_empty():return
@@ -778,7 +779,9 @@ func _show_training_result()->void:
 	summary.text=str(after.name).left(24)+" · "+("Salto" if after.skill=="jump" else "Esquiva")
 	summary.size.y=30
 	var bars:=VBoxContainer.new();bars.name="TrainingResultBars";bars.position=Vector2(25,190);bars.size.x=462;hud.end_panel.add_child(bars)
-	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:HorseStatBars.row(bars,spec[0],HorseStatBars.learned_value(SaveData.horse_collection.find(_training_session.learner),_training_session.skill) if spec[1]=="learning" else after[spec[1]],0,100,true)
+	for spec in [["Aprendizaje","learning"],["Dominio","mastery"],["Afinidad","affinity"]]:
+		var line:=HorseStatBars.row(bars,spec[0],HorseStatBars.learned_value(SaveData.horse_collection.find(_training_session.learner),_training_session.skill) if spec[1]=="learning" else after[spec[1]],AttributeRanges306.LOW,AttributeRanges306.HIGH,true)
+		line.get_child(1).baseline306=clampf(float(_training_before.get(spec[1],after[spec[1]]))/AttributeRanges306.HIGH,0.,1.)
 
 	hud.end_panel.offset_top=-210;hud.end_panel.offset_bottom=210
 	hud.end_label.position.y=12;hud.end_label.size.y=125

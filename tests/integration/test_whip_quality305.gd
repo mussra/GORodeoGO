@@ -17,7 +17,7 @@ func test_bulls_and_horses_receive_advertised_seconds_without_hidden_reduction()
  horse.free();level.free();SaveData.trial_session_active=old
 func test_shop_uses_same_settings_and_explains_quality():
  var p:=EquipmentPanel.new();add_child_autofree(p)
- assert_string_contains(p._effect_text('scare_whip265'),'240 px · efecto 1,1 s')
- assert_string_contains(p._effect_text('scare_whip_plus265'),'310 px · efecto 1,4 s')
+ assert_eq(EquipmentAttributes306.specs('scare_whip265')[0][1],240.)
+ assert_eq(EquipmentAttributes306.specs('scare_whip_plus265')[1][1],1.4)
  assert_string_contains(p._effect_text('scare_whip265'),'sin daño')
- assert_string_contains(p._upgrade_diff_text('scare_whip_plus265'),'1,1 s → mejorado: 310 px / 1,4 s')
+ assert_string_contains(p._upgrade_diff_text('scare_whip_plus265'),'verde: mejora')

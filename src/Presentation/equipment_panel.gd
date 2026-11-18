@@ -12,13 +12,14 @@ var _horses:HorsePanel
 var _confirm:ConfirmationDialog
 var _pending_purchase:String=""
 var _hats:HatPanel
+var _confirm_bars306:VBoxContainer
 func _ready()->void:
  set_meta("background300","content")
  MenuInputGuard.install(self);set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=50
  var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  _canvas=Control.new();_canvas.size=Vector2(1280,720);add_child(_canvas)
  _label("EQUIPO",Vector2(40,22),30);_balance=_label("",Vector2(40,72),24)
- var note:=_label("Juanito · guarnicionero · puntos del juego, sin dinero real",Vector2(640,78),16);note.modulate=Color(1,1,1,.65)
+ var note:=_label("Marca blanca: actual · verde: mejora · puntos, sin dinero real",Vector2(640,78),16);note.modulate=Color(1,1,1,.65)
  _card("Volver","back",Vector2(1130,15),Vector2(110,90),func():hide();closed.emit())
  _card("Caballeriza · cría","horse",Vector2(40,125),Vector2(270,145),func():
   if _horses==null:_horses=HorsePanel.new();add_child(_horses)
@@ -46,12 +47,14 @@ func _item_row(id:String)->Panel:
  var icon:=EquipmentIcon229.new();icon.kind=("long" if str(item.slot)=="lasso" else "whip" if str(item.get("icon","whip"))=="long" else str(item.get("icon","whip")));icon.position=Vector2(14,14);icon.size=Vector2(96,96);panel.add_child(icon)
  _row_label(panel,str(item.name),Vector2(126,15),20)
  _row_label(panel,_effect_text(id),Vector2(126,42),17)
- var diff:String=_upgrade_diff_text(id)
- if not diff.is_empty():_row_label(panel,diff,Vector2(126,65),15)
+ var specs:Array=EquipmentAttributes306.specs(id)
+ var height:float=120.+specs.size()*39.
+ panel.custom_minimum_size.y=height
+ var bars:=EquipmentAttributes306.create(panel,id,650.);bars.position=Vector2(126,76);bars.size.x=650.
  var price_text:String=("Mejora: +%d puntos"%int(item.price)) if item.has("requires") else ("%d puntos"%int(item.price))
- _row_label(panel,price_text,Vector2(126,85),17)
+ _row_label(panel,price_text,Vector2(126,height-34),17)
  _rows302[id]=panel
- var badge:=Label.new();badge.position=Vector2(530,86);badge.size=Vector2(255,25);badge.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;badge.add_theme_font_size_override("font_size",16);badge.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(badge);_badges302[id]=badge
+ var badge:=Label.new();badge.position=Vector2(530,height-34);badge.size=Vector2(255,25);badge.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;badge.add_theme_font_size_override("font_size",16);badge.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(badge);_badges302[id]=badge
  _buy[id]=_row_card(panel,"Conseguir","buy",Vector2(800,20),Vector2(170,84),func():
   _confirm_purchase(id))
  _equip[id]=_row_card(panel,"Equipar","equip",Vector2(985,20),Vector2(170,84),func():
@@ -71,28 +74,14 @@ func _row_card(panel:Panel,caption:String,kind:String,pos:Vector2,extent:Vector2
  return button
 func _effect_text(id:String)->String:
  var item:Dictionary=EquipmentCatalog.ITEMS[id]
- if str(item.get("slot",""))=="scare_whip":return AnimalScare265.caption305(int(item.scare_level265))+" · solo ruido, sin daño"
- if item.has("small_lasso_range"):return "Cerdos/cabras: alcance +50%, margen 58 → 80 px; toros sin cambios"
- if item.has("reach"):return "Regate: señal sin golpes ni daño · trazo %d px"%int(item.reach)
- if item.has("running_drain_mult"):return "Al correr: -%d%% de gasto de resistencia"%int(round((1.0-float(item.running_drain_mult))*100.0))
- if item.has("dodge_recharge_mult"):return "Regate: recarga -%d%%"%int(round((1.0-float(item.dodge_recharge_mult))*100.0))
- if item.has("stun_mult"):return "Aturdimiento tras golpe: -%d%%"%int(round((1.0-float(item.stun_mult))*100.0))
- if item.has("terrain_relief"):return "Esfuerzo fuera de camino: -%d%%"%int(round(float(item.terrain_relief)*100.0))
- if item.has("spur_boost"):return "+%d%% velocidad %.1f s · recarga %.0f s · -%d%% resistencia"%[int(round(float(item.spur_boost)*100.0)),float(item.spur_seconds),float(item.spur_cooldown),int(round(float(item.spur_stamina_cost)*100.0))]
  if item.get("blocked",false):return str(item.get("blocked_reason","Pendiente"))
- return "Solo apariencia, sin ventaja de juego"
+ if str(item.slot)=="scare_whip":return "Solo ruido, sin daño. Aleja a los animales afectados."
+ if item.has("small_lasso_range"):return "Facilita capturar cerdos y cabras; toros sin cambios"
+ if item.has("reach"):return "Regate: señal sin golpes ni daño; no da más velocidad"
+ if item.get("cosmetic",false):return "Solo apariencia, sin ventaja de juego"
+ return "Propiedades de equipo · barras de menor a mejor"
 func _upgrade_diff_text(id:String)->String:
- var item:Dictionary=EquipmentCatalog.ITEMS[id]
- var base_id:String=str(item.get("requires",""))
- if base_id.is_empty() or not EquipmentCatalog.ITEMS.has(base_id):return ""
- if str(item.get("slot",""))=="scare_whip":return "Básico: 240 px / 1,1 s → mejorado: 310 px / 1,4 s; nunca golpea"
- if item.has("reach"):return "Básica: 260 px → mejorada: 420 px; sin más velocidad"
- if item.has("running_drain_mult"):return "Básica: ahorro 5% → mejorada: ahorro 10%"
- if item.has("dodge_recharge_mult"):return "Básica: recarga -5% → mejorada: recarga -10%"
- if item.has("stun_mult"):return "Básica: aturdimiento -5% → mejorada: -10%; suelta capturas igual"
- if item.has("spur_seconds"):return "Básicas: 1 s / 8 s → finas: 1,3 s / 7 s; mismo impulso y coste"
- if item.get("blocked",false):return "No disponible; no se pueden gastar puntos"
- return "Variante elaborada del básico; solo apariencia"
+ return "Marca blanca: actual · dorado: objeto · verde: mejora" if not EquipmentAttributes306.specs(id).is_empty() else ""
 
 func _label(text:String,pos:Vector2,font:int)->Label:
  var label:=Label.new();label.text=text;label.position=pos;label.add_theme_font_size_override("font_size",font);_canvas.add_child(label);return label
@@ -132,6 +121,9 @@ func refresh()->void:
   var face302:=ButtonSkin272.style("normal").duplicate() as StyleBoxTexture
   face302.modulate_color=Color("ffe3a0") if selected else Color.WHITE
   _rows302[id].add_theme_stylebox_override("panel",face302)
+  var old_bars:Node=_rows302[id].get_node_or_null("Attributes306")
+  if old_bars!=null:_rows302[id].remove_child(old_bars);old_bars.free()
+  var bars:=EquipmentAttributes306.create(_rows302[id],id,650.);bars.position=Vector2(126,76);bars.size.x=650.
  var selected_whip:String=state.equipped.get("whip","")
  _state.text="FUSTA DE REGATE: "+(tr(EquipmentCatalog.ITEMS[selected_whip]["name"]) if EquipmentCatalog.ITEMS.has(selected_whip) else tr("UI_058"))
 
@@ -141,6 +133,11 @@ func _confirm_purchase(id:String)->void:
  var item:Dictionary=EquipmentCatalog.ITEMS[id]
  var basic:String=str(item.get("requires",""))
  var total:int=int(item.price)+(int(EquipmentCatalog.ITEMS[basic].price) if not basic.is_empty() else 0)
- _confirm.dialog_text="%s\n%s\n\n%s\nCoste ahora: %d puntos\nCoste total (básico + mejora): %d puntos\nSaldo después: %d puntos\n\nCompra única. Equipar después es gratis. Sin dinero real."%[item.name,_effect_text(id),_upgrade_diff_text(id),int(item.price),total,SaveData.equipment_points-int(item.price)]
- if str(item.get("slot","")) in ["scare_whip","whip"]:_confirm.dialog_text+="\n\nSolo ruido o señal: no toca ni daña a ningún animal."
- _confirm.popup_centered(Vector2i(700,340))
+ _confirm.dialog_text=""
+ if is_instance_valid(_confirm_bars306):_confirm_bars306.free()
+ _confirm_bars306=VBoxContainer.new();_confirm_bars306.custom_minimum_size=Vector2(650,0);_confirm_bars306.add_theme_constant_override("separation",10);_confirm.add_child(_confirm_bars306)
+ var heading:=Label.new();heading.custom_minimum_size.x=650.;heading.text=str(item.name)+"\n"+_effect_text(id);heading.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_confirm_bars306.add_child(heading)
+ EquipmentAttributes306.create(_confirm_bars306,id,650.)
+ var legend:=Label.new();legend.text=_upgrade_diff_text(id);_confirm_bars306.add_child(legend)
+ var price:=Label.new();price.custom_minimum_size.x=650.;price.text="Coste ahora: %d puntos · total básico y mejora: %d puntos\nSaldo después: %d puntos\nCompra única. Equipar después es gratis. Sin dinero real."%[int(item.price),total,SaveData.equipment_points-int(item.price)];price.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;_confirm_bars306.add_child(price)
+ _confirm.popup_centered(Vector2i(730,260+EquipmentAttributes306.specs(id).size()*42))
