@@ -21,6 +21,8 @@ var debug_mode_path:String=DEBUG_SAVE_PATH
 var horse_collection:HorseCollection = HorseCollection.new()
 var hat_color: String = "original"
 var hat_designs235:Dictionary={}
+var world_bull_returns269:Dictionary={}
+var pending_bull_returns269:Dictionary={}
 var rodeo_intro240:bool=false
 var victories240:Dictionary=ModeVictories240.fresh()
 var _issued240:int=0
@@ -95,6 +97,8 @@ func save_progress() -> bool:
 	var started:int=Time.get_ticks_usec()
 	var actual_write:bool=not trial_session_active
 	var ok:bool=_save_progress242()
+	if ok and actual_write:
+		world_bull_returns269.merge(pending_bull_returns269,true);pending_bull_returns269.clear()
 	if actual_write:
 		var elapsed:int=Time.get_ticks_usec()-started
 		save_metrics242.calls+=1;save_metrics242.last_usec=elapsed
@@ -112,6 +116,8 @@ func _save_progress242() -> bool:
 	config.set_value("meta", "version", SAVE_VERSION)
 	config.set_value("progress","victories240",victories240)
 	config.set_value("progress","rodeo_intro240",rodeo_intro240)
+	var returned269:Dictionary=world_bull_returns269.duplicate(true);returned269.merge(pending_bull_returns269,true)
+	config.set_value("world","bull_returns269",returned269)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
 	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
 	var next_hat_designs235:=HatDesigns235.collect(hat_designs235,horse_collection)
@@ -178,6 +184,7 @@ func load_progress() -> void:
 	world_discovered.clear()
 	world_tamed.clear()
 	world_position = Vector2(0, 160)
+	world_bull_returns269={};pending_bull_returns269={}
 	rodeo_intro240=false
 	victories240=ModeVictories240.fresh();_issued240=0;pending_victory240.clear()
 	world_quests.clear();world_jobs249.clear();interior_search264.clear();world_goats_given249=0
@@ -251,6 +258,7 @@ func load_progress() -> void:
 	if typeof(we)==TYPE_ARRAY:
 		for op in we:
 			if WorldEdits.valid_op(op):world_edits.append(op)
+	world_bull_returns269=clean_bull_returns269(config.get_value("world","bull_returns269",{}));pending_bull_returns269.clear()
 	rodeo_intro240=config.get_value("progress","rodeo_intro240",false)==true
 	var victory_raw:Variant=config.get_value("progress","victories240",ModeVictories240.fresh())
 	if not ModeVictories240.valid(victory_raw):
@@ -440,7 +448,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["interior_search264","rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["world_bull_returns269","pending_bull_returns269","interior_search264","rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
@@ -889,3 +897,18 @@ func accept_rodeo240()->bool:
 	rodeo_intro240=true
 	if save_progress():return true
 	rodeo_intro240=before;return false
+
+func record_bull_return269(level:int,index:int)->bool:
+	if trial_session_active or debug_mode or level<1 or level>LevelCatalog.MAX_LEVEL or index<0 or index>=mini(16,LevelCatalog.get_level(level).bull_count):return false
+	var key:String="%d:%d"%[level,index]
+	if world_bull_returns269.has(key):return true
+	pending_bull_returns269[key]=true
+	return save_progress()
+static func clean_bull_returns269(raw:Variant)->Dictionary:
+	var result:Dictionary={}
+	if not raw is Dictionary:return result
+	for level in range(1,LevelCatalog.MAX_LEVEL+1):
+		for index in mini(16,LevelCatalog.get_level(level).bull_count):
+			var key:String="%d:%d"%[level,index]
+			if raw.has(key) and raw[key] is bool and raw[key]==true:result[key]=true
+	return result

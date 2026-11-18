@@ -1,0 +1,17 @@
+{
+  "version": "2.7.197",
+  "version_code": 456,
+  "tests": 402,
+  "passed": 402,
+  "assertions": 54551,
+  "scripts": 64,
+  "split_run": [
+    206,
+    196
+  ],
+  "max_visible": 6,
+  "recording": "on safe pen return, unique level and bull index",
+  "historical_captures_reconstructed": false,
+  "physical_android": false,
+  "screenshots_inspected": true
+}

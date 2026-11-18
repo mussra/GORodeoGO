@@ -543,6 +543,8 @@ func _on_bull_returned(returned_bull: Node2D) -> void:
 	_courier_jobs.erase(returned_bull) # permanently secured, not a released wild opener
 	_refresh_trail()
 	_audio.play("return")
+	if not SaveData.record_bull_return269(_level_number,_active_bulls.find(returned_bull)) and not SaveData.trial_session_active and not SaveData.debug_mode:
+		hud.flash_hint("Toro devuelto, pendiente de guardar. Se reintentará con el siguiente guardado.",4.)
 	_bulls_returned += 1
 	hud.update_bull_count(_bulls_returned, _active_bulls.size())
 	if _win_requires_all_bulls and _bulls_returned >= _active_bulls.size():

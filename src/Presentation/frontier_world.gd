@@ -121,6 +121,7 @@ func _ready() -> void:
 	visible=false
 	y_sort_enabled = true
 	SaveData.ensure_world_seed()
+	var farmer_corral269:=FarmerCorral269.new();add_child(farmer_corral269)
 	var base := ColorRect.new()
 	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	base.color = Color("2e5d33")
@@ -1186,6 +1187,10 @@ class DiscoveryMap extends WorldDiscoveryMap159:
 
 func _exit_tree()->void:
 	if is_instance_valid(_navigation):get_tree().paused=_navigation_was_paused
+	# Builders live outside the scene tree; a dialog can leave one mid-build.
+	for builder in _chunk_pending.values():_discard_builder(builder)
+	for builder in _chunk_built.values():_discard_builder(builder)
+	_chunk_pending.clear();_chunk_built.clear();_build_queue.clear()
 
 ## Additive, repeatable near-ranch prototype; does not alter chunk RNG or saves.
 func _setup_goat_prototype()->void:
