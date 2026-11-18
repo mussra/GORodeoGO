@@ -9,6 +9,9 @@ var minus:Button
 var reset:Button
 var plus:Button
 var factor:float=1.
+var rendered_factor266:float=1.
+var _zoom_tween266:Tween
+const ZOOM_SECONDS266:float=.38
 var arrival_active244:bool=false
 var overview246:Node2D
 func _ready()->void:
@@ -18,7 +21,7 @@ func _ready()->void:
  reset=_button('100%',108.);reset.tooltip_text='Volver a la vista normal'
  plus=_button('+',48.);plus.tooltip_text='Acercar la cámara'
  minus.pressed.connect(func():step(-1))
- reset.pressed.connect(func():set_factor(1.))
+ reset.pressed.connect(func():set_factor(1.,true,true))
  plus.pressed.connect(func():step(1))
  get_viewport().size_changed.connect(_layout)
  var cfg:=ConfigFile.new()
@@ -42,33 +45,40 @@ func step(direction:int)->void:
  else:
   for value in STEPS:
    if value>factor+.001:target=value;break
- set_factor(target)
-func set_factor(value:float,persist:bool=true)->void:
+ set_factor(target,true,true)
+func set_factor(value:float,persist:bool=true,animate:bool=false)->void:
  factor=clampf(value,minimum_for(get_viewport_rect().size),1.5)
  if arrival_active244 and world!=null and world.get("_arrival244")!=null:world._arrival244.finish(false)
- if is_instance_valid(camera):camera.zoom=Vector2.ONE*factor
- # Only tiny, non-colliding decorative flowers disappear in overview. Collectible
- # quest flowers use another renderer and remain visible and interactive.
- for decor in get_tree().get_nodes_in_group('overview_decor243'):
-  if decor.get_viewport()==get_viewport():decor.visible=factor>=.99
- _overview246()
+ if is_instance_valid(_zoom_tween266):_zoom_tween266.kill()
+ if animate and is_instance_valid(camera) and not is_equal_approx(camera.zoom.x,factor):
+  rendered_factor266=camera.zoom.x
+  _zoom_tween266=create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+  _zoom_tween266.tween_method(_apply_zoom266,rendered_factor266,factor,ZOOM_SECONDS266)
+ else:_apply_zoom266(factor)
  reset.text='%d%%'%roundi(factor*100.)
  minus.disabled=factor<=minimum_for(get_viewport_rect().size)+.001
  plus.disabled=factor>=1.499
  if persist:
   var cfg:=ConfigFile.new();cfg.set_value('camera','zoom',factor);cfg.save(PREF_PATH)
+func _apply_zoom266(value:float)->void:
+ rendered_factor266=value
+ if is_instance_valid(camera):camera.zoom=Vector2.ONE*value
+ # Only tiny, non-colliding decorative flowers disappear in overview. Collectible
+ # quest flowers use another renderer and remain visible and interactive.
+ for decor in get_tree().get_nodes_in_group('overview_decor243'):
+  if decor.get_viewport()==get_viewport():decor.visible=rendered_factor266>=.99
+ _overview246()
 func _layout()->void:
  var extent:Vector2=get_viewport_rect().size
- position=Vector2(maxf(204.,extent.x-232.),62.)
- set_factor(factor,false)
+ position=Vector2(maxf(204.,extent.x-234.),182.)
 func _process(_delta:float)->void:
  if not is_instance_valid(world):return
  visible=not world._loading_world and not world._map_overlay.expanded and not is_instance_valid(world._navigation) and not is_instance_valid(world._npc_dialog) and not is_instance_valid(world._journal140) and not is_instance_valid(world._note_dialog106) and not is_instance_valid(world._board_panel) and not world._quest_panel.visible and not world._edit_mode
 
 func _overview246()->void:
  if not is_instance_valid(world) or not world is Node2D:return
- var needs:bool=factor<loaded_minimum246(get_viewport_rect().size)
+ var needs:bool=rendered_factor266<loaded_minimum246(get_viewport_rect().size)
  if needs and not is_instance_valid(overview246):
   overview246=load('res://src/Presentation/town_arrival_view244.gd').new();overview246.world=world;overview246.overview246=true;world.add_child(overview246)
  elif not needs and is_instance_valid(overview246):overview246.queue_free();overview246=null
- if world.get('_arrival244')!=null and not world._arrival244.active:world._arrival244._set_lod(factor<.7)
+ if world.get('_arrival244')!=null and not world._arrival244.active:world._arrival244._set_lod(rendered_factor266<.7)

@@ -111,7 +111,7 @@ func _layout() -> void:
  var viewport: Vector2 = get_viewport_rect().size
  var previous_size:Vector2=size
  size = Vector2(minf(1060, viewport.x - 60), minf(620, viewport.y - 90)) if expanded else Vector2(180, 112)
- position = (viewport - size) / 2.0 if expanded else Vector2(18, minimap_top159())
+ position = (viewport - size) / 2.0 if expanded else Vector2(viewport.x-size.x-18, minimap_top159())
  if size!=previous_size:_terrain_valid=false
  if _sites144!=null:_sites144.visible=expanded;_sites144.size=Vector2(220,56)
  if _notes162!=null:_notes162.visible=expanded;_notes162.position=Vector2(252,16);_notes162.size=Vector2(104,56)
@@ -535,7 +535,7 @@ func show_sites159()->void:
 func choose159(id:String)->void:
  if world._travel144!=null:world._travel144.choose(id)
 
-func minimap_top159()->float:return 84.
+func minimap_top159()->float:return 62.
 
 func center_note162(note:Dictionary)->void:
  _selected_note162=str(note.id)

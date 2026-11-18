@@ -1,0 +1,27 @@
+{
+  "version": "2.7.193",
+  "version_code": 452,
+  "tests": 374,
+  "passed": 374,
+  "assertions": 54193,
+  "scripts": 60,
+  "warnings": 1,
+  "deprecated": 18,
+  "transition_seconds": 0.38,
+  "curve": "sine ease in/out",
+  "rapid_taps": "retarget from rendered camera zoom",
+  "minimap_rect_1280x720": [
+    1082,
+    62,
+    180,
+    112
+  ],
+  "toolbar_rect_1280x720": [
+    1046,
+    182,
+    216,
+    46
+  ],
+  "gui": "injected mouse click without touch mirroring, intermediate zoom and exact endpoint checked; screenshots inspected",
+  "physical_android": false
+}

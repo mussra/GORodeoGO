@@ -37,7 +37,7 @@ func test_first_completed_arrival_is_persisted_with_seed_and_save_scope():
 func test_manual_zoom_cancels_and_prevents_immediate_retry():
  arrival.begin(plan());arrival.elapsed=1.;arrival.apply_frame()
  world._camera_controls243.step(-1)
- assert_false(arrival.active);assert_eq(arrival.camera.zoom,Vector2.ONE*.85)
+ assert_false(arrival.active);assert_almost_eq(world._camera_controls243.factor,.85,.001);await wait_seconds(.5);assert_eq(arrival.camera.zoom,Vector2.ONE*.85)
  assert_true(arrival.attempted.has(arrival.key('town1')));assert_false(arrival.seen.has(arrival.key('town1')))
 func test_map_or_lasso_interrupt_restores_without_committing_seen():
  arrival.begin(plan());world._map_overlay.expanded=true;arrival._process(.1)
