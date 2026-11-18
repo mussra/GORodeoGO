@@ -5,7 +5,7 @@ var use_existing_conversation:bool=false
 var dialog:NpcDialog
 var dialog_block:Control
 func _ready():
- prototype=false;title="FLORISTERÍA";npc_name="la florista";npc_path="res://art/npc/florist.png"
+ room_id264="home:florist";prototype=false;title="FLORISTERÍA";npc_name="la florista";npc_path="res://art/npc/florist.png"
  background_path="res://art/interiors262/florist-room.png"
  super._ready()
  add_object("display_flowers","Examinar las flores","inspect","Florista: Son mis muestras. Puedes mirarlas de cerca; no se recogen del mostrador.")
@@ -14,6 +14,11 @@ func _ready():
  objects.position=Vector2(36,520);objects.size=Vector2(1200,58);objects.vertical=false
  for button in objects.get_children():button.custom_minimum_size=Vector2(384,52);button.size_flags_vertical=Control.SIZE_SHRINK_BEGIN;button.add_theme_font_size_override("font_size",18)
  message.position=Vector2(40,592);message.size=Vector2(1200,50);message.add_theme_font_size_override("font_size",20)
+ reserved_ui264.append(Rect2(36,520,1200,58))
+ found_names264={"worktable":"un lazo de la mesa de trabajo"}
+ add_search_site264("worktable",Rect2(572,220,90,80),"work_ribbon","owner")
+ add_search_site264("left_floor",Rect2(510,410,130,80))
+ add_search_site264("right_shelf",Rect2(810,132,75,60))
  if not use_existing_conversation:conversation_requested.connect(_talk)
 func _talk():
  if is_instance_valid(dialog):return

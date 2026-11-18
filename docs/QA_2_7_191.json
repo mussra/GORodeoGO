@@ -1,0 +1,36 @@
+{
+  "version": "2.7.191",
+  "version_code": 450,
+  "regression": {
+    "selected_scripts": 57,
+    "tests": 357,
+    "passed": 357,
+    "assertions": 54083,
+    "warnings": 1,
+    "deprecated": 14
+  },
+  "gui": "injected click test passed both interiors",
+  "hint_taps": [
+    4,
+    9,
+    14,
+    19
+  ],
+  "hint_scope": "per authored site, cadence resets on room entry",
+  "saved": [
+    "found item ids by room/site",
+    "pending show-owner conversation"
+  ],
+  "ownership": "discovery is not an inventory transfer; these initial materials stay with their owners",
+  "ui_reserved": "reject overlapping search regions: bottom actions, exit/talk; fixed 1280x720 canvas with viewport fit",
+  "scope": [
+    "home florist",
+    "Juanito workshop"
+  ],
+  "not_verified": [
+    "physical Android touch",
+    "all historical tests",
+    "future house interiors"
+  ],
+  "no_story_changes": true
+}

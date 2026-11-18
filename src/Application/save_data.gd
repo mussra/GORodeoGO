@@ -56,6 +56,7 @@ var world_roaming139:Dictionary={} # Moved individuals, sparse/current-chunk ind
 var world_garden212:Dictionary=Garden212.fresh()
 var world_flora138:Dictionary={} # Separate versioned expansion, never rewrites inherited quests.
 var world_jobs249:Dictionary={}
+var interior_search264:Dictionary={}
 var world_goats_given249:int=0
 var world_quests:Dictionary={} # NPC quest states; old captures are never retro-counted
 var world_missions: Dictionary = {}  # mission id -> "offered" / "encargo" / "done"
@@ -125,6 +126,7 @@ func _save_progress242() -> bool:
 	config.set_value("world", "position", world_position)
 	config.set_value("world", "quests", world_quests)
 	config.set_value("world","jobs249",world_jobs249)
+	config.set_value("world","interior_search264",interior_search264)
 	config.set_value("world","goats_given249",world_goats_given249)
 	config.set_value("world","flora138",world_flora138)
 	config.set_value("world","garden212",world_garden212)
@@ -178,7 +180,7 @@ func load_progress() -> void:
 	world_position = Vector2(0, 160)
 	rodeo_intro240=false
 	victories240=ModeVictories240.fresh();_issued240=0;pending_victory240.clear()
-	world_quests.clear();world_jobs249.clear();world_goats_given249=0
+	world_quests.clear();world_jobs249.clear();interior_search264.clear();world_goats_given249=0
 	world_flora138.clear()
 	world_garden212=Garden212.fresh()
 	world_roaming139.clear()
@@ -256,6 +258,8 @@ func load_progress() -> void:
 	victories240=victory_raw.duplicate(true);_issued240=victories240.last;pending_victory240.clear()
 	world_quests=NpcQuests.clean(config.get_value("world","quests",{}))
 	world_jobs249=TownJobs249.clean(config.get_value("world","jobs249",{}),world_seed)
+	var search_raw264:Variant=config.get_value("world","interior_search264",{})
+	interior_search264=search_raw264 if search_raw264 is Dictionary else {}
 	world_goats_given249=clampi(int(config.get_value("world","goats_given249",0)),0,world_goat_captures.size())
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
 	var garden_raw:Variant=config.get_value("world","garden212",{})
@@ -436,7 +440,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["interior_search264","rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true
