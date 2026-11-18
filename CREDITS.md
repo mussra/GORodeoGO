@@ -42,3 +42,6 @@ redistribucion compatible, comprobada para cada archivo.
 Dibujo aportado por Ant el 18-nov-2026 para Rancho. Original intacto en
 art/equipment271/source/latigo-ant-original.png. El PNG tiene alfa real;
 solo se recorta el margen transparente, sin borrar píxeles del objeto ni redibujarlo.
+
+## Botones de interfaz 2.7.200
+Arte aportado por Ant el18nov2026. Original conservado en art/ui/skin272/source/original.png; recortes y trazabilidad en manifest.json. Se conserva alfa y se retiran partículas exteriores desconectadas. Integración nueve zonas en ButtonSkin272. Sin imágenes de terceros nuevas.

@@ -61,7 +61,8 @@ func _row_card(panel:Panel,caption:String,kind:String,pos:Vector2,extent:Vector2
  for state in ["normal","hover","pressed","disabled","focus"]:
   button.add_theme_stylebox_override(state,RanchTheme.box(Color("1b3d49") if state in ["normal","disabled"] else Color("285a68"),Color("478b9a"),12))
  var icon:=EquipmentIcon229.new();icon.kind=kind;icon.size=Vector2.ONE*minf(60.,extent.y-32.);icon.position=Vector2(6,(extent.y-icon.size.y)*.5);button.add_child(icon)
- var label:=Label.new();label.name="Caption229";label.text=caption;label.position=Vector2(4,extent.y-28);label.size=Vector2(extent.x-8,25);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.add_theme_font_size_override("font_size",17);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(label)
+ var label:=Label.new();label.name="Caption229";label.text=caption;label.position=Vector2(4,extent.y-37);label.size=Vector2(extent.x-8,25);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.add_theme_font_size_override("font_size",17);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(label)
+ ButtonSkin272.apply(button,kind=="buy")
  return button
 func _effect_text(id:String)->String:
  var item:Dictionary=EquipmentCatalog.ITEMS[id]
@@ -93,7 +94,8 @@ func _card(caption:String,kind:String,pos:Vector2,extent:Vector2,callback:Callab
  for state in ["normal","hover","pressed","disabled","focus"]:
   button.add_theme_stylebox_override(state,RanchTheme.box(Color("1b3d49") if state in ["normal","disabled"] else Color("285a68"),Color("478b9a"),12))
  var icon:=EquipmentIcon229.new();icon.kind=kind;icon.size=Vector2.ONE*minf(90.,extent.y-34.);icon.position=Vector2((extent.x-icon.size.x)*.5,5);button.add_child(icon)
- var label:=Label.new();label.name="Caption229";label.text=caption;label.position=Vector2(4,extent.y-30);label.size=Vector2(extent.x-8,27);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.add_theme_font_size_override("font_size",18);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(label)
+ var label:=Label.new();label.name="Caption229";label.text=caption;label.position=Vector2(4,extent.y-39);label.size=Vector2(extent.x-8,27);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.add_theme_font_size_override("font_size",18);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(label)
+ ButtonSkin272.apply(button,kind=="buy")
  return button
 func _layout()->void:
  if _canvas==null:return

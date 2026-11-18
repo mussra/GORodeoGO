@@ -158,6 +158,8 @@ func _build_pause_panel() -> void:
 	menu_button.pressed.connect(func(): quit_requested.emit())
 	_pause_panel.add_child(menu_button)
 
+	ButtonSkin272.tree(_pause_panel)
+	ButtonSkin272.apply(resume_button,true)
 	add_child(_pause_panel)
 
 func _apply_ranch_ui() -> void:

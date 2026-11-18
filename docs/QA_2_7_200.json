@@ -1,0 +1,40 @@
+{
+  "version": "2.7.200",
+  "version_code": 459,
+  "tests": 405,
+  "passed": 405,
+  "assertions": 54659,
+  "scripts": 65,
+  "physical_android": false,
+  "screenshots_inspected": true,
+  "pause_screenshot": "actual HUD isolated, not Android gameplay",
+  "scope": [
+    "main menu",
+    "Games",
+    "Equipment",
+    "Settings",
+    "pause"
+  ],
+  "skin": "shared9slice",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "native_margins_LRTB": [
+    58,
+    58,
+    48,
+    48
+  ],
+  "runtime_texture_size": [
+    120,
+    54
+  ],
+  "runtime_margins_LRTB": [
+    20,
+    20,
+    17,
+    17
+  ],
+  "sha256": "cb3e1ae34e3da270b2567e84e6f5a445d58b50afe88d589d172dfa727f42bc36"
+}

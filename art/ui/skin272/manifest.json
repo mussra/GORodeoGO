@@ -1,0 +1,313 @@
+{
+  "source_size": [
+    1536,
+    1024
+  ],
+  "source_sha256": "1d4e8e33435bc9fae19239be0f221623c245c5a516dd4b34d39f092e9b483a55",
+  "source_alpha_range": [
+    0,
+    254
+  ],
+  "files": [
+    {
+      "file": "primary_normal.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        27,
+        65,
+        370,
+        218
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "primary_hover.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        409,
+        65,
+        750,
+        219
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "primary_pressed.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        789,
+        65,
+        1130,
+        219
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "primary_disabled.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        1168,
+        65,
+        1509,
+        219
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "secondary_normal.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        27,
+        276,
+        370,
+        430
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "secondary_hover.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        409,
+        276,
+        751,
+        430
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "secondary_pressed.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        790,
+        276,
+        1130,
+        430
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "secondary_disabled.png",
+      "size": [
+        343,
+        154
+      ],
+      "source_bbox": [
+        1168,
+        276,
+        1510,
+        429
+      ],
+      "nine_slice_LRTB": [
+        58,
+        58,
+        48,
+        48
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "square_normal.png",
+      "size": [
+        248,
+        248
+      ],
+      "source_bbox": [
+        78,
+        466,
+        322,
+        694
+      ],
+      "nine_slice_LRTB": [
+        52,
+        52,
+        52,
+        52
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "square_hover.png",
+      "size": [
+        248,
+        248
+      ],
+      "source_bbox": [
+        457,
+        466,
+        705,
+        694
+      ],
+      "nine_slice_LRTB": [
+        52,
+        52,
+        52,
+        52
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "square_pressed.png",
+      "size": [
+        248,
+        248
+      ],
+      "source_bbox": [
+        839,
+        466,
+        1085,
+        694
+      ],
+      "nine_slice_LRTB": [
+        52,
+        52,
+        52,
+        52
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "square_disabled.png",
+      "size": [
+        248,
+        248
+      ],
+      "source_bbox": [
+        1219,
+        467,
+        1465,
+        694
+      ],
+      "nine_slice_LRTB": [
+        52,
+        52,
+        52,
+        52
+      ],
+      "uniform_scale_only": false
+    },
+    {
+      "file": "round_normal.png",
+      "size": [
+        250,
+        250
+      ],
+      "source_bbox": [
+        75,
+        723,
+        324,
+        968
+      ],
+      "nine_slice_LRTB": null,
+      "uniform_scale_only": true
+    },
+    {
+      "file": "round_hover.png",
+      "size": [
+        250,
+        250
+      ],
+      "source_bbox": [
+        453,
+        722,
+        703,
+        968
+      ],
+      "nine_slice_LRTB": null,
+      "uniform_scale_only": true
+    },
+    {
+      "file": "round_pressed.png",
+      "size": [
+        250,
+        250
+      ],
+      "source_bbox": [
+        837,
+        722,
+        1087,
+        968
+      ],
+      "nine_slice_LRTB": null,
+      "uniform_scale_only": true
+    },
+    {
+      "file": "round_disabled.png",
+      "size": [
+        250,
+        250
+      ],
+      "source_bbox": [
+        1216,
+        722,
+        1466,
+        968
+      ],
+      "nine_slice_LRTB": null,
+      "uniform_scale_only": true
+    }
+  ]
+}
