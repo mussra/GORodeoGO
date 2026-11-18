@@ -205,3 +205,12 @@ func test_actual_newborn_uses_mean_and_has_no_second_growth_bonus():
  assert_false(child.is_empty());assert_true(child.growth_capped255)
  for key in HorseStats.BASE:assert_almost_eq(HorseStats.read(child)[key],(a[key]+b[key])*.5,.000000001)
  var state:=c.export_state();assert_true(c.restore(state));assert_eq(c.export_state(),state)
+
+func test_victory_uses_same_mounted_portrait_as_horse_detail308():
+ var view:=HorseVictory251.new();view.reward=VictoryGrowth251.apply(sut.horse_collection,"original","race");add_child(view);await wait_process_frames(3)
+ var portrait:TextureRect=view.canvas.get_node("VictoryPortrait308")
+ var reference:=TextureRect.new();HorsePortrait.apply_horse(reference,view.reward.horse,SaveData.hat_color)
+ assert_eq(portrait.texture,reference.texture)
+ assert_eq(portrait.material.shader,reference.material.shader)
+ for key in ["coat_color","mane_color","pattern","mastery_strength251","special_finish168"]:assert_eq(portrait.material.get_shader_parameter(key),reference.material.get_shader_parameter(key))
+ reference.free();view.free()

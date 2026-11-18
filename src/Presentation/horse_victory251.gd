@@ -18,8 +18,7 @@ func _ready()->void:
  var panel:=Panel.new();panel.position=Vector2(150,72);panel.size=Vector2(980,576);ButtonSkin272.panel(panel);canvas.add_child(panel)
  _label("VICTORIA · TU CABALLO MEJORA",Vector2(198,101),29,Color("ffe1a1"))
  _label(str(reward.horse.name),Vector2(198,156),35,Color("fff3cf"))
- var portrait:=TextureRect.new();portrait.position=Vector2(196,228);portrait.size=Vector2(310,260);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.texture=PixelLabTrial.pose_texture("horse","side",0,reward.horse.traits,reward.horse);portrait.mouse_filter=Control.MOUSE_FILTER_IGNORE
- if not HorseFinish168.style(reward.horse).is_empty():portrait.material=HorseAdorn169.material(reward.horse,HorseFinish168.selected_spec("walk","horse"),0)
+ var portrait:=TextureRect.new();portrait.position=Vector2(196,228);portrait.size=Vector2(310,240);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.name="VictoryPortrait308";HorsePortrait.apply_horse(portrait,reward.horse,SaveData.hat_color);portrait.mouse_filter=Control.MOUSE_FILTER_IGNORE
  canvas.add_child(portrait)
  var stats:=HorseStats.read(reward.horse)
  for i in HorseSummary185.STATS.size():

@@ -1,0 +1,21 @@
+{
+  "version": "3.0.8",
+  "code": 468,
+  "package": "com.example.rancho.review",
+  "sha256": "7509d47bbaf0211b680aad211949ae705df5f35d13ae505e22e07bfad6f14317",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 76,
+  "tests": 457,
+  "passing": 457,
+  "assertions": 55490,
+  "visual_screenshots": [
+    "308-victoria",
+    "308-caballo-ficha"
+  ],
+  "caveats": [
+    "Desktop Godot only, no physical Android",
+    "Known deprecated test APIs and two ObjectDB exit instances"
+  ],
+  "ranges_source": "src/Application/attribute_ranges306.gd",
+  "gameplay_changes": false
+}
