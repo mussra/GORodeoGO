@@ -27,11 +27,11 @@ func _ready():
  if not npc_path.is_empty():_image(npc_path,Vector2(800,188),Vector2(300,340))
  var nameplate:=_label(npc_name,Vector2(790,532),Vector2(320,32),23);nameplate.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  objects=VBoxContainer.new();objects.position=Vector2(44,214);objects.size=Vector2(540,235);objects.add_theme_constant_override("separation",16);canvas.add_child(objects)
- message=_label("Puedes mirar. Para llevarte algo, habla antes con quien atiende.",Vector2(44,555),Vector2(710,70),22)
+ message=_label("Puedes mirar. Si te interesa algo, habla con quien atiende.",Vector2(44,555),Vector2(710,70),22)
  _button("Salir al rancho",Vector2(210,650),Vector2(370,54),finish)
  _button("Hablar con "+npc_name,Vector2(620,650),Vector2(520,54),func():conversation_requested.emit())
 func add_object(id:String,caption:String,kind:String,description:String):
- assert(kind in ["inspect","ask","gift","purchase"])
+ assert(kind in ["inspect","ask"]) # The player shows interest; the owner decides any offer.
  var button:=Button.new();button.text=caption;button.custom_minimum_size=Vector2(540,64);QuestButtonStyle.apply(button);objects.add_child(button)
  button.pressed.connect(func():
   message.text=description

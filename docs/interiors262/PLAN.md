@@ -18,7 +18,8 @@ No hay fondo interior de floristería entre los assets actuales. La maqueta lo i
 - Puerta cercana y botón Entrar. El vecino no se duplica fuera/dentro.
 - Congelar movimiento y lazo del jugador; volver al punto exterior seguro que corresponde a esa puerta.
 - Cerrar diálogo antes que habitación con Atrás; no dejar pulsaciones pasar al mundo.
-- Interacciones separadas: **Examinar**, **Preguntar/Pedir permiso**, **Recibir regalo**, **Comprar por X puntos**.
+- Acciones iniciales del jugador: **Examinar** e **Interesarse/Preguntar**. Invitación común: "Si te interesa algo, habla conmigo". No anunciar regalos ni ofrecer al jugador elegir entre comprar o pedir un regalo.
+- El personaje decide por objeto si lo vende, lo regala o no lo ofrece. Solo después aparece su oferta concreta con precio o entrega, y el jugador puede aceptarla o rechazarla.
 - Nunca recoger objetos de un mostrador al pasar o tocarlos. No hay botín de pertenencias privadas.
 - Una compra muestra precio y efecto; un regalo tiene un ofrecimiento del dueño. Comprobar capacidad/saldo y guardar de forma atómica; si falla el guardado, no descontar ni entregar y comunicarlo.
 - Los regalos únicos necesitan identificador de edificio/objeto en el guardado; no una variable de la escena. Aún no hay regalos/compras nuevos en esta maqueta.
@@ -30,3 +31,7 @@ Se reutilizan `art/npc/florist.png`, `art/npc/farmer.png`, los personajes existe
 ## Próximo paso comprobable
 
 Con el fondo de floristería: revisar perspectiva y espacio útil, integrar imagen, conectar la puerta y el diálogo existente sin recursión entre servicio/interior, retirar la florista exterior y probar encargos antiguos/nuevos, salida, carga de partida y controles. Después entregar APK de prueba. Hasta entonces, 2.7.189 sigue siendo la APK vigente.
+
+## Ajuste de tono de Ant (18 de noviembre, 08:39-08:40)
+
+La florista y los demás personajes no anuncian regalos al recibir al jugador. Invitan a hablar si algo le interesa. La decisión de vender o regalar corresponde al personaje, no a un selector del jugador. Las reglas de guardado anteriores se aplicarán a una oferta del personaje ya definida.
