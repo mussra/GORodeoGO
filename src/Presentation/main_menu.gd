@@ -147,14 +147,14 @@ func _build_menu() -> void:
 	_hd_rider = Sprite2D.new()
 	HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color);HorseGalaxyLook.configure_portrait(_hd_rider.material,SaveData.horse_collection.find(SaveData.horse_collection.selected))
 	_hd_rider.position = Vector2(0,0)
-	_hd_rider.scale = Vector2.ONE * .51
+	_hd_rider.scale = Vector2.ONE * .45
 	rider_host.add_child(_hd_rider)
 	_skill_column189=Control.new();_skill_column189.name="MountedSkills189";_skill_column189.mouse_filter=Control.MOUSE_FILTER_IGNORE;_hero.add_child(_skill_column189)
 	_jump_badge=JumpBadge.new();_jump_badge.position=Vector2.ZERO;_jump_badge.size=Vector2(64,56);_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));_skill_column189.add_child(_jump_badge)
 	_dodge_badge=JumpBadge.new();_dodge_badge.skill="dodge";_dodge_badge.position=Vector2(0,80);_dodge_badge.size=Vector2(64,56);_dodge_badge.capable=HorseTraining.knows(SaveData.horse_collection.find(SaveData.horse_collection.selected),"dodge");_skill_column189.add_child(_dodge_badge)
 	_equipment_caption = _label("",16,Color("9cbcc0"))
-	_equipment_caption.position=Vector2(850,600)
-	add_child(_equipment_caption)
+	_equipment_caption.position=Vector2(690,610)
+	_hero.add_child(_equipment_caption)
 	_refresh_points_caption()
 	var footer := _label(tr("UI_006"),13,Color("78979d"))
 	footer.name = "Footer"
@@ -216,7 +216,7 @@ func _layout() -> void:
 	_equipment_button.position=Vector2(68,569)
 	_equipment_button.size=Vector2(418,60)
 	_caption.position = Vector2(70,634)
-	_hero.get_node("Rider").position = Vector2(912,355)
+	_hero.get_node("Rider").position = Vector2(912,376)
 	_hero.get_node("Rider").scale = Vector2.ONE
 	_skill_column189.position=Vector2(1170,245)
 	_skill_column189.size=Vector2(64,136)

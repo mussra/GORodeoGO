@@ -8,8 +8,8 @@ extends RefCounted
 ## inventory exists. Points rewards below unchanged.
 const REWARDS:Dictionary={1:10,2:25,3:60,4:110,5:200,6:320,7:470,8:650,9:820,10:1000,11:1300,12:1700,13:2200,14:2800,15:3500,16:4300,17:5200,18:6200,19:7300,20:8500,21:8600,22:8700,23:8800,24:8900,25:9000,26:9100,27:9200,28:9300,29:9400,30:9500,31:9600,32:9700,33:9800,34:9900,35:10000,36:10100,37:10200,38:10300,39:10400,40:10500}
 const ITEMS:Dictionary={
- "scare_whip265":{"name":"Látigo de chasquido","slot":"scare_whip","price":250,"scare_level265":1,"icon":"whip","description":"Aparta animales sin golpearlos: radio 240 px, recarga 5 s. Botón propio."},
- "scare_whip_plus265":{"name":"Látigo de chasquido mejorado","slot":"scare_whip","price":500,"requires":"scare_whip265","scare_level265":2,"icon":"long","description":"Radio 310 px y recarga 4 s. No hace daño ni sustituye la fusta de regate."},
+ "scare_whip265":{"name":"Látigo de chasquido","slot":"scare_whip","price":250,"scare_level265":1,"icon":"whip","description":"Radio 240 px, efecto 1,1 s, recarga 5 s. Solo ruido: sin golpes ni daño."},
+ "scare_whip_plus265":{"name":"Látigo de chasquido mejorado","slot":"scare_whip","price":500,"requires":"scare_whip265","scare_level265":2,"icon":"long","description":"Radio 310 px, efecto 1,4 s, recarga 4 s. Solo ruido, sin daño. No sustituye la fusta de regate."},
  "lasso_small257":{"name":"Lazo largo de captura","slot":"lasso","price":200,"small_lasso_range":1.5,"icon":"reins","description":"Cerdos y cabras: alcance +50% y margen 80 px. No mejora toros."},
 	"whip_basic":{"name":"Fusta","slot":"whip","price":1000,"reach":260.0,"icon":"whip","description":"Habilita el regate con trazo de hasta 260 px"},
 	"whip_long":{"name":"Fusta mejorada","slot":"whip","price":2000,"requires":"whip_basic","reach":420.0,"icon":"long","description":"Amplía el trazo hasta 420 px; no aumenta la velocidad"},

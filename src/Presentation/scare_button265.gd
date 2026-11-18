@@ -19,7 +19,7 @@ func _ready():
  _refresh265()
 func settings265()->Dictionary:
  var item:=EquipmentEffects._equipped_item("scare_whip")
- return AnimalScare265.IMPROVED if item.get("scare_level265",0)==2 else AnimalScare265.BASIC
+ return AnimalScare265.for_quality305(int(item.get("scare_level265",1)))
 func can_activate265()->bool:
  if not is_instance_valid(player) or cooldown265>0. or EquipmentEffects._equipped_item("scare_whip").is_empty():return false
  if not player.is_physics_processing() or get_tree().paused:return false

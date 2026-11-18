@@ -1,0 +1,84 @@
+{
+  "version": "3.0.5",
+  "code": 465,
+  "package": "com.example.rancho.review",
+  "sha256": "87c5c469986502c281ce8b937bd0a81f106a1f21664299c436d63eda4e7cd08f",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 74,
+  "tests": 447,
+  "passing": 447,
+  "assertions": 55206,
+  "visual_screenshots": [
+    "principal",
+    "principal-960x540",
+    "principal-1280x800",
+    "dentro",
+    "fuera",
+    "distancia",
+    "salir",
+    "equipo",
+    "jump",
+    "dodge",
+    "propiedades",
+    "comprar-caballo",
+    "vender-caballo",
+    "descartar-emblema",
+    "quitar-emblema",
+    "npc",
+    "florista",
+    "primo",
+    "nota",
+    "servicio",
+    "pueblo",
+    "huerto",
+    "tienda-latigos",
+    "latigo-basico",
+    "latigo-mejorado"
+  ],
+  "caveats": [
+    "Desktop Godot, no physical Android test",
+    "Two ObjectDB instances and deprecated test APIs on exit"
+  ],
+  "ranch_scope": "Rodeo delivery floor, 80x80, inclusive boundary, wild bulls retreat while rider inside. Grown avoidance margin100px, no teleport. Outside contact still stuns and drops captures.",
+  "whips": [
+    {
+      "quality": "basic",
+      "radius_px": 240,
+      "seconds": 1.1,
+      "cooldown_seconds": 5
+    },
+    {
+      "quality": "improved",
+      "radius_px": 310,
+      "seconds": 1.4,
+      "cooldown_seconds": 4
+    }
+  ],
+  "dialogue_inventory": {
+    "native": [
+      "exit",
+      "equipment",
+      "jump",
+      "dodge",
+      "properties",
+      "buy horse",
+      "sell horse",
+      "discard emblem",
+      "remove emblem"
+    ],
+    "panels": [
+      "npc",
+      "florist",
+      "cousin",
+      "map note",
+      "town service",
+      "town dialogue",
+      "garden"
+    ]
+  },
+  "sources": [
+    "Ant2026-11-18 19:43:26",
+    "Ant2026-11-18 19:46:23",
+    "Ant2026-11-18 19:52:15"
+  ]
+}

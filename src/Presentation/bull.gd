@@ -124,8 +124,12 @@ var scare_left265:float=0.
 var scare_origin265:Vector2
 func scare265(origin:Vector2,seconds:float)->bool:
 	if controller==null or not controller.is_wild() or _delivered or _courier_active:return false
-	scare_origin265=origin;scare_left265=seconds*.65;return true
+	scare_origin265=origin;scare_left265=seconds;return true
+const RANCH_MARGIN305:float=100.0
 func _physics_process(delta: float) -> void:
+	if controller!=null and controller.is_wild() and _player_inside_ranch305():
+		_retreat_from_ranch305(delta)
+		return
 	if scare_left265>0. and controller!=null and controller.is_wild():
 		scare_left265=maxf(0.,scare_left265-delta)
 		var direction:=AnimalScare265.away(scare_origin265,global_position)
@@ -209,6 +213,18 @@ func _physics_process(delta: float) -> void:
 		_:
 			velocity = Vector2.ZERO
 
+## The ranch is a sanctuary, not a target behind an invisible hit shield.
+func _retreat_from_ranch305(delta:float)->void:
+	_touching_player=false;_chase_heading=Vector2.ZERO;_chase_reaction=0.0;_chase_skidding=false
+	_random_chase.update(delta,false,false,0.)
+	var sanctuary:=pen_rect.grow(RANCH_MARGIN305)
+	var direction:=FleeSteering.compute_direction(global_position,pen_rect.get_center(),false,world_bounds,obstacles,sanctuary,boundary_avoid_margin)
+	velocity=direction*_effective_flee_speed
+	move_and_slide();global_position=global_position.clamp(world_bounds.position,world_bounds.end)
+	_blocked_detector.reset()
+	_update_flee_animation(direction,delta);_sprite_swap.set_motion_speed(velocity.length(),flee_speed)
+	queue_redraw()
+
 ## Follow the rider's travelled path, leaving a spatial leash behind, rather
 ## than copying velocity at an arbitrary side/front offset or cutting corners.
 ## The movement itself is TowFollower — the same code the open world uses.
@@ -265,6 +281,11 @@ func _compute_disturbance() -> float:
 ## Distance-based, independent of physics collision layers (Player/Bull never physically block
 ## each other — see level_0.tscn collision_layer/mask — so this is the only contact signal).
 func _check_player_contact() -> void:
+	# The receiving ranch protects the rider, including on horseback. Distance
+	# contact must not hit through its wild-bull barrier or drop held captures.
+	if _player_inside_ranch305():
+		_touching_player = false
+		return
 	if _touch_grace_remaining > 0.0:
 		return  # just dropped on purpose: must not stun the player who released it (D038)
 	var distance: float = global_position.distance_to(_player.global_position)
@@ -278,6 +299,13 @@ func _check_player_contact() -> void:
 			_release_any_held_peer()
 	else:
 		_touching_player = false
+
+func _player_inside_ranch305() -> bool:
+	if _player == null or not pen_rect.has_area():
+		return false
+	var p: Vector2 = _player.global_position
+	# Include all four boundary lines. No margin enlarges the sanctuary.
+	return p.x >= pen_rect.position.x and p.x <= pen_rect.end.x and p.y >= pen_rect.position.y and p.y <= pen_rect.end.y
 
 ## Colliding with a wild bull makes the player drop whatever they were towing.
 func _release_any_held_peer() -> void:

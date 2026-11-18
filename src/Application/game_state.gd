@@ -35,6 +35,7 @@ func set_movement258(anchored:bool)->bool:
  return true
 var _exit_dialog:ConfirmationDialog
 func _ready()->void:
+ var dialogues:=DialogSkin305.new();dialogues.name="DialogSkin305";add_child(dialogues)
  load_movement258()
  var scrolling:=SharedScroll260.new();scrolling.name="SharedScroll260";add_child(scrolling)
  var cfg:=ConfigFile.new()

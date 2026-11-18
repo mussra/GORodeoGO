@@ -285,4 +285,4 @@ var scare_left265:float=0.
 var scare_origin265:Vector2
 func scare265(origin:Vector2,seconds:float)->bool:
 	if roped:return false
-	scare_origin265=origin;scare_left265=seconds*.7;return true
+	scare_origin265=origin;scare_left265=seconds;return true

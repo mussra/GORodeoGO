@@ -56,6 +56,18 @@ static func create() -> Theme:
 ## line so it stays inside the rounded panel.
 static func style_dialog(dialog: AcceptDialog, show_title: bool = false) -> void:
 	dialog.theme = create()
+	var frame := ButtonSkin272.style("normal").duplicate() as StyleBoxTexture
+	frame.content_margin_left=32;frame.content_margin_right=32;frame.content_margin_top=28;frame.content_margin_bottom=28
+	dialog.theme.set_stylebox("panel","AcceptDialog",frame)
+	for state in ["normal","hover","pressed","disabled"]:dialog.theme.set_stylebox(state,"Button",ButtonSkin272.style(state))
+	dialog.theme.set_color("font_pressed_color","Button",CREAM)
+	dialog.theme.set_constant("buttons_separation","AcceptDialog",24)
+	dialog.get_ok_button().custom_minimum_size=Vector2(144,52)
+	ButtonSkin272.apply(dialog.get_ok_button())
+	if dialog is ConfirmationDialog:
+		dialog.get_cancel_button().custom_minimum_size=Vector2(160,52)
+		ButtonSkin272.apply(dialog.get_cancel_button())
+	dialog.set_meta("dialog_skin305",true)
 	dialog.borderless = true
 	dialog.transparent_bg = true
 	if show_title and not dialog.title.is_empty() and not dialog.dialog_text.begins_with(dialog.title):
