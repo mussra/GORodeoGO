@@ -1,0 +1,38 @@
+{
+  "version": "3.0.4",
+  "version_code": 464,
+  "scripts": 71,
+  "tests": 435,
+  "passing": 435,
+  "assertions": 55128,
+  "package": "com.example.rancho.review",
+  "apk_sha256": "98913381f796215c6ebd1a0781c2aa68d77f0a69840a4dd6cc0f8211e9cec734",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "visual": [
+    "principal logo proportional, subtitle and buttons clear",
+    "Juegos closed rose wreath",
+    "Frontera closed rose wreath",
+    "six pending closed wreaths",
+    "six achieved closed wreaths, no style selector"
+  ],
+  "resolution": "1598x719 real Godot window captures",
+  "layout_test_sizes": [
+    "960x540",
+    "1280x720",
+    "1600x720"
+  ],
+  "caveats": [
+    "No physical Android execution",
+    "GUT emits existing deprecation warnings and two ObjectDB instances on exit"
+  ],
+  "no_changes": [
+    "main",
+    "store",
+    "spending",
+    "mechanics",
+    "economy",
+    "save format",
+    "rank gold crown",
+    "equipment horseshoes"
+  ]
+}

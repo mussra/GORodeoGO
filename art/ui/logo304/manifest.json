@@ -1,0 +1,21 @@
+{
+  "original_size": [
+    1536,
+    1024
+  ],
+  "alpha_extrema": [
+    0,
+    254
+  ],
+  "crop": [
+    54,
+    70,
+    1503,
+    935
+  ],
+  "result": [
+    1449,
+    865
+  ],
+  "background_removed": false
+}

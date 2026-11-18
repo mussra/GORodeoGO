@@ -1,0 +1,49 @@
+{
+  "closed_current_assets": [
+    "art/ui/crowns241/round/bulls.png",
+    "art/ui/crowns241/round/bulls_pending.png",
+    "art/ui/crowns241/round/cup.png",
+    "art/ui/crowns241/round/cup_pending.png",
+    "art/ui/crowns241/round/duel.png",
+    "art/ui/crowns241/round/duel_pending.png",
+    "art/ui/crowns241/round/joust.png",
+    "art/ui/crowns241/round/joust_pending.png",
+    "art/ui/crowns241/round/memory.png",
+    "art/ui/crowns241/round/memory_pending.png",
+    "art/ui/crowns241/round/race.png",
+    "art/ui/crowns241/round/race_pending.png"
+  ],
+  "deleted_open_assets": [
+    "art/ui/crowns241/bulls.png",
+    "art/ui/crowns241/bulls_pending.png",
+    "art/ui/crowns241/race.png",
+    "art/ui/crowns241/race_pending.png",
+    "art/ui/crowns241/duel.png",
+    "art/ui/crowns241/duel_pending.png",
+    "art/ui/crowns241/joust.png",
+    "art/ui/crowns241/joust_pending.png",
+    "art/ui/crowns241/memory.png",
+    "art/ui/crowns241/memory_pending.png",
+    "art/ui/crowns241/cup.png",
+    "art/ui/crowns241/cup_pending.png"
+  ],
+  "removed": [
+    "style selector",
+    "round241 flag",
+    "toggle method",
+    "open source sheet",
+    "open manifest",
+    "generator open option"
+  ],
+  "screens": [
+    "Juegos card",
+    "Frontera pause card",
+    "six-mode pending and achieved catalogue"
+  ],
+  "unchanged": [
+    "gold rank crown on pack leader",
+    "equipment horseshoes",
+    "logo horseshoe",
+    "historical release screenshots and git history"
+  ]
+}

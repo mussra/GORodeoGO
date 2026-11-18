@@ -20,13 +20,6 @@ func _build_menu() -> void:
 	_hero.move_child(_portrait,0)
 	_hero.get_node("Tag").text = "TU RANCHO. TU AVENTURA."
 	_hero.get_node("Tag").add_theme_color_override("font_color",Color("264451"))
-	var logo: Label = _hero.get_node("Logo")
-	logo.text = "GO\nRODEO\nGO!"
-	logo.add_theme_font_size_override("font_size",54)
-	logo.add_theme_color_override("font_color",Color("fff1ba"))
-	logo.add_theme_color_override("font_outline_color",Color("263747"))
-	logo.add_theme_constant_override("outline_size",14)
-	logo.rotation = -.05
 	_hero.get_node("Description").hide()
 	_play.text = "JUEGOS"
 	_missions.text = "MAPA DE NIVELES"

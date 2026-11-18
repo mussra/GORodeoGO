@@ -2,7 +2,6 @@ extends GutTest
 var menu:Control
 var snapshot:Dictionary
 func before_each()->void:
- ModeCrowns240.round241=false
  _ignore(get_tree().root.get_node("GutRunner"))
  snapshot={"debug":SaveData.debug_mode,"intro":SaveData.rodeo_intro240,"level":SaveData.highest_level_completed,"places":SaveData.world_places144.duplicate(true),"quests":SaveData.world_quests.duplicate(true),"wins":SaveData.victories240.duplicate(true)}
  SaveData.debug_mode=false;SaveData.rodeo_intro240=false;SaveData.highest_level_completed=0;SaveData.world_places144={};SaveData.world_quests={};SaveData.victories240=ModeVictories240.fresh();GameState.brand_intro_played=true
@@ -50,17 +49,16 @@ func test_supplied_crown_icons_fit_their_cards_and_pending_uses_separate_assets(
   var image:=icon.texture.get_image();assert_eq(image.get_pixel(0,0).a,0.0)
  crowns.free()
 
-func test_touch_style_selector_changes_all_icons_without_changing_progress()->void:
+func test_closed_crowns_are_the_only_style_and_have_no_toggle()->void:
  var before:Dictionary=SaveData.victories240.duplicate(true)
  var crowns:=ModeCrowns240.new();menu.add_child(crowns)
  await wait_process_frames(3)
- await tap(crowns.style_button241.get_global_rect().get_center())
- assert_true(ModeCrowns240.round241)
+ assert_false(crowns.has_method("_toggle_style241"))
+ for child in crowns.canvas.get_children():
+  if child is Button:assert_false(child.text.contains("Diseño:"))
  for mode in ModeVictories240.MODES:
   var icon:TextureRect=crowns.canvas.get_node("Crown_"+mode)
   assert_string_contains(icon.texture.resource_path,"/round/")
- assert_eq(SaveData.victories240,before)
- await tap(crowns.style_button241.get_global_rect().get_center())
- assert_false(ModeCrowns240.round241)
+  assert_false(ResourceLoader.exists("res://art/ui/crowns241/"+mode+".png"))
  assert_eq(SaveData.victories240,before)
  crowns.free()

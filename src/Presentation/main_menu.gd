@@ -97,10 +97,8 @@ func _build_menu() -> void:
 	var tag := _label(tr("UI_000"),15,Color("7de1cc"))
 	tag.name = "Tag"
 	_hero.add_child(tag)
-	var title := _label("GO RODEO\nGO",74,Color("f8edce"))
-	title.name = "Logo"
-	title.add_theme_font_override("font",preload("res://art/ui/fonts/RodeoDisplay.ttf"))
-	title.add_theme_constant_override("line_spacing",-18)
+	var title := TextureRect.new()
+	title.name="Logo";title.texture=load("res://art/ui/logo304/logo.png");title.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;title.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;title.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	_hero.add_child(title)
 	var desc := _label(tr("UI_001"),19,Color("adc5c6"))
 	desc.name = "Description"
@@ -202,8 +200,9 @@ func _layout() -> void:
 	_hero.scale = Vector2.ONE*k
 	_hero.size = Vector2(1280,720)
 	_hero.get_node("Tag").position = Vector2(68,70)
-	_hero.get_node("Logo").position = Vector2(64,112)
-	_hero.get_node("Description").position = Vector2(70,310)
+	_hero.get_node("Logo").position = Vector2(64,98)
+	_hero.get_node("Logo").size = Vector2(440,235)
+	_hero.get_node("Description").position = Vector2(70,348)
 	_play.position = Vector2(68,411)
 	_play.size = Vector2(418,70)
 	MenuEntryArt189.apply(_play,"levels")
@@ -323,7 +322,7 @@ func _show_games213()->void:
 			entry.locked251=true
 			_games213.keep_open250.append(entry.id)
 		entry.compact250=true
-	_games213.entries.append({"id":"crowns240","icon223":"res://art/ui/crowns241/cup.png","compact250":true,"title":"Coronas y victorias","hint":"Tus resultados · tipos de corona"})
+	_games213.entries.append({"id":"crowns240","icon223":"res://art/ui/crowns241/round/cup.png","compact250":true,"title":"Coronas y victorias","hint":"Tus resultados · tipos de corona"})
 	var next240:String="Todos los modos disponibles. Completa tus coronas."
 	for mode in ["bulls","race","duel","joust","memory"]:
 		if not SaveData.mode_open240(mode):next240="Siguiente paso: "+ModeAccess240.current_requirement268(mode,SaveData.world_quests);break

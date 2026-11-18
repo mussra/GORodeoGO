@@ -4,8 +4,6 @@ extends Control
 const TITLES=["Rodeo de toros","Carreras","Duelo de lazos","Justa con lazos","Hípica de memoria","Copa"]
 const FLOWERS=["Amapolas","Girasoles","Acianos","Violetas","Margaritas","Rosas"]
 const COLORS=[Color("f97b77"),Color("ffc962"),Color("7db5ff"),Color("c7a0f4"),Color("fff4d6"),Color("f49ec7")]
-static var round241:bool=false
-var style_button241:Button
 var canvas:Control
 var notice:Label
 func _ready()->void:
@@ -14,8 +12,6 @@ func _ready()->void:
  canvas=Control.new();canvas.size=Vector2(1280,720);add_child(canvas);resized.connect(_layout);_layout()
  MenuNavigation.header(canvas,"CORONAS Y VICTORIAS",queue_free)
  _label("Registro "+("DEBUG · separado" if SaveData.debug_mode else "normal")+" · victorias desde esta versión",Vector2(40,83),20,Color("bbd4dc"))
- style_button241=Button.new();style_button241.position=Vector2(860,76);style_button241.size=Vector2(380,44);style_button241.text="Diseño: "+("redonda" if round241 else "U")+" · cambiar";canvas.add_child(style_button241)
- style_button241.pressed.connect(_toggle_style241)
  var cup:=RaceCupSession194.load_state()
  var cup_complete:bool=cup.get("ok",false) and RaceCup194.current(cup.state).is_empty()
  for i in ModeVictories240.MODES.size():
@@ -36,12 +32,7 @@ func _ready()->void:
    if SaveData.retry_victory240():HorseVictory251.present(get_parent());queue_free();get_parent().add_child(ModeCrowns240.new())
    else:notice.text="No se ha guardado. Progreso anterior protegido.")
 func _texture241(mode:String,obtained:bool)->Texture2D:
- return load("res://art/ui/crowns241/"+("round/" if round241 else "")+mode+("" if obtained else "_pending")+".png")
-func _toggle_style241()->void:
- round241=not round241
- style_button241.text="Diseño: "+("redonda" if round241 else "U")+" · cambiar"
- for mode in ModeVictories240.MODES:
-  var icon:TextureRect=canvas.get_node("Crown_"+mode);icon.texture=_texture241(mode,icon.get_meta("obtained241"))
+ return load("res://art/ui/crowns241/round/"+mode+("" if obtained else "_pending")+".png")
 func _label(text:String,at:Vector2,font:int,color:Color)->Label:
  var label:=Label.new();label.text=text;label.position=at;label.add_theme_font_size_override("font_size",font);label.add_theme_color_override("font_color",color);canvas.add_child(label);return label
 func _layout()->void:
