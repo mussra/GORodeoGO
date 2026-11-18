@@ -24,3 +24,21 @@ redistribucion compatible, comprobada para cada archivo.
   20 fotogramas PNG, celdas160x144, pies alineados, sin redibujar el personaje.
 - Procedencia/licencia anterior a la aportacion: no verificada; no se declara
   CC0 ni biblioteca gratuita. Pendiente de acreditar para distribucion final.
+
+## Chasquido de látigo - audio/scare265.wav
+- Obra: Whip crack #3, sonido 2951.
+- Autor: Joseph SARDIN, BigSoundBank.
+- Fuente: https://bigsoundbank.com/whip-crack-3-s2951.html
+- Original WAV: https://bigsoundbank.com/UPLOAD/bwf-en/2951.wav
+- Licencia: Creative Commons CC0 1.0 Universal, uso comercial y edición permitidos, sin atribución obligatoria.
+- Términos del sitio: https://bigsoundbank.com/licenses.html
+- Texto CC0: https://creativecommons.org/publicdomain/zero/1.0/
+- Verificado y descargado sin cuenta el 18-nov-2026; elegido por Ant.
+- Original preservado en audio/sources/whip-crack-3-2951-original.wav (excluido del APK).
+- Edición: conserva 0,08..0,70 s, ganancia -3 dB, fundidos de 3/20 ms,
+  mono PCM 48 kHz 16 bits. Sin cambiar tono ni velocidad.
+
+## Icono de látigo - art/equipment271/latigo.png
+Dibujo aportado por Ant el 18-nov-2026 para Rancho. Original intacto en
+art/equipment271/source/latigo-ant-original.png. El PNG tiene alfa real;
+solo se recorta el margen transparente, sin borrar píxeles del objeto ni redibujarlo.

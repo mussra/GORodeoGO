@@ -1,0 +1,18 @@
+{
+  "version": "2.7.199",
+  "version_code": 458,
+  "tests": 402,
+  "passed": 402,
+  "assertions": 54556,
+  "scripts": 64,
+  "icon_size": [
+    68,
+    68
+  ],
+  "original_has_alpha": true,
+  "audio_seconds": 0.62,
+  "audio_peak_dbfs": -4,
+  "audio_provisional": true,
+  "physical_android": false,
+  "screenshots_inspected": true
+}
