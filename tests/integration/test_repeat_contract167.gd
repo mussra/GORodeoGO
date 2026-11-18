@@ -11,6 +11,7 @@ func after_each():
 func test_farmer_entry_accept_claim_next_species_and_back_preserve_old_quests():
  NpcQuests.accept(SaveData.world_quests,"farmer_pigs")
  for i in 3:NpcQuests.record(SaveData.world_quests,"capture_animal","pig","old%d"%i)
+ SaveData.rodeo_intro240=true # Already read the separate Rodeo notice in this contracts fixture.
  var old:=SaveData.world_quests.duplicate(true);var npc:Dictionary=NpcQuests.NPCS[0].duplicate(true);world.player.position=npc.position;world._open_npc(npc)
  assert_not_null(world._npc_dialog.get_node_or_null("RepeatContracts165"));world._npc_dialog.get_node("RepeatContracts165").pressed.emit();await get_tree().process_frame
  var panel:RepeatContractsPanel165=world._npc_dialog;assert_not_null(panel);assert_false(world.player.is_physics_processing());panel.action.pressed.emit();assert_true(SaveData.repeat_contract165.active);assert_true(panel.action.disabled);assert_true(SaveData.can_capture_animal165("pig"))

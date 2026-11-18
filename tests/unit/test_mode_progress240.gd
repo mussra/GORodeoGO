@@ -18,12 +18,12 @@ func test_chain_from_empty_to_every_mode():
  for mode in ModeVictories240.MODES:assert_false(ModeAccess240.open(mode,0,places,quests,false,wins))
  quests.farmer_pigs={"status":"done"}
  assert_true(ModeAccess240.rodeo_offered(quests))
- assert_false(ModeAccess240.open("bulls",0,places,quests,false,wins))
+ assert_true(ModeAccess240.open("bulls",0,places,quests,false,wins))
  assert_true(ModeAccess240.open("bulls",0,places,quests,true,wins))
  assert_false(ModeAccess240.open("race",1,places,quests,true,wins))
  places.visited.town1=true;places.visited.town2=true
  assert_eq(ModeAccess240.village_count(places),2)
- assert_true(ModeAccess240.open("race",1,places,quests,true,wins))
+ assert_true(ModeAccess240.open("race",1,places,quests,false,wins))
  assert_false(ModeAccess240.open("duel",1,places,quests,true,wins))
  wins.race=1;assert_false(ModeAccess240.open("duel",1,places,quests,true,wins))
  wins.race=2;assert_true(ModeAccess240.open("duel",1,places,quests,true,wins))

@@ -1,0 +1,14 @@
+{
+  "version": "2.7.196",
+  "version_code": 455,
+  "tests": 391,
+  "passed": 391,
+  "assertions": 54501,
+  "scripts": 63,
+  "split_run": [
+    206,
+    185
+  ],
+  "physical_android": false,
+  "screenshots_inspected": true
+}

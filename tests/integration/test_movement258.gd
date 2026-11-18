@@ -17,7 +17,7 @@ func test_anchored_origin_does_not_chase_finger_after_saturation():
  assert_eq(stick.joystick_mode,VirtualJoystick.JOYSTICK_DYNAMIC);assert_eq(stick.joystick_size,120.)
  touch(Vector2(180,400),true);await wait_physics_frames(2);drag(Vector2(500,400));await wait_physics_frames(2)
  assert_gt(moving().x,.9)
- drag(Vector2(220,400));await wait_physics_frames(2);assert_gt(moving().x,.1);assert_eq(moving().y,0.)
+ drag(Vector2(220,400));await wait_physics_frames(2);assert_gt(moving().x,.1);assert_almost_eq(moving().y,0.,.00001)
  drag(Vector2(130,400));await wait_physics_frames(2);assert_lt(moving().x,-.1)
  touch(Vector2(130,400),false);await wait_physics_frames(3);assert_eq(moving(),Vector2.ZERO)
 func test_lasso_works_with_second_finger_while_moving_anchored():

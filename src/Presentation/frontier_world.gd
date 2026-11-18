@@ -27,6 +27,7 @@ var _cousin_layer140:CousinLayer140
 var _journal140:Panel
 var _roaming139:WorldHerdPositions139
 var _flower_sample138:WorldFlowerTarget105
+var _rodeo_offer_shown268:bool=false
 var _npc_dialog:Node
 var _npc_button:Button
 var _quest_label:Label
@@ -194,6 +195,7 @@ func _physics246(delta:float)->void:
 	_tick_goats(delta)
 
 func _process(delta:float)->void:
+	_maybe_offer_rodeo268()
 	var t_:int=Time.get_ticks_usec()
 	_frame246(delta)
 	if GameState.performance_osd245:
@@ -1742,3 +1744,19 @@ func capture_goat265(goat:Node2D)->bool:
 	if goat==_lasso_horse:_end_lasso()
 	goat.roped=false;goat.set_process(false);goat.queue_free();_refresh_quest_hud();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED")+" · +%d puntos"%ProgressionEconomy165.GOAT_CAPTURE_POINTS)
 	return true
+
+func _maybe_offer_rodeo268()->void:
+	if _rodeo_offer_shown268 or _loading_world or not ModeAccess240.rodeo_offered(SaveData.world_quests) or SaveData.rodeo_intro240:return
+	if not is_instance_valid(player) or not is_instance_valid(_hud) or get_tree().paused or _edit_mode:return
+	if is_instance_valid(_npc_dialog) or is_instance_valid(_navigation) or is_instance_valid(_interior262) or is_instance_valid(_journal140) or is_instance_valid(_note_dialog106):return
+	if is_instance_valid(_map_overlay) and _map_overlay.expanded:return
+	if _quest_panel.visible or is_instance_valid(_board_panel) or (_arrival244!=null and _arrival244.active):return
+	if (_travel144!=null and (_travel144.active or is_instance_valid(_travel144.panel))) or _lasso_state!="":return
+	if player.lasso.is_in_flight() or player.lasso.is_charging():return
+	_rodeo_offer_shown268=true
+	player.cancel_input();player.velocity=Vector2.ZERO;player.set_physics_process(false);player.lasso.cancel_all_actions()
+	_npc_block=Control.new();_npc_block.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);_npc_block.mouse_filter=Control.MOUSE_FILTER_STOP;_hud.add_child(_npc_block)
+	var offer:=RodeoOffer268.new();_npc_dialog=offer;_hud.add_child(offer)
+	offer.closed.connect(func():
+		SaveData.accept_rodeo240() # Compatibility flag / notice remembered; access already follows completed pigs.
+		_close_npc())

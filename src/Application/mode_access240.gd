@@ -15,7 +15,7 @@ static func rodeo_offered(quests:Dictionary)->bool:
  return quests.get("farmer_pigs",{}).get("status","")=="done"
 static func open(mode:String,highest:int,places:Dictionary,quests:Dictionary,intro:bool,wins:Dictionary,debug:bool=false)->bool:
  if debug:return true
- if mode=="bulls":return intro
+ if mode=="bulls":return intro or rodeo_offered(quests)
  if mode=="race":return open("bulls",highest,places,quests,intro,wins) and highest>=RODEO_LEVEL and village_count(places)>=VILLAGES
  if mode=="duel":return open("race",highest,places,quests,intro,wins) and wins.get("race",0)>=RACE_WINS
  if mode=="joust":return open("duel",highest,places,quests,intro,wins) and wins.get("duel",0)>=DUEL_WINS
@@ -23,7 +23,7 @@ static func open(mode:String,highest:int,places:Dictionary,quests:Dictionary,int
  if mode=="cup":return open("duel",highest,places,quests,intro,wins) and wins.get("duel",0)>=DUEL_WINS
  return false
 static func requirement(mode:String)->String:
- if mode=="bulls":return "Frontera: ayuda al granjero con los tres cerdos y acepta la misión de Rodeo."
+ if mode=="bulls":return "Frontera: completa el primer encargo de tres cerdos del granjero. El Rodeo se habilita automáticamente."
  if mode=="race":return "Supera el nivel %d de Rodeo y visita %d pueblos distintos del rancho."%[RODEO_LEVEL,VILLAGES]
  if mode=="duel":return "Gana %d carreras."%RACE_WINS
  if mode=="joust":return "Gana %d duelo completo (al mejor de tres)."%DUEL_WINS
@@ -32,9 +32,16 @@ static func requirement(mode:String)->String:
  return "Disponible"
 
 static func card_requirement(mode:String)->String:
- if mode=="bulls":return "Pendiente: 3 cerdos y aceptar\nla misión en Frontera."
+ if mode=="bulls":return "Pendiente: completa el primer\nencargo de 3 cerdos en Frontera."
  if mode=="race":return "Pendiente: gana Rodeo %d\ny visita %d pueblos nuevos."%[RODEO_LEVEL,VILLAGES]
  if mode=="duel":return "Pendiente: gana %d carreras."%RACE_WINS
  if mode=="joust":return "Pendiente: gana %d duelo."%DUEL_WINS
  if mode=="memory":return "Pendiente: gana %d justa."%JOUST_WINS
  return requirement(mode)
+
+static func current_requirement268(mode:String,quests:Dictionary)->String:
+ if mode=="bulls" and rodeo_offered(quests):return "Los tres cerdos ya están completados. Rodeo habilitado en Juegos."
+ return requirement(mode)
+static func current_card268(mode:String,quests:Dictionary)->String:
+ if mode=="bulls" and rodeo_offered(quests):return "3 cerdos completados.\nRodeo habilitado."
+ return card_requirement(mode)

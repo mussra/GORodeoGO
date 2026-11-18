@@ -314,19 +314,19 @@ func _show_games213()->void:
 	_games213=NavigationSheet.new();_games213.title="JUEGOS";_games213.entries=GAMES213.duplicate(true)
 	for entry in _games213.entries:
 		if not SaveData.mode_open240(entry.id):
-			entry.hint=ModeAccess240.card_requirement(entry.id)
+			entry.hint=ModeAccess240.current_card268(entry.id,SaveData.world_quests)
 			entry.locked251=true
 			_games213.keep_open250.append(entry.id)
 		entry.compact250=true
 	_games213.entries.append({"id":"crowns240","icon223":"res://art/ui/crowns241/cup.png","compact250":true,"title":"Coronas y victorias","hint":"Tus resultados · tipos de corona"})
 	var next240:String="Todos los modos disponibles. Completa tus coronas."
 	for mode in ["bulls","race","duel","joust","memory"]:
-		if not SaveData.mode_open240(mode):next240="Siguiente paso: "+ModeAccess240.requirement(mode);break
+		if not SaveData.mode_open240(mode):next240="Siguiente paso: "+ModeAccess240.current_requirement268(mode,SaveData.world_quests);break
 	_games213.access_note239=next240+"\nParámetros de progresión en prueba. Coronas y victorias: sexta tarjeta."
 	_games213.tree_exited.connect(_guard_recheck213);_games213.selected.connect(_choose_game213);_games213.closed.connect(func():_games213=null);add_child(_games213)
 func _choose_game213(id:String)->void:
 	if id!="crowns240" and not SaveData.mode_open240(id):
-		_games213.show_requirement250(ModeAccess240.requirement(id));return
+		_games213.show_requirement250(ModeAccess240.current_requirement268(id,SaveData.world_quests));return
 	_games213=null
 	if id=="crowns240":add_child(ModeCrowns240.new());return
 	if not SaveData.mode_open240(id):_show_games213();return
