@@ -26,7 +26,15 @@ func test_frontier_people_are_distant_distinct_and_do_not_replace_animals():
  parade._process(.1)
  for figure in parade.frontier_people267:
   assert_false(roles.has(figure.get_meta("frontier_role267")));roles.append(figure.get_meta("frontier_role267"))
-  assert_lte(figure.position.y,421.);assert_lt(figure.position.y,LoadingParade.FLOOR228)
+  assert_lte(figure.position.y,447.);assert_lt(figure.position.y,LoadingParade.FLOOR228)
   assert_lt(figure.z_index,parade.rider.z_index)
-  assert_almost_eq(NpcScale214.visible_bounds(figure.texture).size.y*figure.scale.y,46.,.01)
+  assert_almost_eq(NpcScale214.visible_bounds(figure.texture).size.y*figure.scale.y,70.,.01)
  assert_true(roles.has("Granjero"));assert_true(roles.has("Alma"));assert_true(roles.has("Juanito"))
+
+func test_people_are_more_spaced_in_their_loop():
+ parade.age=4.;parade._process(0.)
+ for i in parade.frontier_people267.size():
+  var a:Sprite2D=parade.frontier_people267[i]
+  for j in range(i+1,parade.frontier_people267.size()):
+   var b:Sprite2D=parade.frontier_people267[j]
+   assert_gte(absf(a.position.x-b.position.x),339.9)

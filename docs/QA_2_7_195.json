@@ -1,0 +1,16 @@
+{
+  "version": "2.7.195",
+  "version_code": 454,
+  "tests": 382,
+  "passed": 382,
+  "assertions": 54448,
+  "scripts": 62,
+  "warnings": 1,
+  "deprecated": 18,
+  "exit_objects": 2,
+  "visible_height": 70,
+  "spacing": 340,
+  "frontier_people_retained": 6,
+  "physical_android": false,
+  "screenshots_inspected": true
+}

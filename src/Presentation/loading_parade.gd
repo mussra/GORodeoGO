@@ -7,8 +7,8 @@ var rng=RandomNumberGenerator.new()
 var rider:AnimatedSprite2D
 var actors:Array=[]
 var frontier_people267:Array[Sprite2D]=[]
-const DISTANT_FLOOR267:float=418.
-const DISTANT_HEIGHT267:float=46.
+const DISTANT_FLOOR267:float=444.
+const DISTANT_HEIGHT267:float=70.
 const FRONTIER_PEOPLE267:Array=[
  ["Granjero","res://art/npc/farmer.png"],
  ["Florista","res://art/npc/florist.png"],
@@ -97,7 +97,7 @@ func _process(delta:float):
  var t=fposmod(age,cycle)
  for i in frontier_people267.size():
   var figure:Sprite2D=frontier_people267[i]
-  figure.position=Vector2(fposmod(180.+i*216.-age*14.,1420.)-70.,DISTANT_FLOOR267+float(i%2)*3.)
+  figure.position=Vector2(fposmod(180.+i*340.-age*20.,2040.)-70.,DISTANT_FLOOR267+float(i%2)*3.)
   figure.rotation=sin(age*.9+float(i))*.008
  rider.position=Vector2(drift_x(age if ready_age<0 else ready_age),FLOOR228)
  for a in actors:
