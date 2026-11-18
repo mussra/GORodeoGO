@@ -88,6 +88,7 @@ func set_is_chaser(value: bool) -> void:
 	_is_chaser = value
 
 func _ready() -> void:
+	add_to_group("scare_animals265")
 	_sprite_swap = SpriteSwap.new(self, $Polygon2D, ART_ROOT, ANIM_NAMES)
 	if _sprite_swap.has_sprite():PixelLabTrial.apply_bull(_sprite_swap._frames)
 
@@ -119,7 +120,17 @@ func begin_active() -> void:
 func set_player(player: Node2D) -> void:
 	_player = player
 
+var scare_left265:float=0.
+var scare_origin265:Vector2
+func scare265(origin:Vector2,seconds:float)->bool:
+	if controller==null or not controller.is_wild() or _delivered or _courier_active:return false
+	scare_origin265=origin;scare_left265=seconds*.65;return true
 func _physics_process(delta: float) -> void:
+	if scare_left265>0. and controller!=null and controller.is_wild():
+		scare_left265=maxf(0.,scare_left265-delta)
+		var direction:=AnimalScare265.away(scare_origin265,global_position)
+		velocity=direction*minf(100.,flee_speed*.55);move_and_slide();global_position=global_position.clamp(world_bounds.position,world_bounds.end)
+		_update_flee_animation(direction,delta);return
 	queue_redraw()
 	_update_release_overlaps()
 	_distraction.update(delta)

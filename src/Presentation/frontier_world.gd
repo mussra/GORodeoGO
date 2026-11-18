@@ -1733,3 +1733,12 @@ func _open_florist262(data:Dictionary):
 	room.closed.connect(func():
 		if is_instance_valid(_npc_dialog) and _npc_dialog!=room:_npc_dialog.queue_free()
 		_npc_dialog=null;_interior262=null;player.cancel_input();player.set_physics_process(true);_refresh_quest_hud();_refresh_missions())
+
+func capture_goat265(goat:Node2D)->bool:
+	if not is_instance_valid(goat) or goat.is_queued_for_deletion() or not goat.roped or not SaveData.can_capture_animal165("goat"):return false
+	if player.global_position.distance_to(goat.global_position)>minf(240.,float(AnimalScare265.IMPROVED.radius)):return false
+	var id:String=str(goat.get_meta("capture_id112","goat:"+str(goat.get_meta("origin",goat.position))))
+	if not SaveData.record_goat104(id):_toast(tr("WORLD_SAVE_FAILED104"));return false
+	if goat==_lasso_horse:_end_lasso()
+	goat.roped=false;goat.set_process(false);goat.queue_free();_refresh_quest_hud();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED")+" · +%d puntos"%ProgressionEconomy165.GOAT_CAPTURE_POINTS)
+	return true

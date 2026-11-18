@@ -132,6 +132,7 @@ func _ready() -> void:
 		g.set_state(spec[1], 1.0)
 		hud.add_child(g)
 		_level_gauges[spec[0]] = g
+	var scare265:=ScareButton265.new();scare265.player=player;hud.add_child(scare265)
 	hud.next_requested.connect(_on_next_requested)
 	hud.sound_toggled.connect(_on_sound_toggled)
 	player.lasso_released.connect(func(): _audio.play("throw"))

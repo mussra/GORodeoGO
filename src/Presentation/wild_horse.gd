@@ -60,6 +60,7 @@ func setup(p_herd: Dictionary) -> void:
 	home = herd.get("pos", Vector2.ZERO)
 
 func _ready() -> void:
+	add_to_group("scare_animals265")
 	collision_mask|=HorseJump.FENCE_LAYER
 	position = home
 	road_provider94=WorldWildRoads94.provider(self)
@@ -83,6 +84,8 @@ func _ready() -> void:
 		_pick_wander_target()
 
 func _physics_process(delta: float) -> void:
+	if scare_left265>0. and not roped:
+		scare_left265=maxf(0.,scare_left265-delta);_flee=AnimalScare265.away(scare_origin265,global_position)*150.
 	if is_instance_valid(player_ref) and not roped and position.distance_squared_to(player_ref.position)>1000.0*1000.0 and float(get_meta("escape_left110",0.))<=0.:
 		_art.set_motion107(Vector2.ZERO);_art.speed_scale=0.0;return
 	_bob += delta
@@ -277,3 +280,9 @@ func try_capture(landing_point: Vector2) -> bool:
 	if roped:
 		return false
 	return global_position.distance_to(landing_point) <= LassoController.PREY_HIT_RADIUS + LassoController.PREY_CAPTURE_TOLERANCE
+
+var scare_left265:float=0.
+var scare_origin265:Vector2
+func scare265(origin:Vector2,seconds:float)->bool:
+	if roped:return false
+	scare_origin265=origin;scare_left265=seconds*.7;return true

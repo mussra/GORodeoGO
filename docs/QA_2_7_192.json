@@ -1,0 +1,48 @@
+{
+  "version": "2.7.192",
+  "version_code": 451,
+  "regression": {
+    "selected_scripts": 59,
+    "tests": 366,
+    "passed": 366,
+    "assertions": 54155,
+    "warnings": 1,
+    "deprecated": 18,
+    "exit_objects": 2
+  },
+  "button": {
+    "size": [
+      112,
+      112
+    ],
+    "gauge_size": [
+      76,
+      76
+    ],
+    "position": [
+      818,
+      602
+    ],
+    "gui_click": "passed",
+    "screenshots_inspected": true
+  },
+  "balance": {
+    "basic_points": 250,
+    "upgrade_points": 500,
+    "radius": [
+      240,
+      310
+    ],
+    "cooldown_seconds": [
+      5,
+      4
+    ],
+    "goat_instant_capture": "only already roped, quest unlocked, range <=240, existing atomic save/reward path"
+  },
+  "purchase_persistence": "separate scratch save buy basic/equip/buy upgrade/equip/clear/reload passed",
+  "not_verified": [
+    "physical Android touch",
+    "real mobile balance",
+    "full historical suite"
+  ]
+}

@@ -13,6 +13,9 @@ static func abilities(player:CharacterBody2D,gauges:Dictionary,horse:Dictionary)
  gauges.jump.set_state(player.can_jump,1.-player._jump_cooldown/maxf(.01,1.2*player.jump_recovery_multiplier))
  gauges.dodge.set_state(player.dodge_available,1.-player.dodge_cooldown/maxf(.01,player.dodge_recharge_seconds))
  _ensure_spur_button(player,gauges)
+ var host:Node=gauges.stamina.get_parent()
+ if host.get_node_or_null("ScareButton265")==null:
+  var button:=ScareButton265.new();button.player=player;host.add_child(button)
 ## Juanito's spurs button (Ant 16-nov): explicit button, shows cooldown and
 ## stamina cost before use. Lives next to the gauges; visible only when spurs
 ## are equipped. Bound once per host; the rider node survives mount changes.

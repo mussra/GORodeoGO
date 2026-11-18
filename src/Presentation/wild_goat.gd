@@ -9,6 +9,7 @@ var pixellab_views:Array=[]
 func setup(p_pen:Dictionary)->void:
  pen=p_pen;home=pen.get("pos",Vector2.ZERO);state=WorldGoats.new_state()
 func _ready()->void:
+ add_to_group("scare_animals265")
  position=home
  road_provider94=WorldWildRoads94.provider(self)
  WorldWildRoads94.bind_spawn(self,road_provider94)
@@ -22,6 +23,7 @@ func _ready()->void:
  goat_art.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR
  add_child(goat_art);goat_art.play("run")
 func _process(delta:float)->void:
+ _tick_scare265(delta)
  _settle_offroad95(delta)
  _fence_jump=maxf(0,_fence_jump-delta)
  # The visual lifts during a jump, but depth still follows the feet like peers.
@@ -36,6 +38,7 @@ func _process(delta:float)->void:
  goat_art.speed_scale=1.0 if movement.length_squared()>0.01 else 0.0
  queue_redraw()
 func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
+ if scare_left265>0.:point=scare_origin265;charge=false
  movement=(point-position) if charge else (position-point)
  if movement.length()<1:movement=Vector2.RIGHT
  var speed:float=WorldGoats.CHARGE_SPEED if charge else WorldGoats.FLEE_SPEED
@@ -50,3 +53,10 @@ func move_from_or_towards(point:Vector2,delta:float,charge:bool)->void:
 func _draw()->void:
  super._draw()
  if not roped and bool(state.get("alert110",false)) and float(state.get("spook",0.))<=0.:draw_string(ThemeDB.fallback_font,Vector2(-5,-85),"?",HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color("ffe6a0"))
+
+func scare265(origin:Vector2,seconds:float)->bool:
+ if roped:
+  var world:Node=get_parent()
+  while world!=null and not world.has_method("capture_goat265"):world=world.get_parent()
+  return world.capture_goat265(self) if world!=null else false
+ return super.scare265(origin,seconds)

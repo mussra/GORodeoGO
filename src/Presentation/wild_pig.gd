@@ -42,6 +42,7 @@ func setup(p_pen: Dictionary) -> void:
 	home = pen.get("pos", Vector2.ZERO)
 
 func _ready() -> void:
+	add_to_group("scare_animals265")
 	position = home
 	road_provider94=WorldWildRoads94.provider(self)
 	WorldWildRoads94.bind_spawn(self,road_provider94)
@@ -50,6 +51,7 @@ func _ready() -> void:
 	add_child(_art)
 
 func _process(delta: float) -> void:
+	_tick_scare265(delta)
 	_settle_offroad95(delta)
 	if is_instance_valid(_art):_art.update_state(bool(state.get("flee",false)) and not movement.is_zero_approx(),bool(state.get("tired",false)),flip_h,movement)
 	touch_grace = maxf(0.0, touch_grace - delta)
@@ -68,6 +70,7 @@ func release() -> void:
 	_touching_rider = false
 
 func flee_from(from: Vector2, delta: float, speed: float = 170.0) -> void:
+	if scare_left265>0.:from=scare_origin265
 	var away: Vector2 = position - from
 	if away.length() < 1.0:
 		away = Vector2.RIGHT
@@ -122,3 +125,13 @@ func _heading249(motion:Vector2,delta:float)->void:
 	if _flip_pending249>=WildHeading129.VIEW_HOLD:flip_h=desired;_flip_pending249=0.
 
 func small_lasso_target257()->bool:return true
+
+var scare_left265:float=0.
+var scare_origin265:Vector2
+func scare265(origin:Vector2,seconds:float)->bool:
+	if roped:return false
+	scare_origin265=origin-global_position+position;scare_left265=seconds
+	state.spook=maxf(float(state.get("spook",0.)),seconds);return true
+func _tick_scare265(delta:float):
+	if scare_left265<=0. or roped:return
+	scare_left265=maxf(0.,scare_left265-delta);flee_from(scare_origin265,delta,145. if self.get_script().resource_path.ends_with("wild_goat.gd") else 175.)

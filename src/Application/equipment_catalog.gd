@@ -8,6 +8,8 @@ extends RefCounted
 ## inventory exists. Points rewards below unchanged.
 const REWARDS:Dictionary={1:10,2:25,3:60,4:110,5:200,6:320,7:470,8:650,9:820,10:1000,11:1300,12:1700,13:2200,14:2800,15:3500,16:4300,17:5200,18:6200,19:7300,20:8500,21:8600,22:8700,23:8800,24:8900,25:9000,26:9100,27:9200,28:9300,29:9400,30:9500,31:9600,32:9700,33:9800,34:9900,35:10000,36:10100,37:10200,38:10300,39:10400,40:10500}
 const ITEMS:Dictionary={
+ "scare_whip265":{"name":"Látigo de chasquido","slot":"scare_whip","price":250,"scare_level265":1,"icon":"whip","description":"Aparta animales sin golpearlos: radio 240 px, recarga 5 s. Botón propio."},
+ "scare_whip_plus265":{"name":"Látigo de chasquido mejorado","slot":"scare_whip","price":500,"requires":"scare_whip265","scare_level265":2,"icon":"long","description":"Radio 310 px y recarga 4 s. No hace daño ni sustituye la fusta de regate."},
  "lasso_small257":{"name":"Lazo largo de captura","slot":"lasso","price":200,"small_lasso_range":1.5,"icon":"reins","description":"Cerdos y cabras: alcance +50% y margen 80 px. No mejora toros."},
 	"whip_basic":{"name":"Fusta","slot":"whip","price":1000,"reach":260.0,"icon":"whip","description":"Habilita el regate con trazo de hasta 260 px"},
 	"whip_long":{"name":"Fusta mejorada","slot":"whip","price":2000,"requires":"whip_basic","reach":420.0,"icon":"long","description":"Amplía el trazo hasta 420 px; no aumenta la velocidad"},
@@ -27,7 +29,7 @@ const ITEMS:Dictionary={
 	"cosmetic_blanket_deluxe":{"name":"Manta bordada","slot":"cosmetic_blanket","price":600,"requires":"cosmetic_blanket","cosmetic":true,"icon":"blanket","description":"Variante elaborada; solo apariencia"},
 }
 ## Display order for Juanito's panel.
-const ORDER:Array[String]=["lasso_small257","whip_basic","whip_long","saddle_basic","saddle_improved","reins_basic","reins_improved","stirrups_basic","stirrups_improved","shoes_basic","shoes_improved","spurs_basic","spurs_improved","cosmetic_hat","cosmetic_hat_deluxe","cosmetic_blanket","cosmetic_blanket_deluxe"]
+const ORDER:Array[String]=["scare_whip265","scare_whip_plus265","lasso_small257","whip_basic","whip_long","saddle_basic","saddle_improved","reins_basic","reins_improved","stirrups_basic","stirrups_improved","shoes_basic","shoes_improved","spurs_basic","spurs_improved","cosmetic_hat","cosmetic_hat_deluxe","cosmetic_blanket","cosmetic_blanket_deluxe"]
 
 static func effect_value(id:String,key:String,fallback:float=1.0)->float:
 	var item:Variant=ITEMS.get(id,null)
