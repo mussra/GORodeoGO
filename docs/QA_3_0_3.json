@@ -1,0 +1,34 @@
+{
+  "version": "3.0.3",
+  "code": 463,
+  "sha256": "1cd6eeba348e9dddc19953b889a26be8c96d66839f61af367cdea94b913e1498",
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "scripts": 70,
+  "tests_passed": 433,
+  "assertions": 55081,
+  "physical_android": false,
+  "full_historical_suite": false,
+  "scope": "five supplied Frontera access icons only",
+  "source": {
+    "size": [
+      1536,
+      1024
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      254
+    ],
+    "real_alpha": true,
+    "background_removal": false,
+    "crop": "main visible contour alpha>16 plus4px; original pixels and alpha preserved inside bounds; each icon fitted224px inside256px transparent tile"
+  },
+  "screenshots": "Real desktop Godot render; Frontera pause in loaded isolated world; no physical Android",
+  "warnings": [
+    "1 GUT warning",
+    "21 deprecated calls",
+    "2 ObjectDB exit references",
+    "build-tools35 fallback for target36"
+  ]
+}

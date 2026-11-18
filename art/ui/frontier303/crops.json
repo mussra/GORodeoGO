@@ -1,0 +1,99 @@
+{
+  "source_size": [
+    1536,
+    1024
+  ],
+  "alpha_extrema": [
+    0,
+    254
+  ],
+  "real_alpha": true,
+  "background_removed": false,
+  "crops": [
+    {
+      "name": "book",
+      "cell": [
+        0,
+        0
+      ],
+      "alpha_bbox": [
+        99,
+        77,
+        460,
+        477
+      ],
+      "size": [
+        202,
+        224
+      ]
+    },
+    {
+      "name": "crowns",
+      "cell": [
+        1,
+        0
+      ],
+      "alpha_bbox": [
+        52,
+        105,
+        462,
+        432
+      ],
+      "size": [
+        224,
+        179
+      ]
+    },
+    {
+      "name": "mission",
+      "cell": [
+        2,
+        0
+      ],
+      "alpha_bbox": [
+        88,
+        89,
+        444,
+        474
+      ],
+      "size": [
+        207,
+        224
+      ]
+    },
+    {
+      "name": "debug",
+      "cell": [
+        0,
+        1
+      ],
+      "alpha_bbox": [
+        81,
+        78,
+        483,
+        442
+      ],
+      "size": [
+        224,
+        203
+      ]
+    },
+    {
+      "name": "performance",
+      "cell": [
+        1,
+        1
+      ],
+      "alpha_bbox": [
+        83,
+        74,
+        429,
+        425
+      ],
+      "size": [
+        221,
+        224
+      ]
+    }
+  ]
+}
