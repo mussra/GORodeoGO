@@ -1,0 +1,47 @@
+{
+  "version": "2.7.189",
+  "version_code": 448,
+  "suite": {
+    "scripts": 54,
+    "tests": 340,
+    "passing": 340,
+    "assertions": 53950,
+    "scope": "selected regression suite, not all historical scripts",
+    "warnings": 1,
+    "deprecated": 7,
+    "exit_object_leaks": 2
+  },
+  "scroll_views": 14,
+  "scroll_checks": [
+    "simulated touch drag",
+    "wheel",
+    "draggable native scrollbar"
+  ],
+  "short_content": "temporary tall fixtures used where real content did not overflow",
+  "atlas": {
+    "raw_base_combinations": 47250,
+    "normalized_appearance_keys": 41706,
+    "pixel_exhaustive": false,
+    "rarity3_raw": 2574,
+    "rarity3_keys": 2403,
+    "rarity3_family_cards": 117
+  },
+  "page_benchmark_ms": {
+    "baseline188": [
+      550.742,
+      563.831,
+      573.188
+    ],
+    "cached189": [
+      105.562,
+      115.601,
+      113.507
+    ],
+    "scope": "same Linux software-rendered viewport, page refresh through frame_post_draw after warm-up, Android unmeasured"
+  },
+  "caveats": [
+    "No physical Android touch/performance test",
+    "Entire historical suite not green: generic full run hit old-world fixture errors and was stopped; selected 54-script regression suite passes",
+    "One GUT warning, seven deprecated notices, two exit object leaks remain"
+  ]
+}

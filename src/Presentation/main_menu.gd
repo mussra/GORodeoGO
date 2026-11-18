@@ -284,7 +284,7 @@ func _show_equipment()->void:
 	_equipment_panel.show()
 
 func _show_settings()->void:
-	var panel:=Control.new();panel.name="Settings213";panel.set_meta("back_closes",true);panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
+	var panel:=Control.new();panel.name="Settings213";MenuInputGuard.install(panel);panel.set_meta("back_closes",true);panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.z_index=90;add_child(panel)
 	var bg:=ColorRect.new();bg.color=Color("10252d");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.add_child(bg)
 	var content:=Control.new();var k:=minf(size.x/1280.,size.y/720.);content.scale=Vector2.ONE*k;content.position=(size-Vector2(1280,720)*k)*.5;panel.add_child(content)
 	var scroll:=ScrollContainer.new();scroll.position=Vector2(60,40);scroll.size=Vector2(1160,640);content.add_child(scroll)

@@ -97,3 +97,43 @@ static func owned_first_order(entries:Array[Dictionary])->Array[Dictionary]:
  for entry in entries:
   if not entry.owned:out.append(entry)
  return out
+
+## Presentation-only normalization of fields the portrait does not display.
+## Never deletes, edits or merges owned horse records or breeding genes.
+static func visible_key261(h:Dictionary)->String:
+ var t:Dictionary=h.traits.duplicate(true)
+ var pattern:int=int(t.pattern)
+ if pattern in [0,4]:t.spots=-1;t.erase("spots_style238")
+ elif t.get("spots_style238","")!="rainbow":
+  var color_:Color=HorsePatternMap.color(t) if HorseCollection.spots_index(t)>=0 or pattern>=10 else Color(.96,.93,.85)
+  t.spots=-1;t["visible_ink261"]=color_.to_html()
+  if color_==Color(HorseAppearance.COLORS[int(t.coat)]) and pattern!=12:
+   t.pattern=0;t.erase("visible_ink261");t.erase("spots_style238")
+ if int(t.pattern)==0:t.erase("visible_ink261")
+ var normalized:Dictionary={"traits":t,"stage":h.get("stage","adult"),"species":h.get("species","horse")}
+ var stable:Array=[int(t.coat),int(t.pattern),int(t.mane),t.has("eyes"),HorseCollection.eye_index(t),HorseCollection.legs_index(t),t.get("visible_ink261",""),t.get("coat_style238","flat"),t.get("spots_style238","flat"),t.get("finish","normal"),t.get("emblem",{}),normalized.stage,normalized.species,h.get("unicorn_variant",""),h.get("master251",false)]
+ return JSON.stringify(stable)
+static func visible_groups261(entries:Array[Dictionary])->Array[Dictionary]:
+ var out:Array[Dictionary]=[];var seen:Dictionary={}
+ for entry in entries:
+  var key:String=visible_key261(entry.horse)
+  if not seen.has(key):
+   var copy:Dictionary=entry.duplicate(false);copy["combinations261"]=1;copy["members261"]=[entry];out.append(copy);seen[key]=out.size()-1
+  else:
+   var group:Dictionary=out[int(seen[key])];group.combinations261+=1;group.members261.append(entry)
+   if entry.owned and not group.owned:group.horse=entry.horse;group.owned=true
+ return out
+
+static func family_groups261(entries:Array[Dictionary])->Array[Dictionary]:
+ var out:Array[Dictionary]=[];var seen:Dictionary={}
+ for entry in entries:
+  var t:Dictionary=entry.horse.traits
+  var key:String=JSON.stringify([t.coat,t.pattern,t.mane,entry.horse.get("species","horse"),entry.horse.get("unicorn_variant","")])
+  if not seen.has(key):
+   var copy:Dictionary=entry.duplicate(false);copy["variants261"]=int(entry.get("combinations261",1));copy["family261"]=true;copy["family_members261"]=[entry];out.append(copy);seen[key]=out.size()-1
+  else:
+   var group:Dictionary=out[int(seen[key])];group.variants261+=int(entry.get("combinations261",1));group.family_members261.append(entry)
+   if entry.owned and not group.owned:group.horse=entry.horse;group.owned=true
+ for group in out:
+  var members:Array[Dictionary]=[];members.assign(group.family_members261);group.variants261=visible_groups261(members).size()
+ return out

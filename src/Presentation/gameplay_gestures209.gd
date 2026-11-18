@@ -71,6 +71,8 @@ func _input(event:InputEvent)->void:
   get_viewport().set_input_as_handled();return
  if event is InputEventScreenTouch:
   if event.pressed:
+   var native_scroll:ScrollContainer=_scroll_at249(event.position)
+   if native_scroll!=null and native_scroll.has_meta("shared_scroll260"):return
    if not _can_begin():return
    if touches.has(event.index):_cancel_touches224()
    var ui:=_ui_at(game,event.position)

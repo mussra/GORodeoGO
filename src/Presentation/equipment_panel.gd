@@ -27,7 +27,6 @@ func _ready()->void:
  _card("Acabados","finish",Vector2(970,125),Vector2(270,145),func():add_child(FinishShop168.new()))
  var scroll:=ScrollContainer.new();scroll.position=Vector2(40,292);scroll.size=Vector2(1200,352);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;_canvas.add_child(scroll)
  scroll.name="EquipmentList257";scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_ALWAYS;scroll.get_v_scroll_bar().custom_minimum_size.x=24
- var gesture:=EquipmentScroll257.new();gesture.scroll=scroll;add_child(gesture)
  var list:=VBoxContainer.new();list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;list.add_theme_constant_override("separation",8);scroll.add_child(list)
  for id in EquipmentCatalog.ORDER:
   if not EquipmentCatalog.ITEMS.has(id):continue

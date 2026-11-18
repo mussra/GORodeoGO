@@ -15,7 +15,7 @@ func test_scroll_is_shared_and_wide_in_every_panel():
  var panel:=EquipmentPanel.new();add_child(panel);await wait_process_frames(5)
  var scroll:ScrollContainer=panel.find_child("EquipmentList257",true,false)
  assert_not_null(scroll);assert_gte(scroll.get_v_scroll_bar().size.x,24.)
- assert_true(panel.get_children().any(func(c):return c is EquipmentScroll257))
+ assert_true(scroll.has_meta("shared_scroll260"))
  scroll.scroll_vertical=100000;await wait_process_frames(3)
  assert_gt(scroll.scroll_vertical,1000);assert_almost_eq(float(scroll.scroll_vertical),scroll.get_v_scroll_bar().max_value-scroll.get_v_scroll_bar().page,1.)
  panel.free()

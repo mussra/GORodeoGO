@@ -1,0 +1,56 @@
+extends Node
+var reports:Array=[]
+func _ready():run.call_deferred()
+func touch(p:Vector2,down:bool):
+ var e:=InputEventScreenTouch.new();e.position=get_viewport().get_final_transform()*p;e.index=0;e.pressed=down;Input.parse_input_event(e);Input.flush_buffered_events()
+func drag(p:Vector2):
+ var e:=InputEventScreenDrag.new();e.position=get_viewport().get_final_transform()*p;e.index=0;Input.parse_input_event(e);Input.flush_buffered_events()
+func collect(n:Node,out:Array):
+ if n is ScrollContainer:out.append(n)
+ for c in n.get_children():collect(c,out)
+func check(root:Node,label_:String):
+ await get_tree().create_timer(.15).timeout
+ var views:Array=[];collect(root,views)
+ for v in views:
+  if not v.is_visible_in_tree():continue
+  assert(v.has_meta("shared_scroll260"))
+  var content:Control
+  for c in v.get_children():
+   if c is Control and not c is ScrollBar:content=c;break
+  var natural:float=v.get_v_scroll_bar().max_value-v.get_v_scroll_bar().page
+  # Tiny/empty real datasets still exercise this screen's real scroll control,
+  # with a temporary tall reading fixture. No player state is saved.
+  var extra:Control
+  if natural<140:
+   if content is Container:
+    extra=Control.new();extra.custom_minimum_size=Vector2(100,1800);content.add_child(extra)
+   elif content!=null:content.custom_minimum_size.y=maxf(content.custom_minimum_size.y,1800)
+  await get_tree().create_timer(.1).timeout
+  v.scroll_vertical=0
+  var p:Vector2=v.get_global_rect().get_center()+Vector2(0,60)
+  touch(p,true);await get_tree().process_frame
+  for i in 6:drag(p-Vector2(0,20*(i+1)));await get_tree().process_frame
+  touch(p-Vector2(0,120),false);await get_tree().create_timer(.08).timeout
+  assert(v.scroll_vertical>50);var value:int=v.scroll_vertical
+  var manager:SharedScroll260=GameState.get_node("SharedScroll260");manager.velocity=Vector2.ZERO
+  var wheel:=InputEventMouseButton.new();wheel.position=get_viewport().get_final_transform()*p;wheel.button_index=MOUSE_BUTTON_WHEEL_DOWN;wheel.pressed=true;Input.parse_input_event(wheel);Input.flush_buffered_events();await get_tree().process_frame
+  assert(v.scroll_vertical>value)
+  var bar:ScrollBar=v.get_v_scroll_bar();v.scroll_vertical=0;await get_tree().process_frame
+  p=bar.get_global_rect().position+Vector2(12,12);touch(p,true);await get_tree().process_frame;drag(p+Vector2(0,120));await get_tree().process_frame;touch(p+Vector2(0,120),false);await get_tree().process_frame
+  assert(v.scroll_vertical>50)
+  reports.append({"screen":label_,"drag":value,"wheel":true,"bar":true,"fixture_for_short_content":natural<140})
+  print("SCROLL260 ",label_," drag=",value," wheel=true bar=true fixture=",natural<140)
+  if label_ in ["horse-detail","ranch","settings","collection"]:
+   await RenderingServer.frame_post_draw;get_viewport().get_texture().get_image().save_png("/downloads/scroll260-"+label_+".png")
+  manager.cancel()
+func run():
+ get_tree().root.size=Vector2i(1280,720);TranslationServer.set_locale("es");GameState.sound_enabled=false;GameState.brand_intro_played=true
+ SaveData.save_path="user://qa260world.dat";SaveData.horse_collection.seed_trial();SaveData.world_generator_version=6;SaveData.world_seed=752026;SaveData.world_position=Vector2(1500,730);SaveData.world_edits=[];SaveData.world_discovered=[];SaveData.world_quests={}
+ var world=load("res://tools/perf_world242.gd").new();add_child(world)
+ while world._loading_world:await get_tree().process_frame
+ if world._arrival244.active:world._arrival244.finish(false)
+ world._arrival244.set_process(false)
+ world._open_board();await check(world._board_panel,"board");world._board_panel.free();world._board_panel=null
+ world.process_mode=Node.PROCESS_MODE_DISABLED;SaveData.world_generator_version=5;SaveData.world_cousins140={"known":{"town1":true},"met":{},"hint215":""}
+ world._show_journal140();await check(world._journal140,"journal");world._journal140.free();world._journal140=null
+ world.free();get_tree().quit()
