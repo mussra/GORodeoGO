@@ -1,0 +1,1012 @@
+{
+  "grid": {
+    "columns": 10,
+    "rows": 10,
+    "requested_sheet_size": 4000,
+    "cell_size": 400,
+    "order": "left to right, top to bottom"
+  },
+  "status": "planned replacement slots, not activated",
+  "items": [
+    {
+      "cell": 1,
+      "row": 1,
+      "column": 1,
+      "file": "back.png",
+      "description": "flecha de volver hacia la izquierda",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 2,
+      "row": 1,
+      "column": 2,
+      "file": "buy.png",
+      "description": "moneda dorada con pequeño signo más",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 3,
+      "row": 1,
+      "column": 3,
+      "file": "equip.png",
+      "description": "marca de equipado verde",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 4,
+      "row": 1,
+      "column": 4,
+      "file": "hat_category.png",
+      "description": "sombrero marrón de la categoría Sombreros",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 5,
+      "row": 1,
+      "column": 5,
+      "file": "finish_category.png",
+      "description": "grupo de tres estrellas de acabados",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 6,
+      "row": 1,
+      "column": 6,
+      "file": "whip_basic.png",
+      "description": "fusta básica de cuero",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 7,
+      "row": 1,
+      "column": 7,
+      "file": "whip_long.png",
+      "description": "fusta mejorada de cuero con extremo largo",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 8,
+      "row": 1,
+      "column": 8,
+      "file": "saddle.png",
+      "description": "montura de viaje de cuero",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 9,
+      "row": 1,
+      "column": 9,
+      "file": "reins.png",
+      "description": "par de riendas de precisión",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 10,
+      "row": 1,
+      "column": 10,
+      "file": "stirrups.png",
+      "description": "par de estribos metálicos con correas",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 11,
+      "row": 2,
+      "column": 1,
+      "file": "horseshoe.png",
+      "description": "herradura de hierro",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 12,
+      "row": 2,
+      "column": 2,
+      "file": "spurs.png",
+      "description": "par de espuelas con estrella metálica",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 13,
+      "row": 2,
+      "column": 3,
+      "file": "blanket.png",
+      "description": "manta roja de montura con ribete dorado",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 14,
+      "row": 2,
+      "column": 4,
+      "file": "hat_gala.png",
+      "description": "sombrero oscuro de gala con cinta dorada",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 15,
+      "row": 2,
+      "column": 5,
+      "file": "lasso_item.png",
+      "description": "lazo largo enrollado, cuerda y lazada claramente reconocibles",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 16,
+      "row": 2,
+      "column": 6,
+      "file": "victory_spark.png",
+      "description": "estrella luminosa de mejora de cuatro puntas",
+      "group": "Equipo",
+      "source": "src/Presentation/equipment_icon229.gd",
+      "target_size": "32-100 px"
+    },
+    {
+      "cell": 17,
+      "row": 2,
+      "column": 7,
+      "file": "button_normal.png",
+      "description": "botón redondeado azul petróleo sin texto",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 18,
+      "row": 2,
+      "column": 8,
+      "file": "button_pressed.png",
+      "description": "mismo botón pulsado de color miel sin texto",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 19,
+      "row": 2,
+      "column": 9,
+      "file": "button_disabled.png",
+      "description": "mismo botón desactivado oscuro sin texto",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 20,
+      "row": 2,
+      "column": 10,
+      "file": "panel.png",
+      "description": "marco de panel azul petróleo, centro despejado",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 21,
+      "row": 3,
+      "column": 1,
+      "file": "dialog.png",
+      "description": "marco de diálogo redondeado, centro despejado",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 22,
+      "row": 3,
+      "column": 2,
+      "file": "bar_track.png",
+      "description": "canal vacío de barra horizontal",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 23,
+      "row": 3,
+      "column": 3,
+      "file": "bar_fill.png",
+      "description": "relleno horizontal turquesa de barra",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 24,
+      "row": 3,
+      "column": 4,
+      "file": "joystick_knob.png",
+      "description": "botón circular semitransparente dorado para el dedo",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 25,
+      "row": 3,
+      "column": 5,
+      "file": "scroll_track.png",
+      "description": "canal vertical fino de desplazamiento",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 26,
+      "row": 3,
+      "column": 6,
+      "file": "scroll_thumb.png",
+      "description": "agarre vertical dorado de desplazamiento",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 27,
+      "row": 3,
+      "column": 7,
+      "file": "tab.png",
+      "description": "pestaña redondeada sin texto",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 28,
+      "row": 3,
+      "column": 8,
+      "file": "checkbox.png",
+      "description": "casilla vacía cuadrada de cuero",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 29,
+      "row": 3,
+      "column": 9,
+      "file": "radio.png",
+      "description": "selector circular vacío",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 30,
+      "row": 3,
+      "column": 10,
+      "file": "slider.png",
+      "description": "pequeño tirador redondo para deslizador",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 31,
+      "row": 4,
+      "column": 1,
+      "file": "close_cross.png",
+      "description": "cruz de cerrar sencilla",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 32,
+      "row": 4,
+      "column": 2,
+      "file": "tooltip.png",
+      "description": "placa de aviso pequeña sin texto",
+      "group": "Marcos y controles",
+      "source": "src/Presentation/ranch_theme.gd; quest_button_style.gd; menu_backdrop.gd; joystick_appearance.gd",
+      "target_size": "base 128-400 px; paneles escalables"
+    },
+    {
+      "cell": 33,
+      "row": 4,
+      "column": 3,
+      "file": "capture_ring.png",
+      "description": "anillo vacío dorado de captura",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 34,
+      "row": 4,
+      "column": 4,
+      "file": "capture_dot.png",
+      "description": "punto de impacto luminoso pequeño",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 35,
+      "row": 4,
+      "column": 5,
+      "file": "rope_segment.png",
+      "description": "tramo de cuerda trenzada recta horizontal, repetible",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 36,
+      "row": 4,
+      "column": 6,
+      "file": "rope_loop.png",
+      "description": "lazada de cuerda vista desde arriba, vacía por dentro",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 37,
+      "row": 4,
+      "column": 7,
+      "file": "player_ring.png",
+      "description": "óvalo turquesa vacío de selección bajo el jinete",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 38,
+      "row": 4,
+      "column": 8,
+      "file": "player_arrow.png",
+      "description": "punta triangular turquesa de dirección",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 39,
+      "row": 4,
+      "column": 9,
+      "file": "edge_arrow.png",
+      "description": "flecha dorada de dirección fuera de pantalla",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 40,
+      "row": 4,
+      "column": 10,
+      "file": "edge_badge.png",
+      "description": "medallón oscuro vacío para indicador lateral",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 41,
+      "row": 5,
+      "column": 1,
+      "file": "fatigue_frame.png",
+      "description": "marco fino vacío de fatiga",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 42,
+      "row": 5,
+      "column": 2,
+      "file": "held_check.png",
+      "description": "pequeña marca de animal controlado",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 43,
+      "row": 5,
+      "column": 3,
+      "file": "stun_dust.png",
+      "description": "nube pequeña de polvo de golpe",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 44,
+      "row": 5,
+      "column": 4,
+      "file": "dash_dust.png",
+      "description": "nube alargada de polvo de carrera",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 45,
+      "row": 5,
+      "column": 5,
+      "file": "dash_streak.png",
+      "description": "destello alargado turquesa de regate",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 46,
+      "row": 5,
+      "column": 6,
+      "file": "cooldown_arc.png",
+      "description": "aro vacío de recarga, sin porcentaje",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 47,
+      "row": 5,
+      "column": 7,
+      "file": "memory_halo.png",
+      "description": "halo circular de pista de memoria",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 48,
+      "row": 5,
+      "column": 8,
+      "file": "number_plaque.png",
+      "description": "placa de madera pequeña vacía para número",
+      "group": "Captura y efectos",
+      "source": "src/Presentation/lasso_rope_style.gd; lasso_controller.gd; held_visuals.gd; dodge_visuals.gd; dodge_edge_cue.gd; player_marker223.gd; edge_indicators.gd",
+      "target_size": "16-160 px; cuerda repetible"
+    },
+    {
+      "cell": 49,
+      "row": 5,
+      "column": 9,
+      "file": "book_mean.png",
+      "description": "dos grupos de barras que dan una barra intermedia, concepto de media sin números",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 50,
+      "row": 5,
+      "column": 10,
+      "file": "book_caps.png",
+      "description": "barra llena con tope final visible",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 51,
+      "row": 6,
+      "column": 1,
+      "file": "book_breeds.png",
+      "description": "tres siluetas de caballo con aspectos distintos",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 52,
+      "row": 6,
+      "column": 2,
+      "file": "shield_classic.png",
+      "description": "escudo heráldico clásico vacío",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 53,
+      "row": 6,
+      "column": 3,
+      "file": "shield_round.png",
+      "description": "escudo heráldico redondo vacío",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 54,
+      "row": 6,
+      "column": 4,
+      "file": "shield_flat.png",
+      "description": "escudo heráldico de base plana vacío",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 55,
+      "row": 6,
+      "column": 5,
+      "file": "symbol_sun.png",
+      "description": "símbolo heráldico de sol",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 56,
+      "row": 6,
+      "column": 6,
+      "file": "symbol_mountain.png",
+      "description": "símbolo heráldico de montañas",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 57,
+      "row": 6,
+      "column": 7,
+      "file": "symbol_diamond.png",
+      "description": "símbolo heráldico de rombo",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 58,
+      "row": 6,
+      "column": 8,
+      "file": "symbol_cross.png",
+      "description": "símbolo heráldico de cruz",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 59,
+      "row": 6,
+      "column": 9,
+      "file": "symbol_wave.png",
+      "description": "símbolo heráldico de ola",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 60,
+      "row": 6,
+      "column": 10,
+      "file": "book_paper.png",
+      "description": "textura de pergamino crema sin letras",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 61,
+      "row": 7,
+      "column": 1,
+      "file": "genealogy_connector.png",
+      "description": "pequeño tramo de rama de árbol genealógico",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 62,
+      "row": 7,
+      "column": 2,
+      "file": "affinity_question.png",
+      "description": "signo de interrogación de afinidad",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 63,
+      "row": 7,
+      "column": 3,
+      "file": "alert_mark.png",
+      "description": "signo de exclamación de alerta",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 64,
+      "row": 7,
+      "column": 4,
+      "file": "lineage_badge.png",
+      "description": "escudo con silueta de caballo, insignia de linaje",
+      "group": "Libro y heráldica",
+      "source": "src/Presentation/breeding_book256.gd; horse_emblem.gd; genealogy_panel.gd",
+      "target_size": "32-128 px; ilustraciones libro 460x126"
+    },
+    {
+      "cell": 65,
+      "row": 7,
+      "column": 5,
+      "file": "fence_rail.png",
+      "description": "travesaño horizontal de valla de madera",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 66,
+      "row": 7,
+      "column": 6,
+      "file": "fence_post.png",
+      "description": "poste de valla de madera",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 67,
+      "row": 7,
+      "column": 7,
+      "file": "gate_leaf.png",
+      "description": "hoja de portón de madera sin cerrar la carretera",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 68,
+      "row": 7,
+      "column": 8,
+      "file": "wood_sign.png",
+      "description": "cartel de madera vacío sobre poste",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 69,
+      "row": 7,
+      "column": 9,
+      "file": "town_map_icon.png",
+      "description": "miniatura de pueblo con dos casitas y carretera que continúa entre dos postes",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 70,
+      "row": 7,
+      "column": 10,
+      "file": "road_surface.png",
+      "description": "textura de tierra clara de camino, vista superior, repetible",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 71,
+      "row": 8,
+      "column": 1,
+      "file": "race_track.png",
+      "description": "textura de pista de arena, vista superior, repetible",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 72,
+      "row": 8,
+      "column": 2,
+      "file": "arena_floor.png",
+      "description": "suelo azul verdoso discreto de recinto, repetible",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 73,
+      "row": 8,
+      "column": 3,
+      "file": "hay.png",
+      "description": "bala redonda de heno de estación de distracción",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 74,
+      "row": 8,
+      "column": 4,
+      "file": "water_trough.png",
+      "description": "abrevadero lleno de agua, vista tres cuartos superior",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 75,
+      "row": 8,
+      "column": 5,
+      "file": "cactus.png",
+      "description": "cactus verde con dos brazos",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 76,
+      "row": 8,
+      "column": 6,
+      "file": "garden_plot.png",
+      "description": "parcela pequeña de huerto con cuatro surcos vacíos",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 77,
+      "row": 8,
+      "column": 7,
+      "file": "wall_stone.png",
+      "description": "textura de muro de piedra crema repetible",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 78,
+      "row": 8,
+      "column": 8,
+      "file": "wall_trim.png",
+      "description": "remate horizontal de muro de piedra",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 79,
+      "row": 8,
+      "column": 9,
+      "file": "gate_pillar.png",
+      "description": "pilar de entrada de piedra",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 80,
+      "row": 8,
+      "column": 10,
+      "file": "map_frame.png",
+      "description": "marco de minimapa cuadrado con interior vacío",
+      "group": "Mundo y mapas",
+      "source": "src/Presentation/jump_fence.gd; puzzle_corral.gd; town_layer227.gd; town_paint215.gd; arena_art.gd; world_decor.gd; garden_world212.gd; country_preview146.gd",
+      "target_size": "objetos 32-128 px; piezas 128-400 px"
+    },
+    {
+      "cell": 81,
+      "row": 9,
+      "column": 1,
+      "file": "menu_background.png",
+      "description": "motivo de fondo azul petróleo con horizonte de rancho muy sutil",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 82,
+      "row": 9,
+      "column": 2,
+      "file": "cartoon_background.png",
+      "description": "paisaje simplificado de cielo, colinas y arena",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 83,
+      "row": 9,
+      "column": 3,
+      "file": "sea_surface.png",
+      "description": "textura de mar azul turquesa repetible",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 84,
+      "row": 9,
+      "column": 4,
+      "file": "river_surface.png",
+      "description": "textura de río azul claro repetible",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 85,
+      "row": 9,
+      "column": 5,
+      "file": "shore_foam.png",
+      "description": "tramo horizontal de espuma de orilla, repetible",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 86,
+      "row": 9,
+      "column": 6,
+      "file": "bridge_board.png",
+      "description": "tablón de puente de madera repetible",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 87,
+      "row": 9,
+      "column": 7,
+      "file": "goal_pen.png",
+      "description": "base decorativa de destino de captura vacía",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 88,
+      "row": 9,
+      "column": 8,
+      "file": "obstacle_block.png",
+      "description": "obstáculo cuadrado de madera reforzada",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 89,
+      "row": 9,
+      "column": 9,
+      "file": "goal_lantern.png",
+      "description": "pequeño poste con luz de destino",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 90,
+      "row": 9,
+      "column": 10,
+      "file": "memory_fence.png",
+      "description": "valla de salto de hípica vista de frente",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 91,
+      "row": 10,
+      "column": 1,
+      "file": "pattern_star.png",
+      "description": "estrella de cinco puntas para máscara de pelaje y muro",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 92,
+      "row": 10,
+      "column": 2,
+      "file": "pattern_spot.png",
+      "description": "mancha orgánica para máscara de pelaje y muro",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 93,
+      "row": 10,
+      "column": 3,
+      "file": "pattern_stripe.png",
+      "description": "rayas curvas para máscara de pelaje y muro",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 94,
+      "row": 10,
+      "column": 4,
+      "file": "pattern_roan.png",
+      "description": "moteado suave para máscara de pelaje",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 95,
+      "row": 10,
+      "column": 5,
+      "file": "galaxy_cloud.png",
+      "description": "pequeña nebulosa violeta azulada sin estrellas sueltas",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 96,
+      "row": 10,
+      "column": 6,
+      "file": "glow_aura.png",
+      "description": "halo suave luminoso turquesa sin objeto central",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 97,
+      "row": 10,
+      "column": 7,
+      "file": "map_node.png",
+      "description": "nodo circular vacío de mapa de pueblos",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 98,
+      "row": 10,
+      "column": 8,
+      "file": "map_route_arrow.png",
+      "description": "punta de flecha pequeña para ruta de mapa",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 99,
+      "row": 10,
+      "column": 9,
+      "file": "minimap_dot.png",
+      "description": "punto circular claro para entidades de minimapa",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    },
+    {
+      "cell": 100,
+      "row": 10,
+      "column": 10,
+      "file": "ground_shadow.png",
+      "description": "sombra oval suave negra semitransparente",
+      "group": "Fondos y módulos",
+      "source": "src/Presentation/cartoon_backdrop.gd; menu_backdrop.gd; country_preview146.gd; town_paint215.gd; horse_appearance.gd; horse_galaxy_look.gd",
+      "target_size": "piezas 128-400 px; fondos finales requieren ampliación"
+    }
+  ]
+}

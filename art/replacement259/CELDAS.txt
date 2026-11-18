@@ -1,0 +1,21 @@
+Mapa de recorte: 10 columnas × 10 filas, izquierda a derecha y arriba abajo. Destino art/replacement259/.
+
+Fila 1: 1 back.png, 2 buy.png, 3 equip.png, 4 hat_category.png, 5 finish_category.png, 6 whip_basic.png, 7 whip_long.png, 8 saddle.png, 9 reins.png, 10 stirrups.png
+
+Fila 2: 11 horseshoe.png, 12 spurs.png, 13 blanket.png, 14 hat_gala.png, 15 lasso_item.png, 16 victory_spark.png, 17 button_normal.png, 18 button_pressed.png, 19 button_disabled.png, 20 panel.png
+
+Fila 3: 21 dialog.png, 22 bar_track.png, 23 bar_fill.png, 24 joystick_knob.png, 25 scroll_track.png, 26 scroll_thumb.png, 27 tab.png, 28 checkbox.png, 29 radio.png, 30 slider.png
+
+Fila 4: 31 close_cross.png, 32 tooltip.png, 33 capture_ring.png, 34 capture_dot.png, 35 rope_segment.png, 36 rope_loop.png, 37 player_ring.png, 38 player_arrow.png, 39 edge_arrow.png, 40 edge_badge.png
+
+Fila 5: 41 fatigue_frame.png, 42 held_check.png, 43 stun_dust.png, 44 dash_dust.png, 45 dash_streak.png, 46 cooldown_arc.png, 47 memory_halo.png, 48 number_plaque.png, 49 book_mean.png, 50 book_caps.png
+
+Fila 6: 51 book_breeds.png, 52 shield_classic.png, 53 shield_round.png, 54 shield_flat.png, 55 symbol_sun.png, 56 symbol_mountain.png, 57 symbol_diamond.png, 58 symbol_cross.png, 59 symbol_wave.png, 60 book_paper.png
+
+Fila 7: 61 genealogy_connector.png, 62 affinity_question.png, 63 alert_mark.png, 64 lineage_badge.png, 65 fence_rail.png, 66 fence_post.png, 67 gate_leaf.png, 68 wood_sign.png, 69 town_map_icon.png, 70 road_surface.png
+
+Fila 8: 71 race_track.png, 72 arena_floor.png, 73 hay.png, 74 water_trough.png, 75 cactus.png, 76 garden_plot.png, 77 wall_stone.png, 78 wall_trim.png, 79 gate_pillar.png, 80 map_frame.png
+
+Fila 9: 81 menu_background.png, 82 cartoon_background.png, 83 sea_surface.png, 84 river_surface.png, 85 shore_foam.png, 86 bridge_board.png, 87 goal_pen.png, 88 obstacle_block.png, 89 goal_lantern.png, 90 memory_fence.png
+
+Fila 10: 91 pattern_star.png, 92 pattern_spot.png, 93 pattern_stripe.png, 94 pattern_roan.png, 95 galaxy_cloud.png, 96 glow_aura.png, 97 map_node.png, 98 map_route_arrow.png, 99 minimap_dot.png, 100 ground_shadow.png

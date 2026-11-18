@@ -1,0 +1,102 @@
+Crea UNA SOLA imagen: hoja de recursos para mi juego Rancho, 4000×4000 px, cuadrícula EXACTA 10 columnas × 10 filas de celdas iguales (400 px). Un recurso centrado por celda, orden izquierda a derecha y arriba abajo, margen interior 15%. Sin rejilla visible, números, etiquetas, texto ni marcas de agua. Fondo liso magenta puro #FF00FF, también dentro de aros y marcos; nada magenta en el dibujo. Estilo igual a mis referencias de Alma, libro y guarnicionería: cartoon 2D cálido, contorno marrón limpio, volumen pintado suave, cuero/madera miel, metal envejecido, turquesa y oro. Muy legible al reducir a 48 px. No fotorealismo, no 3D. Botones, marcos, placas y escudos sin letras. Texturas repetibles sin costuras. Exactamente estos 100 elementos, uno por celda:
+1. Volver izquierda
+2. Moneda con +
+3. Check equipado
+4. Sombrero marrón
+5. Tres estrellas acabados
+6. Fusta básica
+7. Fusta larga
+8. Montura de cuero
+9. Riendas
+10. Estribos
+11. Herradura
+12. Espuelas
+13. Manta roja dorada
+14. Sombrero de gala
+15. Lazo enrollado
+16. Destello mejora
+17. Botón normal petróleo
+18. Botón pulsado miel
+19. Botón desactivado
+20. Marco de panel
+21. Marco de diálogo
+22. Barra vacía
+23. Relleno turquesa
+24. Pomo joystick
+25. Canal scroll vertical
+26. Agarre scroll dorado
+27. Pestaña vacía
+28. Casilla vacía
+29. Selector circular
+30. Tirador deslizador
+31. Cruz cerrar
+32. Placa aviso
+33. Anillo captura
+34. Punto impacto
+35. Cuerda recta repetible
+36. Lazada cuerda
+37. Óvalo selección turquesa
+38. Triángulo dirección
+39. Flecha fuera pantalla
+40. Medallón indicador
+41. Marco fatiga
+42. Check animal controlado
+43. Polvo golpe
+44. Polvo carrera
+45. Estela regate turquesa
+46. Aro recarga
+47. Halo memoria
+48. Placa número vacía
+49. Dos barras dan su media
+50. Barra con tope
+51. Tres siluetas caballo
+52. Escudo clásico vacío
+53. Escudo redondo vacío
+54. Escudo base plana
+55. Símbolo sol
+56. Símbolo sierra
+57. Símbolo rombo
+58. Símbolo cruz
+59. Símbolo ola
+60. Pergamino vacío
+61. Conector genealogía
+62. Interrogación afinidad
+63. Exclamación alerta
+64. Escudo caballo linaje
+65. Travesaño valla
+66. Poste madera
+67. Hoja portón
+68. Cartel con poste vacío
+69. Pueblo con carretera abierta
+70. Tierra camino repetible
+71. Arena pista repetible
+72. Suelo recinto repetible
+73. Bala redonda heno
+74. Abrevadero lleno
+75. Cactus dos brazos
+76. Huerto cuatro surcos
+77. Piedra muro repetible
+78. Remate muro
+79. Pilar entrada
+80. Marco minimapa vacío
+81. Fondo rancho petróleo
+82. Fondo cielo colinas arena
+83. Mar repetible
+84. Río repetible
+85. Espuma orilla repetible
+86. Tablón puente
+87. Base destino captura
+88. Obstáculo madera
+89. Poste con luz
+90. Valla hípica frontal
+91. Máscara estrella pelaje
+92. Máscara mancha pelaje
+93. Máscara rayas pelaje
+94. Máscara moteado pelaje
+95. Nebulosa violeta azul
+96. Halo suave turquesa
+97. Nodo mapa vacío
+98. Flecha ruta mapa
+99. Punto entidad mapa
+100. Sombra oval suave
+Una sola hoja completa, sin omitir ni duplicar celdas.
