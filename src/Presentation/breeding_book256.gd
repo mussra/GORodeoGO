@@ -64,11 +64,22 @@ func show_page(index:int):
   label_("ALMA  /  "+("PASO %d DE 6"%(page+1) if tutorial else "CONSEJO %d"%(page+1)),Vector2(690,83),Vector2(450,30),18,Color("8c633f"))
   label_(BreedingAdvice256.TITLES[page],Vector2(690,122),Vector2(465,70),32)
   if page in [0,3,5]:image_("res://art/breeding256/book-open.png",Vector2(789,200),Vector2(260,138))
+  elif page==4:
+   appearance_horses321()
   else:
    var glyph:=BookGlyph256.new();glyph.position=Vector2(700,211);glyph.size=Vector2(460,126);glyph.kind=page;content.add_child(glyph)
   for i in 3:label_(BreedingAdvice256.TIPS[page][i],Vector2(690,359+i*58),Vector2(461,56),21)
   button_("Anterior",Vector2(688,557),Vector2(188,58),show_page.bind(page-1))
   button_("Siguiente" if page<5 else "Volver a portada",Vector2(889,557),Vector2(270,58),show_page.bind(page+1 if page<5 else -1))
+## Same riderless side-view textures and genotype painting as the world horses.
+func appearance_horses321()->void:
+ var examples:Array[Dictionary]=[{"coat":10,"pattern":0,"mane":1},{"coat":1,"pattern":1,"mane":0},{"coat":13,"pattern":2,"mane":4}]
+ for i in examples.size():
+  var view:=TextureRect.new();view.name="AppearanceHorse321_"+str(i)
+  view.texture=PixelLabTrial.pose_texture("horse","side",0,examples[i])
+  view.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;view.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+  view.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;view.position=Vector2(690+i*155,203);view.size=Vector2(150,144)
+  view.mouse_filter=Control.MOUSE_FILTER_IGNORE;content.add_child(view)
 func start_tutorial():tutorial=true;show_page(0)
 func finish():closed.emit();queue_free()
 func _unhandled_input(event:InputEvent):

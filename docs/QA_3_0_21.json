@@ -1,0 +1,12 @@
+{
+  "version": "3.0.21",
+  "code": 481,
+  "bytes": 81306375,
+  "sha256": "abdc692c5c97379ca5f8cc5b0a92f0a16dece4d33647da55133df5ff6767ae11",
+  "tests": 487,
+  "passing": 487,
+  "asserts": 65464,
+  "physical_android": false,
+  "alma_chapter": 5,
+  "real_horse_examples": 3
+}

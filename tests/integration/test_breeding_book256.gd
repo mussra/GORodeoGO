@@ -44,3 +44,17 @@ func test_workshop_uses_same_equipment_panel_and_exits_without_purchase():
  room.open_equipment();assert_true(room.equipment.visible)
  assert_eq(SaveData.horse_collection.export_state(),original);assert_eq(SaveData.equipment_points,points)
  room.finish();await wait_process_frames(2);assert_false(is_instance_valid(room))
+
+func test_appearance_chapter_uses_three_real_riderless_horse_textures():
+ var book:=BreedingBook256.new();book.page=4;add_child(book)
+ var textures:Array=[]
+ for i in 3:
+  var horse:TextureRect=book.content.get_node("AppearanceHorse321_"+str(i))
+  assert_not_null(horse.texture)
+  assert_gt(horse.texture.get_width(),0)
+  assert_eq(horse.stretch_mode,TextureRect.STRETCH_KEEP_ASPECT_CENTERED)
+  assert_lte(horse.position.y+horse.size.y,359.)
+  textures.append(horse.texture.get_image().get_data().hex_encode().sha256_text())
+ assert_ne(textures[0],textures[1]);assert_ne(textures[1],textures[2])
+ for child in book.content.get_children():assert_false(child is BreedingBook256.BookGlyph256)
+ book.free()
