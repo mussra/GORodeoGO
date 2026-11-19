@@ -1,0 +1,13 @@
+{
+  "version": "3.0.17",
+  "code": 477,
+  "bytes": 81289442,
+  "sha256": "81d10684d0cec5c2af72c2fb4367494a7613edb1a537ca446a8cbddad1b24077",
+  "tests": 463,
+  "passing": 463,
+  "asserts": 55516,
+  "physical_android": false,
+  "gate_leaves_removed": true,
+  "gate_width": 320,
+  "physics_unchanged": true
+}
