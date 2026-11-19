@@ -57,9 +57,4 @@ func _draw() -> void:
 func _rail(a: Vector2, b: Vector2, color: Color = Color("84aeb4")) -> void:
 	if absf(a.y-b.y)<.1:
 		CorralArt310.horizontal(self,a.x,b.x,a.y);return
-	draw_line(a + Vector2(2, 5), b + Vector2(2, 5), Color(0.2, 0.14, 0.1, 0.2), 8, true)
-	draw_line(a, b, color, 6, true)
-	var steps: int = maxi(1, int(a.distance_to(b) / 30))
-	for i in range(steps + 1):
-		var point: Vector2 = a.lerp(b, float(i) / steps)
-		draw_rect(Rect2(point - Vector2(4, 7), Vector2(8, 14)), Color("395c68"))
+	CorralArt310.vertical(self,a.x,a.y,b.y)

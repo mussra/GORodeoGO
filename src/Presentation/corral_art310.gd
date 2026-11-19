@@ -1,5 +1,6 @@
 class_name CorralArt310
 extends RefCounted
+const VERTICAL312=preload("res://art/corral312/rail-vertical.png")
 const RAIL=preload("res://art/corral310/rail-horizontal.png")
 const GATE=preload("res://art/corral310/gate-closed.png")
 const OPEN_LEFT=preload("res://art/corral310/gate-open-left.png")
@@ -15,3 +16,11 @@ static func closed(node:CanvasItem,x:float,y:float):fit(node,GATE,Rect2(x-60,y-4
 static func opened(node:CanvasItem,x:float,y:float):
  fit(node,OPEN_LEFT,Rect2(x-88,y-40,30,47))
  fit(node,OPEN_RIGHT,Rect2(x+58,y-40,30,47))
+
+# Ant's complete three-post upright fence. Only transparent margins are cropped.
+# Uniform scale preserves the supplied perspective; no rotation or repainting.
+# First and final post bases are at source y=270 and y=2160.
+static func vertical(node:CanvasItem,x:float,a:float,b:float):
+ if b<=a:return
+ var scale:float=(b-a)/1890.
+ node.draw_texture_rect(VERTICAL312,Rect2(x-77.5*scale,a-270.*scale,155.*scale,2164.*scale),false)

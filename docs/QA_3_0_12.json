@@ -1,0 +1,13 @@
+{
+  "version": "3.0.12",
+  "code": 472,
+  "bytes": 80525946,
+  "sha256": "4b6f7bb994cc23550d0f906c0e49a8d2ea2001e7978339f7eca8b9b7cb27a28f",
+  "tests": 457,
+  "passing": 457,
+  "asserts": 55490,
+  "source_alpha": true,
+  "physical_android": false,
+  "complete_three_post_image": true,
+  "test_caveat": "Initial parallel run: 1 save-write error in network234; isolated full block rerun 206/206 passed. Other block 251/251 passed."
+}
