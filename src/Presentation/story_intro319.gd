@@ -10,7 +10,6 @@ const PAGES:Array[String]=[
  "Habla con personajes y explora el mundo para poder desbloquear diferentes tipos de pruebas y competiciones para hacer encima de tu caballo."
 ]
 var page319:int=0
-var clock319:float=0.
 var appearance_clock319:float=0.
 var preview_changes319:int=0
 var persist319:bool=true
@@ -41,28 +40,20 @@ func _ready()->void:
 func _fit319()->void:
  if not is_instance_valid(canvas319):return
  var k:float=minf(size.x/1280.,size.y/720.);canvas319.scale=Vector2.ONE*k;canvas319.position=(size-Vector2(1280,720)*k)*.5
-static func page_seconds319(index:int)->float:
- return float(PAGES[index].length())/32.+1.1
-static func total_seconds319()->float:
- var total:float=0.
- for i in PAGES.size():total+=page_seconds319(i)
- return total
 func _page319()->void:
- clock319=0.;appearance_clock319=0.;body319.text=PAGES[page319];body319.restart319()
+ appearance_clock319=0.;body319.text=PAGES[page319];body319.restart319()
  counter319.text="%d / %d"%[page319+1,PAGES.size()];next319.text="Empezar mi aventura" if page319==PAGES.size()-1 else "Continuar"
 func _process(delta:float)->void:
- clock319+=delta;appearance_clock319+=delta
+ appearance_clock319+=delta
  if page319 in [1,4] and appearance_clock319>=.85:
   appearance_clock319=0.
   if page319==1:
    traits319={"coat":rng319.randi_range(0,HorseCollection.COATS.size()-1),"pattern":rng319.randi_range(0,HorseCollection.PATTERNS.size()-1),"mane":rng319.randi_range(0,HorseCollection.MANES.size()-1)}
   else:hat319=["blue","hat:v3:2:6:10","hat:v3:8:13:0","hat:v3:13:14:2","original"][posmod(preview_changes319,5)]
   _appearance319()
- if clock319>=page_seconds319(page319):_advance319()
 func _appearance319()->void:
  HorsePortrait.apply(mounted319,traits319,hat319);mounted319.scale=Vector2.ONE*(420./mounted319.texture.get_height());preview_changes319+=1
 func _next319()->void:
- if body319.visible_characters!=-1:body319.finish319();return
  _advance319()
 func _advance319()->void:
  if page319>=PAGES.size()-1:_finish319();return

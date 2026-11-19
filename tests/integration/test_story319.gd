@@ -27,7 +27,6 @@ func test_all_lengths_finish_in_less_than_ten_seconds():
 func test_intro_duration_changes_and_no_collection_mutation():
  var original:Dictionary=SaveData.horse_collection.export_state().duplicate(true);var hat:String=SaveData.hat_color
  var intro:=StoryIntro319.new();intro.persist319=false;add_child_autofree(intro)
- assert_gte(StoryIntro319.total_seconds319(),20.);assert_lte(StoryIntro319.total_seconds319(),30.)
  assert_eq(intro.page319,0);assert_eq(intro.body319.visible_characters,0)
  intro.page319=1;intro._page319();var changes_:int=intro.preview_changes319;intro._process(1.);assert_gt(intro.preview_changes319,changes_)
  intro.page319=4;intro._page319();intro._process(1.);assert_ne(intro.hat319,"original")
@@ -69,3 +68,20 @@ func test_alma_uses_same_progressive_text():
  for child in book.content.get_children():
   if child is DialogueLabel319:tips+=1
  assert_eq(tips,3)
+
+func test_presentation_never_advances_on_time_only_continue():
+ var intro:=StoryIntro319.new();intro.persist319=false;add_child_autofree(intro)
+ for page_ in StoryIntro319.PAGES.size():
+  assert_eq(intro.page319,page_)
+  intro.body319._process(600.);intro._process(600.)
+  assert_eq(intro.page319,page_,"Still on the same passage after ten minutes")
+  assert_false(intro.is_queued_for_deletion())
+  if page_<StoryIntro319.PAGES.size()-1:
+   intro.next319.pressed.emit()
+   assert_eq(intro.page319,page_+1)
+ intro.next319.pressed.emit();assert_true(intro.is_queued_for_deletion())
+func test_continue_advances_even_while_letters_are_appearing():
+ var intro:=StoryIntro319.new();intro.persist319=false;add_child_autofree(intro)
+ assert_eq(intro.body319.visible_characters,0)
+ intro.next319.pressed.emit();assert_eq(intro.page319,1)
+ intro.body319.finish319();assert_eq(intro.page319,1)

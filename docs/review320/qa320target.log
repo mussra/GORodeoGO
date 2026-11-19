@@ -1,0 +1,110 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/integration/test_story319.gd
+[0m* test_dialogue_progress_and_replacement_and_tap
+* test_all_lengths_finish_in_less_than_ten_seconds
+* test_intro_duration_changes_and_no_collection_mutation
+* test_intro_complete_and_replay_save_contract
+* test_count_catalogue_uses_visible_normalization
+* test_story_and_npc_bodies_share_component
+* test_first_menu_modal_and_settings_replay
+* test_saved_intro_flag_and_new_file_default
+* test_alma_uses_same_progressive_text
+* test_presentation_never_advances_on_time_only_continue
+* test_continue_advances_even_while_letters_are_appearing
+[1m11/11 passed.
+[0m[4m
+
+res://tests/integration/test_dialog_skin305.gd
+[0m* test_native_confirmation_auto_skin_preserves_words_and_actions
+* test_accept_and_equipment_confirmation_share_frame_and_buttons
+* test_conversation_panel_and_dynamically_added_buttons
+* test_hat_has_room_below_top_buttons_at_all_aspects
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_quest_scroll249.gd
+[0m* test_drag_over_card_scrolls_without_turning_into_riding
+* test_drag_scrollbar_and_both_limits_remain_ui
+[1m2/2 passed.
+[0m[4m
+
+res://tests/integration/test_jobs249.gd
+[0m* test_free_capture_without_a_quest_and_inventory_sale_once_in_same_save
+* test_delivery_failure_restores_inventory_points_and_job_without_partial_reward
+LOAD_FRAME_PROFILE {"frames":105,"max_ms":1242.092,"over_100ms":2,"over_50ms":2,"p50_ms":9.022,"p95_ms":23.762,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_florist_actual_targets_three_unique_pickups_return_then_recommendation
+* test_saddler_counts_only_new_taming_after_accept_and_keeps_horse
+LOAD_FRAME_PROFILE {"frames":50,"max_ms":165.953,"over_100ms":1,"over_50ms":1,"p50_ms":6.969,"p95_ms":24.353,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_legacy_farmer_recognizes_existing_animals_but_does_not_reuse_sold_stock
+* test_loco_objective_requires_real_arrival_and_return_not_just_opening_dialog
+* test_clean_drops_unknown_office_and_duplicate_events_without_trusting_flags
+* test_discovered_legacy_herd_is_updated_on_world_load_without_respawning_captured_sibling
+LOAD_FRAME_PROFILE {"frames":47,"max_ms":163.881,"over_100ms":1,"over_50ms":2,"p50_ms":6.944,"p95_ms":28.967,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_roaming_horse_prepares_origin_even_when_its_origin_chunk_is_not_loaded
+LOAD_FRAME_PROFILE {"frames":52,"max_ms":175.273,"over_100ms":1,"over_50ms":1,"p50_ms":7.639,"p95_ms":15.813,"version":"2.7.82+preview83","worst_phase":"reveal"}
+[1m9/9 passed.
+[0m[4m
+
+res://tests/integration/test_services231.gd
+[0m* test_v5_has_one_loco_two_service_accesses_and_horse_panel_resumes_play_on_back
+LOAD_FRAME_PROFILE {"frames":49,"max_ms":188.976,"over_100ms":1,"over_50ms":1,"p50_ms":7.014,"p95_ms":15.384,"version":"2.7.82+preview83","worst_phase":"reveal"}
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+    [DEPRECATED]:  wait_frames has been replaced with wait_physics_frames which is counted in _physics_process.  wait_process_frames has also been added which is counted in _process.
+* test_v4_keeps_four_loco_and_has_no_service_relocation
+LOAD_FRAME_PROFILE {"frames":56,"max_ms":189.519,"over_100ms":1,"over_50ms":2,"p50_ms":6.855,"p95_ms":38.201,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_discovered_legacy_herd_is_updated_on_world_load_without_respawning_captured_sibling
+LOAD_FRAME_PROFILE {"frames":48,"max_ms":163.418,"over_100ms":1,"over_50ms":2,"p50_ms":6.89,"p95_ms":19.462,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_roaming_horse_prepares_origin_even_when_its_origin_chunk_is_not_loaded
+[1m4/4 passed.
+[0mLOAD_FRAME_PROFILE {"frames":79,"max_ms":29.067,"over_100ms":0,"over_50ms":0,"p50_ms":6.902,"p95_ms":19.506,"version":"2.7.82+preview83","worst_phase":"reveal"}
+
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Deprecated            4
+
+Scripts               5
+Tests                30
+Passing Tests        30
+Asserts             224
+Time              18.411s
+
+
+[32m---- All tests passed! ----
+[0m

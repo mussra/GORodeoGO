@@ -1,0 +1,13 @@
+{
+  "version": "3.0.20",
+  "code": 480,
+  "bytes": 81306375,
+  "sha256": "8f208d920c4202d97a660e114476ef5b477cb70cd6947b044a78a8571f0d71b6",
+  "tests": 486,
+  "passing": 486,
+  "asserts": 65425,
+  "physical_android": false,
+  "intro_auto_advance": false,
+  "simulated_wait_seconds": 600,
+  "progressive_text_preserved": true
+}
