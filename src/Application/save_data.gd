@@ -44,6 +44,7 @@ var dual_lasso_intro_shown: bool = false
 ## Frontera: bounded open-world test (Ant, 7-nov-2026). Seed 0 = world not created yet.
 ## Discovered chunks never change once seen; tamed herds never respawn.
 var world_generator_version:int=1 # missing field means legacy; only new worlds use v2
+var story_intro319:bool=false
 var world_seed: int = 0
 var world_discovered: Array[String] = []
 var world_tamed: Array[String] = []
@@ -114,6 +115,7 @@ func _save_progress242() -> bool:
 	if trial_session_active:return true # in-memory selections only, never touch real save
 	var config := ConfigFile.new()
 	config.set_value("meta", "version", SAVE_VERSION)
+	config.set_value("progress","story_intro319",story_intro319)
 	config.set_value("progress","victories240",victories240)
 	config.set_value("progress","rodeo_intro240",rodeo_intro240)
 	var returned269:Dictionary=world_bull_returns269.duplicate(true);returned269.merge(pending_bull_returns269,true)
@@ -179,6 +181,7 @@ func load_progress() -> void:
 	equipment_owned.clear()
 	equipment_equipped.clear()
 	points_legacy_credit_applied = false
+	story_intro319=false
 	world_seed = 0
 	world_generator_version=1
 	world_discovered.clear()
@@ -222,6 +225,7 @@ func load_progress() -> void:
 		config.get_value("progress", "highest_level_completed", 0)
 	)
 	GalaxyKeys173.migrate(horse_collection,highest_level_completed)
+	story_intro319=config.get_value("progress","story_intro319",false)==true
 	dual_lasso_intro_shown = config.get_value("progress", "dual_lasso_intro_shown", false)
 
 	var points:Variant=config.get_value("equipment","points",0)
@@ -448,7 +452,7 @@ var trial_session_active:bool=false
 var _trial_snapshot:Dictionary={}
 func begin_trial_session()->bool:
 	if not GameState.trial_tools_enabled() or trial_session_active:return false
-	for key in ["world_bull_returns269","pending_bull_returns269","interior_search264","rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
+	for key in ["story_intro319","world_bull_returns269","pending_bull_returns269","interior_search264","rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
 	trial_session_active=true

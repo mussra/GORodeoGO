@@ -1,13 +1,16 @@
 extends GutTest
+var old_story319:bool
 var menu:Control
 var snapshot:Dictionary
 func before_each()->void:
+ old_story319=SaveData.story_intro319;SaveData.story_intro319=true
  _ignore(get_tree().root.get_node("GutRunner"))
  snapshot={"debug":SaveData.debug_mode,"intro":SaveData.rodeo_intro240,"level":SaveData.highest_level_completed,"places":SaveData.world_places144.duplicate(true),"quests":SaveData.world_quests.duplicate(true),"wins":SaveData.victories240.duplicate(true)}
  SaveData.debug_mode=false;SaveData.rodeo_intro240=false;SaveData.highest_level_completed=0;SaveData.world_places144={};SaveData.world_quests={};SaveData.victories240=ModeVictories240.fresh();GameState.brand_intro_played=true
  menu=load("res://src/Presentation/main_menu.tscn").instantiate();add_child(menu);menu._show_games213()
  await wait_seconds(.3)
 func after_each()->void:
+ SaveData.story_intro319=old_story319
  if is_instance_valid(menu):menu.free()
  SaveData.debug_mode=snapshot.debug;SaveData.rodeo_intro240=snapshot.intro;SaveData.highest_level_completed=snapshot.level;SaveData.world_places144=snapshot.places;SaveData.world_quests=snapshot.quests;SaveData.victories240=snapshot.wins
 func tap(at:Vector2)->void:

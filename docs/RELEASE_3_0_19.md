@@ -1,0 +1,10 @@
+# Rancho Prueba 3.0.19
+
+- Presentación de Charlie al abrir la partida por primera vez, después del logo. Seis pasajes de texto progresivo, unos 30 segundos en automático, sin voz. Se puede completar el texto al tocarlo, avanzar o saltar. Charlie es un nombre provisional.
+- Demostración de caballos con distintos pelajes, patrones y crines durante su explicación, y de sombreros durante la explicación de complementos. Solo cambia la vista previa: no añade caballos ni cambia lo equipado.
+- Presenta exploración, información sobre caballos, misiones, encargos, puntos, equipo, fruta, pruebas y competiciones. La frase de la fruta se ha dejado neutra, sin asignar nombre al caballo.
+- La cifra se ha comprobado ejecutando el catálogo: 47.250 combinaciones base, 41.706 apariencias tras la normalización visual del Atlas y 2.268 familias pelaje/patrón/crin. La intro dice más de 40.000 combinaciones de apariencia, no razas. Ojos, patas, acabados y emblemas pueden añadir variantes.
+- Texto progresivo compartido para granjero, floristas, locos, diálogos de pueblos y servicios, Lucía, consejos de Alma e historias. Ritmo de 45 caracteres por segundo, con máximo de 9,5 segundos por texto. La intro usa 32 caracteres por segundo para facilitar la lectura. El texto conserva su distribución mientras aparece. Tocar el texto lo muestra entero.
+- Se recuerda que la intro ya se ha visto al acabar o saltarla. Una partida nueva sin ese indicador vuelve a mostrarla. También se puede repetir desde Ajustes > Volver a ver la introducción, sin borrar el progreso. Las partidas anteriores que no tengan el indicador la verán una vez al actualizar.
+- 484/484 pruebas, 65.400 aserciones en la pasada final. Verificados avance, salto, repetición, guardado, partida nueva, bloqueo de botones del menú detrás de la intro y las variantes del catálogo. Capturas parciales y completas revisadas visualmente. Sin prueba física Android ni certificación de rendimiento móvil; avisos conocidos de objetos retenidos al cerrar los tests.
+- Paquete com.example.rancho.review, versionCode 479, misma firma de pruebas. Rama feat/open-world-test-20261107. Sin main, tienda ni gasto.

@@ -1,14 +1,17 @@
 extends GutTest
+var old_story319:bool
 var m:Control
 var old_intro:bool
 var old_debug302:bool
 var old_size302:Vector2i
 func before_each():
+ old_story319=SaveData.story_intro319;SaveData.story_intro319=true
  old_debug302=SaveData.debug_mode;SaveData.debug_mode=true;old_size302=get_tree().root.size;get_tree().root.size=Vector2i(1280,720)
  old_intro=GameState.brand_intro_played;GameState.brand_intro_played=true
  var runner=get_tree().root.get_node("GutRunner");ignore(runner)
  m=load("res://src/Presentation/main_menu.tscn").instantiate();m.set_script(load("res://tests/integration/menu_routes213_fixture.gd"));add_child(m)
 func after_each():
+ SaveData.story_intro319=old_story319
  if is_instance_valid(m):m.free()
  GameState.brand_intro_played=old_intro;SaveData.debug_mode=old_debug302;get_tree().root.size=old_size302
 func ignore(n:Node):

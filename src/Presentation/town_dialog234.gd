@@ -60,7 +60,7 @@ func _ready():
   button(service,Vector2(32,492),func():service_requested.emit(role,town))
  button("Hasta luego",Vector2(486 if has_service else 32,492),func():closed.emit(),Vector2(422 if has_service else 876,52))
 func _label247(text_:String,at:Vector2,extent:Vector2,font:int,color:Color)->Label:
- var label:=Label.new();label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.position=at;label.size=extent;label.text=text_;label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+ var label:Label=DialogueLabel319.new() if at.y>=148 and at.x==32 else Label.new();label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.position=at;label.size=extent;label.text=text_;label.mouse_filter=Control.MOUSE_FILTER_IGNORE
  label.add_theme_font_size_override('font_size',font);label.add_theme_color_override('font_color',color);label.add_theme_constant_override('line_spacing',4);add_child(label);return label
 func button(text:String,at:Vector2,action:Callable,extent:Vector2=Vector2(422,52)):
  var b:=Button.new();b.text=text;b.position=at;b.size=extent;QuestButtonStyle.apply(b);b.add_theme_font_size_override('font_size',22);add_child(b);b.pressed.connect(action)

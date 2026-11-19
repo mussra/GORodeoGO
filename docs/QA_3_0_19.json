@@ -1,0 +1,15 @@
+{
+  "version": "3.0.19",
+  "code": 479,
+  "bytes": 81306375,
+  "sha256": "6c38dc22c8be048b9ec96bc007d93acdc44cc138cdf85a920b5f30a8e78c1316",
+  "tests": 484,
+  "passing": 484,
+  "asserts": 65400,
+  "physical_android": false,
+  "intro_seconds": 29.69375,
+  "dialogue_max_seconds": 9.5,
+  "catalogue_variants": 47250,
+  "visible_variants": 41706,
+  "families": 2268
+}

@@ -6,7 +6,7 @@ func setup_journey(remote_:bool)->void:
  position=Vector2(300,145);size=Vector2(680,530);z_index=100;mouse_filter=Control.MOUSE_FILTER_STOP
  var state:Dictionary=SaveData.world_flora138;var species:String=FloristJourney138.current(state);var current_stage:String=FloristJourney138.stage(state,species)
  var title:=Label.new();title.text="Floristería · "+TownIdentity215.display_name248(SaveData.world_cousins140,"east138") if remote_ else "Florista · semillas de otro pueblo";title.position=Vector2(24,18);title.add_theme_font_size_override("font_size",25);add_child(title);TextFit181.fixed(title,Vector2(size.x-48,44),24,20,2)
- var body:=Label.new();body.position=Vector2(24,70);body.size=Vector2(632,245);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",22);add_child(body)
+ var body:=DialogueLabel319.new();body.position=Vector2(24,70);body.size=Vector2(632,245);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",22);add_child(body)
  DetailCard179.style_panel(self)
  DetailCard179.reading_surface(body)
  TextFit181.fixed(body,body.size,21,18,9)

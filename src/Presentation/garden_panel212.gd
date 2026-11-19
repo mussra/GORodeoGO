@@ -17,7 +17,7 @@ func rebuild():
  var portrait:=TextureRect.new();portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.texture=garden.GARDENER[garden.pose_name];portrait.position=Vector2(24,82);portrait.size=Vector2(120,150);add_child(portrait)
  if state.discovered:
   var crop:=TextureRect.new();crop.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;crop.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;crop.texture=garden.CARROTS[4];crop.position=Vector2(48,250);crop.size=Vector2(72,78);add_child(crop)
- var body:=Label.new();body.position=Vector2(164,78);body.size=Vector2(570,260);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;add_child(body);DetailCard179.reading_surface(body)
+ var body:=DialogueLabel319.new();body.position=Vector2(164,78);body.size=Vector2(570,260);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;add_child(body);DetailCard179.reading_surface(body)
  body.text=Garden212.summary(state)+"\n\n"+garden.location_hint()+"\n\n"+("Zanahoria nutritiva: 15% menos gasto al trotar o galopar durante 120 s de juego en Frontera. Sin velocidad ni cambios genéticos." if state.discovered else "La propiedad de esta variedad se descubre con la primera cosecha. Sin árbol genético ni plantas que se marchiten.")
  TextFit181.fixed(body,body.size,21,18,13)
  var status:=Label.new();status.position=Vector2(24,348);status.size=Vector2(712,70);status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;add_child(status)

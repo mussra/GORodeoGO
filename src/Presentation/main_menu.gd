@@ -52,7 +52,7 @@ func _ready() -> void:
 ## The logo reveal precedes the existing staggered menu entrance once per process.
 func _begin_brand_intro() -> void:
 	if GameState.brand_intro_played:
-		_animate_intro()
+		_after_brand319()
 		return
 	GameState.brand_intro_played = true
 	var cover := ColorRect.new()
@@ -75,7 +75,7 @@ func _begin_brand_intro() -> void:
 	reveal.tween_interval(1.8)
 	reveal.tween_property(cover, "modulate:a", 0.0, .3)
 	reveal.tween_callback(cover.queue_free)
-	reveal.tween_callback(_animate_intro)
+	reveal.tween_callback(_after_brand319)
 
 func _label(text: String, font_size: int, color: Color) -> Label:
 	var node := Label.new()
@@ -307,6 +307,7 @@ El lazo sigue disponible con el otro dedo.";box.add_child(movement_note)
 	if GameState.trial_tools_enabled():
 		var osd:=CheckButton.new();osd.name="PerformanceToggle245";osd.text="Mostrar rendimiento (OSD)";osd.custom_minimum_size.y=56;osd.button_pressed=GameState.performance_osd245;box.add_child(osd);osd.toggled.connect(GameState.set_performance_osd245)
 		var debug:=Button.new();debug.text="Herramientas DEBUG";debug.custom_minimum_size.y=56;box.add_child(debug);debug.pressed.connect(_show_debug213)
+	var replay319:=Button.new();replay319.text="Volver a ver la introducción";replay319.custom_minimum_size.y=52;box.add_child(replay319);replay319.pressed.connect(func():_show_story319(false))
 	var close:=Button.new();close.text=tr("UI_009");close.custom_minimum_size.y=52;box.add_child(close);close.pressed.connect(panel.queue_free)
 	ButtonSkin272.tree(panel)
 	pick.item_selected.connect(func(i:int):
@@ -352,3 +353,10 @@ func _show_debug213()->void:
 func _guard_recheck213()->void:
 	for child in get_children():
 		if child is MenuInputGuard:child._mark()
+
+func _after_brand319()->void:
+	_animate_intro()
+	if not SaveData.story_intro319:_show_story319(true)
+func _show_story319(persist_:bool=false)->void:
+	if get_node_or_null("StoryIntro319")!=null:return
+	var intro319:=StoryIntro319.new();intro319.persist319=persist_;add_child(intro319)

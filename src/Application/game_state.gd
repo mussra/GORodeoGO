@@ -54,6 +54,7 @@ func close_top_overlay(node:Node)->bool:
  var children:Array=node.get_children();children.reverse()
  for child in children:
   if child is CanvasItem and not child.is_visible_in_tree():continue
+  if child is StoryIntro319:child._finish319();return true
   if child is Window:
    if child.visible:child.hide();child.queue_free();return true
    continue

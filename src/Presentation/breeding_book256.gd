@@ -21,7 +21,7 @@ func _fit():
 func panel(at:Vector2,extent:Vector2,color:Color,border:Color,radius:int=16)->Panel:
  var p:=Panel.new();p.position=at;p.size=extent;p.add_theme_stylebox_override("panel",RanchTheme.box(color,border,radius));content.add_child(p);return p
 func label_(text_:String,at:Vector2,extent:Vector2,font:int=24,color:Color=INK)->Label:
- var l:=Label.new();l.text=text_;l.position=at;l.size=extent;l.add_theme_color_override("font_color",color);l.add_theme_font_size_override("font_size",font);l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;content.add_child(l)
+ var l:Label=DialogueLabel319.new() if at.x==690 and at.y>=359 and at.y<=475 else Label.new();l.text=text_;l.position=at;l.size=extent;l.add_theme_color_override("font_color",color);l.add_theme_font_size_override("font_size",font);l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;content.add_child(l)
  l.clip_text=true;l.text_overrun_behavior=TextServer.OVERRUN_NO_TRIMMING;l.autowrap_mode=TextServer.AUTOWRAP_OFF
  var wrapped:String="";var line_:String="";var face:Font=l.get_theme_font("font")
  for paragraph in text_.split("\n"):
