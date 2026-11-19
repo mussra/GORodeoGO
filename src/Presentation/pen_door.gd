@@ -1,6 +1,8 @@
 class_name PenDoor
 extends Area2D
 
+const PLAQUE311=preload("res://art/corral311/plaque.png")
+
 ## Presentation layer: a pen-puzzle door (GAMEPLAY_SPEC.md, levels 11+). Opens the bulls
 ## in its pen once the player stands still next to it for hold_seconds. Spawned at runtime
 ## by Level0 from LevelData.pens, the same way obstacles are spawned from obstacle_rects —
@@ -96,9 +98,9 @@ func _circle_points(radius: float, segments: int) -> PackedVector2Array:
 
 func _draw() -> void:
 	# Small outside latch: the actual gate is drawn and collides in the fence.
-	draw_style_box(RanchTheme.box(Color("173c4a"), Color("a9e9d8"), 5), Rect2(-20, -15, 40, 30))
+	draw_texture_rect(PLAQUE311,Rect2(-28,-15,56,30),false)
 	var badge: String = "%dM" % door_number if is_master else str(door_number)
-	draw_string(ThemeDB.fallback_font, Vector2(-17, 6), badge, HORIZONTAL_ALIGNMENT_CENTER, 34, 17, Color("fff2d2"))
+	draw_string(ThemeDB.fallback_font, Vector2(-17, 6), badge, HORIZONTAL_ALIGNMENT_CENTER, 34, 17, Color("302012"))
 	if _player_inside:
 		var fraction: float = clampf(_hold_timer / hold_seconds, 0, 1)
 		draw_arc(Vector2.ZERO, 27, -PI / 2, -PI / 2 + TAU * fraction, 48, Color("8fe5b6"), 4, true)
