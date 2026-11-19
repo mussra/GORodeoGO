@@ -27,19 +27,23 @@ func _draw() -> void:
 	var count:=maxi(1,int(ceil(world_bounds.size.x/155.)))
 	var width:=world_bounds.size.x/count
 	var height:=width*FENCE310.get_height()/FENCE310.get_width()
-	for y in [world_bounds.position.y-10,world_bounds.end.y+10]:
+	for y in [world_bounds.position.y-10]:
 		for i in count:
 			var x:=world_bounds.position.x+i*width
 			draw_texture_rect(FENCE310,Rect2(x,y-height*.80,width+1,height),false)
 	# Whole supplied three-post images. End posts overlap at their centers.
 	# Uniform scale; align the art with the horizontal corner posts, not collision edits.
-	var side_count:=maxi(1,int(round((world_bounds.size.y+20)/160.)))
+	var side_count:=maxi(1,int(round((world_bounds.size.y+20)/290.)))
 	var side_scale:float=(world_bounds.size.y+20)/(2164.+(side_count-1)*1790.)
 	var side_size:=Vector2(155.,2164.)*side_scale
 	for x:float in [world_bounds.position.x+10,world_bounds.end.x-10]:
 		for i in side_count:
 			var y:float=world_bounds.position.y-10+i*1790.*side_scale
 			draw_texture_rect(CorralArt310.VERTICAL312,Rect2(Vector2(x-side_size.x*.5,y),side_size),false)
+	# Foreground bottom rail covers the vertical end posts at both corners.
+	for i in count:
+		var x:float=world_bounds.position.x+i*width
+		draw_texture_rect(FENCE310,Rect2(x,world_bounds.end.y+10-height*.80,width+1,height),false)
 	var random := RandomNumberGenerator.new()
 	random.seed=93842
 	for rect: Rect2 in obstacle_rects:

@@ -1,0 +1,12 @@
+{
+  "version": "3.0.14",
+  "code": 474,
+  "bytes": 80525946,
+  "sha256": "1ae6c85e7933c4d72b084d71b3ffe16264815804839f9e9b7ff881ea416af149",
+  "tests": 457,
+  "passing": 457,
+  "asserts": 55490,
+  "physical_android": false,
+  "vertical_width_level11": 21.95245321193728,
+  "uniform_scale": true
+}
