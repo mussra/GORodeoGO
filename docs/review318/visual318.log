@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 23.2.1-1ubuntu3.1~22.04.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 15.0.7, 256 bits)
+
+LOAD_FRAME_PROFILE {"frames":45,"max_ms":1370.606,"over_100ms":1,"over_50ms":4,"p50_ms":37.394,"p95_ms":60.334,"version":"2.7.82+preview83","worst_phase":"reveal"}
+GATE home círculo north [(999.336, -924.0551), (679.336, -924.0551)]
+GATE home círculo south [(999.336, 1464.055), (679.336, 1464.055)]
+GATE home círculo east [(2033.391, 110.0), (2033.391, 430.0)]
+GATE home círculo west [(-354.7191, 429.9999), (-354.7191, 109.9999)]
+GATE town1 rombo north [(13472.0, -269.1581), (13152.0, -269.1581)]
+GATE town1 rombo south [(13472.0, 979.1581), (13152.0, 979.1581)]
+GATE town1 rombo east [(14200.84, 195.0), (14200.84, 515.0)]
+GATE town1 rombo west [(12423.16, 515.0), (12423.16, 195.0)]
+GATE town2 estrella north [(1160.0, 14216.31), (839.9999, 14216.31)]
+GATE town2 estrella south [(1160.0, 15323.07), (840.0, 15323.07)]
+GATE town2 estrella east [(1523.086, 14434.73), (1913.539, 14754.73)]
+GATE town2 estrella west [(86.46089, 14754.73), (476.914, 14434.73)]
+GATE town6 rectángulo north [(13152.0, 14448.98), (13472.0, 14448.98)]
+GATE town6 rectángulo south [(13472.0, 15175.02), (13152.0, 15175.02)]
+GATE town6 rectángulo east [(14024.53, 14652.0), (14024.53, 14972.0)]
+GATE town6 rectángulo west [(12599.47, 14972.0), (12599.47, 14652.0)]

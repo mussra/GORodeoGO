@@ -11,7 +11,7 @@ func test_six_town_shapes_have_closed_visual_corners_without_mutating_physics():
   seen[plan.shape]=true
   var before:Dictionary=plan.duplicate(true);var geometry:Dictionary=TownWallArt242.geometry(plan)
   assert_false(geometry.outer.is_empty());assert_false(geometry.surface.is_empty());assert_false(geometry.inset.is_empty())
-  assert_eq(TownWallArt242.chains(plan.segments).size(),1,'Gate is the only opening in the continuous contour')
+  assert_eq(TownWallArt242.chains(plan.segments).size(),4,'Four cardinal openings separate four wall chains')
   for segment in plan.segments:
    var middle:Vector2=(segment.a+segment.b)*.5
    assert_true(geometry.surface.any(func(poly):return Geometry2D.is_point_in_polygon(middle,poly)))

@@ -1,0 +1,14 @@
+{
+  "version": "3.0.18",
+  "code": 478,
+  "bytes": 81297815,
+  "sha256": "a2db2bd2728e2479c0dfe48ca82b86e05466e76ae898f77cfb38db01a75485ab",
+  "tests": 475,
+  "passing": 475,
+  "asserts": 65357,
+  "physical_android": false,
+  "cardinal_gates": 4,
+  "gate_width": 320,
+  "actual_content_margin": 120,
+  "player_recovery": true
+}

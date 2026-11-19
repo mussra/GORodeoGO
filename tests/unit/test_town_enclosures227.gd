@@ -1,12 +1,12 @@
 extends "res://tests/unit/test_herd_town217.gd"
-func test_all_shapes_enclose_all_owned_contents_and_have_one_walkable_entrance():
+func test_all_shapes_enclose_all_owned_contents_and_have_four_walkable_entrances():
  SaveData.world_generator_version=4
  var seen:Dictionary={};var towns:int=0
  for seed_ in range(752026,752046):
   var plans:=TownEnclosures227.plans(seed_);assert_eq(plans.size(),4)
   for id in VillageCousins140.IDS:
    var plan:Dictionary=plans[id];seen[plan.shape]=true;towns+=1
-   assert_eq(plan.posts.size(),2,"Exactly two ends of one doorway")
+   assert_eq(plan.posts.size(),8,"Two ends for each of four doorways")
    for x in 5:
     for y in 5:
      var point:Vector2=plan.contents.position+plan.contents.size*Vector2(x/4.,y/4.)

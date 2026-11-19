@@ -102,7 +102,8 @@ func _refresh_roads246()->void:
  var plans_:Dictionary=TownEnclosures227.plans(seed)
  var routes:Array=[]
  if version>=6:routes.append_array(TownNetwork234.roads(seed,plans_))
- for plan_ in plans_.values():routes.append(plan_.road)
+ for plan_ in plans_.values():
+  routes.append(plan_.road);routes.append_array(plan_.access_roads318)
  for route in routes:
   for i in route.size()-1:
    var a:Vector2=route[i];var b:Vector2=route[i+1]

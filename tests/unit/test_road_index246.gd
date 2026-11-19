@@ -5,7 +5,8 @@ func after_each():SaveData.world_generator_version=old_version
 func brute(point:Vector2,margin:float)->bool:
  var plans:Dictionary=TownEnclosures227.plans(752026)
  var routes:Array=TownNetwork234.roads(752026,plans).duplicate()
- for plan in plans.values():routes.append(plan.road)
+ for plan in plans.values():
+  routes.append(plan.road);routes.append_array(plan.access_roads318)
  for route in routes:
   for i in route.size()-1:
    if point.distance_to(Geometry2D.get_closest_point_to_segment(point,route[i],route[i+1]))<=22.+margin:return true

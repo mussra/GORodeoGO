@@ -47,6 +47,7 @@ func _refresh246()->void:
  var all:Dictionary=TownEnclosures227.plans(SaveData.world_seed) if SaveData.world_generator_version>=4 else {}
  var routes_:Array=[]
  for item in all.values():
+  routes_.append_array(item.access_roads318)
   if (item.bounds as Rect2).grow(80.).intersects(_bounds246):_plans246.append(item)
   routes_.append(item.road)
  if SaveData.world_generator_version>=6:routes_.append_array(TownNetwork234.roads(SaveData.world_seed,all))

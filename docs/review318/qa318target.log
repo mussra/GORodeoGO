@@ -1,0 +1,78 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/unit/test_town_cardinals318.gd
+[0m* test_four_cardinal_passages_follow_every_shape_and_remain_walkable
+* test_mouth_segments_do_not_enter_any_of_the_four_cut_strips
+* test_content_bounds_are_measured_from_real_outdoor_components
+[1m3/3 passed.
+[0m[4m
+
+res://tests/unit/test_town_enclosures227.gd
+[0m* test_all_shapes_enclose_all_owned_contents_and_have_four_walkable_entrances
+* test_towns_are_separated_and_seeded_not_rerolled_on_reload
+* test_legacy_terrain_and_registry_are_unchanged_and_v4_registry_matches_geometry
+* test_wild_populations_and_decor_are_not_generated_inside_new_towns
+* test_flower_samples_and_road_routes_stay_outside_owned_enclosure_and_do_not_cross_walls
+* test_circles_are_round_and_map_access_roads_are_clipped_to_discovered_chunk
+* test_new_policy_includes_seen_roaming_origins_and_keeps_stats
+* test_distance_blending_and_no_remote_changes
+* test_visit_order_real_second_town_and_legacy_next_new_not_pin
+* test_policy_save_is_atomic_future_version_blocks_load_and_collection_unchanged
+* test_distant_herds_do_not_write_unchanged_genetics_and_bad_eyes_are_rejected
+* test_explanation_names_actual_pattern_and_only_describes_local_wild_horses
+* test_second_and_third_visited_towns_have_separate_persistent_messages
+* test_far_from_all_towns_keeps_unbiased_original_random_population
+[1m14/14 passed.
+[0m[4m
+
+res://tests/unit/test_wall_art242.gd
+[0m* test_chains_join_unsorted_segments_at_both_ends_without_changing_source
+* test_six_town_shapes_have_closed_visual_corners_without_mutating_physics
+* test_visual_gap_at_gate_is_not_filled
+[1m3/3 passed.
+[0m
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Scripts               3
+Tests                20
+Passing Tests        20
+Asserts           16017
+Time              1.915s
+
+
+[32m---- All tests passed! ----
+[0m

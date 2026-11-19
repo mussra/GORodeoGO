@@ -18,7 +18,9 @@ static func lanes(seed_:int,c:Vector2i,version:int)->Array:
   var plans:=TownEnclosures227.plans(seed_)
   for path in TownNetwork234.roads(seed_,plans):out.append({"points":path,"width":40.})
  if version>=4:
-  for plan in TownEnclosures227.plans(seed_).values():out.append({"points":plan.road,"width":40.})
+  for plan in TownEnclosures227.plans(seed_).values():
+   out.append({"points":plan.road,"width":40.})
+   for road in plan.access_roads318:out.append({"points":road,"width":40.})
  if version<6 and not SaveData.world_cousins140.is_empty():
   for id in TownEnclosures227.cousin_ids231():
    out.append({"points":TownEnclosures227.cousin_lane231(SaveData.world_cousins140,id),"width":32.})

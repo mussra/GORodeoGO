@@ -24,5 +24,5 @@ static func painted(left:bool,look:Dictionary)->Texture2D:
  var texture:=ImageTexture.create_from_image(image);cache[key]=texture;return texture
 static func post(node:CanvasItem,at:Vector2,left:bool,look:Dictionary):
  var texture:=painted(left,look)
- var size:Vector2=texture.get_size()*(126./307.)
- node.draw_texture_rect(texture,Rect2(at-Vector2(size.x*.5,78.),size),false)
+ var size:Vector2=texture.get_size()*(146./307.)
+ node.draw_texture_rect(texture,Rect2(at-Vector2(size.x*.5,98.),size),false)

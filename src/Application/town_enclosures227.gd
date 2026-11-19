@@ -15,8 +15,7 @@ static func doors(seed_:int)->Dictionary:
   return {"home":FloristJourney138.home_door(seed_),"east138":Vector2(10560,358),"west140":Vector2(10560,358-10240.*flip),"east140":Vector2(10560,358+10240.*flip)}
  return {"home":FloristJourney138.home_door(seed_),"east138":Vector2(10560,358),"west140":Vector2(-9920,358),"east140":Vector2(20800,358)}
 static func contents(seed_:int,id:String)->Rect2:
- if id=="home":return Rect2(Vector2(-100,-420),Vector2(1930,1670))
- return Rect2(doors(seed_)[id]+Vector2(-800,-620),Vector2(1550,1120))
+ return TownContent318.bounds(seed_,id,doors(seed_)[id])
 static func normalized(shape:int)->PackedVector2Array:
  if shape==0:return PackedVector2Array([Vector2(-1,-.8),Vector2(1,-.8),Vector2(1,.8),Vector2(-1,.8)])
  if shape==1:return PackedVector2Array([Vector2(0,-1),Vector2(1,0),Vector2(0,1),Vector2(-1,0)])
@@ -27,7 +26,8 @@ static func normalized(shape:int)->PackedVector2Array:
   out.append(Vector2.from_angle(-PI*.5+i*TAU/count)*radius)
  return out
 static func plans(seed_:int)->Dictionary:
- var cache_key:Vector2i=Vector2i(seed_,SaveData.world_generator_version)
+ var content_state:Array=[SaveData.world_garden212.get("anchors",{}),SaveData.world_edits] if SaveData.world_seed==seed_ else []
+ var cache_key:String=str([seed_,SaveData.world_generator_version,hash(content_state)])
  if cache.has(cache_key):return cache[cache_key]
  if cache.size()>32:cache.clear()
  var result:Dictionary={};var rng:=RandomNumberGenerator.new();rng.seed=hash("town-enclosures227-v4-%d"%seed_)
@@ -37,56 +37,55 @@ static func plans(seed_:int)->Dictionary:
  var ids:Array=doors(seed_).keys()
  for index in ids.size():
   var id:String=ids[index];var required:Rect2=contents(seed_,id);var center:Vector2=required.get_center();var shape:int=posmod(hash("town-shape236-%d-%s"%[seed_,id]),6) if SaveData.world_generator_version>=6 else order[index%order.size()]
-  var unit:PackedVector2Array=normalized(shape);var half:Vector2=required.size*.5+Vector2(190,190)
+  var unit:PackedVector2Array=normalized(shape);var half:Vector2=required.size*.5+Vector2(120,120)
   if shape in [3,4]:half=Vector2.ONE*maxf(half.x,half.y)
-  var polygon:=PackedVector2Array();var scale_:float=1.
-  # Scale the shape around the fixed contents, rather than moving any contents.
-  for attempt in 32:
-   polygon.clear()
-   for p in unit:polygon.append(center+p*half*scale_)
-   var fits:bool=true;var reserve:Rect2=required.grow(240.)
-   for x in 5:
-    for y in 5:
-     var point:Vector2=reserve.position+reserve.size*Vector2(x/4.,y/4.)
-     if not Geometry2D.is_point_in_polygon(point,polygon):fits=false
-   if fits:break
-   scale_*=1.08
-  var gate:Vector2;var gate_edge:int=-1;var best_y:float=-INF
-  for i in polygon.size():
-   var a:Vector2=polygon[i];var b:Vector2=polygon[(i+1)%polygon.size()]
-   if absf(a.x-b.x)<.001:continue
-   var t:float=(center.x-a.x)/(b.x-a.x)
-   if t<0. or t>1.:continue
-   var point:Vector2=a.lerp(b,t)
-   if point.y>best_y:gate=point;best_y=point.y;gate_edge=i
+  var low_scale:float=0.;var high_scale:float=1.
+  var reserve:Rect2=required.grow(120.)
+  while not fits_contents318(unit,center,half,high_scale,reserve):high_scale*=1.15
+  for attempt in 18:
+   var middle:float=(low_scale+high_scale)*.5
+   if fits_contents318(unit,center,half,middle,reserve):high_scale=middle
+   else:low_scale=middle
+  var polygon:=PackedVector2Array()
+  for p in unit:polygon.append(center+p*half*(high_scale+0.0001))
+  var gates:Dictionary=cardinal_gates318(polygon,center)
   var segments:Array=[];var posts:Array=[];var outward:=Vector2.DOWN
-  # Remove a south-facing doorway across all intersected contour edges, also
-  # when the gate falls on a diamond/star vertex or several circle segments.
-  var cut:Rect2=Rect2(Vector2(gate.x-GATE_WIDTH*.5,gate.y-700.),Vector2(GATE_WIDTH,900.))
-  for i in polygon.size():
-   var a:Vector2=polygon[i];var b:Vector2=polygon[(i+1)%polygon.size()];var delta:Vector2=b-a
-   var low:float=0.;var high:float=1.;var intersects:bool=true
-   for axis in 2:
-    if absf(delta[axis])<.001:
-     if a[axis]<cut.position[axis] or a[axis]>cut.end[axis]:intersects=false
-    else:
-     var t1:float=(cut.position[axis]-a[axis])/delta[axis];var t2:float=(cut.end[axis]-a[axis])/delta[axis]
-     low=maxf(low,minf(t1,t2));high=minf(high,maxf(t1,t2))
-   if not intersects or high<=low:segments.append({"a":a,"b":b});continue
-   if low>0.:
-    var post:Vector2=a.lerp(b,low);segments.append({"a":a,"b":post});posts.append(post)
-   if high<1.:
-    var post:Vector2=a.lerp(b,high);segments.append({"a":post,"b":b});posts.append(post)
+  for i in polygon.size():segments.append({"a":polygon[i],"b":polygon[(i+1)%polygon.size()]})
+  for direction in gates:
+   var entry:Dictionary=gates[direction];var clipped:Array=[]
+   for segment in segments:
+    var a:Vector2=segment.a;var b:Vector2=segment.b;var delta:Vector2=b-a
+    var cut:Rect2=entry.cut;var low:float=0.;var high:float=1.;var intersects:bool=true
+    for axis in 2:
+     if absf(delta[axis])<.001:
+      if a[axis]<cut.position[axis] or a[axis]>cut.end[axis]:intersects=false
+     else:
+      var t1:float=(cut.position[axis]-a[axis])/delta[axis];var t2:float=(cut.end[axis]-a[axis])/delta[axis]
+      low=maxf(low,minf(t1,t2));high=minf(high,maxf(t1,t2))
+    if not intersects or high<=low:clipped.append(segment);continue
+    if low>0.:
+     var post:Vector2=a.lerp(b,low);clipped.append({"a":a,"b":post});posts.append(post);entry.posts.append(post)
+    if high<1.:
+     var post:Vector2=a.lerp(b,high);clipped.append({"a":post,"b":b});posts.append(post);entry.posts.append(post)
+   segments=clipped
+  var gate:Vector2=gates.south.point
   var bounds:=Rect2(polygon[0],Vector2.ZERO)
   for p in polygon:bounds=bounds.expand(p)
   var approach:=PackedVector2Array([doors(seed_)[id]+Vector2(0,160),Vector2(gate.x,doors(seed_)[id].y+160)])
-  if id=="home":approach=PackedVector2Array([Vector2(1600,470),Vector2(1740,470),Vector2(1740,1330),Vector2(gate.x,1330)])
+  if id=="home":
+   var turn:Vector2=required.end+Vector2(35,35)
+   approach=PackedVector2Array([Vector2(1600,470),Vector2(turn.x,470),turn,Vector2(gate.x,turn.y)])
   approach.append(gate-outward*110.);approach.append(gate+outward*130.)
   if SaveData.world_generator_version>=6:pass
   elif SaveData.world_generator_version>=5 and id in ["west140","east140"]:
    approach.append(Vector2(gate.x,bounds.end.y+300.));approach.append(Vector2(15500.,bounds.end.y+300.));approach.append(Vector2(15500.,TRUNK_Y))
   else:approach.append(Vector2(gate.x,TRUNK_Y))
-  result[id]={"id":id,"shape":shape,"shape_name":SHAPES[shape],"polygon":polygon,"segments":segments,"gate":gate,"posts":posts,"outward":outward,"center":center,"bounds":bounds,"contents":required,"road":approach}
+  var access_roads:Array=[]
+  for direction in gates:
+   if direction=="south":continue
+   var entry:Dictionary=gates[direction]
+   access_roads.append(PackedVector2Array([entry.point-entry.outward*160.,entry.point+entry.outward*180.]))
+  result[id]={"id":id,"shape":shape,"shape_name":SHAPES[shape],"polygon":polygon,"segments":segments,"gate":gate,"posts":posts,"outward":outward,"center":center,"bounds":bounds,"contents":required,"road":approach,"gates":gates,"access_roads318":access_roads}
  if SaveData.world_generator_version>=6:
   var network_roads:=TownNetwork234.roads(seed_,result)
   for id in result:result[id]["network_roads234"]=network_roads if id=="home" else []
@@ -128,15 +127,17 @@ static func graph(seed_:int,c:Vector2i)->Dictionary:
  return out
 static func access_contains(seed_:int,p:Vector2,margin:float=0.)->bool:
  for plan in plans(seed_).values():
-  var road:PackedVector2Array=plan.road
-  for i in road.size()-1:
-   if p.distance_to(Geometry2D.get_closest_point_to_segment(p,road[i],road[i+1]))<=22.+margin:return true
+  var roads:Array=[plan.road];roads.append_array(plan.access_roads318)
+  for road in roads:
+   for i in road.size()-1:
+    if p.distance_to(Geometry2D.get_closest_point_to_segment(p,road[i],road[i+1]))<=22.+margin:return true
  return false
 
 static func roads_in_chunk(seed_:int,c:Vector2i)->Array:
  var out:Array=[];var bounds:=Rect2(Vector2(c)*1024.,Vector2.ONE*1024.)
  var routes:Array=[]
- for plan in plans(seed_).values():routes.append(plan.road)
+ for plan in plans(seed_).values():
+  routes.append(plan.road);routes.append_array(plan.access_roads318)
  if SaveData.world_generator_version>=6:routes.append_array(TownNetwork234.roads(seed_,plans(seed_)))
  for road in routes:
   for i in road.size()-1:
@@ -160,3 +161,40 @@ static func role231(id:String)->String:
  return TownNetwork234.role_text(SaveData.world_seed,id) if SaveData.world_generator_version>=6 else {"home":"Granjero y Lucía", "east138":"Florista", "west140":"Cuidador de caballos", "east140":"Guarnicionero"}.get(id,"")
 static func links231()->Array:
  return [["home","east138"],["east138","west140"],["east138","east140"]]
+
+static func cardinal_gates318(polygon:PackedVector2Array,center:Vector2)->Dictionary:
+ var out:Dictionary={}
+ var directions:Dictionary={"north":Vector2.UP,"south":Vector2.DOWN,"east":Vector2.RIGHT,"west":Vector2.LEFT}
+ for name_ in directions:
+  var normal:Vector2=directions[name_];var tangent:=Vector2(-normal.y,normal.x);var best:float=-INF
+  var extreme:float=-INF;var lateral:float=0.;var count_:int=0
+  for vertex in polygon:
+   var depth:float=(vertex-center).dot(normal)
+   if depth>extreme+.01:extreme=depth;lateral=(vertex-center).dot(tangent);count_=1
+   elif absf(depth-extreme)<.01:lateral+=(vertex-center).dot(tangent);count_+=1
+  var origin:Vector2=center+tangent*(lateral/maxi(count_,1))
+  for i in polygon.size():
+   var a:Vector2=polygon[i]-origin;var b:Vector2=polygon[(i+1)%polygon.size()]-origin
+   var ta:float=a.dot(tangent);var tb:float=b.dot(tangent)
+   if absf(ta-tb)<.001:continue
+   var t:float=-ta/(tb-ta)
+   if t<0. or t>1.:continue
+   best=maxf(best,a.lerp(b,t).dot(normal))
+  var point:Vector2=origin+normal*best
+  # One half-plane strip, cut through every edge near the radial extremity.
+  var cut:Rect2
+  var reach:float=best+2000.
+  if name_=="south":cut=Rect2(origin+Vector2(-GATE_WIDTH*.5,0),Vector2(GATE_WIDTH,reach))
+  elif name_=="north":cut=Rect2(origin+Vector2(-GATE_WIDTH*.5,-reach),Vector2(GATE_WIDTH,reach))
+  elif name_=="east":cut=Rect2(origin+Vector2(0,-GATE_WIDTH*.5),Vector2(reach,GATE_WIDTH))
+  else:cut=Rect2(origin+Vector2(-reach,-GATE_WIDTH*.5),Vector2(reach,GATE_WIDTH))
+  out[name_]={"point":point,"outward":normal,"posts":[],"cut":cut}
+ return out
+
+static func fits_contents318(unit:PackedVector2Array,center:Vector2,half:Vector2,scale_:float,reserve:Rect2)->bool:
+ var polygon:=PackedVector2Array()
+ for p in unit:polygon.append(center+p*half*scale_)
+ for x in 5:
+  for y in 5:
+   if not Geometry2D.is_point_in_polygon(reserve.position+reserve.size*Vector2(x/4.,y/4.),polygon):return false
+ return true

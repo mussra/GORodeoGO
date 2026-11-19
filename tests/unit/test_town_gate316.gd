@@ -7,7 +7,7 @@ func test_both_leafs_keep_uniform_scale():
 func test_leafs_never_enter_existing_320_unit_gate():
  var plans:=TownEnclosures227.plans(752026)
  for plan in plans.values():
-  for post in plan.posts:
+  for post in plan.gates.south.posts:
    var left:bool=post.x<plan.gate.x
    var r:=TownGateArt316.rect(post,left)
    if left:assert_lt(r.end.x,plan.gate.x-160.)

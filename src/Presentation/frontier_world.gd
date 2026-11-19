@@ -132,6 +132,9 @@ func _ready() -> void:
 	player = PlayerScript.new()
 	player.position = SaveData.world_position
 	if SaveData.world_generator_version>=6:TownNetwork234.ensure_near(SaveData.world_seed,player.position)
+	if SaveData.world_generator_version>=4 and WorldTerrain103.blocked(SaveData.world_seed,player.position,20.):
+		var clear318:Vector2=WorldTerrain103.clear_spawn(SaveData.world_seed,player.position)
+		if clear318.is_finite():player.position=clear318;SaveData.world_position=clear318
 	add_child(player)
 	_marker = DrawNode.new()
 	_marker.draw_fn = _draw_rider_marker
