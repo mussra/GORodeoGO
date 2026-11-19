@@ -1,0 +1,12 @@
+{
+  "version": "3.0.13",
+  "code": 473,
+  "bytes": 80525946,
+  "sha256": "535c2e67254d4adfde9fbf86a42dd2d4d4d2ce704d71d835d33c56117256dc0d",
+  "tests": 457,
+  "passing": 457,
+  "asserts": 55490,
+  "source_alpha": true,
+  "physical_android": false,
+  "complete_three_post_image": true
+}
