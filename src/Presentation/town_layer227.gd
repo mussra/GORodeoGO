@@ -11,5 +11,6 @@ func _draw():
   var look:=TownIdentity215.look(SaveData.world_cousins140,plan.id)
   for post in plan.posts:
    if look.is_empty():continue
+   TownGateArt316.leaf(self,post,post.x<plan.gate.x)
    TownArt315.post(self,post,post.x<plan.gate.x,look)
  # Town name and roles now use one screen-space placard (TownSign242).

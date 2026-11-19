@@ -1,0 +1,32 @@
+{
+  "version": "3.0.16",
+  "code": 476,
+  "bytes": 81289442,
+  "sha256": "7cb75c8a77720de4977ebdb3335e9006b98e5d368a4a477db2e2dea8df7c9fd1",
+  "tests": 463,
+  "passing": 463,
+  "asserts": 55516,
+  "physical_android": false,
+  "leaf_size": [
+    98.32740213523131,
+    90
+  ],
+  "uniform_scale": true,
+  "gate_width": 320,
+  "physics_unchanged": true,
+  "source_rgba": true,
+  "crops": {
+    "left": [
+      137,
+      160,
+      751,
+      722
+    ],
+    "right": [
+      1028,
+      160,
+      1642,
+      722
+    ]
+  }
+}
