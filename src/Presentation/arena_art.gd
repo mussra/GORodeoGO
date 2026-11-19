@@ -1,6 +1,9 @@
 class_name ArenaArt
 extends Node2D
 
+const SAND310=preload("res://art/arena310/sand-mirror-tile.png")
+const FENCE310=preload("res://art/arena310/fence-horizontal.png")
+
 ## Decorative layer only. Collision and level geometry remain owned by the scene/catalog.
 var obstacle_rects: Array = []
 var world_bounds:Rect2=Rect2(-480,-270,960,540)
@@ -11,33 +14,30 @@ func _ready() -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	# Grass apron, inset dirt arena and a deliberately quiet centre for gameplay.
-	draw_rect(world_bounds.grow(350), Color("091b27"))
-	draw_style_box(RanchTheme.box(Color("102c38"), Color("27505e"), 24), world_bounds.grow(43))
-	draw_style_box(RanchTheme.box(Color("27444c"), Color("54b9b1"), 18), world_bounds.grow(15))
-	draw_style_box(RanchTheme.box(Color("34575c"), Color.TRANSPARENT, 12), world_bounds.grow(-6))
-	# Embedded ranch-floor panels, quiet enough to keep silhouettes legible.
-	for x in range(int(world_bounds.position.x+40),int(world_bounds.end.x),80):
-		draw_line(Vector2(x,world_bounds.position.y+12),Vector2(x,world_bounds.end.y-12),Color(.3,.6,.64,.075),1,true)
-	for y in range(int(world_bounds.position.y+30),int(world_bounds.end.y),80):
-		draw_line(Vector2(world_bounds.position.x+12,y),Vector2(world_bounds.end.x-12,y),Color(.3,.6,.64,.075),1,true)
+	# Ant's illustrated floor. Mirror-derived repeat of the supplied interior crop;
+	# no painted border is repeated and collision bounds remain unchanged.
+	texture_repeat=CanvasItem.TEXTURE_REPEAT_ENABLED
+	draw_rect(world_bounds.grow(350), Color("294b36"))
+	var floor_box:=world_bounds.grow(15)
+	var points:=PackedVector2Array([floor_box.position,Vector2(floor_box.end.x,floor_box.position.y),floor_box.end,Vector2(floor_box.position.x,floor_box.end.y)])
+	var uv:=PackedVector2Array()
+	for point in points:uv.append(point/435.)
+	draw_polygon(points,PackedColorArray([Color.WHITE]),uv,SAND310)
+	# Supplied horizontal fence modules, uniformly scaled, no stretching.
+	var count:=maxi(1,int(ceil(world_bounds.size.x/155.)))
+	var width:=world_bounds.size.x/count
+	var height:=width*FENCE310.get_height()/FENCE310.get_width()
+	for y in [world_bounds.position.y-10,world_bounds.end.y+10]:
+		for i in count:
+			var x:=world_bounds.position.x+i*width
+			draw_texture_rect(FENCE310,Rect2(x,y-height*.80,width+1,height),false)
+	# Side rails remain the old geometry: supplied oblique views do not match
+	# the straight vertical collision lines. Never rotate frontal art to fake it.
+	for x:float in [world_bounds.position.x-10,world_bounds.end.x+10]:
+		for offset:float in [-4.,4.]:
+			draw_line(Vector2(x+offset,world_bounds.position.y-10),Vector2(x+offset,world_bounds.end.y+10),Color("9c7146"),5)
 	var random := RandomNumberGenerator.new()
-	random.seed = 93842
-	for i in range(430):
-		var point := Vector2(random.randf_range(world_bounds.position.x+12,world_bounds.end.x-12),random.randf_range(world_bounds.position.y+12,world_bounds.end.y-12))
-		draw_line(point, point + Vector2(random.randf_range(1, 5), 0), Color(.55,.78,.78,.10), 1.0)
-	# Rail fence is drawn over the original perimeter collision shapes.
-	for y: float in [world_bounds.position.y-10,world_bounds.end.y+10]:
-		draw_line(Vector2(world_bounds.position.x-12, y + 6), Vector2(world_bounds.end.x+12, y + 6), Color(0.22, 0.16, 0.1, 0.23), 10)
-		for offset: float in [-5.0, 4.0]:
-			draw_line(Vector2(world_bounds.position.x-12, y + offset), Vector2(world_bounds.end.x+12, y + offset), Color("81b4bb"), 5)
-		for x in range(int(world_bounds.position.x-10),int(world_bounds.end.x+11),49):
-			_post(Vector2(x, y))
-	for x: float in [world_bounds.position.x-10,world_bounds.end.x+10]:
-		for offset: float in [-4.0, 4.0]:
-			draw_line(Vector2(x + offset, world_bounds.position.y-10), Vector2(x + offset, world_bounds.end.y+10), Color("81b4bb"), 5)
-		for y in range(int(world_bounds.position.y+25),int(world_bounds.end.y-24),49):
-			_post(Vector2(x, y))
+	random.seed=93842
 	for rect: Rect2 in obstacle_rects:
 		_crates(rect)
 	_draw_destination()

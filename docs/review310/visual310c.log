@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+OpenGL API 4.5 (Core Profile) Mesa 23.2.1-1ubuntu3.1~22.04.3 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 15.0.7, 256 bits)
+
+SCRIPT ERROR: Invalid access to property or key 'base' on a base object of type 'Dictionary'.
+          at: TownLayer227._draw (res://src/Presentation/town_layer227.gd:14)
+          GDScript backtrace (most recent call first):
+              [0] _draw (res://src/Presentation/town_layer227.gd:14)
+LOAD_FRAME_PROFILE {"frames":15,"max_ms":306.743,"over_100ms":1,"over_50ms":15,"p50_ms":70.684,"p95_ms":306.743,"version":"2.7.82+preview83","worst_phase":"prepare"}
+SHOT310 huerto-introduce
+SHOT310 huerto-accept
+SHOT310 huerto-sample
+SHOT310 huerto-plant
+SHOT310 huerto-water
+SHOT310 huerto-ripe
+SHOT310 rodeo-1
+SHOT310 rodeo-11
+SHOT310 rodeo-11-abierto
+SHOT310 rodeo-40
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

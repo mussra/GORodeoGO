@@ -1,0 +1,20 @@
+{
+  "version": "3.0.10",
+  "code": 470,
+  "tests": 457,
+  "passing": 457,
+  "assertions": 55490,
+  "extra_garden": {
+    "passing": 9,
+    "total": 11,
+    "baseline_same": true
+  },
+  "apk_bytes": 80177370,
+  "sha256": "e2fca8c866140dd3b0fc45239c4acaab1a0621d9a9170ec61c3cd3797a8995c1",
+  "physical_android": false,
+  "original_sources": {
+    "art/garden310/source/ant-garden-sheet.png": "5d6d19dee7430e54e0fe73f015411f40f51cb53f2908d8a1c276c885cc68707c",
+    "art/arena310/source/ant-arena-sheet.png": "23418372917c74b1f241000054fc5cef99b240c97fe403ef3a84f9c32385c069",
+    "art/corral310/source/ant-corral-sheet.png": "c74a13476258c8ce658007914a5d4b6bc8fd0bcb7f10d03585a2c0cf47fbc9f5"
+  }
+}

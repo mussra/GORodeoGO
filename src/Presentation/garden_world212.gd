@@ -1,6 +1,8 @@
 class_name GardenWorld212
 extends Node
 const CARROTS=[preload("res://art/garden212/carrot-0.png"),preload("res://art/garden212/carrot-1.png"),preload("res://art/garden212/carrot-2.png"),preload("res://art/garden212/carrot-3.png"),preload("res://art/garden212/carrot-4.png")]
+const PLOT_EMPTY310=preload("res://art/garden310/plot-empty.png")
+const PLOT_PREPARED310=preload("res://art/garden310/plot-prepared.png")
 var town_id:String=Garden212.BASE_TOWN_ID
 var world:Node2D
 var home:Vector2
@@ -117,9 +119,11 @@ func _process(delta:float):
   last_stage=state.stage;marker.queue_redraw();world.get_node("GardenAccess214").queue_redraw()
 func _draw_plot(_canvas:Node2D):
  if SaveData.world_garden212.stage=="locked":return
- marker.draw_style_box(RanchTheme.box(Color("755134"),Color("b39461"),5),Rect2(plot-Vector2(125,40),Vector2(250,95)))
+ # Ant's supplied complete plot, uniformly fitted. Keep crop, NPC and collision anchors.
+ var texture:Texture2D=PLOT_PREPARED310 if SaveData.world_garden212.stage in ["empty","growing","ripe"] else PLOT_EMPTY310
+ var extent:=texture.get_size();var fit:=minf(250./extent.x,180./extent.y);extent*=fit
+ marker.draw_texture_rect(texture,Rect2(plot+Vector2(0,5)-extent*.5,extent),false)
  marker.draw_string(ThemeDB.fallback_font,plot+Vector2(95,65),"Lucía",HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff1cd"))
- for i in 4:marker.draw_line(plot+Vector2(-108,-20+i*22),plot+Vector2(108,-20+i*22),Color("4d3527"),4.)
  if SaveData.world_garden212.stage=="search":
   marker.draw_arc(sample,42.,0,TAU,48,Color("f2b55d"),3.,true)
 

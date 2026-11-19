@@ -1,0 +1,73 @@
+{
+  "size": [
+    1254,
+    1254
+  ],
+  "mode": "RGBA",
+  "alpha_zero": 707806,
+  "alpha_partial": 863561,
+  "alpha_opaque": 1149,
+  "corner_rgba": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "plot-empty": {
+    "cell": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "alpha_bbox": [
+      0,
+      4,
+      627,
+      624
+    ]
+  },
+  "plot-prepared": {
+    "cell": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "alpha_bbox": [
+      0,
+      17,
+      627,
+      627
+    ]
+  },
+  "furrows-study": {
+    "cell": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "alpha_bbox": [
+      0,
+      1,
+      615,
+      627
+    ]
+  },
+  "edge-study": {
+    "cell": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "alpha_bbox": [
+      1,
+      0,
+      626,
+      627
+    ]
+  },
+  "furrow_opposite_edges_exact": false
+}

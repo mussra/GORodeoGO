@@ -53,11 +53,10 @@ func _draw() -> void:
 	_rail(Vector2(rect.end.x, rect.position.y), rect.end)
 	if not opened:
 		pass # closed front rail is drawn once by its y-sorted sibling
-	else:
-		draw_line(gate - Vector2(60, 0), gate - Vector2(75, layout["inward"] * 28), Color("b0eadb"), 6, true)
-		draw_line(gate + Vector2(60, 0), gate + Vector2(75, layout["inward"] * 28), Color("b0eadb"), 6, true)
 	draw_string(ThemeDB.fallback_font, Vector2(rect.position.x + 8, back + (18 if layout["inward"] > 0 else -10)), "RECINTO %d" % number, HORIZONTAL_ALIGNMENT_LEFT, 100, 12, Color("fff1cf"))
 func _rail(a: Vector2, b: Vector2, color: Color = Color("84aeb4")) -> void:
+	if absf(a.y-b.y)<.1:
+		CorralArt310.horizontal(self,a.x,b.x,a.y);return
 	draw_line(a + Vector2(2, 5), b + Vector2(2, 5), Color(0.2, 0.14, 0.1, 0.2), 8, true)
 	draw_line(a, b, color, 6, true)
 	var steps: int = maxi(1, int(a.distance_to(b) / 30))
