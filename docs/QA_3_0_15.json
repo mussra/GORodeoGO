@@ -1,0 +1,16 @@
+{
+  "version": "3.0.15",
+  "code": 475,
+  "bytes": 80625293,
+  "sha256": "fff6f1c7cc4ea53a246c3e18fba6e48a0807911c07c01fe0dc8b446a377b3f2a",
+  "tests": 460,
+  "passing": 460,
+  "asserts": 55501,
+  "physical_android": false,
+  "art_cells_integrated": [
+    5,
+    6
+  ],
+  "placeholder_gate_leaves_removed": true,
+  "wall_geometry_and_collision_unchanged": true
+}
