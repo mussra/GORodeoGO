@@ -31,6 +31,7 @@ func setup_journey(remote_:bool)->void:
    "sample":
     body.text=recognition+"Has traído una muestra de "+FloristJourney138.title(species)+". Si me la entregas, podré crear aquí su propio cultivo."
     button138("Entregar muestra",Vector2(24,330),"deliver",species)
+ body.text="¡Hola, "+RiderStory322.NAME+"! "+body.text
  button138("Seguir explorando",Vector2(184,448),"close",species)
 func button138(text_:String,at:Vector2,action_:String,species:String)->void:
  var b:=Button.new();b.text=text_;b.position=at;b.size=Vector2(300,58);b.add_theme_font_size_override("font_size",19);QuestButtonStyle.apply(b);add_child(b)

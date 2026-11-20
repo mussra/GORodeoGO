@@ -1,0 +1,13 @@
+{
+  "version": "3.0.22",
+  "code": 482,
+  "bytes": 81310650,
+  "sha256": "f618bcf9e5947bb88860b2e9c87ec234832e80a7c019e3f246939ccc07025a7e",
+  "tests": 489,
+  "passing": 489,
+  "asserts": 65483,
+  "physical_android": false,
+  "rider_name": "Pablo",
+  "intro_auto_advance": false,
+  "entrance_seconds": 0.65
+}

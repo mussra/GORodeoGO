@@ -27,14 +27,14 @@ func _ready():
  route247=_label247("",Vector2(32,348),Vector2(876,54),21,Color('bed0d0'))
  var relayed:String=conversation247.relayed
  if not relayed.is_empty():
-  heading247.text="Tengo un recado para ti"
+  heading247.text="Pablo, tengo un recado para ti"
   body247.text=TownMessages247.message(SaveData.world_seed,relayed,role)
   route247.text="Siguiente recado: "+TownIdentity215.display_name248(SaveData.world_cousins140,target247)+"." if not target247.is_empty() else "Con este recado ya estás al día. ¡Buen viaje!"
  elif target247.is_empty():
-  heading247.text="Gracias por tu ayuda"
+  heading247.text="Gracias por tu ayuda, Pablo"
   body247.text="Por ahora no me quedan encargos de este oficio. Sigue explorando y encontrarás otros pueblos."
  else:
-  heading247.text="Gracias por ayudarme"
+  heading247.text="Gracias por ayudarme, Pablo"
   var who:String={"loco":"mi primo","farmer":"mi primo, el granjero","florist":"mi prima, la florista","saddler":"mi primo, el guarnicionero"}[role]
   body247.text="Ve a ver a "+who+"."
   var route:=TravelEstimate237.route(SaveData.world_seed,town,role)
@@ -77,6 +77,7 @@ func _job249()->void:
  if q.kind=="capture_animal" and ready_:text_="Veo que ya tienes "+("un cerdo" if q.target=="pig" else "una cabra")+". Me vendría bien. "+("¿Me lo vendes" if q.target=="pig" else "¿Me la vendes")+" por 40 puntos?"
  elif s.status=="done":text_=q.done+" Tu recompensa: %d puntos."%q.reward
  elif s.status=="active":text_=q.active+". Llevas %d de %d."%[s.count,q.goal]
+ text_="¡Hola, "+RiderStory322.NAME+"! "+text_
  body247=_label247(text_,Vector2(32,214),Vector2(876,140),25,Color('e6eeea'))
  route247=_label247("Después de ayudarme, te presentaré a otro vecino.",Vector2(32,370),Vector2(876,40),21,Color('bed0d0'))
  var label_:String="Vender 1 "+("cerdo" if q.target=="pig" else "cabra")+" · 40 puntos" if q.kind=="capture_animal" and ready_ else "Entregar encargo · %d puntos"%q.reward if ready_ else "Aceptar encargo" if s.status=="locked" else "Ver objetivo en el mapa"

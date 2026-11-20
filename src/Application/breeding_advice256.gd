@@ -3,7 +3,7 @@ extends RefCounted
 const IDS=["breeding","mean","caps","mastery","breeds","lineage"]
 const TITLES=["Criar con calma","La media de sus padres","Mejorar sin sobrepasar","Camino a la maestría","Razas y apariencias","Tu linaje, tu marca"]
 const TIPS=[
- ["Elige dos adultos distintos de tu cuadra.","Cuida al potro con 10 victorias o encargos repetibles cobrados.","Salto y Esquiva se aprenden: no vienen regalados por cruzar."],
+ ["Pablo, elige dos adultos distintos de tu cuadra.","Cuida al potro con 10 victorias o encargos repetibles cobrados.","Salto y Esquiva se aprenden: no vienen regalados por cruzar."],
  ["Cada propiedad de la cría es la media de ambos padres.","Las mejoras ganadas por los padres también cuentan.","Ejemplo: Velocidad 260 + 280 da una cría con 270."],
  ["Cada barra tiene un máximo: nunca se sobrepasa.","Toros: Fuerza. Carrera: Velocidad y un caballo.","Duelo: Manejo y Serenidad. Justa añade Agilidad."],
  ["Una familia comparte su avance: especie y patrón.","Completa 6 toros distintos, 2 circuitos, Duelo, Justa e Hípica.","Brillo y un exclusivo por familia. Los hijos de su patrón conservan la maestría."],

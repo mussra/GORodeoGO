@@ -14,6 +14,7 @@ func setup(id:String,state_:Dictionary,surprise:bool):
  var portrait:=Sprite2D.new();portrait.texture=load("res://art/npc/loco-"+("sorpresa" if surprise else "normal")+"140.png");portrait.position=Vector2(92,175);portrait.scale=Vector2.ONE*1.1;add_child(portrait)
  body=DialogueLabel319.new();body.position=Vector2(185,80);body.size=Vector2(525,200);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body.add_theme_font_size_override("font_size",22);body.text=("¡Esos cuernos! ¡Yo sabía que existían!\n\n" if surprise else "")+VillageCousins140.clue(id);add_child(body)
  if id in [SaveData.world_places144.get("teach217",""),SaveData.world_places144.get("teach_far220","")]:body.text=HerdTown217.dialogue220(SaveData.world_places144,SaveData.world_cousins140,id)
+ body.text="¡Hola, "+RiderStory322.NAME+"! "+body.text
  DetailCard179.style_panel(self)
  DetailCard179.reading_surface(body)
  TextFit181.fixed(body,body.size,21,18,9)

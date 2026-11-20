@@ -39,6 +39,7 @@ func setup(npc:Dictionary,states:Dictionary):
    var caption=Label.new();caption.text="Recoge tres de este tipo";caption.position=Vector2(110,365);add_child(caption)
   else:
    var flower=FlowerQuestGlyph105.new();flower.position=Vector2(24,345);flower.color=WorldFlowers105.color_for(id);flower.caption="Recoge al pasar por encima";add_child(flower)
+ body.text="¡Hola, "+RiderStory322.NAME+"! "+body.text
  var back=Button.new();back.position=Vector2(355,275);back.size=Vector2(295,52);back.text="Seguir explorando" if finished123 else "Ahora no" if s.status=="locked" else ("Gracias · continuar" if s.status=="done" else "Seguir explorando");QuestButtonStyle.apply(back);add_child(back);back.pressed.connect(func():
   if s.status=="done" and not (npc.id=="farmer" and q.kind=="capture_animal"):acknowledged.emit(id)
   closed.emit())

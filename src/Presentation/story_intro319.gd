@@ -2,7 +2,7 @@ class_name StoryIntro319
 extends Control
 signal finished
 const PAGES:Array[String]=[
- "Hola, me llamo Charlie, soy el jinete más valiente de este lado del charco.",
+ "Hola, me llamo "+RiderStory322.NAME+", soy el jinete más valiente de este lado del charco.",
  "Mi objetivo es hacerme con todos los caballos posibles. ¡Hay más de 40.000 combinaciones de apariencia! Los caballos se distinguen por las manchas, el color de su crin y el color de su pelaje.",
  "Tengo que investigar por el mundo para ir recolectando información sobre los caballos que pueda.",
  "Por el camino me encontraré misiones, me harán encargos que me servirán para buscarme la vida, poder ganar puntos y así poder mejorar mi equipo.",
@@ -18,6 +18,8 @@ var mounted319:Sprite2D
 var counter319:Label
 var next319:Button
 var canvas319:Control
+var entrance322:Tween
+var entrance_done322:bool=false
 var rng319:=RandomNumberGenerator.new()
 var traits319:Dictionary={"coat":10,"pattern":0,"mane":1}
 var hat319:String="original"
@@ -30,13 +32,13 @@ func _ready()->void:
  var title:=Label.new();title.text="UNA VIDA A CABALLO";title.position=Vector2(65,45);title.add_theme_font_size_override("font_size",36);title.add_theme_color_override("font_color",Color("f7cf7c"));canvas319.add_child(title)
  mounted319=Sprite2D.new();mounted319.position=Vector2(300,375);canvas319.add_child(mounted319);_appearance319()
  var panel:=Panel.new();panel.position=Vector2(560,160);panel.size=Vector2(650,390);DetailCard179.style_panel(panel);canvas319.add_child(panel)
- var who:=Label.new();who.text="Charlie";who.position=Vector2(30,22);who.add_theme_font_size_override("font_size",28);panel.add_child(who)
+ var who:=Label.new();who.text=RiderStory322.NAME;who.position=Vector2(30,22);who.add_theme_font_size_override("font_size",28);panel.add_child(who)
  body319=DialogueLabel319.new();body319.characters_per_second319=32.;body319.position=Vector2(30,82);body319.size=Vector2(590,260);body319.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;body319.add_theme_font_size_override("font_size",26);body319.add_theme_color_override("font_color",Color("fff2d8"));panel.add_child(body319)
  counter319=Label.new();counter319.position=Vector2(580,575);counter319.add_theme_font_size_override("font_size",20);canvas319.add_child(counter319)
  next319=Button.new();next319.position=Vector2(900,570);next319.size=Vector2(310,62);QuestButtonStyle.apply(next319);canvas319.add_child(next319);next319.pressed.connect(_next319)
  var skip:=Button.new();skip.text="Saltar introducción";skip.position=Vector2(65,625);skip.size=Vector2(320,55);QuestButtonStyle.apply(skip);canvas319.add_child(skip);skip.pressed.connect(_finish319)
  var hint:=Label.new();hint.text="Toca el texto para mostrarlo entero";hint.position=Vector2(580,650);hint.add_theme_font_size_override("font_size",18);canvas319.add_child(hint)
- resized.connect(_fit319);_fit319();_page319();next319.grab_focus.call_deferred()
+ resized.connect(_fit319);_fit319();_page319();_entrance322(panel,shade);next319.grab_focus.call_deferred()
 func _fit319()->void:
  if not is_instance_valid(canvas319):return
  var k:float=minf(size.x/1280.,size.y/720.);canvas319.scale=Vector2.ONE*k;canvas319.position=(size-Vector2(1280,720)*k)*.5
@@ -68,3 +70,15 @@ func _finish319()->void:
 func _unhandled_input(event:InputEvent)->void:
  if event.is_action_pressed("ui_cancel"):
   _finish319();get_viewport().set_input_as_handled()
+
+## A short, staggered arrival. Text begins only after its reading panel settles.
+func _entrance322(panel:Panel,shade:ColorRect)->void:
+ body319.set_process(false);body319.visible_characters=0
+ canvas319.modulate.a=0.;panel.position=Vector2(608,172);mounted319.position=Vector2(258,375);shade.modulate.a=0.
+ entrance322=create_tween().set_parallel(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+ entrance322.tween_property(shade,"modulate:a",1.,.35)
+ entrance322.tween_property(canvas319,"modulate:a",1.,.42)
+ entrance322.tween_property(mounted319,"position",Vector2(300,375),.65).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+ entrance322.tween_property(panel,"position",Vector2(560,160),.55).set_delay(.10).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+ entrance322.chain().tween_callback(func():
+  entrance_done322=true;body319.restart319();body319.set_process(true))

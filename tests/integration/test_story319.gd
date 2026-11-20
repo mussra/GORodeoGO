@@ -85,3 +85,26 @@ func test_continue_advances_even_while_letters_are_appearing():
  assert_eq(intro.body319.visible_characters,0)
  intro.next319.pressed.emit();assert_eq(intro.page319,1)
  intro.body319.finish319();assert_eq(intro.page319,1)
+
+func test_pablo_identity_and_animated_entrance():
+ assert_eq(RiderStory322.NAME,"Pablo")
+ assert_string_contains(StoryIntro319.PAGES[0],"Pablo")
+ var intro:=StoryIntro319.new();intro.persist319=false;add_child_autofree(intro)
+ assert_eq(intro.canvas319.modulate.a,0.)
+ assert_false(intro.body319.is_processing())
+ assert_false(intro.entrance_done322)
+ await wait_seconds(.8)
+ assert_true(intro.entrance_done322);assert_true(intro.body319.is_processing())
+ assert_almost_eq(intro.canvas319.modulate.a,1.,.01)
+ assert_eq(intro.mounted319.position,Vector2(300,375))
+ assert_eq(intro.page319,0)
+func test_in_game_characters_address_pablo():
+ var farmer:=NpcDialog.new();farmer.setup(NpcQuests.NPCS[0],{});add_child_autofree(farmer)
+ assert_string_contains(farmer.get_node("QuestBody").text,"Pablo")
+ var service:=TownServicePanel231.new();service.town_id="east140";add_child_autofree(service)
+ var found:bool=false
+ for child in service.get_children():
+  if child is DialogueLabel319 and child.text.contains("Pablo"):found=true
+ assert_true(found)
+ assert_string_contains(BreedingAdvice256.TIPS[0][0],"Pablo")
+ for role_ in ["farmer","florist","loco","saddler","gardener","alma"]:assert_string_contains(RiderStory322.greeting(role_),"Pablo")
