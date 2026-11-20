@@ -3,6 +3,8 @@ extends Node
 ## Minimal cross-scene state. Registered as an Autoload (see project.godot [autoload])
 ## so it survives get_tree().change_scene_to_file() calls between menu <-> level.
 
+var controls_world323:bool=false
+var rodeo_guide323:bool=false
 var selected_level: int = 1
 
 var sound_enabled: bool = true
@@ -54,6 +56,8 @@ func close_top_overlay(node:Node)->bool:
  var children:Array=node.get_children();children.reverse()
  for child in children:
   if child is CanvasItem and not child.is_visible_in_tree():continue
+  if child is BullTutorial323:child._finish323();return true
+  if child is TutorialGuide323:child.close323();return true
   if child is StoryIntro319:child._finish319();return true
   if child is Window:
    if child.visible:child.hide();child.queue_free();return true

@@ -1,4 +1,7 @@
 extends "res://tests/integration/test_breeding_world256.gd"
+func after_each():
+ GameState.rodeo_guide323=false
+ super.after_each()
 func done_pigs268():
  SaveData.world_quests={"farmer_pigs":{"status":"done","count":3,"events":["a","b","c"]}};SaveData.rodeo_intro240=false
 func test_completed_existing_save_is_open_without_acceptance_and_shows_notice():

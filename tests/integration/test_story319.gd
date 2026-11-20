@@ -3,7 +3,9 @@ var previous_path319:String
 var previous_story319:bool
 var previous_trial319:bool
 var previous_valid319:bool
+var previous_guides323:Array
 func before_each():
+ previous_guides323=[GameState.controls_world323,GameState.rodeo_guide323];GameState.controls_world323=false;GameState.rodeo_guide323=false
  previous_path319=SaveData.save_path;previous_story319=SaveData.story_intro319
  previous_trial319=SaveData.trial_session_active;previous_valid319=SaveData._load_valid
  SaveData.trial_session_active=false;SaveData._load_valid=true
@@ -12,6 +14,7 @@ func after_each():
  if FileAccess.file_exists(SaveData.save_path):DirAccess.remove_absolute(SaveData.save_path)
  SaveData.save_path=previous_path319;SaveData.story_intro319=previous_story319
  SaveData.trial_session_active=previous_trial319;SaveData._load_valid=previous_valid319
+ GameState.controls_world323=previous_guides323[0];GameState.rodeo_guide323=previous_guides323[1]
 func test_dialogue_progress_and_replacement_and_tap():
  var label:=DialogueLabel319.new();label.text="Un diálogo de prueba que aparece poco a poco.";add_child_autofree(label)
  assert_eq(label.visible_characters,0)
@@ -55,7 +58,10 @@ func test_first_menu_modal_and_settings_replay():
  var intro:StoryIntro319=menu.get_node("StoryIntro319");intro.persist319=false
  assert_true(intro.is_visible_in_tree());assert_true(menu._play.disabled)
  assert_true(GameState.close_top_overlay(menu));await wait_process_frames(6)
- assert_null(menu.get_node_or_null("StoryIntro319"));assert_false(menu._play.disabled)
+ assert_null(menu.get_node_or_null("StoryIntro319"));assert_true(menu._play.disabled)
+ assert_not_null(menu.get_node_or_null("BullTutorial323"));assert_true(GameState.close_top_overlay(menu));await wait_process_frames(4)
+ assert_null(menu.get_node_or_null("BullTutorial323"));assert_true(GameState.close_top_overlay(menu));await wait_process_frames(4)
+ assert_false(menu._play.disabled)
  menu._show_story319(false);await wait_process_frames(3)
  assert_not_null(menu.get_node_or_null("StoryIntro319"));menu.free()
 func test_saved_intro_flag_and_new_file_default():
@@ -108,3 +114,66 @@ func test_in_game_characters_address_pablo():
  assert_true(found)
  assert_string_contains(BreedingAdvice256.TIPS[0][0],"Pablo")
  for role_ in ["farmer","florist","loco","saddler","gardener","alma"]:assert_string_contains(RiderStory322.greeting(role_),"Pablo")
+
+func test_initial_controls_tutorial_is_manual_and_safe():
+ var before_:Dictionary=SaveData.horse_collection.export_state().duplicate(true)
+ var setting_:bool=GameState.anchored_movement258
+ var intro:=StoryIntro319.new();intro.persist319=false;add_child_autofree(intro)
+ intro.page319=6;intro._page319()
+ assert_true(intro.tutorial323.visible);assert_false(intro.mounted319.visible)
+ assert_string_contains(intro.body319.text,"izquierdo")
+ var demo:=intro.tutorial323;demo.set_process(false)
+ demo.press323(Vector2(340,220));assert_false(demo.touched323)
+ demo.press323(Vector2(90,220));demo.drag323(Vector2(135,200));var at_:Vector2=demo.rider323.position;demo._process(.3)
+ assert_ne(demo.rider323.position,at_);assert_true(demo.practiced323)
+ demo.release323();var stopped_:Vector2=demo.rider323.position;demo._process(.3);assert_eq(demo.rider323.position,stopped_)
+ intro.next319.pressed.emit();assert_eq(intro.page319,7);assert_eq(demo.mode323,1)
+ assert_string_contains(intro.body319.text,"derecho")
+ demo.press323(Vector2(80,230));assert_false(demo.touched323)
+ demo.press323(Vector2(290,220));demo.drag323(Vector2(370,180));demo._process(.1)
+ assert_gt(demo.distance323,0.);assert_gt(demo.aim323.x,0.);assert_lt(demo.aim323.y,0.)
+ demo.release323();assert_true(demo.practiced323);assert_gt(demo.released323,0.)
+ demo._process(2.);assert_eq(demo.distance323,0.)
+ intro._process(600.);assert_eq(intro.page319,7);assert_false(intro.is_queued_for_deletion())
+ assert_eq(SaveData.horse_collection.export_state(),before_);assert_eq(GameState.anchored_movement258,setting_)
+
+func test_frontier_and_rodeo_guides_target_real_buttons():
+ SaveData.story_intro319=true;GameState.brand_intro_played=true
+ var old_intro:bool=SaveData.rodeo_intro240;SaveData.rodeo_intro240=true
+ var menu=load("res://src/Presentation/main_menu.tscn").instantiate();add_child(menu)
+ await wait_process_frames(5)
+ menu._frontier_guide323();await wait_process_frames(2)
+ var guide:TutorialGuide323
+ for child in menu.get_children():
+  if child is TutorialGuide323:guide=child
+ assert_false(guide.go323.disabled);assert_same(guide.target323,menu._world_button);assert_string_contains(guide.words323,"explorar")
+ guide.queue_free();await wait_process_frames(2)
+ menu._show_games213();menu._rodeo_card323();await wait_process_frames(2)
+ for child in menu.get_children():
+  if child is TutorialGuide323:guide=child
+ assert_false(guide.go323.disabled);assert_eq(guide.target323.name,"Navigate_bulls")
+ guide.go323.pressed.emit();await wait_process_frames(4)
+ for child in menu.get_children():
+  if child is TutorialGuide323:guide=child
+ assert_same(guide.target323,menu.level_grid.get_child(0));assert_true(menu._drawer.visible)
+ menu.free();SaveData.rodeo_intro240=old_intro
+
+func test_stationary_bull_practice_uses_real_capture_tow_and_double_tap():
+ var saved_:Dictionary=SaveData.horse_collection.export_state().duplicate(true);var points_:int=SaveData.equipment_points;var levels_:int=SaveData.highest_level_completed
+ var practice:=BullTutorial323.new();add_child_autofree(practice)
+ assert_eq(practice.step323,0)
+ var at_:Vector2=practice.bull.position;await wait_process_frames(3);assert_eq(practice.bull.position,at_)
+ practice.player.position=practice.bull.position-Vector2(150,0);practice._physics_process(.1);assert_eq(practice.step323,1)
+ var prey=practice.player.lasso.resolve_capture(practice.bull.position)
+ assert_same(prey,practice.bull);assert_eq(practice.step323,2);assert_true(practice.bull.controller.is_held())
+ practice.bull.position=practice.goal323;practice.player.position=practice.goal323+Vector2(90,0);practice._physics_process(.1);assert_eq(practice.step323,3)
+ practice.player.lasso._on_aim_pressed();practice.player.lasso._on_aim_released(Vector2.ZERO)
+ practice.player.lasso._on_aim_pressed();practice.player.lasso._on_aim_released(Vector2.ZERO)
+ assert_eq(practice.step323,4);assert_false(practice.bull.controller.is_held())
+ assert_eq(SaveData.horse_collection.export_state(),saved_);assert_eq(SaveData.equipment_points,points_);assert_eq(SaveData.highest_level_completed,levels_)
+
+func test_practice_catalog_reuses_demos_without_progress_changes():
+ assert_eq(PracticeCatalog323.entries323().size(),2)
+ var demo=PracticeCatalog323.create323("controls");assert_true(demo is StoryIntro319);assert_eq(demo.page319,6);assert_false(demo.persist319);assert_true(demo.practice_only323);demo.free()
+ var bull_demo=PracticeCatalog323.create323("bull");assert_true(bull_demo is BullTutorial323);bull_demo.free()
+ assert_null(PracticeCatalog323.create323("not-implemented"))

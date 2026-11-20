@@ -5,6 +5,7 @@ var level_scroll173:ScrollContainer
 @onready var quit_button: Button = $QuitButton
 var _settings_button:Button
 var _book256:Button
+var _practice323:Button
 var _hero: Control
 var _drawer: Panel
 var _play: Button
@@ -140,6 +141,7 @@ func _build_menu() -> void:
 	_equipment_panel.closed.connect(_refresh_points_caption)
 	_settings_button=Button.new();_settings_button.text=tr("UI_035");_settings_button.position=Vector2(1000,70);_settings_button.size=Vector2(210,48);_settings_button.pressed.connect(_show_settings);_hero.add_child(_settings_button)
 	_book256=Button.new();_book256.name="BreedingBook256";_book256.text="Libro de crianza";_book256.position=Vector2(760,70);_book256.size=Vector2(210,48);_hero.add_child(_book256);_book256.pressed.connect(func():add_child(BreedingBook256.new()))
+	_practice323=Button.new();_practice323.text="Práctica / Demos";_practice323.position=Vector2(520,70);_practice323.size=Vector2(210,48);_hero.add_child(_practice323);_practice323.pressed.connect(_show_practice323)
 	_refresh_points_caption()
 	var rider_host := Node2D.new()
 	_hero.add_child(rider_host)
@@ -357,6 +359,36 @@ func _guard_recheck213()->void:
 func _after_brand319()->void:
 	_animate_intro()
 	if not SaveData.story_intro319:_show_story319(true)
+	elif GameState.rodeo_guide323:_rodeo_menu323.call_deferred()
 func _show_story319(persist_:bool=false)->void:
 	if get_node_or_null("StoryIntro319")!=null:return
-	var intro319:=StoryIntro319.new();intro319.persist319=persist_;add_child(intro319)
+	var intro319:=StoryIntro319.new();intro319.persist319=persist_
+	intro319.finished.connect(_begin_bull_tutorial323)
+	add_child(intro319)
+
+func _frontier_guide323()->void:
+	GameState.controls_world323=true
+	TutorialGuide323.show323(self,_world_button,"FRONTERA: entra aquí para jugar y explorar el mundo. Allí podrás hablar con personajes y conseguir misiones.","Entrar en Frontera",func():_world_button.pressed.emit())
+func _rodeo_menu323()->void:
+	TutorialGuide323.show323(self,_play,"El granjero necesita ayuda con sus toros. Abre Juegos para encontrar el Rodeo de toros.","Abrir Juegos",func():
+		_show_games213()
+		_rodeo_card323.call_deferred())
+func _rodeo_card323()->void:
+	if not is_instance_valid(_games213):return
+	var card:Control=_games213.canvas.get_node("Navigate_bulls")
+	TutorialGuide323.show323(self,card,"Aquí está Rodeo de toros. Entra para elegir tu primera prueba de captura.","Abrir Rodeo de toros",func():
+		if is_instance_valid(_games213):_games213.queue_free()
+		_choose_game213("bulls")
+		_rodeo_level323.call_deferred())
+func _rodeo_level323()->void:
+	var first:Button=level_grid.get_child(0)
+	TutorialGuide323.show323(self,first,"Empieza por la prueba 1. Mueve a Pablo con el dedo izquierdo y apunta el lazo con el derecho para capturar los toros.","Jugar la prueba 1",func():
+		GameState.rodeo_guide323=false
+		first.pressed.emit())
+
+func _begin_bull_tutorial323()->void:
+	var demo:=PracticeCatalog323.create323("bull");demo.onboarding323=true;demo.finished.connect(_frontier_guide323);add_child(demo)
+func _show_practice323()->void:
+	var sheet:=NavigationSheet.new();sheet.title="PRÁCTICA / DEMOS";sheet.entries=PracticeCatalog323.entries323()
+	sheet.selected.connect(func(id:String):PracticeCatalog323.show323(self,id))
+	add_child(sheet)

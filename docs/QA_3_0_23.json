@@ -1,0 +1,27 @@
+{
+  "version": "3.0.23",
+  "versionCode": 483,
+  "tests": 493,
+  "assertions": 65543,
+  "suites": [
+    {
+      "scripts": 38,
+      "tests": 241,
+      "assertions": 47583
+    },
+    {
+      "scripts": 22,
+      "tests": 136,
+      "assertions": 16445
+    },
+    {
+      "scripts": 22,
+      "tests": 116,
+      "assertions": 1515
+    }
+  ],
+  "touch": "synthesized screen touch/drag, both sticks, actual lasso and double tap",
+  "android_physical": false,
+  "main_unchanged": true,
+  "family_video": "private, not a release asset"
+}

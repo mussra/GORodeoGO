@@ -225,6 +225,7 @@ func _frame246(delta: float) -> void:
 			_returning_home=false;_home_pending=false;SaveData.save_world_state(player.position)
 		FrontierTransition.obtain(get_tree()).reveal()
 		player.set_physics_process(true)
+		if GameState.controls_world323:_controls_world323.call_deferred()
 	if not _country_resume_checked152:
 		_country_resume_checked152=true
 		if SaveData.country_ledger146.get("active", "frontier")==CountryRoute146.ID:
@@ -1767,4 +1768,13 @@ func _maybe_offer_rodeo268()->void:
 	var offer:=RodeoOffer268.new();_npc_dialog=offer;_hud.add_child(offer)
 	offer.closed.connect(func():
 		SaveData.accept_rodeo240() # Compatibility flag / notice remembered; access already follows completed pigs.
-		_close_npc())
+		_close_npc()
+		GameState.rodeo_guide323=true
+		TutorialGuide323.show323(self,_hud.get_node("WorldNavigation"),"Vamos a ayudar al granjero con sus toros. Te guiaré hasta la primera prueba del Rodeo.","Ir al menú principal",_menu))
+
+func _controls_world323()->void:
+	if not GameState.controls_world323:return
+	GameState.controls_world323=false
+	player.cancel_input();player.set_physics_process(false)
+	var guide:=TutorialGuide323.show323(self,_quest_toggle,"ENCARGOS: cuando consigas misiones en Frontera, podrás verlas aquí. Habla con los personajes para conseguirlas.","Ver Encargos",func():_quest_toggle.pressed.emit())
+	guide.completed.connect(func():player.set_physics_process(true))
