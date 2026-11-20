@@ -33,8 +33,8 @@ for i in range(9):
  # Never tint blue trousers, black outlines or the coat-mask region.
  boot=np.array(b);safe=(a[:,:,3]>100)&(a[:,:,0]>a[:,:,2]*1.25)&(a[:,:,0]<180)&(a[:,:,0]>40)&(m[:,:,0]<100)&(m[:,:,1]<100);boot=np.where(safe,boot,0).astype('uint8');save(src,f'side_{i:02}.png',leg,boot)
 src='art/portraits/adult_hd.png';a=np.array(Image.open(R/src).convert('RGBA'));m=np.array(Image.open(R/'art/portraits/adult_lower_legs_mask.png').convert('RGB'));eligible=(m[:,:,0]>100)&(a[:,:,3]>100);leg=np.zeros(eligible.shape,dtype='uint8')
-n,labels,stats,centers=cv2.connectedComponentsWithStats(eligible.astype('uint8'));yy,xx=np.mgrid[:983,:936]
+n,labels,stats,centers=cv2.connectedComponentsWithStats(eligible.astype('uint8'));yy,xx=np.mgrid[:a.shape[0],:a.shape[1]]
 for i in range(1,n):
  edge=stats[i,1]+48-.12*(xx-centers[i,0]);leg[(labels==i)&(yy>=edge)&(yy<edge+22)]=255
-b=Image.new('L',(936,983));d=ImageDraw.Draw(b);d.polygon([(382,488),(411,482),(442,484),(465,497),(459,526),(431,513),(404,514),(378,526)],fill=255);d.polygon([(410,599),(440,592),(470,598),(474,614),(449,626),(420,622)],fill=255);save(src,'portrait.png',leg,np.array(b))
+b=Image.new('L',(a.shape[1],a.shape[0]));d=ImageDraw.Draw(b);d.polygon([(382,488),(411,482),(442,484),(465,497),(459,526),(431,513),(404,514),(378,526)],fill=255);d.polygon([(410,599),(440,592),(470,598),(474,614),(449,626),(420,622)],fill=255);save(src,'portrait.png',leg,np.array(b))
 (OUT/'audit.json').write_text(json.dumps(audit,indent=2));print(json.dumps(audit,indent=2))

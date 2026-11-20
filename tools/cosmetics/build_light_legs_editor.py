@@ -3,12 +3,13 @@ Keeps the prior baseline and storage keys so saved edits are not lost.
 """
 import base64,hashlib,json,re,sys
 from pathlib import Path
+from PIL import Image
 R=Path(__file__).resolve().parents[2]
 source=Path(sys.argv[1]);target=Path(sys.argv[2])
 html=source.read_text();match=re.search(r'const ASSETS = (.*?);\nconst BASELINE',html,re.S)
 items=json.loads(match.group(1));items=[a for a in items if a['id']!='portrait-light-legs']
 mask=(R/'art/portraits/adult_light_legs_mask.png').read_bytes();art=(R/'art/portraits/adult_hd.png').read_bytes()
-items.insert(0,dict(id='portrait-light-legs',name='Retrato · Patas claras (borde de los calcetines)',kind='socks',w=936,h=983,hash=hashlib.sha256(mask).hexdigest(),s='data:image/png;base64,'+base64.b64encode(art).decode(),m='data:image/png;base64,'+base64.b64encode(mask).decode()))
+items.insert(0,dict(id='portrait-light-legs',name='Retrato · Patas claras (borde de los calcetines)',kind='socks',w=Image.open(R/'art/portraits/adult_hd.png').width,h=Image.open(R/'art/portraits/adult_hd.png').height,hash=hashlib.sha256(mask).hexdigest(),s='data:image/png;base64,'+base64.b64encode(art).decode(),m='data:image/png;base64,'+base64.b64encode(mask).decode()))
 html=html[:match.start(1)]+json.dumps(items,separators=(',',':'))+html[match.end(1):]
 html=html.replace("function materialsFor(kind){ return", "function materialsFor(kind){ if(kind === 'socks') return ['coat','erase']; return")
 html=html.replace("b.textContent = m === 'eye'", "b.textContent = k === 'socks' && m === 'coat' ? 'Patas claras' : m === 'eye'")

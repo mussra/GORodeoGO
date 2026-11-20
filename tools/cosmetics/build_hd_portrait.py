@@ -176,7 +176,7 @@ apply_paint([[(550,125),(565,125),(580,128),(598,134),(616,142),(634,151),(651,1
 apply_paint([[(474,367),(483,359),(492,353),(494,354),(485,363),(474,373)]],[0,255,0])
 
 # Source contains extraction flecks beyond the figure. Fixed reviewed framing.
-bbox=(round(240*w/1313),0,round(1040*w/1313),round(840*h/875))
+bbox=(round(240*w/1313),0,round(1040*w/1313),h+12)
 # Iris-only texture: saturated painted ring, excluding dark pupil and white highlights.
 eye_region=Image.new('L',im.size);draw=ImageDraw.Draw(eye_region)
 for box in [(879,207,906,244),(975,204,986,229)]:

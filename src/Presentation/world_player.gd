@@ -249,22 +249,17 @@ func movement_wish()->Vector2:
 	return Input.get_vector("move_left", "move_right", "move_up", "move_down")
 
 ## Same dodge drawing as the corral rider (DodgeVisuals): trail, bullet-time
-## preview, recharge bar and dust.
+## preview and dust. Cooldowns are shown by the HUD clocks.
 func _draw() -> void:
 	if spur_boost_left>0.0:
 		draw_arc(Vector2(0,-44),35.0,PI*.65,PI*1.35,16,Color(1.0,.85,.4,.5),2.0,true)
 	DodgeVisuals.draw_trail(self, dodge.skid_trail, dodge.trail_fade, Vector2.ZERO)
 	if dodge.drawing:
 		DodgeVisuals.draw_drawing(self, dodge.preview_points(dodge.draw_points))
-	if dodge_available:
-		draw_dodge_recharge204()
 	if dodge.remaining > 0.0:
 		DodgeVisuals.draw_dash_dust(self, dodge.direction, Vector2.ZERO)
 	# Charge-aim circle: shared with the corral rider (Ant 21:47, it was missing here).
 	lasso.draw_charge_aim(self)
-
-func draw_dodge_recharge204()->void:
-	DodgeVisuals.draw_recharge(self, Vector2(0, -110), 1.0 - dodge.cooldown / maxf(0.01, dodge.recharge_seconds))
 
 func _update_animation(delta: float) -> void:
 	if _sprite_swap == null:return

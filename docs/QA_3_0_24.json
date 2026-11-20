@@ -1,0 +1,27 @@
+{
+  "version": "3.0.24",
+  "version_code": 484,
+  "package": "com.example.rancho.review",
+  "apk_sha256": "a6e7691aa7434f5f43e97eab4a04c9c4988a9f52c807ae74df08b6a8901fff3b",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "regression": 493,
+    "additional_targeted": 28,
+    "passing": 521,
+    "assertions": 66581
+  },
+  "portrait_exact_source_test": "PASS: original source pixels plus bottom transparent margin, eight masks aligned",
+  "visual_review": [
+    "intro",
+    "menu",
+    "breeding parents and foal",
+    "108 animation frames",
+    "Frontera and Rodeo without overhead rider bar"
+  ],
+  "caveats": [
+    "No physical Android device validation",
+    "Legacy tools/cosmetics/test_hd_portrait_mask.py has a pre-existing stale assertion at source point (901,165). The previous mask already contains RGB(234,0,0), whereas the old assertion demands black. All pre-existing mask rows are byte-identical; the new exact-source regression passes.",
+    "Godot emits existing deprecated API/ObjectDB warnings; ALSA unavailable during screenshot capture, dummy audio used."
+  ],
+  "private_media": "Family guide video and website replacement media transferred privately, not included in this release"
+}

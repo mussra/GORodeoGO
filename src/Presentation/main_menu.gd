@@ -149,7 +149,7 @@ func _build_menu() -> void:
 	_hd_rider = Sprite2D.new()
 	HorsePortrait.apply(_hd_rider,SaveData.horse_collection.find(SaveData.horse_collection.selected).traits,SaveData.hat_color);HorseGalaxyLook.configure_portrait(_hd_rider.material,SaveData.horse_collection.find(SaveData.horse_collection.selected))
 	_hd_rider.position = Vector2(0,0)
-	_hd_rider.scale = Vector2.ONE * .45
+	_hd_rider.scale = Vector2.ONE * (442.35 / _hd_rider.texture.get_height())
 	rider_host.add_child(_hd_rider)
 	_skill_column189=Control.new();_skill_column189.name="MountedSkills189";_skill_column189.mouse_filter=Control.MOUSE_FILTER_IGNORE;_hero.add_child(_skill_column189)
 	_jump_badge=JumpBadge.new();_jump_badge.position=Vector2.ZERO;_jump_badge.size=Vector2(64,56);_jump_badge.capable=HorseJump.capable(SaveData.horse_collection.find(SaveData.horse_collection.selected));_skill_column189.add_child(_jump_badge)

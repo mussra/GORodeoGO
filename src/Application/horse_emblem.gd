@@ -94,7 +94,8 @@ static func warp_columns(ink:Image,amount:float)->Image:
 static func portrait_mask(config:Dictionary)->Texture2D:
  var key:="portrait"+JSON.stringify(config)
  if cache.has(key):return cache[key]
- var image:=Image.create(936,983,false,Image.FORMAT_RGBA8);image.fill(Color.TRANSPARENT)
+ var portrait:Texture2D=load("res://art/portraits/adult_hd.png")
+ var image:=Image.create(portrait.get_width(),portrait.get_height(),false,Image.FORMAT_RGBA8);image.fill(Color.TRANSPARENT)
  var area:Image=load("res://art/lineage_masks/portrait/adult.png").get_image()
  if area.is_compressed():area.decompress()
  var rect:Rect2i=area.get_used_rect()

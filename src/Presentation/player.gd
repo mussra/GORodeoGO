@@ -383,8 +383,6 @@ func _draw() -> void:
 	DodgeVisuals.draw_trail(self, _skid_trail, _trail_fade)
 	if _drawing_dodge:
 		DodgeVisuals.draw_drawing(self, dodge_preview_points(_draw_points))
-	if dodge_available:
-		DodgeVisuals.draw_recharge(self, _overhead_bar_anchor(), 1.0 - _dodge_cooldown / dodge_recharge_seconds)
 	if _dodge_remaining > 0.0:
 		DodgeVisuals.draw_dash_dust(self, _dodge_direction)
 	draw_set_transform(Vector2(0, 33), 0.0, Vector2(1.0, 0.3))

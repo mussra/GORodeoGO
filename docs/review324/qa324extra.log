@@ -1,0 +1,95 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/unit/test_fixes324.gd
+[0m* test_pig_and_goat_capture_on_the_exact_exhaustion_tick
+* test_already_tired_animal_needs_no_extra_hold_timer
+* test_rope_break_and_goat_contact_still_win
+* test_unroped_animals_do_not_capture_themselves
+* test_both_riders_no_longer_draw_the_overhead_bar
+* test_portrait_has_full_hooves_and_aligned_masks
+[1m6/6 passed.
+[0m[4m
+
+res://tests/integration/test_capture324.gd
+[0m* test_world_records_pig_and_goat_on_their_exhaustion_tick_once
+[1m1/1 passed.
+[0m[4m
+
+res://tests/unit/test_world_pigs.gd
+[0m* test_slow_and_close_captures
+* test_fast_nearby_scatters_and_drains
+* test_far_or_idle_does_nothing
+* test_progress_never_negative
+* test_chase_pig_flees_when_rider_close
+* test_chase_running_without_rope_never_tires_the_pig
+* test_chase_roped_runs_within_rope_and_tires_faster
+* test_chase_distance_breaks_the_rope_not_standing_still
+* test_chase_moving_keeps_the_rope
+* test_chase_tired_and_roped_captures_fast
+* test_chase_tired_unroped_recovers
+* test_exhausted_pig_keeps_fatigue_and_captures_immediately_after_rope
+[1m12/12 passed.
+[0m[4m
+
+res://tests/unit/test_world_goats.gd
+[0m* test_reverses_when_roped
+* test_contact_wins_over_capture
+* test_distance_and_survival
+* test_pig_distance_break_even_tired
+* test_nominal_nine_frames_and_stable_pivot
+* test_roped_goat_moves_towards_rider_not_away
+[1m6/6 passed.
+[0m[4m
+
+res://tests/unit/test_lasso_fatigue83.gd
+[0m* test_inherits_velocity_in_any_direction_and_time_scale
+* test_pig_goat_free_chase_never_drains_and_recovers_immediately
+* test_charge_visual_projects_the_same_inherited_landing
+[1m3/3 passed.
+[0mLOAD_FRAME_PROFILE {"frames":141,"max_ms":179.801,"over_100ms":1,"over_50ms":2,"p50_ms":9.414,"p95_ms":16.527,"version":"2.7.82+preview83","worst_phase":"reveal"}
+
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Scripts               5
+Tests                28
+Passing Tests        28
+Asserts            1038
+Time              2.788s
+
+
+[32m---- All tests passed! ----
+[0m

@@ -85,8 +85,7 @@ func test_chase_tired_unroped_recovers():
  assert_false(st.tired)
  assert_gt(float(st.run),0.0)  # partially rested, not fresh
 
-func test_exhausted_pig_keeps_fatigue_and_captures_one_second_after_rope():
+func test_exhausted_pig_keeps_fatigue_and_captures_immediately_after_rope():
  var st=WorldPigs.new_chase_state();st.tired=true;st.progress=.9
  st=WorldPigs.begin_rope(st);assert_true(st.tired);assert_eq(st.progress,0.0)
- st=WorldPigs.chase_tick(st,150,260,true,.9);assert_false(WorldPigs.captured(st));assert_false(st.flee)
- st=WorldPigs.chase_tick(st,150,260,true,.11);assert_true(WorldPigs.captured(st))
+ st=WorldPigs.chase_tick(st,150,260,true,.001);assert_true(WorldPigs.captured(st));assert_false(st.flee)
