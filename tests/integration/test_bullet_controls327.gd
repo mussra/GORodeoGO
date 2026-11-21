@@ -45,3 +45,5 @@ func test_approved_atlas_slices_both_icons_and_preserves_button_footprint():
   var texture=ActionIcons327.texture327(cell);assert_not_null(texture);assert_eq(texture.get_size(),Vector2(512,512))
   var b=Button.new();b.size=Vector2(112,112);add_child_autofree(b);ActionIcons327.attach327(b,cell)
   var art=b.get_node('ActionArt327');assert_eq(art.size,Vector2(88,76));assert_eq(b.size,Vector2(112,112));assert_eq(art.mouse_filter,Control.MOUSE_FILTER_IGNORE)
+  for state in ["normal","hover","pressed","hover_pressed","disabled","focus"]:assert_true(b.get_theme_stylebox(state) is StyleBoxEmpty)
+  var caption=b.get_node('ActionLabel327');assert_eq(caption.get_theme_constant('outline_size'),4)

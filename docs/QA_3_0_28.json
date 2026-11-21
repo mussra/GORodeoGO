@@ -1,0 +1,22 @@
+{
+  "version": "3.0.28",
+  "version_code": 488,
+  "package": "com.example.rancho.review",
+  "apk_sha256": "a6497ca4eebc57439a1d5e9f0fc843384b21cab2b10d05922edf48218a7c9cd4",
+  "tests": {
+    "passing": 69,
+    "assertions": 1349,
+    "scope": "13 scripts, related regression and bullet-time input/atlas tests; full game suite last run on 3.0.27"
+  },
+  "change": "Remove both action-button panels in normal, hover, pressed, hover_pressed, disabled and focus states. Preserve icons, status labels, cooldown arcs and 112x112 hit areas. Cream text with dark outline.",
+  "visual_verification": [
+    "Frontera ready",
+    "Frontera drawing",
+    "Rodeo ready"
+  ],
+  "limitations": [
+    "No physical Android test",
+    "Existing deprecated API/ObjectDB warnings remain"
+  ],
+  "main_changed": false
+}

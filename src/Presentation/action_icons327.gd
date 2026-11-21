@@ -10,7 +10,10 @@ static func texture327(cell:int)->Texture2D:
 static func attach327(button:Button,cell:int)->void:
  var icon:=texture327(cell)
  if icon==null:return
+ # No face, panel, border or focus rectangle in any state. Hit area stays 112px.
+ for state in ["normal","hover","pressed","hover_pressed","disabled","focus"]:
+  button.add_theme_stylebox_override(state,StyleBoxEmpty.new())
  var old=button.get_node_or_null("WhipArt271")
  if old!=null:old.hide()
  var art:=TextureRect.new();art.name="ActionArt327";art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;art.texture=icon;art.position=Vector2(12,2);art.size=Vector2(88,76);art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;art.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(art)
- var label:=Label.new();label.name="ActionLabel327";label.position=Vector2(2,78);label.size=Vector2(108,28);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.add_theme_font_size_override("font_size",13);label.add_theme_color_override("font_color",Color("30200d"));label.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(label)
+ var label:=Label.new();label.name="ActionLabel327";label.position=Vector2(2,78);label.size=Vector2(108,28);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;label.add_theme_font_size_override("font_size",13);label.add_theme_color_override("font_color",Color("fff1d2"));label.add_theme_color_override("font_outline_color",Color("201a13"));label.add_theme_constant_override("outline_size",4);label.mouse_filter=Control.MOUSE_FILTER_IGNORE;button.add_child(label)
