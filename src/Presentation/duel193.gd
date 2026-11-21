@@ -73,7 +73,7 @@ func _physics_process(delta:float)->void:
  _refresh()
 func _refresh()->void:
  info.text="DUELO DE LAZOS · %d - %d · mejor de tres\nManga %d · primer lazo válido gana · sin daño"%[scores[0],scores[1],round_number]
- guidance.text="PREPARADOS · %d"%ceili(countdown) if countdown>0. else "Mueve izquierda · apunta y suelta derecha · doble toque al mover: regate"
+ guidance.text="PREPARADOS · %d"%ceili(countdown) if countdown>0. else "Mueve izquierda · apunta y suelta derecha · botón Regate: tiempo bala"
 func targets_for(attacker:Node2D)->Array:
  var opponent:Node2D=riders[1] if attacker==riders[0] else riders[0]
  return [opponent] if running else [] # Resolve by the actual landing circle, not the moving thrower distance.

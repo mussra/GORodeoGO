@@ -25,7 +25,8 @@ func running_lift():
  rider.velocity=Vector2(200,0);rider.dodge.on_move_released(Vector2.RIGHT)
 func check_arm_and_execute():
  running_lift();rider.dodge.on_move_pressed()
- assert_true(rider.dodge.drawing,"one re-press after a long running hold")
+ assert_false(rider.dodge.drawing,"re-press stays ordinary movement")
+ assert_true(rider.dodge.begin_drawing326())
  assert_eq(Engine.time_scale,DodgeController.DRAW_TIME_SCALE)
  rider.dodge.draw_points=PackedVector2Array([Vector2.ZERO,Vector2(80,0)])
  rider.dodge.on_move_released(Vector2.RIGHT)
@@ -63,9 +64,12 @@ func test_native_running_lift_and_repress_in_world_and_race():
   else:await make_mode(mode)
   touch(true);await wait_physics_frames(2);drag();await wait_physics_frames(4)
   rider.dodge.move_pressed_at-=5.;rider.velocity=Vector2(200,0)
-  touch(false);await wait_physics_frames(1);touch(true)
-  assert_true(rider.dodge.drawing,"native "+mode+" re-press arms without another tap")
-  drag();await wait_physics_frames(1);touch(false)
+  touch(false);await wait_physics_frames(1);touch(true);await wait_physics_frames(2)
+  assert_false(rider.dodge.drawing,"native re-press never arms")
+  rider.dodge.last_touch_index=0;rider.dodge.last_pointer=Vector2(200,530);rider.dodge.on_move_pressed()
+  assert_true(rider.dodge.begin_drawing326())
+  var path_input:=InputEventScreenDrag.new();path_input.index=0;path_input.position=Vector2(280,530);rider.dodge.handle_input(path_input)
+  rider.dodge.on_move_released(Vector2.RIGHT);touch(false)
   assert_false(rider.dodge.path.is_empty(),"native "+mode+" release executes")
   host.free();host=null;rider=null
   Engine.time_scale=1.;await wait_physics_frames(2)
@@ -91,6 +95,7 @@ func test_actual_frontier_after_streaming_uses_running_repress():
  rider=host.player
  assert_true(rider.is_physics_processing())
  running_lift();rider.dodge.on_move_pressed()
- assert_true(rider.dodge.drawing,"actual Frontera same long-hold gesture")
+ assert_false(rider.dodge.drawing,"actual Frontera movement does not arm")
+ assert_true(rider.dodge.begin_drawing326())
  rider.cancel_input();host.free();host=null;rider=null
  SaveData.save_path=old_path

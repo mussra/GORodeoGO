@@ -1,4 +1,10 @@
 extends GutTest
+func before_each():
+	SaveData.debug_mode=true;SaveData.dual_lasso_intro_shown=true
+	_ignore326(get_tree().root.get_node("GutRunner"))
+func _ignore326(node:Node):
+	if node is Control:node.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	for child in node.get_children():_ignore326(child)
 func after_each()->void:Engine.time_scale=1.0
 func test_all_edges_corners_dwell_inward_return_and_exact_direction()->void:
 	var scene:Node=load("res://src/Presentation/level_0.tscn").instantiate()
@@ -29,7 +35,7 @@ func test_all_edges_corners_dwell_inward_return_and_exact_direction()->void:
 	player._last_pointer=size/2
 	for i in range(60):player._extend_drawing_at_edge(.02)
 	assert_eq(player._draw_virtual,Vector2.ZERO,"quiet in centre is not auto-extension")
-func test_native_touch_edge_hold_release_executes_same_preview_and_other_finger_cannot_redirect()->void:
+func test_button_trace_edge_release_executes_same_preview_and_other_finger_cannot_redirect()->void:
 	SaveData.dual_lasso_intro_shown=true
 	GameState.selected_level=18
 	var level:Node=load("res://src/Presentation/level_0.tscn").instantiate()
@@ -45,10 +51,13 @@ func test_native_touch_edge_hold_release_executes_same_preview_and_other_finger_
 	await get_tree().process_frame;await get_tree().process_frame
 	touch.pressed=true;Input.parse_input_event(touch.duplicate())
 	await get_tree().process_frame;await get_tree().process_frame
+	player._input(touch)
+	player._on_move_pressed()
+	assert_true(player.dodge.begin_drawing326())
 	assert_true(player._drawing_dodge)
 	var drag:=InputEventScreenDrag.new()
 	drag.index=0;drag.position=Vector2(5,420);drag.relative=Vector2(-125,0)
-	Input.parse_input_event(drag)
+	player._input(drag)
 	await get_tree().process_frame;await get_tree().process_frame
 	await wait_seconds(.3)
 	assert_true(player._draw_edge_active)

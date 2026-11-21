@@ -1,0 +1,32 @@
+{
+  "version": "3.0.26",
+  "version_code": 486,
+  "package": "com.example.rancho.review",
+  "apk_sha256": "7f8a32d11291914cac2ad0531400aaae208dac1351903c33b4f5ad527ce0ab18",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "tests": {
+    "passing": 556,
+    "assertions": 66833,
+    "base_tests": 493,
+    "additional_targeted_tests": 63
+  },
+  "button": "One shared explicit button, independent touch routing, cooldown and availability conditions. Movement double-taps do not activate bullet-time. Right-stick double-tap release is unchanged.",
+  "animals": "Linked pigs/goats pause position, fatigue, contact/range rules and hold timer while drawing the bullet-time path. Normal capture and escape rules resume after drawing; no general stun immunity added.",
+  "checks": [
+    "Native touch activates button in actual Frontera and corral",
+    "Button does not emit lasso release",
+    "Next left-finger drag owns trace, button finger does not",
+    "Roped pig and goat preserve state, timer, position and owner while drawing",
+    "Distance-break resumes after drawing",
+    "Corral bull remains held",
+    "Untrained/cooldown/can_start gates respected",
+    "Button and whip do not overlap at four resolutions",
+    "Visual screenshots inspected after fixing clipped button text"
+  ],
+  "caveats": [
+    "No physical Android device validation",
+    "Existing deprecated API/ObjectDB warnings remain",
+    "Legacy isolated gesture tests migrated to explicit activation; modern button integration supplies native touch coverage",
+    "Touch fixture waits for root loading curtain from prior world fixture to close"
+  ]
+}

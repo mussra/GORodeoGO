@@ -3,6 +3,10 @@ var host:Node2D
 var player:Node2D
 var aim_joystick:VirtualJoystick
 func before_each():
+ var cover=get_tree().root.get_node_or_null("FrontierTransition")
+ for i in 100:
+  if not is_instance_valid(cover):break
+  await wait_process_frames(1)
  ignore(get_tree().root.get_node("GutRunner"))
  host=Node2D.new();host.set_script(load("res://tests/integration/touch_host224.gd"));add_child(host)
  player=host.player;aim_joystick=host.aim_joystick;await wait_physics_frames(3)
@@ -52,7 +56,7 @@ func test_pending_release_is_invalidated_when_focus_is_lost():
  assert_false(player.lasso.is_in_flight());assert_false(player.lasso.is_charging());assert_eq(moving(),Vector2.ZERO)
 func test_drawn_regate_can_still_extend_at_edge_and_execute_on_release():
  touch(Vector2(150,400),true);await wait_physics_frames(2);touch(Vector2(150,400),false);await wait_physics_frames(2)
- touch(Vector2(150,400),true);await wait_physics_frames(2);drag(Vector2(0,400));await wait_physics_frames(2);assert_true(player.dodge.drawing)
+ touch(Vector2(150,400),true);await wait_physics_frames(2);assert_true(player.dodge.begin_drawing326());drag(Vector2(0,400));await wait_physics_frames(2);assert_true(player.dodge.drawing)
  drag(Vector2(-10,400));await wait_physics_frames(2);assert_true(player.dodge.drawing)
  touch(Vector2(-10,400),false);await wait_physics_frames(2);assert_false(player.dodge.path.is_empty());assert_eq(Engine.time_scale,1.)
 

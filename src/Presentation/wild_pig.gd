@@ -55,7 +55,7 @@ func _process(delta: float) -> void:
 	_settle_offroad95(delta)
 	if is_instance_valid(_art):_art.update_state(bool(state.get("flee",false)) and not movement.is_zero_approx(),bool(state.get("tired",false)),flip_h,movement)
 	touch_grace = maxf(0.0, touch_grace - delta)
-	if roped:
+	if roped and not bullet_time_held326():
 		# Safety timer. Chase motion is handled by the shared world tick.
 		held = maxf(0.0, held - delta)
 	queue_redraw()
@@ -135,3 +135,6 @@ func scare265(origin:Vector2,seconds:float)->bool:
 func _tick_scare265(delta:float):
 	if scare_left265<=0. or roped:return
 	scare_left265=maxf(0.,scare_left265-delta);flee_from(scare_origin265,delta,145. if self.get_script().resource_path.ends_with("wild_goat.gd") else 175.)
+
+func bullet_time_held326()->bool:
+	return roped and is_instance_valid(rider) and rider.get('dodge')!=null and rider.dodge.drawing

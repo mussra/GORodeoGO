@@ -39,6 +39,7 @@ func test_double_tap_then_drag_records_path_but_normal_drag_does_not() -> void:
 	player._on_move_released(Vector2.RIGHT)
 	player._input(touch)
 	player._on_move_pressed()
+	assert_true(player.dodge.begin_drawing326())
 	assert_true(player._drawing_dodge)
 	player._input(drag)
 	drag.position = Vector2(110,350)
@@ -181,7 +182,7 @@ func test_running_hold_release_and_single_repress_arms_dodge() -> void:
 	player.velocity = Vector2(200,0)
 	player._on_move_released(Vector2.RIGHT)
 	player._on_move_pressed()
-	assert_true(player._drawing_dodge, "long running hold counts as the first press")
+	assert_false(player._drawing_dodge, "running re-press must remain ordinary movement")
 	player.cancel_input()
 
 func test_running_repress_after_window_is_normal_movement() -> void:
@@ -200,7 +201,7 @@ func test_stationary_start_still_requires_two_quick_presses() -> void:
 	assert_false(player._drawing_dodge)
 	player._on_move_released(Vector2.ZERO)
 	player._on_move_pressed()
-	assert_true(player._drawing_dodge)
+	assert_false(player._drawing_dodge)
 	player.cancel_input()
 
 func test_cancel_clears_running_release_and_cooldown_blocks_repress() -> void:

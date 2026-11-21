@@ -1,4 +1,10 @@
 extends GutTest
+func before_each():
+	SaveData.debug_mode=true;SaveData.dual_lasso_intro_shown=true
+	_ignore326(get_tree().root.get_node("GutRunner"))
+func _ignore326(node:Node):
+	if node is Control:node.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	for child in node.get_children():_ignore326(child)
 func after_each() -> void:
 	Engine.time_scale = 1.0
 func test_drawing_slows_world_and_every_exit_restores_time() -> void:
@@ -10,6 +16,7 @@ func test_drawing_slows_world_and_every_exit_restores_time() -> void:
 	player._on_move_pressed()
 	player._on_move_released(Vector2.ZERO)
 	player._on_move_pressed()
+	assert_true(player.dodge.begin_drawing326())
 	assert_almost_eq(Engine.time_scale,.24,.01)
 	player._draw_points = PackedVector2Array([Vector2.ZERO,Vector2(100,0)])
 	player._on_move_released(Vector2.ZERO)
@@ -42,7 +49,7 @@ func test_real_time_timeout_and_pause_cannot_leave_world_slowed() -> void:
 	assert_eq(Engine.time_scale,1.0)
 	level.resume_game()
 
-func test_screen_events_pass_through_native_joystick_to_time_bullet() -> void:
+func test_button_armed_controller_accepts_trace_and_release() -> void:
 	SaveData.dual_lasso_intro_shown = true
 	GameState.selected_level = 1
 	var level: Node = load("res://src/Presentation/level_0.tscn").instantiate()
@@ -67,13 +74,16 @@ func test_screen_events_pass_through_native_joystick_to_time_bullet() -> void:
 	Input.parse_input_event(touch.duplicate())
 	await get_tree().process_frame
 	await get_tree().process_frame
-	assert_true(player._drawing_dodge,"native joystick starts freehand after two taps")
+	assert_false(player._drawing_dodge,"native double tap does not start bullet-time")
+	assert_true(player.dodge.begin_drawing326())
 	assert_almost_eq(Engine.time_scale,.24,.01)
+	player._input(touch)
+	player._on_move_pressed()
 	var drag := InputEventScreenDrag.new()
 	drag.index=0
 	drag.position=origin+Vector2(100,0)
 	drag.relative=Vector2(100,0)
-	Input.parse_input_event(drag.duplicate())
+	player._input(drag.duplicate())
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_gt(player._draw_points.size(),1)
@@ -82,5 +92,6 @@ func test_screen_events_pass_through_native_joystick_to_time_bullet() -> void:
 	Input.parse_input_event(touch.duplicate())
 	await get_tree().process_frame
 	await get_tree().process_frame
+	player._on_move_released(Vector2.ZERO)
 	assert_eq(Engine.time_scale,1.0)
 	assert_false(player._drawing_dodge)

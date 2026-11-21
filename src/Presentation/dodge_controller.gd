@@ -5,7 +5,7 @@ extends Node
 ## open world (world_player.gd) — one gesture, one bullet-time, one trail, one
 ## execution (Ant's unification rule: same code, no copies).
 ##
-## Gesture: double-press (or running re-press) of the move stick arms a
+## Gesture: the explicit Regate button arms a
 ## freehand draw in bullet-time; releasing the stick executes the traced path.
 ## While drawing, dragging past the screen edge keeps extending the trace.
 ##
@@ -75,26 +75,27 @@ func set_move_joystick(stick) -> void:
 	stick.pressed.connect(on_move_pressed)
 	stick.released.connect(on_move_released)
 
+## Only an explicit button starts bullet-time. Ordinary movement never arms it.
+var move_held326:bool=false
+var move_pointer326:Vector2=Vector2.ZERO
+var move_index326:int=-1
 func on_move_pressed() -> void:
-	move_pressed_at = _now_seconds()
-	var running_repress: bool = move_pressed_at - running_release_at <= MOVE_REPRESS_WINDOW_SECONDS
-	running_release_at = -INF
-	var double_press: bool = _move_tap.register_tap(move_pressed_at)
-	if available and (running_repress or double_press) and cooldown <= 0.0 and can_start.call():
-		_move_tap.reset()
-		drawing = true
-		drawing_real_started = _now_seconds()
-		Engine.time_scale = DRAW_TIME_SCALE
-		drawing_started.emit()
-		_draw_touch_index = last_touch_index
-		draw_screen_start = last_pointer
-		draw_pointer_previous = last_pointer
-		draw_virtual = Vector2.ZERO
-		draw_heading = Vector2.ZERO
-		draw_edge_elapsed = 0.0
-		draw_edge_active = false
-		draw_points = PackedVector2Array([Vector2.ZERO])
-		owner_body.velocity = Vector2.ZERO
+	move_pressed_at=_now_seconds();move_held326=true
+	move_pointer326=last_pointer;move_index326=last_touch_index
+	if drawing and _draw_touch_index<0:
+		_draw_touch_index=move_index326
+		draw_screen_start=move_pointer326;draw_pointer_previous=move_pointer326
+
+func begin_drawing326()->bool:
+	if not available or drawing or remaining>0. or not path.is_empty() or cooldown>0. or not can_start.call():return false
+	drawing=true;drawing_real_started=_now_seconds();Engine.time_scale=DRAW_TIME_SCALE
+	_draw_touch_index=move_index326 if move_held326 else -1
+	draw_screen_start=move_pointer326;draw_pointer_previous=move_pointer326
+	last_pointer=move_pointer326
+	draw_virtual=Vector2.ZERO;draw_heading=Vector2.ZERO
+	draw_edge_elapsed=0.;draw_edge_active=false
+	draw_points=PackedVector2Array([Vector2.ZERO]);owner_body.velocity=Vector2.ZERO
+	drawing_started.emit();return true
 
 ## The owner forwards its _input events here.
 func handle_input(event: InputEvent) -> void:
@@ -102,6 +103,7 @@ func handle_input(event: InputEvent) -> void:
 		last_pointer = event.position
 		last_touch_index = event.index
 	elif event is InputEventScreenDrag:
+		if move_held326 and event.index==move_index326 and not drawing:move_pointer326=event.position
 		if drawing and event.index == _draw_touch_index:
 			last_pointer = event.position
 			var zoom: float = owner_body.get_viewport().get_camera_2d().zoom.x if owner_body.get_viewport().get_camera_2d() != null else 1.0
@@ -146,6 +148,7 @@ func extend_drawing_at_edge(real_delta: float) -> void:
 	append_draw_point()
 
 func on_move_released(_direction: Vector2) -> void:
+	move_held326=false;move_index326=-1
 	running_release_at = -INF
 	run_after_dodge = Vector2.ZERO
 	if drawing:
@@ -155,13 +158,6 @@ func on_move_released(_direction: Vector2) -> void:
 		request_path(draw_points)
 		draw_points = PackedVector2Array()
 		_move_tap.reset()
-	elif not _direction.is_zero_approx() and moving_with_input.call() and path.is_empty():
-		# A running hold is the first press. Only the gap after release is timed.
-		running_release_at = _now_seconds()
-		_move_tap.reset()
-	elif _now_seconds() - move_pressed_at > .22:
-		_move_tap.reset()
-
 ## One projection shared by drawing and execution: never show unscaled reach.
 func preview_points(points: PackedVector2Array) -> PackedVector2Array:
 	return DodgeCurve.smooth(points, path_limit)
@@ -279,6 +275,7 @@ func step_dash(max_speed: float, delta: float) -> bool:
 	return true
 
 func cancel() -> void:
+	move_held326=false;move_index326=-1
 	running_release_at = -INF
 	run_after_dodge = Vector2.ZERO
 	if drawing:

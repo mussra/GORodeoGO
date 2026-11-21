@@ -5,6 +5,10 @@ extends GutTest
 ## execute; no Dodge button, no world_dodge action, no separate dash copy.
 
 func _fresh_world() -> Node2D:
+	SaveData.debug_mode=true
+	SaveData.horse_collection=HorseCollection.new()
+	SaveData.horse_collection.seed_trial()
+	SaveData.horse_collection.horses[0]["can_dodge"]=true
 	SaveData.world_seed = 424242
 	SaveData.world_discovered.clear()
 	SaveData.world_tamed.clear()
@@ -19,7 +23,7 @@ func _fresh_world() -> Node2D:
 
 func test_dodge_gesture_draws_and_executes_path() -> void:
 	var world := _fresh_world()
-	await wait_physics_frames(4)
+	while world._loading_world:await wait_process_frames(1)
 	world.player.position = Vector2(0, 600)
 	var from: Vector2 = world.player.position
 	var dodge = world.player.dodge
@@ -27,7 +31,8 @@ func test_dodge_gesture_draws_and_executes_path() -> void:
 	dodge.on_move_pressed()
 	dodge.on_move_released(Vector2.ZERO)
 	dodge.on_move_pressed()
-	assert_true(dodge.drawing, "double-press arms bullet-time drawing")
+	assert_false(dodge.drawing, "double-press is only movement")
+	assert_true(dodge.begin_drawing326())
 	assert_lt(Engine.time_scale, 1.0, "bullet-time while drawing")
 	dodge.draw_points = PackedVector2Array([Vector2.ZERO, Vector2(120, 0)])
 	dodge.on_move_released(Vector2.ZERO)
@@ -42,14 +47,14 @@ func test_dodge_gesture_draws_and_executes_path() -> void:
 
 func test_dodge_needs_a_direction() -> void:
 	var world := _fresh_world()
-	await wait_physics_frames(4)
+	while world._loading_world:await wait_process_frames(1)
 	assert_false(world.player.request_dodge(Vector2.ZERO), "no dash without direction")
 
 func test_dodge_requires_a_trained_horse_like_the_levels() -> void:
 	var world := _fresh_world()
 	# Ant 7-nov-2026 21:33 "Igual": skills need training in the world too.
 	SaveData.horse_collection.horses[0]["can_dodge"] = false
-	await wait_physics_frames(4)
+	while world._loading_world:await wait_process_frames(1)
 	assert_false(world.player.dodge_available, "untrained horse: dodge unavailable")
 	var dodge = world.player.dodge
 	dodge.on_move_pressed()

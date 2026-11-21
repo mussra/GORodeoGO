@@ -15,6 +15,7 @@ static func install(scene:Node)->void:
  scene.add_child(gate)
  scene.move_child.call_deferred(gate,-1)
 func _ready()->void:
+ _install_dodge326.call_deferred()
  process_mode=Node.PROCESS_MODE_ALWAYS
  game.child_entered_tree.connect(_watch_root209)
  for child in game.get_children():_watch_root209(child)
@@ -156,3 +157,10 @@ func _process(_delta:float)->void:
  if not touches.is_empty() and not _can_begin():_cancel_touches224()
 func _notification(what:int)->void:
  if what in [NOTIFICATION_APPLICATION_FOCUS_OUT,NOTIFICATION_WM_WINDOW_FOCUS_OUT,NOTIFICATION_APPLICATION_PAUSED] and is_instance_valid(game):_cancel_touches224()
+
+func _install_dodge326()->void:
+ if not is_instance_valid(game) or not is_instance_valid(game.get('player')):return
+ var player:CharacterBody2D=game.player
+ if player.get('dodge')==null:return
+ var layer:=CanvasLayer.new();layer.name='DodgeActions326';layer.layer=30;game.add_child(layer)
+ var button:=DodgeButton326.new();button.player=player;layer.add_child(button)

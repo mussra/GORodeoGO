@@ -275,6 +275,7 @@ func _draw_rider_marker(n: Node2D) -> void:
 	n.draw_colored_polygon(PackedVector2Array([Vector2(-7, -6), Vector2(7, -6), Vector2(0, 5)]), Color("ffd23d"))
 
 func _tick_lasso(_delta: float) -> void:
+	if _protect_roped_drawing326(_lasso_horse):return
 	# Ant 21:47: the roped animal stays put and the hold timer captures it —
 	# if the timer runs out first, it bolts (release path cancels the session).
 	if _lasso_state == "hold":
@@ -817,6 +818,8 @@ func _tick_pigs(delta: float) -> void:
 		for pig in pen.get_children():
 			if pig.name == "bar" or pig.is_queued_for_deletion():
 				continue
+			if _protect_roped_drawing326(pig):
+				pig.movement=Vector2.ZERO;all_captured=false;continue
 			var dist: float = player.position.distance_to(pig.position)
 			if dist > 700.0 and not pig.roped:
 				pig.state=WorldPigs.chase_tick(pig.state,dist,player.velocity.length(),false,delta)
@@ -1027,8 +1030,7 @@ func _build_hud() -> void:
 	_board_button.visible = false
 	_board_button.pressed.connect(_open_board)
 	_hud.add_child(_board_button)
-	# No dodge button: the regate is the corral's gesture (double-press the
-	# move stick), handled by the shared DodgeController on the player.
+	# Regate uses the shared explicit button and DodgeController.
 	_map_overlay = DiscoveryMap.new()
 	_map_overlay.world = self
 	# Ant 22:49 ("el mapa pequeño no puedo recuperarlo tras cerrarlo"): like the
@@ -1207,6 +1209,7 @@ func _setup_goat_prototype()->void:
 func _tick_goats(delta:float)->void:
 	if not is_instance_valid(_prototype_goats):return
 	for goat in _prototype_goats.get_children():
+		if _protect_roped_drawing326(goat):goat.movement=Vector2.ZERO;continue
 		var dist:float=player.position.distance_to(goat.position)
 		if dist>maxf(700.,_exit_distance110()+200.) and not goat.roped:
 			goat.state=WorldGoats.tick(goat.state,dist,false,delta)
@@ -1778,3 +1781,8 @@ func _controls_world323()->void:
 	player.cancel_input();player.set_physics_process(false)
 	var guide:=TutorialGuide323.show323(self,_quest_toggle,"ENCARGOS: cuando consigas misiones en Frontera, podrás verlas aquí. Habla con los personajes para conseguirlas.","Ver Encargos",func():_quest_toggle.pressed.emit())
 	guide.completed.connect(func():player.set_physics_process(true))
+
+## Pause the linked pig/goat while Pablo is choosing his bullet-time trace.
+## No contact, range break, fatigue or hold expiry is evaluated in this interval.
+func _protect_roped_drawing326(animal:Node)->bool:
+	return is_instance_valid(animal) and animal.get_script() in [PigScript,GoatScript] and animal.roped and player.dodge.drawing

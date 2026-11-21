@@ -30,7 +30,7 @@ func _process(delta:float)->void:
  z_index=0
  goat_art.position.y=-sin(PI*(1-_fence_jump/.48))*28 if _fence_jump>0 else 0
  touch_grace=maxf(0,touch_grace-delta)
- if roped:held=maxf(0,held-delta)
+ if roped and not bullet_time_held326():held=maxf(0,held-delta)
  var wanted:String=AnimalDirection.available_view(movement,pixellab_views)
  var view:String="run" if wanted=="side" else "run_"+wanted
  goat_art.flip_h=movement.x<0 and wanted not in ["up","down"]
