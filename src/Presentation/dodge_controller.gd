@@ -75,26 +75,41 @@ func set_move_joystick(stick) -> void:
 	stick.pressed.connect(on_move_pressed)
 	stick.released.connect(on_move_released)
 
-## Only an explicit button starts bullet-time. Ordinary movement never arms it.
+## Configurable activation: explicit button by default, optional movement double-tap.
 var move_held326:bool=false
 var move_pointer326:Vector2=Vector2.ZERO
 var move_index326:int=-1
+var automatic_heading327:Vector2=Vector2.ZERO
+var released_heading327:Vector2=Vector2.ZERO
 func on_move_pressed() -> void:
 	move_pressed_at=_now_seconds();move_held326=true
 	move_pointer326=last_pointer;move_index326=last_touch_index
+	var running_repress:bool=move_pressed_at-running_release_at<=MOVE_REPRESS_WINDOW_SECONDS
+	running_release_at=-INF
+	var double_press:bool=_move_tap.register_tap(move_pressed_at)
+	if not GameState.bullet_button327 and (running_repress or double_press):
+		begin_drawing326(released_heading327 if running_repress else Vector2.ZERO)
+		released_heading327=Vector2.ZERO
 	if drawing and _draw_touch_index<0:
 		_draw_touch_index=move_index326
 		draw_screen_start=move_pointer326;draw_pointer_previous=move_pointer326
 
-func begin_drawing326()->bool:
+func begin_drawing326(initial:Vector2=Vector2.ZERO)->bool:
 	if not available or drawing or remaining>0. or not path.is_empty() or cooldown>0. or not can_start.call():return false
+	var heading:Vector2=initial
+	if heading.is_zero_approx():heading=Input.get_vector("move_left","move_right","move_up","move_down")
+	if heading.is_zero_approx() and moving_with_input.call():heading=owner_body.velocity
+	automatic_heading327=heading.normalized()
 	drawing=true;drawing_real_started=_now_seconds();Engine.time_scale=DRAW_TIME_SCALE
 	_draw_touch_index=move_index326 if move_held326 else -1
 	draw_screen_start=move_pointer326;draw_pointer_previous=move_pointer326
 	last_pointer=move_pointer326
 	draw_virtual=Vector2.ZERO;draw_heading=Vector2.ZERO
 	draw_edge_elapsed=0.;draw_edge_active=false
-	draw_points=PackedVector2Array([Vector2.ZERO]);owner_body.velocity=Vector2.ZERO
+	draw_points=PackedVector2Array([Vector2.ZERO])
+	if not automatic_heading327.is_zero_approx():
+		draw_heading=automatic_heading327;draw_virtual=draw_heading*18.;append_draw_point()
+	owner_body.velocity=Vector2.ZERO
 	drawing_started.emit();return true
 
 ## The owner forwards its _input events here.
@@ -110,6 +125,7 @@ func handle_input(event: InputEvent) -> void:
 			var delta: Vector2 = event.position - draw_pointer_previous
 			draw_pointer_previous = event.position
 			if delta.length() > 1:
+				automatic_heading327=Vector2.ZERO
 				draw_heading = delta.normalized()
 			draw_virtual += delta / zoom
 			append_draw_point()
@@ -124,7 +140,10 @@ func append_draw_point() -> void:
 ## While drawing: keep extending the trace past the screen edge; cap the
 ## bullet-time at DRAW_MAX_REAL_SECONDS. The owner zeroes velocity and redraws.
 func process_drawing(real_delta: float) -> void:
-	extend_drawing_at_edge(real_delta)
+	if not automatic_heading327.is_zero_approx():
+		draw_virtual+=automatic_heading327*DRAW_EDGE_SPEED*minf(real_delta,.05)
+		append_draw_point()
+	else:extend_drawing_at_edge(real_delta)
 	if _now_seconds() - drawing_real_started > DRAW_MAX_REAL_SECONDS:
 		on_move_released(Vector2.ZERO)
 	owner_body.velocity = Vector2.ZERO
@@ -150,6 +169,9 @@ func extend_drawing_at_edge(real_delta: float) -> void:
 func on_move_released(_direction: Vector2) -> void:
 	move_held326=false;move_index326=-1
 	running_release_at = -INF
+	if not drawing and not GameState.bullet_button327 and not _direction.is_zero_approx() and moving_with_input.call() and path.is_empty():
+		running_release_at=_now_seconds();released_heading327=_direction.normalized();_move_tap.reset()
+	elif not drawing and _now_seconds()-move_pressed_at>.22:_move_tap.reset()
 	run_after_dodge = Vector2.ZERO
 	if drawing:
 		drawing = false
@@ -275,7 +297,7 @@ func step_dash(max_speed: float, delta: float) -> bool:
 	return true
 
 func cancel() -> void:
-	move_held326=false;move_index326=-1
+	move_held326=false;move_index326=-1;automatic_heading327=Vector2.ZERO;released_heading327=Vector2.ZERO
 	running_release_at = -INF
 	run_after_dodge = Vector2.ZERO
 	if drawing:

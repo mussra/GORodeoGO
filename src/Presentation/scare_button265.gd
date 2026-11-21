@@ -13,7 +13,10 @@ func _ready():
  tooltip_text="Solo ruido: no toca ni hace daño a ningún animal"
  get_viewport().size_changed.connect(layout301);layout301()
  var art:=TextureRect.new();art.name="WhipArt271";art.texture_filter=CanvasItem.TEXTURE_FILTER_LINEAR;art.position=Vector2(22,6);art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;art.texture=load("res://art/equipment271/latigo.png");art.size=Vector2(68,68);art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;art.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(art);art.set_deferred("size",Vector2(68,68))
- status271=Label.new();status271.position=Vector2(4,77);status271.size=Vector2(104,29);status271.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status271.add_theme_font_size_override("font_size",18);status271.add_theme_color_override("font_color",Color("30200d"));status271.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(status271)
+ ActionIcons327.attach327(self,1)
+ status271=get_node_or_null("ActionLabel327")
+ if status271==null:
+  status271=Label.new();status271.position=Vector2(4,77);status271.size=Vector2(104,29);status271.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status271.add_theme_font_size_override("font_size",18);status271.add_theme_color_override("font_color",Color("30200d"));status271.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(status271)
  pressed.connect(activate265)
  audio265=AudioStreamPlayer.new();audio265.stream=load("res://audio/scare265.wav");add_child(audio265)
  _refresh265()
@@ -40,7 +43,7 @@ func _process(delta:float):
 func _refresh265():
  visible=not EquipmentEffects._equipped_item("scare_whip").is_empty()
  text=""
- if is_instance_valid(status271):status271.text="%d s"%int(ceil(cooldown265)) if cooldown265>0. else "LISTO"
+ if is_instance_valid(status271):status271.text="%d s"%int(ceil(cooldown265)) if cooldown265>0. else "LÁTIGO"
  disabled=not can_activate265();queue_redraw()
 func _draw():
  if cooldown265>0.:draw_arc(size*.5,49.,-PI*.5,-PI*.5+TAU*(1.-cooldown265/maxf(.01,cooldown_total265)),48,Color("ffe29b"),4.,true)

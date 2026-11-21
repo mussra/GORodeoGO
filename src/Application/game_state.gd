@@ -27,13 +27,21 @@ func set_performance_osd245(enabled:bool)->void:
 
 const CONTROL_PREF258="user://movement258.cfg"
 var anchored_movement258:bool=false
+var bullet_button327:bool=true
 func load_movement258()->void:
- var cfg:=ConfigFile.new();anchored_movement258=false
- if cfg.load(CONTROL_PREF258)==OK:anchored_movement258=bool(cfg.get_value("movement","anchored",false))
+ var cfg:=ConfigFile.new();anchored_movement258=false;bullet_button327=true
+ if cfg.load(CONTROL_PREF258)==OK:
+  anchored_movement258=bool(cfg.get_value("movement","anchored",false))
+  bullet_button327=bool(cfg.get_value("bullet_time","button",true))
 func set_movement258(anchored:bool)->bool:
- var cfg:=ConfigFile.new();cfg.set_value("movement","anchored",anchored)
+ var cfg:=ConfigFile.new();cfg.load(CONTROL_PREF258);cfg.set_value("movement","anchored",anchored)
  if cfg.save(CONTROL_PREF258)!=OK:return false
  anchored_movement258=anchored
+ return true
+func set_bullet_button327(button:bool)->bool:
+ var cfg:=ConfigFile.new();cfg.load(CONTROL_PREF258);cfg.set_value("bullet_time","button",button)
+ if cfg.save(CONTROL_PREF258)!=OK:return false
+ bullet_button327=button
  return true
 var _exit_dialog:ConfirmationDialog
 func _ready()->void:

@@ -306,6 +306,12 @@ func _show_settings()->void:
 El lazo sigue disponible con el otro dedo.";box.add_child(movement_note)
 	movement.item_selected.connect(func(i:int):
 		if not GameState.set_movement258(i==1):movement_note.text="No se pudo guardar el control. Inténtalo de nuevo.")
+	var bullet_title:=Label.new();bullet_title.text="Activar tiempo bala";box.add_child(bullet_title)
+	var bullet:=OptionButton.new();bullet.name="BulletMode327";bullet.custom_minimum_size=Vector2(700,56);bullet.add_item("Botón TIEMPO BALA · recomendado");bullet.add_item("Doble toque en movimiento · sin botón");bullet.selected=0 if GameState.bullet_button327 else 1;box.add_child(bullet)
+	var bullet_note:=Label.new();bullet_note.text="Si ya te mueves, el trazado empieza en esa dirección.
+Arrastra para cambiarlo; suelta el mando para ejecutar.";box.add_child(bullet_note)
+	bullet.item_selected.connect(func(i:int):
+		if not GameState.set_bullet_button327(i==0):bullet_note.text="No se pudo guardar el control. Inténtalo de nuevo.")
 	if GameState.trial_tools_enabled():
 		var osd:=CheckButton.new();osd.name="PerformanceToggle245";osd.text="Mostrar rendimiento (OSD)";osd.custom_minimum_size.y=56;osd.button_pressed=GameState.performance_osd245;box.add_child(osd);osd.toggled.connect(GameState.set_performance_osd245)
 		var debug:=Button.new();debug.text="Herramientas DEBUG";debug.custom_minimum_size.y=56;box.add_child(debug);debug.pressed.connect(_show_debug213)

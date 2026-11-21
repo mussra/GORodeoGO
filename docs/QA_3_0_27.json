@@ -1,0 +1,57 @@
+{
+  "version": "3.0.27",
+  "version_code": 487,
+  "package": "com.example.rancho.review",
+  "apk_sha256": "e76714107c915ee10d2674b347370bf6f7cd612b8b4c8bddb4bd104a5bcd79d0",
+  "tests": {
+    "passing": 562,
+    "assertions": 66878,
+    "suites": [
+      {
+        "scripts": 38,
+        "tests": 241,
+        "assertions": 47581
+      },
+      {
+        "scripts": 22,
+        "tests": 136,
+        "assertions": 16446
+      },
+      {
+        "scripts": 22,
+        "tests": 116,
+        "assertions": 1516
+      },
+      {
+        "scripts": 13,
+        "tests": 69,
+        "assertions": 1335
+      }
+    ]
+  },
+  "behavior": [
+    "Moving at activation seeds the trace in the current direction immediately and keeps extending without another drag",
+    "Manual drag takes over from the automatic direction; release still executes the trace",
+    "Settings persists choice of explicit button or movement double-tap, independently of anchored/following movement",
+    "Button remains the default; hidden when optional double-tap mode is selected",
+    "Running-release repress retains its last movement direction",
+    "Existing availability, cooldown, stun and linked-pig/goat protections retained"
+  ],
+  "art": {
+    "source": "User-supplied ChatGPT image, 1774x887 RGBA with transparent background",
+    "process": "Crop each half to its alpha bounds; preserve aspect ratio; center in a 512x512 cell with transparent margins. No redrawing.",
+    "output": "res://art/action_buttons327.png",
+    "size": [
+      1024,
+      512
+    ],
+    "verification": "Both icons inspected at 64px and actual 112px button size; atlas integration and independent caption placement tested"
+  },
+  "limitations": [
+    "No physical Android device test",
+    "Visual fixture stages the world and manually ticks controller while world simulation is paused for deterministic screenshots",
+    "Existing deprecated API and ObjectDB warnings remain"
+  ],
+  "main_changed": false,
+  "store_published": false
+}

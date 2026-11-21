@@ -1,0 +1,11 @@
+Genera UNA SOLA IMAGEN PNG de 1024 x 512 píxeles, con fondo transparente real, para un atlas de dos iconos de controles táctiles del juego familiar Rancho. No generes variantes, láminas adicionales, archivos separados ni mockups de un móvil. No incluyas letras, palabras, números, marcas de agua, marcos ni círculos de botón: los estados, textos y fondos los añade el juego.
+
+Divide la imagen en dos celdas cuadradas exactas de 512 x 512, contiguas horizontalmente y sin separación. Cada dibujo queda centrado en su celda, con un margen transparente mínimo de 64 píxeles por cada lado. Ninguna parte atraviesa el límite entre celdas. Deja transparente todo el espacio entre los dibujos.
+
+Estilo compartido: ilustración 2D dibujada a mano de videojuego de rancho acogedor y aventurero, formas grandes y sencillas que un niño pueda reconocer, contorno exterior marrón oscuro grueso y limpio, sombras suaves, volumen sencillo, paleta cálida de cuero y crema con acentos turquesa y dorado. Acabado bonito y coherente entre los dos iconos, sin realismo fotográfico ni detalles minúsculos. Deben entenderse al reducir cada dibujo a 64 píxeles sobre un botón de color pergamino.
+
+CELDA IZQUIERDA, x=0..511, TIEMPO BALA: reloj de bolsillo dorado inclinado levemente, esfera crema con dos agujas oscuras claramente visibles, acento turquesa y una estela corta curva turquesa que sugiere un recorrido que puedes dibujar. Debe comunicar ralentizar el tiempo y elegir dirección, sin balas, armas, proyectiles ni símbolos de reproducción de vídeo. La silueta principal es inequívocamente un reloj.
+
+CELDA DERECHA, x=512..1023, LÁTIGO SONORO: mango corto de cuero marrón unido a una única correa flexible que forma una curva amplia, con un pequeño destello dorado y dos líneas de sonido cerca de la punta. Debe comunicar un chasquido sonoro, sin animales, personas, golpes, heridas ni agresividad. La correa es gruesa y legible, no parece cuerda de lazo, espada ni cable eléctrico.
+
+Ambos dibujos tienen igual peso visual y la misma iluminación. Exporta únicamente el atlas final transparente de 1024 x 512.
