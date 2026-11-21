@@ -3,7 +3,7 @@ extends RefCounted
 # Each mechanic supplies one factory and unlock key. Menu replay and first-use
 # guidance use the same factory; adding another demo needs no menu code.
 static func entries323()->Array:
- return [{"id":"controls","title":"Mover y apuntar","hint":"Dedo izquierdo y lazo derecho"},{"id":"bull","title":"Mi primer toro","hint":"Acercarse, capturar, guiar y soltar"}]
+ return [{"id":"controls","title":"Mover y apuntar","hint":"Dedo izquierdo y lazo derecho"},{"id":"bull","title":"Nivel 1 de toros","hint":"Familiarización · el nivel real, sin guardar"}]
 static func create323(id:String)->Node:
  if id=="bull":return BullTutorial323.new()
  if id=="controls":

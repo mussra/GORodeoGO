@@ -51,7 +51,7 @@ func _page319()->void:
  mounted319.visible=page319<6;tutorial323.visible=page319>=6
  if page319>=6:tutorial323.reset323(page319-6)
  appearance_clock319=0.;body319.text=PAGES[page319];body319.restart319()
- counter319.text="%d / %d"%[page319-5,2] if practice_only323 else "%d / %d"%[page319+1,PAGES.size()];next319.text=("Terminar práctica" if practice_only323 else "Practicar con un toro") if page319==PAGES.size()-1 else "Continuar"
+ counter319.text="%d / %d"%[page319-5,2] if practice_only323 else "%d / %d"%[page319+1,PAGES.size()];next319.text=("Terminar práctica" if practice_only323 else "Jugar el nivel 1 de toros") if page319==PAGES.size()-1 else "Continuar"
 func _process(delta:float)->void:
  appearance_clock319+=delta
  if page319 in [1,4] and appearance_clock319>=.85:

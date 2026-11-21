@@ -158,19 +158,15 @@ func test_frontier_and_rodeo_guides_target_real_buttons():
  assert_same(guide.target323,menu.level_grid.get_child(0));assert_true(menu._drawer.visible)
  menu.free();SaveData.rodeo_intro240=old_intro
 
-func test_stationary_bull_practice_uses_real_capture_tow_and_double_tap():
+func test_first_bull_familiarization_reuses_actual_level_one_without_saving():
  var saved_:Dictionary=SaveData.horse_collection.export_state().duplicate(true);var points_:int=SaveData.equipment_points;var levels_:int=SaveData.highest_level_completed
- var practice:=BullTutorial323.new();add_child_autofree(practice)
- assert_eq(practice.step323,0)
- var at_:Vector2=practice.bull.position;await wait_process_frames(3);assert_eq(practice.bull.position,at_)
- practice.player.position=practice.bull.position-Vector2(150,0);practice._physics_process(.1);assert_eq(practice.step323,1)
- var prey=practice.player.lasso.resolve_capture(practice.bull.position)
- assert_same(prey,practice.bull);assert_eq(practice.step323,2);assert_true(practice.bull.controller.is_held())
- practice.bull.position=practice.goal323;practice.player.position=practice.goal323+Vector2(90,0);practice._physics_process(.1);assert_eq(practice.step323,3)
- practice.player.lasso._on_aim_pressed();practice.player.lasso._on_aim_released(Vector2.ZERO)
- practice.player.lasso._on_aim_pressed();practice.player.lasso._on_aim_released(Vector2.ZERO)
- assert_eq(practice.step323,4);assert_false(practice.bull.controller.is_held())
- assert_eq(SaveData.horse_collection.export_state(),saved_);assert_eq(SaveData.equipment_points,points_);assert_eq(SaveData.highest_level_completed,levels_)
+ var practice:=BullTutorial323.new();add_child(practice);await wait_process_frames(3)
+ assert_eq(practice.level325.scene_file_path,"res://src/Presentation/level_0.tscn")
+ assert_eq(practice.level325._level_number,1);assert_true(SaveData.familiarization325)
+ assert_eq(practice.level325._upgrades.max_simultaneous_captures,1)
+ practice.level325._trigger_win();assert_eq(SaveData.equipment_points,points_);assert_eq(SaveData.highest_level_completed,levels_)
+ practice._finish323();await wait_process_frames(3)
+ assert_false(SaveData.trial_session_active);assert_eq(SaveData.horse_collection.export_state(),saved_)
 
 func test_practice_catalog_reuses_demos_without_progress_changes():
  assert_eq(PracticeCatalog323.entries323().size(),2)

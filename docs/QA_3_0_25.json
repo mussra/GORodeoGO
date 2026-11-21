@@ -1,0 +1,50 @@
+{
+  "version": "3.0.25",
+  "version_code": 485,
+  "tests": 523,
+  "passing": 523,
+  "assertions": 66615,
+  "apk_sha256": "da79097eba9df6bbbad064a54b564d1092636e42fc4669672d889c205c29fbd4",
+  "package": "com.example.rancho.review",
+  "certificate_sha256": "46bdcb2213f8b82696b918f5cfd5764cd5690038ae2938aaec6f11bfffb79bbb",
+  "cause": "MenuInputGuard considered the practice text layout modal but its joysticks were siblings outside that modal, so their mouse_filter became IGNORE. Touch input strength and rider displacement were zero.",
+  "fix": "Reuse the complete level_0.tscn with LevelCatalog level 1 inside one modal host. No copied player/bull/pen logic. Existing level gets only familiarization exit/restart/presentation hooks.",
+  "before": {
+    "movement": 0,
+    "input_strength": 0,
+    "joystick_mouse_filter": 2
+  },
+  "after": {
+    "movement": 90.25001,
+    "input_strength": 0.875,
+    "joystick_mouse_filter": 0
+  },
+  "touch_tests": [
+    "1280x720",
+    "1600x720",
+    "1280x960",
+    "simultaneous move and aim",
+    "menu disabled beneath modal",
+    "menu restored on exit"
+  ],
+  "save_tests": [
+    "trial snapshot restored",
+    "no rewards or unlocks",
+    "real save bytes unchanged",
+    "no debug/double-lasso upgrades",
+    "repeat stays level 1",
+    "quit returns to menu"
+  ],
+  "visuals": [
+    "start",
+    "two-finger move and aim",
+    "completion with Repetir and Terminar"
+  ],
+  "caveats": [
+    "No physical Android device test",
+    "Installed user version unknown",
+    "Existing deprecated API/ObjectDB warnings remain",
+    "A previous world test left a root loading curtain; touch fixture removes that curtain before testing the menu, matching the established joystick fixtures.",
+    "Website guide from 3.0.24 still shows retired separate practice; website was not changed."
+  ]
+}

@@ -18,7 +18,7 @@ var brand_intro_played: bool = false
 func trial_tools_enabled()->bool:
  return bool(ProjectSettings.get_setting("rancho/trial_tools",false))
 func debug_cheats_active()->bool:
- return trial_tools_enabled() and (SaveData.debug_mode or SaveData.trial_session_active)
+ return not SaveData.familiarization325 and trial_tools_enabled() and (SaveData.debug_mode or SaveData.trial_session_active)
 
 var performance_osd245:bool=false
 func set_performance_osd245(enabled:bool)->void:

@@ -1,4 +1,7 @@
 extends Node2D
+signal familiarization_exit325
+signal familiarization_restart325
+var familiarization325:bool=false
 
 ## Level contract wiring only (GAMEPLAY_SPEC.md #Level contract) — no gameplay rules live here.
 ## Level content (bull count, obstacle layout) comes from LevelCatalog.get_level(level_number),
@@ -69,7 +72,7 @@ func _ready() -> void:
 	_upgrades = PlayerUpgrades.for_progress(SaveData.effective_progress())
 	_apply_unlocked_upgrades()
 	if SaveData.trial_session_active:
-		var banner:=Label.new();banner.text=tr("ENSAYO AISLADO · sin premios ni guardado · equipo prestado");banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);ToastStack.backdrop(banner);hud.add_child(banner);hud._toasts.set_top(156.)
+		var banner:=Label.new();banner.text="FAMILIARIZACIÓN · Nivel 1 real · sin premios ni cambios en tu partida" if familiarization325 else tr("ENSAYO AISLADO · sin premios ni guardado · equipo prestado");banner.position=Vector2(25,85);banner.add_theme_font_size_override("font_size",18);ToastStack.backdrop(banner);hud.add_child(banner);hud._toasts.set_top(156.)
 	_level_number = level_data.level_number
 	_arena_scale=ArenaLayout.scale_for_level(_level_number)
 	world_bounds=ArenaLayout.bounds_for_level(_level_number)
@@ -562,6 +565,11 @@ func _trigger_win() -> void:
 	_audio.play("win")
 
 func _save_win241()->void:
+	if familiarization325:
+		hud.end_label.text="¡Nivel 1 completado!\nYa conoces los controles y el corral.\nSin premios ni cambios en tu partida."
+		hud._next_button.hide();hud.restart_button.show();hud.restart_button.text="Repetir"
+		hud.quit_button.text="Terminar"
+		return
 	if SaveData.trial_session_active:
 		hud.end_label.text=tr("UI_020")+"\nENSAYO AISLADO: sin premios ni progreso guardado"
 		_show_training_result();return
@@ -611,6 +619,7 @@ func _freeze_gameplay() -> void:
 	touch_controls.visible = false  # stop joysticks from eating touches meant for the end-game buttons
 
 func _on_next_requested() -> void:
+	if familiarization325:familiarization_exit325.emit();return
 	if _rodeo_unsaved241:return
 	if not _game_over or _level_number >= LevelCatalog.MAX_LEVEL:
 		return
@@ -620,6 +629,8 @@ func _on_next_requested() -> void:
 	get_tree().reload_current_scene()
 
 func _on_restart_requested() -> void:
+	if familiarization325:
+		get_tree().paused=false;familiarization_restart325.emit();return
 	if _rodeo_unsaved241:
 		_save_win241();return
 	RanchMusic.set_paused(false)
@@ -664,6 +675,7 @@ func resume_game() -> void:
 	touch_controls.visible = true
 
 func _on_quit_requested() -> void:
+	if familiarization325:familiarization_exit325.emit();return
 	if _rodeo_unsaved241:return
 	RanchMusic.set_paused(false)
 	get_tree().paused = false

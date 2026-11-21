@@ -449,16 +449,18 @@ func mature_horse_trial(id:String)->bool:
 
 # Explicit scratch session. Snapshot is never serialized; restart loads the real file.
 var trial_session_active:bool=false
+var familiarization325:bool=false
 var _trial_snapshot:Dictionary={}
-func begin_trial_session()->bool:
-	if not GameState.trial_tools_enabled() or trial_session_active:return false
+func begin_trial_session(enhanced:bool=true)->bool:
+	if (enhanced and not GameState.trial_tools_enabled()) or trial_session_active:return false
 	for key in ["story_intro319","world_bull_returns269","pending_bull_returns269","interior_search264","rodeo_intro240","victories240","world_herd_town217","world_garden212","repeat_contract165","siesta_rest166","country_ledger146","world_quests","world_jobs249","world_goats_given249","world_pigs_sold","world_pig_captures","world_goat_captures","hat_color","hat_designs235","highest_level_completed","equipment_points","equipment_owned","equipment_equipped","points_legacy_credit_applied","dual_lasso_intro_shown"]:
 		var v:Variant=get(key);_trial_snapshot[key]=v.duplicate(true) if v is Array or v is Dictionary else v
 	_trial_snapshot.horses=horse_collection.export_state()
-	trial_session_active=true
+	trial_session_active=true;familiarization325=not enhanced
 	horse_collection=HorseCollection.new();horse_collection.restore(_trial_snapshot.horses)
-	horse_collection.add_trial_parents()
-	equipment_owned.assign(EquipmentCatalog.ITEMS.keys());equipment_equipped={"whip":"whip_basic"}
+	if enhanced:
+		horse_collection.add_trial_parents()
+		equipment_owned.assign(EquipmentCatalog.ITEMS.keys());equipment_equipped={"whip":"whip_basic"}
 	dual_lasso_intro_shown=true
 	return true
 func end_trial_session()->void:
@@ -466,9 +468,9 @@ func end_trial_session()->void:
 	for key in _trial_snapshot:
 		if key!="horses":set(key,_trial_snapshot[key])
 	horse_collection=HorseCollection.new();horse_collection.restore(_trial_snapshot.horses)
-	_trial_snapshot.clear();trial_session_active=false
+	_trial_snapshot.clear();trial_session_active=false;familiarization325=false
 func effective_progress()->int:
-	return LevelCatalog.MAX_LEVEL if trial_session_active or debug_mode else highest_level_completed
+	return 0 if familiarization325 else LevelCatalog.MAX_LEVEL if trial_session_active or debug_mode else highest_level_completed
 func preview_trial_traits(coat:int,pattern:int,mane:int,eyes:int=10,finish:String="normal")->bool:
 	if not trial_session_active and not debug_mode:return false
 	var t:Dictionary={"coat":coat,"pattern":pattern,"mane":mane,"eyes":eyes,"finish":finish}
