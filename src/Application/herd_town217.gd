@@ -80,8 +80,8 @@ static func valid(raw:Dictionary,seed_:int)->bool:
    if not traits is Dictionary:return false
    for key in ["coat","pattern","mane","eyes","spots"]:
     if not traits.get(key) is int:return false
-   if traits.coat<0 or traits.coat>=20 or traits.pattern<0 or traits.pattern>=HorseCollection.PATTERNS.size():return false
-   if traits.spots<0 or traits.spots>=20 or traits.mane<0 or traits.mane>=HorseCollection.MANES.size():return false
+   if traits.coat<0 or traits.coat>=HorseCollection.COATS.size() or traits.pattern<0 or traits.pattern>=HorseCollection.PATTERNS.size():return false
+   if traits.spots<0 or traits.spots>=HorseCollection.COATS.size() or traits.mane<0 or traits.mane>=HorseCollection.MANES.size():return false
    if traits.eyes<0 or traits.eyes>=HorseCollection.EYES.size():return false
  return true
 static func explanation(towns:Dictionary,id:String)->String:

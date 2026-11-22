@@ -1,0 +1,106 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/integration/test_herd_palette331.gd
+[0m* test_actual_generator_palette_roundtrips_without_recoloring_or_losing_progress
+* test_invalid_palette_seed_and_structure_remain_rejected
+* test_reloaded_generated_policy_allows_actual_world_pig_capture_and_reload
+[1m3/3 passed.
+[0m[4m
+
+res://tests/integration/test_capture_failure330.gd
+[0m* test_invalid_save_does_not_ring_every_frame_or_leave_a_stuck_capture
+LOAD_FRAME_PROFILE {"frames":111,"max_ms":258.247,"over_100ms":2,"over_50ms":2,"p50_ms":11.723,"p95_ms":19.663,"version":"2.7.82+preview83","worst_phase":"reveal"}
+REPRO330 cues=0 save_attempts=1 roped=false lasso=
+* test_healthy_full_chase_captures_once_and_persists
+* test_capture_can_be_retried_after_save_access_returns_without_losing_progress
+* test_already_recorded_live_pig_is_reconciled_without_duplicate_reward_or_bell
+LOAD_FRAME_PROFILE {"frames":13,"max_ms":259.328,"over_100ms":3,"over_50ms":6,"p50_ms":44.323,"p95_ms":259.328,"version":"2.7.82+preview83","worst_phase":"prepare"}
+* test_readonly_diagnostic_identifies_bad_horse_data_and_preserves_source_bytes
+* test_protected_save_remains_unchanged_after_failed_pig_capture
+[1m6/6 passed.
+[0m[4m
+
+res://tests/integration/test_bullet_button326.gd
+[0m* test_linked_pig_and_goat_keep_rope_position_and_timer_during_bullet_time
+LOAD_FRAME_PROFILE {"frames":21,"max_ms":305.125,"over_100ms":3,"over_50ms":6,"p50_ms":20.511,"p95_ms":263.858,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_native_button_not_double_tap_starts_drawing_and_never_releases_lasso
+LOAD_FRAME_PROFILE {"frames":77,"max_ms":67.489,"over_100ms":0,"over_50ms":1,"p50_ms":6.898,"p95_ms":17.757,"version":"2.7.82+preview83","worst_phase":"prepare"}
+BIND326 held=true index=0 points=[(0.0, 0.0)] time=0.041
+DRAW326 held=true index=0 points=[(0.0, 0.0), (69.99997, -0.000061)] time=0.062
+* test_corral_uses_the_same_native_button_and_preserves_held_bull
+* test_button_layout_separates_whip_and_cooldown_rules
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_bullet_controls327.gd
+[0m* test_left_right_and_diagonal_begin_and_continue_without_new_drag
+* test_actual_left_action_seeds_trace_and_drag_takes_over
+* test_button_mode_never_activates_on_double_press
+* test_optional_double_tap_and_running_repress
+* test_setting_roundtrip_preserves_other_control_and_unrelated_keys
+* test_approved_atlas_slices_both_icons_and_preserves_button_footprint
+[1m6/6 passed.
+[0m[4m
+
+res://tests/unit/test_world_pigs.gd
+[0m* test_slow_and_close_captures
+* test_fast_nearby_scatters_and_drains
+* test_far_or_idle_does_nothing
+* test_progress_never_negative
+* test_chase_pig_flees_when_rider_close
+* test_chase_running_without_rope_never_tires_the_pig
+* test_chase_roped_runs_within_rope_and_tires_faster
+* test_chase_distance_breaks_the_rope_not_standing_still
+* test_chase_moving_keeps_the_rope
+* test_chase_tired_and_roped_captures_fast
+* test_chase_tired_unroped_recovers
+* test_exhausted_pig_keeps_fatigue_and_captures_immediately_after_rope
+[1m12/12 passed.
+[0m
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Scripts               5
+Tests                31
+Passing Tests        31
+Asserts             225
+Time              8.369s
+
+
+[32m---- All tests passed! ----
+[0m
+WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

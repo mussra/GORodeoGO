@@ -1,0 +1,22 @@
+{
+  "version": "3.0.31",
+  "version_code": 491,
+  "apk_sha256": "437ac7aa47d0d67803b7011619c3387411d253c09e81a16dfcee46bb3a217282",
+  "root_cause": "TownIdentity215.spot_index216 selects from all 21 HorseAppearance colors, including index 20, and HerdTown217.colored saves that spot. HerdTown217.valid incorrectly enforced a 20-color bound, causing G25 on reload and blocking all progress writes.",
+  "fix": "Use HorseCollection.COATS.size() for both coat and spot upper bounds. No regeneration, migration, deletion or rewriting during load.",
+  "reproduction": "Seed 7, generator 3, herd chunk 1,-1 naturally generates pink spot index 20. Before patch reload fails and new pig record is rejected; after patch reload succeeds, existing records and exact herd looks remain unchanged, and actual world pig capture persists across reload.",
+  "tests": {
+    "scripts": 5,
+    "passing": 31,
+    "assertions": 225
+  },
+  "safety": [
+    "Read-only load keeps file bytes unchanged",
+    "Existing horse/pig/goat records and points preserved",
+    "Invalid indices, negative colors, wrong seed and malformed arrays still rejected",
+    "Capture and infinite-bell regression tests pass",
+    "No physical Android validation",
+    "Full suite not rerun"
+  ],
+  "caveat": "G25 on user device is confirmed, but exact field is inferred from reproduced generator bug. User should verify G00 after update and test a pig. A different G25 cause would need further diagnosis."
+}
