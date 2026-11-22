@@ -848,15 +848,21 @@ func _tick_pigs(delta: float) -> void:
 					st = WorldPigs.tick(pig.state, dist, player.velocity.length(), delta)
 				pig.state = st
 			if WorldPigs.captured(st) and SaveData.can_capture_animal165("pig"):
-				if pig == _lasso_horse:
-					_end_lasso()
-				_audio.play("return")
 				var id:String=_pen_id_for(Vector2i(node.get_meta("c")))+":"+str(pig.name)
+				# An already-recorded live entity is not a new reward or a save failure.
+				# Reconcile it silently, without awarding a second capture.
+				if SaveData.world_pig_captures.has(id):
+					if pig==_lasso_horse:_end_lasso()
+					pig.queue_free();continue
+				# Commit before ending the rope or playing the success bell.
 				if not SaveData.record_pig104(id):
-					_toast(tr("WORLD_SAVE_FAILED104"));continue
+					_capture_save_failed330(pig)
+					continue
+				if pig == _lasso_horse:_end_lasso()
+				_audio.play("return")
 				_refresh_livestock104();_refresh_quest_hud();_refresh_missions()
-				_toast(tr("WORLD_PIG_CAPTURE104") % [SaveData.world_pig_captures.size(),SaveData.pig_inventory104(),WorldPigs.CHASE_REWARD_POINTS])
-				pig.queue_free()  # captured: counts right away (roped or walk-up)
+				_toast(tr("WORLD_PIG_CAPTURE104") % [SaveData.world_pig_captures.size(),SaveData.pig_inventory104(),WorldPigs.CHASE_REWARD_POINTS],"capture-save330")
+				pig.queue_free()  # committed: counts right away
 			else:
 				all_captured = false
 				if pig.roped and not WorldPigs.CHASE_MODE:
@@ -1786,3 +1792,11 @@ func _controls_world323()->void:
 ## No contact, range break, fatigue or hold expiry is evaluated in this interval.
 func _protect_roped_drawing326(animal:Node)->bool:
 	return is_instance_valid(animal) and animal.get_script() in [PigScript,GoatScript] and animal.roped and player.dodge.drawing
+
+## A failed save is not a capture: no success sound, reward or per-frame retry.
+## Release this rope, preserve the tired animal and allow another explicit attempt.
+func _capture_save_failed330(animal:Node2D)->void:
+	animal.release()
+	animal.state["progress"]=0.0
+	if animal==_lasso_horse:_end_lasso()
+	_toast("No se puede guardar la captura. El animal sigue aquí. Mira Ajustes > Diagnóstico de guardado. No borres la partida.","capture-save330")

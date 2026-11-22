@@ -1,0 +1,95 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/integration/test_capture_failure330.gd
+[0m* test_invalid_save_does_not_ring_every_frame_or_leave_a_stuck_capture
+REPRO330 cues=60 save_attempts=60 roped=true lasso=
+[31m    [Failed]:  [0m[60] expected to equal [0]:  No success bell before a persisted capture
+      at line 22
+[31m    [Failed]:  [0m[60] expected to equal [1]:  No frame-by-frame retries
+      at line 23
+[31m    [Failed]:  [0mFailure releases the animal instead of trapping it
+      at line 24
+* test_healthy_full_chase_captures_once_and_persists
+[31m    [Failed] [0m
+      at line 31
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+      at line 31
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+      at line 31
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+      at line 32
+[31m    [Failed]:  [0m[7] expected to equal [0]:  
+      at line 33
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+      at line 33
+[1m0/2 passed.
+[0mLOAD_FRAME_PROFILE {"frames":96,"max_ms":247.89,"over_100ms":2,"over_50ms":4,"p50_ms":11.46,"p95_ms":40.764,"version":"2.7.82+preview83","worst_phase":"reveal"}
+
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m[4m
+res://tests/integration/test_capture_failure330.gd
+[0m- test_invalid_save_does_not_ring_every_frame_or_leave_a_stuck_capture
+[31m    [Failed]:  [0m[60] expected to equal [0]:  No success bell before a persisted capture
+          at line 22
+[31m    [Failed]:  [0m[60] expected to equal [1]:  No frame-by-frame retries
+          at line 23
+[31m    [Failed]:  [0mFailure releases the animal instead of trapping it
+          at line 24
+- test_healthy_full_chase_captures_once_and_persists
+[31m    [Failed]:  [0m
+          at line 31
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+          at line 31
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+          at line 31
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+          at line 32
+[31m    [Failed]:  [0m[7] expected to equal [0]:  
+          at line 33
+[31m    [Failed]:  [0m[0] expected to equal [1]:  
+          at line 33
+
+Totals
+------
+Scripts               1
+Tests                 2
+Passing Tests      none
+Failing Tests         2
+Asserts            3/12
+Time              3.522s
+
+
+[31m---- 2 failing tests ----
+[0m

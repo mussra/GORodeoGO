@@ -1,0 +1,37 @@
+{
+  "version": "3.0.30",
+  "version_code": 490,
+  "apk_sha256": "0a4a2385871e578e755cc373c43c6291894bc4c288532876314085cc6d7f58fc",
+  "reproduced": "With SaveData validation blocked, prior code attempted to save and played the return bell on all 60 of 60 ticks; pig remained roped but world lasso session had already ended.",
+  "fixed": [
+    "Success cue and rope completion only after persistence succeeds",
+    "One attempt per rope session, release on failed commit, preserve fatigue and animal for retry",
+    "No duplicate reward or cue for an already-recorded live entity",
+    "Replace stale failure notice when a later capture succeeds",
+    "Read-only save diagnostic in Settings with schema/horse/quest/world checks and last write/commit error"
+  ],
+  "tests": {
+    "scripts": 4,
+    "passing": 28,
+    "assertions": 198,
+    "new_tests": 6
+  },
+  "verified_cases": [
+    "Protected source bytes unchanged after failed capture",
+    "No success bell during failed save",
+    "No frame-by-frame repeated capture writes",
+    "Healthy complete chase persists once and sounds once",
+    "Capture can be retried when save access becomes valid",
+    "Previously recorded live pig does not reward twice",
+    "Diagnostic identifies simulated invalid horse data without modifying the file",
+    "Bullet-time touch/button/configuration regressions pass"
+  ],
+  "unresolved": "The precise reason the user phone rejects its save is not known. This build is not a claim that its save file has been repaired. The next step is a screenshot of Settings > Ver diagnóstico de guardado on that device.",
+  "visuals": "Screenshots use isolated staged fixtures. G21 horse-data failure shown is simulated, not evidence about the user save.",
+  "limitations": [
+    "No physical Android validation",
+    "Full suite not rerun; selected related tests have no file-deletion cleanup calls",
+    "Existing ObjectDB warnings"
+  ],
+  "user_data": "No player save deletion, forced reinitialization or validation bypass added."
+}

@@ -315,6 +315,9 @@ Arrastra para cambiarlo; suelta el mando para ejecutar.";box.add_child(bullet_no
 	if GameState.trial_tools_enabled():
 		var osd:=CheckButton.new();osd.name="PerformanceToggle245";osd.text="Mostrar rendimiento (OSD)";osd.custom_minimum_size.y=56;osd.button_pressed=GameState.performance_osd245;box.add_child(osd);osd.toggled.connect(GameState.set_performance_osd245)
 		var debug:=Button.new();debug.text="Herramientas DEBUG";debug.custom_minimum_size.y=56;box.add_child(debug);debug.pressed.connect(_show_debug213)
+	var diag330:=Button.new();diag330.name="SaveDiagnostic330";diag330.text="Ver diagnóstico de guardado";diag330.custom_minimum_size.y=56;box.add_child(diag330)
+	diag330.pressed.connect(func():
+		var dialog:=AcceptDialog.new();dialog.title="Diagnóstico de guardado";dialog.dialog_text=SaveData.save_diagnostic330();dialog.min_size=Vector2i(760,350);dialog.get_label().autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;dialog.get_label().custom_minimum_size.x=700;panel.add_child(dialog);dialog.popup_centered())
 	var replay319:=Button.new();replay319.text="Volver a ver la introducción";replay319.custom_minimum_size.y=52;box.add_child(replay319);replay319.pressed.connect(func():_show_story319(false))
 	var close:=Button.new();close.text=tr("UI_009");close.custom_minimum_size.y=52;box.add_child(close);close.pressed.connect(panel.queue_free)
 	ButtonSkin272.tree(panel)

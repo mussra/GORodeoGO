@@ -93,10 +93,12 @@ func mark_dual_lasso_intro_shown() -> void:
 	dual_lasso_intro_shown = true
 	save_progress()
 
+var save_error330:String=""
 var save_metrics242:Dictionary={"calls":0,"failures":0,"last_usec":0,"max_usec":0,"last_bytes":0}
 func save_progress() -> bool:
 	var started:int=Time.get_ticks_usec()
 	var actual_write:bool=not trial_session_active
+	save_error330=""
 	var ok:bool=_save_progress242()
 	if ok and actual_write:
 		world_bull_returns269.merge(pending_bull_returns269,true);pending_bull_returns269.clear()
@@ -111,7 +113,9 @@ func save_progress() -> bool:
 	return ok
 
 func _save_progress242() -> bool:
-	if not _load_valid:return false # retain unreadable source instead of replacing it with defaults
+	if not _load_valid:
+		save_error330="G01 · Partida protegida: la lectura no superó la validación."
+		return false # retain unreadable source instead of replacing it with defaults
 	if trial_session_active:return true # in-memory selections only, never touch real save
 	var config := ConfigFile.new()
 	config.set_value("meta", "version", SAVE_VERSION)
@@ -160,6 +164,8 @@ func _save_progress242() -> bool:
 	var err: Error = config.save(temp_path)
 	if err == OK:
 		err = DirAccess.rename_absolute(temp_path, save_path)
+		if err!=OK:save_error330="G03 · No se pudo confirmar el archivo: "+error_string(err)
+	else:save_error330="G02 · No se pudo escribir el archivo temporal: "+error_string(err)
 	if err != OK:
 		push_error("SaveData: could not save progress (error %d)." % err)
 		return false
@@ -918,3 +924,35 @@ static func clean_bull_returns269(raw:Variant)->Dictionary:
 			var key:String="%d:%d"%[level,index]
 			if raw.has(key) and raw[key] is bool and raw[key]==true:result[key]=true
 	return result
+
+## Read-only checks. Never changes, repairs, renames or removes the source save.
+func save_diagnostic330()->String:
+	var lines:PackedStringArray=[]
+	lines.append("Modo: "+("DEBUG" if debug_mode else "Normal"))
+	lines.append("Lectura protegida: "+("sí" if not _load_valid else "no"))
+	if not save_error330.is_empty():lines.append(save_error330)
+	var cfg:=ConfigFile.new();var err:=cfg.load(save_path)
+	if err!=OK:
+		lines.append(("G10 · No se puede leer el archivo: " if FileAccess.file_exists(save_path) else "G11 · Todavía no existe archivo en este modo: ")+error_string(err))
+		return "\n".join(lines)
+	var errors:PackedStringArray=[]
+	if not cfg.has_section_key("progress","highest_level_completed"):errors.append("G20 · Falta el registro de progreso.")
+	if cfg.has_section_key("horses_trial","state"):
+		var verify:=HorseCollection.new()
+		if not verify.restore(cfg.get_value("horses_trial","state",{})):errors.append("G21 · El registro de caballos no supera la validación.")
+	var generator:Variant=cfg.get_value("world","generator_version",1)
+	if typeof(generator)!=TYPE_INT or generator not in [1,2,3,4,5,6]:errors.append("G22 · Versión del mundo no reconocida.")
+	if not ModeVictories240.valid(cfg.get_value("progress","victories240",ModeVictories240.fresh())):errors.append("G23 · Registro de victorias no válido.")
+	var garden:Variant=cfg.get_value("world","garden212",{})
+	if not garden is Dictionary or (not garden.is_empty() and garden.get("version",0)!=Garden212.VERSION):errors.append("G24 · Versión del jardín no reconocida.")
+	var seed_:int=int(cfg.get_value("world","seed",0))
+	var herd:Variant=cfg.get_value("world","herd_town217",{})
+	if not herd is Dictionary or (not herd.is_empty() and not HerdTown217.valid(herd,seed_)):errors.append("G25 · Registro del pueblo de manadas no válido.")
+	var contract:Variant=cfg.get_value("world","repeat_contract165",ProgressionEconomy165.new_contract())
+	if not contract is Dictionary or contract.get("version",0)!=ProgressionEconomy165.VERSION:errors.append("G26 · Versión de encargos no reconocida.")
+	var countries:Variant=cfg.get_value("world","countries146",{})
+	if generator is int and generator in [1,2,3,4,5,6] and (not countries is Dictionary or (not countries.is_empty() and not CountryLedger146.valid(countries,seed_,generator))):errors.append("G27 · Registro de países no válido.")
+	if errors.is_empty():lines.append("G00 · Estructura del archivo comprobada.")
+	else:lines.append_array(errors)
+	lines.append("No se ha modificado ningún archivo. Comparte una captura de este diagnóstico si la captura del cerdo falla.")
+	return "\n".join(lines)
