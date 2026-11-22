@@ -1,0 +1,54 @@
+{
+  "version": "3.0.29",
+  "package": "com.example.rancho.review",
+  "version_code": 489,
+  "launcher_name": "Rancho",
+  "locale_labels_checked": 89,
+  "adaptive_xml_verified": true,
+  "launcher_alias_verified": true,
+  "foreground_pixel_match": true,
+  "density_safe_zones": [
+    {
+      "resource": "res/mipmap-hdpi-v4/icon_foreground.webp",
+      "size": 162,
+      "radius": 42.38513890504548,
+      "safe_radius": 49.5
+    },
+    {
+      "resource": "res/mipmap-mdpi-v4/icon_foreground.webp",
+      "size": 108,
+      "radius": 28.78367592924851,
+      "safe_radius": 33.0
+    },
+    {
+      "resource": "res/mipmap-xhdpi-v4/icon_foreground.webp",
+      "size": 216,
+      "radius": 55.70008976653449,
+      "safe_radius": 66.0
+    },
+    {
+      "resource": "res/mipmap-xxhdpi-v4/icon_foreground.webp",
+      "size": 324,
+      "radius": 82.53787009609589,
+      "safe_radius": 99.0
+    },
+    {
+      "resource": "res/mipmap-xxxhdpi-v4/icon_foreground.webp",
+      "size": 432,
+      "radius": 108.47349906774465,
+      "safe_radius": 132.0
+    }
+  ],
+  "apk_sha256": "aa594c30dc9ca22a5afbd635377c876a8fd3768a652f56d02cf2652ab1c31116",
+  "visual_checks": [
+    "Circle, rounded-square and square masks",
+    "200px enlarged and 48px home-screen scale",
+    "Complete hat, mane, tail and hooves visible"
+  ],
+  "limitations": [
+    "No physical Android launcher tested",
+    "Launcher may cache an old icon or label until refreshed",
+    "No gameplay code changed; full game suite not rerun"
+  ],
+  "design_source": "https://developer.android.com/develop/ui/compose/system/icon_design_adaptive"
+}

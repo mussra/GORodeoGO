@@ -1,0 +1,12 @@
+{
+  "canvas": 432,
+  "bbox": [
+    143,
+    113,
+    289,
+    319
+  ],
+  "max_radius": 108.47349906774465,
+  "safe_radius": 132,
+  "source": "art/icon.png"
+}
