@@ -354,7 +354,9 @@ func load_progress() -> void:
 	if not herd_policy.is_empty() and not HerdTown217.valid(herd_policy,world_seed):_load_valid=false;return
 	if old_count<cosmetic_changes332.size():cosmetic_protected332=true
 	world_herd_town217=herd_policy.duplicate(true)
-	world_places144=WorldPlaces144.clean(config.get_value("world","places144",{}),world_seed,world_generator_version)
+	var raw_places335:Variant=config.get_value("world","places144",{})
+	if raw_places335 is Dictionary and raw_places335.has("return335") and (not raw_places335.return335 is Vector2 or not raw_places335.return335.is_finite()):_load_valid=false;return
+	world_places144=WorldPlaces144.clean(raw_places335,world_seed,world_generator_version)
 	siesta_rest166=SiestaRest166.clean(config.get_value("world","siesta_rest166",0.))
 	var contract165:Variant=config.get_value("world","repeat_contract165",ProgressionEconomy165.new_contract())
 	if not contract165 is Dictionary or contract165.get("version",0)!=ProgressionEconomy165.VERSION:

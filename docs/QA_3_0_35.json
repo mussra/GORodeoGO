@@ -1,0 +1,30 @@
+{
+  "version": "3.0.35",
+  "tests": 140,
+  "assertions": 60385,
+  "scripts": 26,
+  "apk_sha256": "423c58a10a4df6e2f0756254625b6ba1526de8b3730cdf8ba33f3ae924b0c2ba",
+  "travel": "Ranch and return-point only: full-distance endpoint travel with safe landing and origin/arrival transactions, no half-route or rest cooldown. Other destinations unchanged.",
+  "tests_added": [
+    "50000-unit roundtrip with 300-second rest already active",
+    "Return point survives independent save reload",
+    "Horse collection and quests unchanged",
+    "Capture blocks trip without releasing animal",
+    "Arrival save failure restores origin and return state"
+  ],
+  "visual": "Map label and confirmation inspected at 1280x720; real carrot sample and feed-menu execution captured with synthetic state.",
+  "food_verification": {
+    "carrots_before": 3,
+    "carrots_after": 2,
+    "duration": 120,
+    "drain_multiplier": 0.85
+  },
+  "limits": [
+    "No physical Android test",
+    "Full travel validates destination rather than riding the intervening terrain",
+    "One return point per save, replaced by next ranch-bound trip",
+    "Other-country travel uses its existing separate system",
+    "Only carrot food exists; no independent anywhere-feed menu",
+    "User saves never accessed in QA"
+  ]
+}

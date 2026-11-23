@@ -4,12 +4,14 @@ signal confirmed
 signal cancelled
 var destination:String=""
 var preview:bool=false
+var full335:bool=false
 func _ready():
  process_mode=Node.PROCESS_MODE_ALWAYS;set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);z_index=180;MenuInputGuard.install(self)
  var bg:=ColorRect.new();bg.color=Color("10252ded");bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(bg)
  var box:=VBoxContainer.new();box.size=Vector2(720,320);add_child(box)
  var title:=Label.new();title.text=destination;title.add_theme_font_size_override("font_size",30);box.add_child(title)
  var note:=Label.new();note.text="El caballo arranca solo y avanzas en línea recta hacia este sitio.\nSi hay un obstáculo, el caballo se para y te despiertas allí. No lo rodea."
+ if full335:note.text="Viaje completo durmiendo, sin media ruta ni límite de distancia. La llegada se comprueba antes de guardar. Puedes volver al punto desde el que viajaste al rancho."
  if preview:note.text+="\nMaqueta: este viaje no se guarda."
  note.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;note.custom_minimum_size=Vector2(680,130);box.add_child(note)
  var go:=Button.new();go.name="ConfirmSiesta144";go.text="Echar la siesta";go.custom_minimum_size.y=56;box.add_child(go);go.pressed.connect(func():confirmed.emit())

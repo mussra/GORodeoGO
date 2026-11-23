@@ -225,6 +225,10 @@ func _end_drag106(point:Vector2)->void:
   else:_select_site144(point)
  _dragging=false;_ensure_terrain()
 func _select_site144(point:Vector2)->void:
+ for site335 in available159():
+  if site335.id!="ranch":continue
+  var marker335:Vector2=_to_map(site335.pos,_map_geometry.data.mins,_map_geometry.cell,_map_geometry.origin)
+  if point.distance_to(marker335)<24.:choose159("ranch");return
  for id in TownIdentity215.known_ids(SaveData.world_cousins140):
   if not _town_visible215(id):continue
   if point.distance_to(_town_marker215(id)+_map_geometry.area.position)<24.:
@@ -390,7 +394,8 @@ func _draw_markers108()->void:
   for site in available159():
    var point:Vector2=_to_map(site.pos,mins,cell,origin)
    if str(site.id)=="ranch":
-    _markers108.draw_arc(point,13.,0,TAU,24,Color("fff1d2"),2.)
+    _markers108.draw_arc(point,17.,0,TAU,32,Color("ffce54"),4.)
+    _markers108.draw_string(ThemeDB.fallback_font,point+Vector2(22,-12),"RANCHO ORIGINAL",HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("fff1d2"))
     AntIcons188.draw_fit(_markers108,6,Rect2(point-Vector2(11,10),Vector2(22,20)))
    else:
     _markers108.draw_circle(point,8.,Color("efb950"))

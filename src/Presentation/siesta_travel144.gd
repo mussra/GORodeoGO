@@ -17,6 +17,8 @@ var discovered_before:Array[String]=[]
 var missions_before:Dictionary={}
 var travel_started:int=0
 var partial163:Dictionary={}
+var full335:bool=false
+var places_before335:Dictionary={}
 func _ready():world=get_parent();process_mode=Node.PROCESS_MODE_ALWAYS
 func candidates()->Array[Dictionary]:return WorldPlaces144.sites(SaveData.world_seed,SaveData.world_generator_version,SaveData.world_cousins140)
 func record_visits()->void:
@@ -37,6 +39,8 @@ func available()->Array[Dictionary]:
  var out:=WorldPlaces144.available(SaveData.world_places144,candidates())
  out.append_array(SiestaDestinations170.notes(SaveData.world_notes106,func(pos:Vector2)->bool:
   var cell:=WorldMap.chunk_at(pos);return SaveData.world_discovered.has(WorldMap.chunk_key(cell.x,cell.y))))
+ var point335:Variant=SaveData.world_places144.get('return335')
+ if point335 is Vector2 and point335.is_finite():out.append({'id':'return335','name':'Volver a mi exploración','pos':point335})
  return out
 func destination170(id:String)->Dictionary:
  for site in available():
@@ -69,7 +73,7 @@ func choose(id:String)->void:
  var why:String=reason()
  if not why.is_empty():world._toast(why);return
  world.player.set_physics_process(false)
- var confirmation:=SiestaConfirmation148.new();confirmation.destination=str(target.name);panel=confirmation
+ var confirmation:=SiestaConfirmation148.new();confirmation.destination=str(target.name);confirmation.full335=id in ["ranch","return335"];panel=confirmation
  confirmation.confirmed.connect(func():close_confirmation();start(str(target.id)))
  confirmation.cancelled.connect(close_confirmation);world._hud.add_child(confirmation)
 
@@ -78,7 +82,10 @@ func start(id:String)->bool:
  if not why.is_empty():last_error=why;world._toast(why);return false
  target=destination170(id)
  if target.is_empty():last_error="Ese sitio todavía no está visitado.";return false
- if SaveData.siesta_rest166>0.:
+ full335=id in ["ranch","return335"]
+ if full335 and world.player.position.distance_to(target.pos)<150.:
+  last_error="Ya estás en este destino.";world._toast(last_error);return false
+ if SaveData.siesta_rest166>0. and not full335:
   active=true;prior_paused=get_tree().paused;get_tree().paused=true
   var was_processing:bool=world.player.is_physics_processing()
   world.player.cancel_input();world.player.velocity=Vector2.ZERO;world.player.set_physics_process(false)
@@ -88,11 +95,12 @@ func start(id:String)->bool:
   active=false;get_tree().paused=prior_paused;world.player.set_physics_process(was_processing)
   if controls!=null:controls.visible=was_visible
   last_error=SiestaRest166.REFUSAL;return false
- partial163=SiestaRoute163.frontier(world.player.position,target.pos)
+ partial163={"path":PackedVector2Array([world.player.position]),"pos":target.pos,"allowed":func(_p):return true} if full335 else SiestaRoute163.frontier(world.player.position,target.pos)
  if partial163.is_empty():
   last_error="Ya estamos cerca. Este último tramo lo hacemos a caballo." if world.player.position.distance_to(target.pos)<SiestaRoute163.FINAL_MANUAL*2. else "No encuentro paso por el terreno que conocemos. Habrá que explorar cómo rodearlo."
   world._toast(last_error);return false
  target=target.duplicate(true);target.pos=partial163.pos
+ places_before335=SaveData.world_places144.duplicate(true)
  origin=world.player.position;missions_before=SaveData.world_missions.duplicate(true);discovered_before=SaveData.world_discovered.duplicate();world._snapshot_roaming139()
  if not SaveData.save_world_state(origin):last_error="No se pudo guardar el origen. No has viajado.";world._toast(last_error);return false
  active=true;travel_started=Time.get_ticks_msec();rollback=false;prior_paused=get_tree().paused;get_tree().paused=true
@@ -110,7 +118,8 @@ func start(id:String)->bool:
   message.text="La zona no pudo cargarse. El origen sigue guardado. Vuelve al menú para reabrirla."
   var back:=Button.new();back.text="Menú principal";back.position=Vector2(490,640);back.size=Vector2(300,56);curtain.add_child(back);back.pressed.connect(func():get_tree().paused=prior_paused;get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn"))
   return false
- if result.ok:message.text=partial163.get("wake172","") if partial163.get("stopped172",false) else "Has avanzado en línea recta hacia "+str(target.name)
+ if result.ok and full335:message.text="Has llegado a "+str(target.name)
+ elif result.ok:message.text=partial163.get("wake172","") if partial163.get("stopped172",false) else "Has avanzado en línea recta hacia "+str(target.name)
  var camera:Camera2D=get_viewport().get_camera_2d()
  if camera!=null:camera.reset_smoothing()
  await curtain.open_eye()
@@ -122,6 +131,10 @@ func start(id:String)->bool:
  if not last_error.is_empty():world._toast(last_error)
  return last_error.is_empty()
 func _load_destination147()->bool:
+ if full335:
+  world.player.position=target.pos;await _load_area();await get_tree().physics_frame;await get_tree().process_frame
+  if not world._build_queue.is_empty():last_error="No se pudo cargar el destino. Vuelves al origen.";return false
+  return true
  var last:Vector2=origin;var desired:Vector2=target.pos;var steps:int=maxi(1,ceili(origin.distance_to(desired)/256.))
  for i in range(1,steps+1):
   var next:Vector2=origin.lerp(desired,float(i)/steps)
@@ -143,9 +156,14 @@ func _validate_destination147()->Vector2:
 func _commit_destination147(landing:Vector2)->bool:
  world.player.position=landing
  SaveData.world_discovered=discovered_before.duplicate();SaveData.world_missions=missions_before.duplicate(true)
- var rest_before:float=SaveData.siesta_rest166;SaveData.siesta_rest166=SiestaRest166.SECONDS
+ var rest_before:float=SaveData.siesta_rest166
+ if full335:
+  SaveData.world_places144=places_before335.duplicate(true)
+  if target.id=="ranch":SaveData.world_places144['return335']=origin
+  elif target.id=="return335":SaveData.world_places144.erase('return335')
+ else:SaveData.siesta_rest166=SiestaRest166.SECONDS
  if SaveData.save_world_state(landing):return true
- SaveData.siesta_rest166=rest_before
+ SaveData.siesta_rest166=rest_before;SaveData.world_places144=places_before335.duplicate(true)
  last_error="No se pudo guardar la llegada. Vuelves al origen.";return false
 func _restore_origin147()->bool:
  rollback=true;SaveData.world_missions=missions_before;SaveData.world_discovered=discovered_before;SaveData.world_position=origin;world.player.position=origin;message.text=last_error;travel_started=Time.get_ticks_msec();await _load_area()
@@ -157,6 +175,7 @@ func _load_area():
  while not world._build_queue.is_empty() and steps<20000 and Time.get_ticks_msec()-travel_started<45000:
   world._drain_chunk_builds();steps+=1;await get_tree().process_frame
 func _safe_landing(pos:Vector2)->Vector2:
+ if full335:return TravelLanding148.find(world.player,pos,func(candidate:Vector2)->bool:return SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,candidate,14.))
  return TravelLanding148.find(world.player,pos,func(candidate:Vector2)->bool:return candidate!=pos or (not partial163.is_empty() and not partial163.allowed.call(candidate)) or not SiestaRoute163.clear(pos,candidate,partial163.allowed) or (SaveData.world_generator_version>=3 and WorldTerrain103.blocked(SaveData.world_seed,candidate,14.)))
 
 func _cover():
