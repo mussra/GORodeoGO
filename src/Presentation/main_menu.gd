@@ -49,6 +49,7 @@ func _ready() -> void:
 	resized.connect(_layout)
 	_layout()
 	call_deferred("_begin_brand_intro")
+	call_deferred("_cosmetic_notice332")
 
 ## The logo reveal precedes the existing staggered menu entrance once per process.
 func _begin_brand_intro() -> void:
@@ -401,3 +402,8 @@ func _show_practice323()->void:
 	var sheet:=NavigationSheet.new();sheet.title="PRÁCTICA / DEMOS";sheet.entries=PracticeCatalog323.entries323()
 	sheet.selected.connect(func(id:String):PracticeCatalog323.show323(self,id))
 	add_child(sheet)
+
+func _cosmetic_notice332()->void:
+	var text_:String=SaveData.take_cosmetic_notice332()
+	if text_.is_empty():return
+	var dialog:=AcceptDialog.new();dialog.title="Partida protegida";dialog.dialog_text=text_;dialog.min_size=Vector2i(880,300);dialog.get_label().autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;dialog.get_label().custom_minimum_size.x=820;add_child(dialog);dialog.popup_centered()

@@ -12,13 +12,14 @@ const KINDS:Array[String]=["tree","pine","fruit_tree","bush","rock","cactus","fl
 static func valid_op(op:Variant)->bool:
  if typeof(op)!=TYPE_DICTIONARY:return false
  var d:Dictionary=op
+ if not d.get("pos") is Vector2 or not d.pos.is_finite():return false
  match d.get("type",""):
   "add_decor":
-   return d.get("kind","") in KINDS and d.get("pos") is Vector2 and clampf(float(d.get("scale",1.0)),0.4,2.0)==float(d.get("scale",1.0))
+   return (d.get("scale",1.0) is float or d.get("scale",1.0) is int) and d.get("kind","") in KINDS and d.get("pos") is Vector2 and clampf(float(d.get("scale",1.0)),0.4,2.0)==float(d.get("scale",1.0))
   "remove_decor":
-   return d.get("pos") is Vector2 and float(d.get("radius",0.0))>0.0 and float(d.get("radius",0.0))<=400.0
+   return (d.get("radius") is float or d.get("radius") is int) and d.get("pos") is Vector2 and float(d.get("radius",0.0))>0.0 and float(d.get("radius",0.0))<=400.0
   "add_pigs":
-   return d.get("pos") is Vector2 and int(d.get("count",0))>=1 and int(d.get("count",0))<=6
+   return d.get("pos") is Vector2 and d.get("count") is int and int(d.get("count",0))>=1 and int(d.get("count",0))<=6
  return false
 
 static func sanitize(op:Dictionary)->Dictionary:

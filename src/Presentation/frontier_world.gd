@@ -1237,9 +1237,13 @@ func _tick_goats(delta:float)->void:
 			if contact:player.stun()
 			_toast(tr("WORLD_GOAT_ESCAPED"))
 		elif float(st.progress)>=1.0 and SaveData.can_capture_animal165("goat"):
+			var id:String=str(goat.get_meta("capture_id112","goat:"+str(goat.get_meta("origin",goat.position))))
+			if SaveData.world_goat_captures.has(id):
+				if goat==_lasso_horse:_end_lasso()
+				goat.queue_free();continue
+			if not SaveData.record_goat104(id):
+				_capture_save_failed330(goat);continue
 			if goat==_lasso_horse:_end_lasso()
-			if not SaveData.record_goat104(str(goat.get_meta("capture_id112","goat:"+str(goat.get_meta("origin",goat.position))))):
-				_toast(tr("WORLD_SAVE_FAILED104"));continue
 			_refresh_quest_hud()
 			goat.queue_free();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED")+" · +%d puntos"%ProgressionEconomy165.GOAT_CAPTURE_POINTS)
 			continue
@@ -1434,6 +1438,7 @@ func _nearest_npc105()->Dictionary:
 	for data in roster:
 		if player.position.distance_to(data.position)<player.position.distance_to(best.position):best=data
 	return best
+var _failed_objectives332:Dictionary={}
 func _tick_flowers105()->void:
 	var florist_door:Vector2=ModularWorldLayout93.world(WorldNominal98.doors().florist) if WorldNominal98.enabled() else WorldFloristShop.DOOR
 	for id in WorldFlowers105.IDS:
@@ -1447,10 +1452,13 @@ func _tick_flowers105()->void:
 				continue
 			if not _flower_nodes105.has(event):
 				var target=WorldFlowerTarget105.new();target.color=WorldFlowers105.color_for(id);target.position=positions[i];add_child(target);_flower_nodes105[event]=target
-			if player.position.distance_to(positions[i])>28.:continue
+			if player.position.distance_to(positions[i])>28.:
+				_failed_objectives332.erase(event);continue
+			if _failed_objectives332.has(event):continue
 			var before:Dictionary=SaveData.world_quests.duplicate(true)
 			NpcQuests.record(SaveData.world_quests,"collect_flower",id,event)
-			if not SaveData.save_world_state(player.position):SaveData.world_quests=before;continue
+			if not SaveData.save_world_state(player.position):
+				SaveData.world_quests=before;_failed_objectives332[event]=true;_objective_save_failed332();continue
 			state=NpcQuests.state(SaveData.world_quests,id)
 			_flower_nodes105[event].queue_free();_flower_nodes105.erase(event)
 			_toast(("Flores azules" if id==WorldFlowers105.IDS[0] else "Flores doradas")+" · %d/3"%state.count,"quest:"+id)
@@ -1721,11 +1729,14 @@ func _tick_jobs249()->void:
 		live[item.event]=true
 		if not _job_nodes249.has(item.event):
 			var glyph:=WorldFlowerTarget105.new();glyph.position=item.pos;glyph.color=Color("68cfff") if item.kind=="collect_flower" else Color("f6c75b");glyph.set_meta("waypoint249",item.kind=="visit_gate");add_child(glyph);_job_nodes249[item.event]=glyph
-		if player.position.distance_to(item.pos)>(35. if item.kind=="collect_flower" else 85.):continue
+		if player.position.distance_to(item.pos)>(35. if item.kind=="collect_flower" else 85.):
+			_failed_objectives332.erase(item.event);continue
+		if _failed_objectives332.has(item.event):continue
 		var before:=SaveData.world_jobs249.duplicate(true)
 		var changed:=TownJobs249.record(item.kind,item.target,item.event)
 		if not changed.is_empty():
-			if not SaveData.save_world_state(player.position):SaveData.world_jobs249=before;continue
+			if not SaveData.save_world_state(player.position):
+				SaveData.world_jobs249=before;_failed_objectives332[item.event]=true;_objective_save_failed332();continue
 			_toast("Objetivo cumplido. Vuelve a quien te dio el encargo." if NpcQuests.state(SaveData.world_jobs249,item.id).status=="done" else "Flor recogida · %d/3"%NpcQuests.state(SaveData.world_jobs249,item.id).count)
 			_refresh_quest_hud()
 	for event in _job_nodes249.keys():
@@ -1758,7 +1769,10 @@ func capture_goat265(goat:Node2D)->bool:
 	if not is_instance_valid(goat) or goat.is_queued_for_deletion() or not goat.roped or not SaveData.can_capture_animal165("goat"):return false
 	if player.global_position.distance_to(goat.global_position)>minf(240.,float(AnimalScare265.IMPROVED.radius)):return false
 	var id:String=str(goat.get_meta("capture_id112","goat:"+str(goat.get_meta("origin",goat.position))))
-	if not SaveData.record_goat104(id):_toast(tr("WORLD_SAVE_FAILED104"));return false
+	if SaveData.world_goat_captures.has(id):
+		if goat==_lasso_horse:_end_lasso()
+		goat.queue_free();return true
+	if not SaveData.record_goat104(id):_capture_save_failed330(goat);return false
 	if goat==_lasso_horse:_end_lasso()
 	goat.roped=false;goat.set_process(false);goat.queue_free();_refresh_quest_hud();_audio.play("win");_toast(tr("WORLD_GOAT_CAPTURED")+" · +%d puntos"%ProgressionEconomy165.GOAT_CAPTURE_POINTS)
 	return true
@@ -1800,3 +1814,6 @@ func _capture_save_failed330(animal:Node2D)->void:
 	animal.state["progress"]=0.0
 	if animal==_lasso_horse:_end_lasso()
 	_toast("No se puede guardar la captura. El animal sigue aquí. Mira Ajustes > Diagnóstico de guardado. No borres la partida.","capture-save330")
+
+func _objective_save_failed332()->void:
+	_toast("No se puede guardar este objetivo. Sigue aquí, sin perder puntos ni objetos. Aléjate y vuelve para reintentarlo. Mira Ajustes > Diagnóstico de guardado.","objective-save332")

@@ -1,0 +1,33 @@
+{
+  "completed": true,
+  "counts": {
+    "breeding_collection": 2000,
+    "capture_commit": 24,
+    "capture_reload": 24,
+    "chunk_determinism": 1440,
+    "contract_claim": 100,
+    "contract_ready": 100,
+    "country_enter": 288,
+    "country_fresh": 288,
+    "country_leave": 288,
+    "country_position": 288,
+    "garden": 21,
+    "herd_policy": 288,
+    "herd_preserved": 24,
+    "invalid_traits": 42,
+    "load_readonly": 24,
+    "market_collection": 60,
+    "market_traits": 360,
+    "optional_appearance": 264,
+    "palette_product": 49896,
+    "quests": 13,
+    "save_reload": 24,
+    "save_write": 24,
+    "town_roundtrip": 288,
+    "victories": 300,
+    "wild_collection": 311,
+    "wild_traits": 1252
+  },
+  "failures": [],
+  "seed": 3322026
+}

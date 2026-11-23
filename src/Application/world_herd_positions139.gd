@@ -29,7 +29,7 @@ func erase(id:String):
   if chunks[c].is_empty():chunks.erase(c)
  state.horses.erase(id)
 func put(id:String,origin:Vector2i,index:int,pos:Vector2):
- if not pos.is_finite():return
+ if not pos.is_finite() or pos.abs().x>100000000. or pos.abs().y>100000000. or index<0 or index>4 or id!=WorldHerd.member_id(origin.x,origin.y,index):return
  if state.horses.has(id):
   if state.horses[id].pos==pos:return
   var old:=WorldMap.chunk_at(state.horses[id].pos)

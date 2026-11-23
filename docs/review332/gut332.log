@@ -1,0 +1,278 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+WARNING: res://addons/gut/gui/GutSceneTheme.tres:3 - ext_resource, invalid UID: uid://c6c7gnx36opr0 - using text path instead: res://addons/gut/fonts/AnonymousPro-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/NormalGui.tscn:5 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+WARNING: res://addons/gut/gui/MinGui.tscn:4 - ext_resource, invalid UID: uid://bnh0lslf4yh87 - using text path instead: res://addons/gut/fonts/CourierPrime-Regular.ttf
+     at: load (scene/resources/resource_format_text.cpp:501)
+     GDScript backtrace (most recent call first):
+         [0] @static_initializer (res://addons/gut/utils.gd:55)
+         [1] _static_init (res://addons/gut/gut_loader.gd:40)
+         [2] @static_initializer (res://addons/gut/gut_loader.gd:1)
+         [3] _init (res://addons/gut/gut_cmdln.gd:24)
+---  GUT  ---
+[1m[INFO]:  [0musing [/home/sandbox/.local/share/godot/app_userdata/Rancho] for temporary output.
+Godot version:  4.7.2
+GUT version:  9.7.1
+[4m
+
+res://tests/integration/test_herd_palette331.gd
+[0m* test_actual_generator_palette_roundtrips_without_recoloring_or_losing_progress
+* test_invalid_palette_seed_and_structure_remain_rejected
+* test_reloaded_generated_policy_allows_actual_world_pig_capture_and_reload
+[1m3/3 passed.
+[0m[4m
+
+res://tests/integration/test_capture_failure330.gd
+[0m* test_invalid_save_does_not_ring_every_frame_or_leave_a_stuck_capture
+LOAD_FRAME_PROFILE {"frames":104,"max_ms":250.972,"over_100ms":2,"over_50ms":3,"p50_ms":11.481,"p95_ms":23.918,"version":"2.7.82+preview83","worst_phase":"reveal"}
+REPRO330 cues=0 save_attempts=1 roped=false lasso=
+* test_healthy_full_chase_captures_once_and_persists
+* test_capture_can_be_retried_after_save_access_returns_without_losing_progress
+LOAD_FRAME_PROFILE {"frames":10,"max_ms":273.894,"over_100ms":2,"over_50ms":5,"p50_ms":50.85,"p95_ms":273.894,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_already_recorded_live_pig_is_reconciled_without_duplicate_reward_or_bell
+* test_readonly_diagnostic_identifies_bad_horse_data_and_preserves_source_bytes
+* test_protected_save_remains_unchanged_after_failed_pig_capture
+[1m6/6 passed.
+[0m[4m
+
+res://tests/integration/test_bullet_button326.gd
+[0m* test_linked_pig_and_goat_keep_rope_position_and_timer_during_bullet_time
+LOAD_FRAME_PROFILE {"frames":16,"max_ms":251.371,"over_100ms":3,"over_50ms":6,"p50_ms":27.893,"p95_ms":251.371,"version":"2.7.82+preview83","worst_phase":"prepare"}
+LOAD_FRAME_PROFILE {"frames":73,"max_ms":16.573,"over_100ms":0,"over_50ms":0,"p50_ms":6.9,"p95_ms":7.748,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_native_button_not_double_tap_starts_drawing_and_never_releases_lasso
+LOAD_FRAME_PROFILE {"frames":76,"max_ms":62.049,"over_100ms":0,"over_50ms":1,"p50_ms":6.91,"p95_ms":17.514,"version":"2.7.82+preview83","worst_phase":"prepare"}
+BIND326 held=true index=0 points=[(0.0, 0.0)] time=0.041
+DRAW326 held=true index=0 points=[(0.0, 0.0), (69.99997, -0.000061)] time=0.062
+* test_corral_uses_the_same_native_button_and_preserves_held_bull
+* test_button_layout_separates_whip_and_cooldown_rules
+[1m4/4 passed.
+[0m[4m
+
+res://tests/integration/test_bullet_controls327.gd
+[0m* test_left_right_and_diagonal_begin_and_continue_without_new_drag
+* test_actual_left_action_seeds_trace_and_drag_takes_over
+* test_button_mode_never_activates_on_double_press
+* test_optional_double_tap_and_running_repress
+* test_setting_roundtrip_preserves_other_control_and_unrelated_keys
+* test_approved_atlas_slices_both_icons_and_preserves_button_footprint
+[1m6/6 passed.
+[0m[4m
+
+res://tests/unit/test_world_pigs.gd
+[0m* test_slow_and_close_captures
+* test_fast_nearby_scatters_and_drains
+* test_far_or_idle_does_nothing
+* test_progress_never_negative
+* test_chase_pig_flees_when_rider_close
+* test_chase_running_without_rope_never_tires_the_pig
+* test_chase_roped_runs_within_rope_and_tires_faster
+* test_chase_distance_breaks_the_rope_not_standing_still
+* test_chase_moving_keeps_the_rope
+* test_chase_tired_and_roped_captures_fast
+* test_chase_tired_unroped_recovers
+* test_exhausted_pig_keeps_fatigue_and_captures_immediately_after_rope
+[1m12/12 passed.
+[0m[4m
+
+res://tests/integration/test_recovery332.gd
+[0m* test_unknown_color_recovers_only_in_memory_and_warns_once
+* test_bad_parentage_is_never_recovered_by_a_color_default
+* test_missing_required_trait_is_not_a_cosmetic_repair
+* test_invalid_critical_points_block_instead_of_silent_zero
+* test_herd_color_recovery_preserves_ids_points_and_original
+* test_new_invalid_candidate_never_replaces_healthy_file
+* test_world_writer_agrees_with_cleaner_boundaries
+* test_nonfinite_world_edits_and_wrong_count_type_rejected
+* test_garden_never_generates_inventory_that_cleaner_truncates
+* test_unknown_herd_version_remains_protected_even_with_bad_color
+* test_write_failure_does_not_replace_original_or_reward_capture
+ERROR: SaveData: could not save progress (error 7).
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] _save_progress242 (res://src/Application/save_data.gd:191)
+       [1] save_progress (res://src/Application/save_data.gd:110)
+       [2] record_goat104 (res://src/Application/save_data.gd:706)
+       [3] test_write_failure_does_not_replace_original_or_reward_capture (res://tests/integration/test_recovery332.gd:48)
+       [4] _run_test (res://addons/gut/gut.gd:622)
+       [5] _test_the_scripts (res://addons/gut/gut.gd:835)
+[34m[ExpectedError][0m
+* test_each_cosmetic_bound_defaults_but_validator_stays_strict
+* test_invalid_town_color_recovers_visually_without_touching_original
+* test_unknown_genetic_finish_is_not_defaulted_or_granted
+* test_critical_capture_record_position_and_inventory_are_never_silently_dropped
+* test_malformed_herd_version_revision_and_rows_are_rejected_without_exception
+* test_new_invalid_inventory_candidate_does_not_truncate_or_replace_file
+[1m17/17 passed.
+[0m[4m
+
+res://tests/integration/test_goat_failure332.gd
+[0m* test_invalid_save_does_not_ring_every_frame_or_leave_a_stuck_capture
+REPRO330 cues=0 save_attempts=1 roped=false lasso=
+* test_healthy_full_chase_captures_once_and_persists
+* test_capture_can_be_retried_after_save_access_returns_without_losing_progress
+LOAD_FRAME_PROFILE {"frames":169,"max_ms":258.296,"over_100ms":3,"over_50ms":6,"p50_ms":11.717,"p95_ms":23.028,"version":"2.7.82+preview83","worst_phase":"reveal"}
+* test_already_recorded_live_pig_is_reconciled_without_duplicate_reward_or_bell
+* test_explicit_goat_capture_failure_releases_without_reward_or_sound
+* test_flower_failure_is_latched_until_player_leaves_and_returns
+LOAD_FRAME_PROFILE {"frames":13,"max_ms":255.316,"over_100ms":3,"over_50ms":5,"p50_ms":28.441,"p95_ms":255.316,"version":"2.7.82+preview83","worst_phase":"prepare"}
+* test_town_job_failure_does_not_retry_each_frame
+[1m7/7 passed.
+[0m[4m
+
+res://tests/unit/test_town_identity215.gd
+[0m* test_identity_is_seeded_persisted_and_has_only_two_patterns_plus_plain
+* test_legacy_additive_names_do_not_move_towns_or_unlock_visited
+* test_shared_wall_materials_are_cached_and_miniature_patterns_are_distinct
+* test_hint_keeps_real_visit_and_direction_rules_separate
+* test_independent_spot216_palette_migrates_without_renaming_town
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_world_herd.gd
+[0m* test_herd_members_stable_related_but_distinct
+* test_following_slots_share_heading_but_are_not_single_file
+* test_wild_spots_are_colored_contrasting_and_deterministic
+* test_panic_is_brief_and_recovery_allows_starting_mount_to_catch
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_world_edits.gd
+[0m* test_add_decor_layers_over_seed
+* test_remove_decor_only_inside_radius
+* test_add_pigs_fills_empty_pen_only
+* test_invalid_ops_are_dropped
+* test_ops_in_other_chunks_do_not_leak
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_country146.gd
+[0m* test_one_source_river_enters_roots_and_approach_upstream_return_are_walkable
+* test_water_and_tree_block_without_jumping_across_them
+* test_ledger_separates_maps_preserves_notes_and_uses_layered_home
+* test_invalid_or_unknown_state_is_rejected_never_migrated_silently
+* test_prototype_domain_never_changes_live_save_or_collection
+[1m5/5 passed.
+[0m[4m
+
+res://tests/unit/test_country_storage149.gd
+[0m* test_v1_upgrade_preserves_identity_links_notes_position_visits_without_inventing_route
+* test_v2_rejects_malformed_out_of_bounds_non_bool_and_oversized_exploration
+* test_record_exploration_preserves_separate_maps_and_only_given_cells
+[1m3/3 passed.
+[0m[4m
+
+res://tests/unit/test_world_goats.gd
+[0m* test_reverses_when_roped
+* test_contact_wins_over_capture
+* test_distance_and_survival
+* test_pig_distance_break_even_tired
+* test_nominal_nine_frames_and_stable_pivot
+* test_roped_goat_moves_towards_rider_not_away
+[1m6/6 passed.
+[0m[4m
+
+res://tests/unit/test_herd_positions139.gd
+[0m* test_sparse_index_moves_between_current_chunks_and_rejects_bad_rows
+* test_loading_old_save_starts_with_no_invented_moved_individuals
+[1m2/2 passed.
+[0m[4m
+
+res://tests/unit/test_country_exploration148.gd
+[0m* test_exploration_is_local_and_available_destinations_require_visit
+[1m1/1 passed.
+[0m[4m
+
+res://tests/unit/test_village_cousins140.gd
+[0m* test_four_distinct_clues_journal_and_unknown_suggestions_in_any_order
+* test_cardinal_direction_from_actual_positions_and_unknown_arrival
+* test_new_caserios_outside_old_exploration_and_true_unicorn_sight_only
+[1m3/3 passed.
+[0m[4m
+
+res://tests/unit/test_world_gait.gd
+[0m* test_low_intensity_is_paso
+* test_rising_intensity_climbs_gaits
+* test_hysteresis_holds_gait_inside_band
+* test_speed_and_pace_are_ordered
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_horse_values.gd
+[0m* test_explicit_all_traits
+* test_unowned_never_invents_stats
+* test_actual_stats_include_calm
+* test_incremental_pixellab_specs_are_exact_46
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_world_stamina.gd
+[0m* test_gallop_drains_trot_sips
+* test_worst_horse_lasts_double
+* test_walk_and_idle_recover
+* test_empty_forces_a_breather_then_recovers
+* test_galope_blocked_below_min_but_trot_allowed
+* test_better_horse_lasts_longer_and_never_below_base
+[1m6/6 passed.
+[0m[4m
+
+res://tests/unit/test_world_trail.gd
+[0m* test_trail_is_deterministic
+* test_trail_passes_by_the_ranch
+* test_trail_changes_with_seed
+* test_trail_wander_stays_bounded_and_continuous
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_world_rules96.gd
+[0m* test_256_seeds_connected_tree_long_main_axis_unique_building_spurs
+* test_deterministic_local_rng_does_not_change_saved_world
+[1m2/2 passed.
+[0m[4m
+
+res://tests/unit/test_progression_economy165.gd
+[0m* test_first_wins_keep_earned_policy_repeats_cannot_farm_8500
+* test_currency_alone_never_unlocks_cosmetics_and_progress_is_not_consumed
+* test_repeat_contract_needs_acceptance_new_capture_ids_and_claim_only_once
+* test_contract_state_roundtrips_and_invalid_data_cannot_award_reward
+[1m4/4 passed.
+[0m[4m
+
+res://tests/unit/test_world_taming.gd
+[0m* test_calm_close_without_rope_never_fills_trust
+* test_rushing_spooks_and_blocks_progress
+* test_far_or_fast_without_spook_gains_nothing
+* test_serenidad_cannot_bypass_rope
+* test_tamed_at_full_progress
+[1m5/5 passed.
+[0mLOAD_FRAME_PROFILE {"frames":10,"max_ms":555.606,"over_100ms":4,"over_50ms":5,"p50_ms":86.25,"p95_ms":555.606,"version":"2.7.82+preview83","worst_phase":"reveal"}
+
+
+
+
+[33m==============================================
+[0m[33m= Run Summary
+[0m[33m==============================================
+[0m
+Totals
+------
+Scripts              23
+Tests               118
+Passing Tests       118
+Asserts           60232
+Time              14.487s
+
+
+[32m---- All tests passed! ----
+[0m

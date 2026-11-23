@@ -28,8 +28,8 @@ static func clean(raw:Variant,seed_:int)->Dictionary:
   if not look.get("base") is String or not Color.html_is_valid(look.base):continue
   if not look.get("spot") is String or not Color.html_is_valid(look.spot):continue
   if not look.get("name") is String or look.name.strip_edges().is_empty():continue
-  var coat:int=clampi(int(look.get("coat",0)),0,19)
-  var spot_index:int=clampi(int(look.get("spot_index",spot_index216(seed_,id,coat))),0,19)
+  var coat:int=clampi(int(look.get("coat",0)),0,HorseCollection.COATS.size()-1)
+  var spot_index:int=clampi(int(look.get("spot_index",spot_index216(seed_,id,coat))),0,HorseCollection.COATS.size()-1)
   out[id]={"version":2,"coat":coat,"spot_index":spot_index,"pattern":look.pattern,"base":look.base,"spot":HorseAppearance.COLORS[spot_index] if look.get("version",1)<2 else look.spot,"name":look.name.left(64)}
  return out
 static func look(state:Dictionary,id:String)->Dictionary:

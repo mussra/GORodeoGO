@@ -15,6 +15,14 @@ const SAVE_VERSION: int = 3  ## bump when the file layout changes, to allow migr
 const NORMAL_SAVE_PATH:String="user://save-normal-progress240.dat"
 const DEBUG_SAVE_PATH:String="user://save-debug-progress240.dat"
 var _load_valid:bool=true
+var cosmetic_protected332:bool=false
+var cosmetic_changes332:Array=[]
+var cosmetic_notices332:Dictionary={}
+func take_cosmetic_notice332()->String:
+	if cosmetic_changes332.is_empty() or cosmetic_notices332.has(save_path):return ""
+	cosmetic_notices332[save_path]=true
+	return "Se han sustituido valores de apariencia no reconocidos (%d) por valores por defecto, solo en memoria. La partida original está intacta y protegida. En esta sesión no se guardarán cambios. Antes de continuar, consulta Ajustes > Diagnóstico de guardado."%cosmetic_changes332.size()
+
 var debug_mode:bool=false
 var normal_mode_path:String=NORMAL_SAVE_PATH
 var debug_mode_path:String=DEBUG_SAVE_PATH
@@ -113,6 +121,9 @@ func save_progress() -> bool:
 	return ok
 
 func _save_progress242() -> bool:
+	if cosmetic_protected332:
+		save_error330="G04 · Apariencia recuperada solo en memoria. El original sigue protegido."
+		return false
 	if not _load_valid:
 		save_error330="G01 · Partida protegida: la lectura no superó la validación."
 		return false # retain unreadable source instead of replacing it with defaults
@@ -126,10 +137,20 @@ func _save_progress242() -> bool:
 	config.set_value("world","bull_returns269",returned269)
 	config.set_value("progress", "highest_level_completed", highest_level_completed)
 	config.set_value("progress", "dual_lasso_intro_shown", dual_lasso_intro_shown)
+	if horse_collection.horses.is_empty():horse_collection.seed_trial()
+	# Validate generated snapshots before the atomic replacement. No relaxed readers.
+	var candidate:=HorseCollection.new()
+	if not world_position.is_finite() or world_pigs_sold<0 or world_pigs_sold>world_pig_captures.size() or world_goats_given249<0 or world_goats_given249>world_goat_captures.size() or world_generator_version not in [1,2,3,4,5,6] or equipment_points<0 or world_seed<0 or repeat_contract165.get("version",0)!=ProgressionEconomy165.VERSION or world_garden212.get("version",0)!=Garden212.VERSION or not candidate.restore(horse_collection.export_state()) or not ModeVictories240.valid(victories240) or (not world_herd_town217.is_empty() and not HerdTown217.valid(world_herd_town217,world_seed)) or (not country_ledger146.is_empty() and not CountryLedger146.valid(country_ledger146,world_seed,world_generator_version)):
+		save_error330="G05 · Los datos nuevos no superan la validación. Archivo anterior intacto."
+		return false
+	for ids332 in [world_pig_captures,world_goat_captures]:
+		if WorldLivestock104.valid_ids(ids332).size()!=ids332.size():save_error330="G05 · Registro de capturas no válido. Archivo anterior intacto.";return false
+	for key332 in ["crops","seeds","harvests"]:
+		var count332:Variant=world_garden212.get(key332,0)
+		if not count332 is int or count332<0 or count332>9999:save_error330="G05 · Inventario del jardín no válido. Archivo anterior intacto.";return false
 	var next_hat_designs235:=HatDesigns235.collect(hat_designs235,horse_collection)
 	config.set_value("appearance","hat_designs235",next_hat_designs235)
 	config.set_value("appearance", "hat_color", hat_color)
-	if horse_collection.horses.is_empty():horse_collection.seed_trial()
 	config.set_value("horses_trial", "state", horse_collection.export_state())
 	config.set_value("world", "seed", world_seed)
 	config.set_value("world", "generator_version", world_generator_version)
@@ -178,6 +199,7 @@ static func load_source_path(current:String,legacy:String)->String:
 
 func load_progress() -> void:
 	_load_valid=true
+	cosmetic_protected332=false;cosmetic_changes332.clear()
 	if trial_session_active:end_trial_session()
 	horse_collection=HorseCollection.new()
 	horse_collection.seed_trial()
@@ -220,10 +242,23 @@ func load_progress() -> void:
 	if not config.has_section_key("progress","highest_level_completed"):
 		_load_valid=false
 		return
-	if config.has_section_key("horses_trial","state") and not horse_collection.restore(config.get_value("horses_trial","state",{})):
-		_load_valid=false
-		return
-	hat_color = HatAppearance.sanitize(config.get_value("appearance", "hat_color", "original"))
+	# Present malformed critical scalars must not be silently replaced by zero.
+	var critical332:Dictionary={"progress":["highest_level_completed"],"equipment":["points"],"world":["seed","pigs_sold","goats_given249"]}
+	for section in critical332:
+		for key in critical332[section]:
+			if config.has_section_key(section,key):
+				var value:Variant=config.get_value(section,key)
+				if not value is int or value<0:_load_valid=false;return
+	if config.has_section_key("horses_trial","state"):
+		var raw_horses:Variant=config.get_value("horses_trial","state",{})
+		if not horse_collection.restore(raw_horses):
+			var recovered:Variant=CosmeticRecovery332.collection(raw_horses,cosmetic_changes332)
+			if cosmetic_changes332.is_empty() or not horse_collection.restore(recovered):
+				_load_valid=false;cosmetic_changes332.clear();return
+			cosmetic_protected332=true
+	var raw_hat332:Variant=config.get_value("appearance", "hat_color", "original")
+	hat_color = HatAppearance.sanitize(raw_hat332)
+	if raw_hat332!=hat_color:cosmetic_changes332.append("hat");cosmetic_protected332=true
 	hat_designs235=HatDesigns235.collect(HatDesigns235.clean(config.get_value("appearance","hat_designs235",{})),horse_collection)
 	# Keep old equipped cosmetics on load, without granting every catalogue item.
 	if hat_color.begins_with("hat:"):hat_designs235[hat_color]=true
@@ -257,12 +292,18 @@ func load_progress() -> void:
 			for item in raw:
 				if typeof(item)==TYPE_STRING and not pair[1].has(item):pair[1].append(item)
 	world_notes106=WorldNotes106.clean(config.get_value("world","notes106",{}));world_notes_revision106+=1
+	for key332 in ["pig_captures","goat_captures"]:
+		var ids332:Variant=config.get_value("world",key332,[])
+		if not ids332 is Array and not ids332 is PackedStringArray:_load_valid=false;return
+		if WorldLivestock104.valid_ids(ids332).size()!=ids332.size():_load_valid=false;return
 	world_pig_captures=WorldLivestock104.valid_ids(config.get_value("world","pig_captures",[]))
 	world_goat_captures=WorldLivestock104.valid_ids(config.get_value("world","goat_captures",[]))
 	var sold:Variant=config.get_value("world","pigs_sold",0)
+	if sold>world_pig_captures.size():_load_valid=false;return
 	world_pigs_sold=clampi(sold,0,world_pig_captures.size()) if sold is int else 0
 	var wpos:Variant=config.get_value("world","position",world_position)
-	if typeof(wpos)==TYPE_VECTOR2 and wpos.is_finite():world_position=wpos
+	if not wpos is Vector2 or not wpos.is_finite():_load_valid=false;return
+	world_position=wpos
 	var we:Variant=config.get_value("world","edits",[])
 	world_edits.clear()
 	if typeof(we)==TYPE_ARRAY:
@@ -278,16 +319,28 @@ func load_progress() -> void:
 	world_jobs249=TownJobs249.clean(config.get_value("world","jobs249",{}),world_seed)
 	var search_raw264:Variant=config.get_value("world","interior_search264",{})
 	interior_search264=search_raw264 if search_raw264 is Dictionary else {}
-	world_goats_given249=clampi(int(config.get_value("world","goats_given249",0)),0,world_goat_captures.size())
+	var given332:int=config.get_value("world","goats_given249",0)
+	if given332>world_goat_captures.size():_load_valid=false;return
+	world_goats_given249=given332
 	world_flora138=FloristJourney138.clean(config.get_value("world","flora138",{}))
 	var garden_raw:Variant=config.get_value("world","garden212",{})
 	if not garden_raw is Dictionary or (not garden_raw.is_empty() and garden_raw.get("version",0)!=Garden212.VERSION):
 		_load_valid=false;return
+	for key332 in ["crops","seeds","harvests"]:
+		var count_value332:Variant=garden_raw.get(key332,0)
+		if not count_value332 is int or count_value332<0 or count_value332>9999:_load_valid=false;return
 	world_garden212=Garden212.clean(garden_raw)
 	world_roaming139=WorldHerdPositions139.clean(config.get_value("world","roaming139",{}),world_seed)
-	world_cousins140=VillageCousins140.clean(config.get_value("world","cousins140",{}),world_seed)
+	var count332:int=cosmetic_changes332.size()
+	var recovered_towns332:Variant=CosmeticRecovery332.towns(config.get_value("world","cousins140",{}),cosmetic_changes332)
+	world_cousins140=VillageCousins140.clean(recovered_towns332,world_seed)
+	if cosmetic_changes332.size()>count332:cosmetic_protected332=true
 	var herd_policy:Variant=config.get_value("world","herd_town217",{})
-	if not herd_policy is Dictionary or (not herd_policy.is_empty() and not HerdTown217.valid(herd_policy,world_seed)):_load_valid=false;return
+	if not herd_policy is Dictionary:_load_valid=false;return
+	var old_count:int=cosmetic_changes332.size()
+	herd_policy=CosmeticRecovery332.policy(herd_policy,cosmetic_changes332)
+	if not herd_policy.is_empty() and not HerdTown217.valid(herd_policy,world_seed):_load_valid=false;return
+	if old_count<cosmetic_changes332.size():cosmetic_protected332=true
 	world_herd_town217=herd_policy.duplicate(true)
 	world_places144=WorldPlaces144.clean(config.get_value("world","places144",{}),world_seed,world_generator_version)
 	siesta_rest166=SiestaRest166.clean(config.get_value("world","siesta_rest166",0.))
@@ -929,7 +982,8 @@ static func clean_bull_returns269(raw:Variant)->Dictionary:
 func save_diagnostic330()->String:
 	var lines:PackedStringArray=[]
 	lines.append("Modo: "+("DEBUG" if debug_mode else "Normal"))
-	lines.append("Lectura protegida: "+("sí" if not _load_valid else "no"))
+	lines.append("Lectura protegida: "+("sí" if not _load_valid or cosmetic_protected332 else "no"))
+	if cosmetic_protected332:lines.append("G04 · Valores de apariencia recuperados solo en memoria: %d. El original no se ha modificado. Esta sesión no guarda cambios."%cosmetic_changes332.size())
 	if not save_error330.is_empty():lines.append(save_error330)
 	var cfg:=ConfigFile.new();var err:=cfg.load(save_path)
 	if err!=OK:
@@ -937,6 +991,10 @@ func save_diagnostic330()->String:
 		return "\n".join(lines)
 	var errors:PackedStringArray=[]
 	if not cfg.has_section_key("progress","highest_level_completed"):errors.append("G20 · Falta el registro de progreso.")
+	for pair in [["progress","highest_level_completed"],["equipment","points"],["world","seed"],["world","pigs_sold"],["world","goats_given249"]]:
+		if cfg.has_section_key(pair[0],pair[1]):
+			var value:Variant=cfg.get_value(pair[0],pair[1])
+			if not value is int or value<0:errors.append("G28 · Dato crítico no válido: "+pair[0]+"/"+pair[1])
 	if cfg.has_section_key("horses_trial","state"):
 		var verify:=HorseCollection.new()
 		if not verify.restore(cfg.get_value("horses_trial","state",{})):errors.append("G21 · El registro de caballos no supera la validación.")
@@ -945,14 +1003,28 @@ func save_diagnostic330()->String:
 	if not ModeVictories240.valid(cfg.get_value("progress","victories240",ModeVictories240.fresh())):errors.append("G23 · Registro de victorias no válido.")
 	var garden:Variant=cfg.get_value("world","garden212",{})
 	if not garden is Dictionary or (not garden.is_empty() and garden.get("version",0)!=Garden212.VERSION):errors.append("G24 · Versión del jardín no reconocida.")
-	var seed_:int=int(cfg.get_value("world","seed",0))
+	var seed_raw332:Variant=cfg.get_value("world","seed",0)
+	var seed_:int=seed_raw332 if seed_raw332 is int else 0
 	var herd:Variant=cfg.get_value("world","herd_town217",{})
 	if not herd is Dictionary or (not herd.is_empty() and not HerdTown217.valid(herd,seed_)):errors.append("G25 · Registro del pueblo de manadas no válido.")
 	var contract:Variant=cfg.get_value("world","repeat_contract165",ProgressionEconomy165.new_contract())
 	if not contract is Dictionary or contract.get("version",0)!=ProgressionEconomy165.VERSION:errors.append("G26 · Versión de encargos no reconocida.")
 	var countries:Variant=cfg.get_value("world","countries146",{})
 	if generator is int and generator in [1,2,3,4,5,6] and (not countries is Dictionary or (not countries.is_empty() and not CountryLedger146.valid(countries,seed_,generator))):errors.append("G27 · Registro de países no válido.")
-	if errors.is_empty():lines.append("G00 · Estructura del archivo comprobada.")
+	for key332 in ["pig_captures","goat_captures"]:
+		var ids332:Variant=cfg.get_value("world",key332,[])
+		if (not ids332 is Array and not ids332 is PackedStringArray) or WorldLivestock104.valid_ids(ids332).size()!=ids332.size():errors.append("G29 · Registro de capturas no válido: "+key332)
+	for pair332 in [["pigs_sold","pig_captures"],["goats_given249","goat_captures"]]:
+		var used332:Variant=cfg.get_value("world",pair332[0],0)
+		var ids332:Variant=cfg.get_value("world",pair332[1],[])
+		if used332 is int and (ids332 is Array or ids332 is PackedStringArray) and used332>ids332.size():errors.append("G31 · Inventario inconsistente: "+pair332[0])
+	if garden is Dictionary:
+		for key332 in ["crops","seeds","harvests"]:
+			var count332:Variant=garden.get(key332,0)
+			if not count332 is int or count332<0 or count332>9999:errors.append("G32 · Inventario del jardín no válido: "+key332)
+	var pos332:Variant=cfg.get_value("world","position",Vector2.ZERO)
+	if not pos332 is Vector2 or not pos332.is_finite():errors.append("G30 · Posición del mundo no válida.")
+	if errors.is_empty():lines.append("G00 · Comprobaciones disponibles superadas. No certifica todos los datos posibles.")
 	else:lines.append_array(errors)
-	lines.append("No se ha modificado ningún archivo. Comparte una captura de este diagnóstico si la captura del cerdo falla.")
+	lines.append("No se ha modificado ningún archivo. Comparte una captura de este diagnóstico si falla el guardado.")
 	return "\n".join(lines)

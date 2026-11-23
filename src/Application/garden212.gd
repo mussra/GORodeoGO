@@ -45,7 +45,7 @@ static func action(state:Dictionary,action_:String,horse:String="")->Dictionary:
    if out.stage!="growing" or out.watered:return {}
    out.watered=true
   "harvest":
-   if out.stage!="ripe":return {}
+   if out.stage!="ripe" or out.crops>9996 or out.seeds>=9999 or out.harvests>=9999:return {}
    out.stage="empty";out.crops+=3;out.seeds+=1;out.harvests+=1;out.discovered=true;out.distance=0.;out.watered=false
   "feed":
    if out.crops<1 or horse.is_empty() or out.food.left>0.:return {}

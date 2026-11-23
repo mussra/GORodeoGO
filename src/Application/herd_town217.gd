@@ -68,8 +68,8 @@ static func apply_saved(members_:Array,state:Dictionary,cx:int,cy:int)->Array:
  for i in out.size():out[i].traits=rows[i].duplicate(true)
  return out
 static func valid(raw:Dictionary,seed_:int)->bool:
- if raw.get("version",0) not in [1,VERSION] or raw.get("seed",0)!=seed_:return false
- if raw.get("version",0)==VERSION and not raw.get("revised226") is Dictionary:return false
+ if not raw.get("version") is int or raw.version not in [1,VERSION] or not raw.get("seed") is int or raw.seed!=seed_:return false
+ if (raw.get("version",0)==VERSION or raw.has("revised226")) and not raw.get("revised226") is Dictionary:return false
  for revision in raw.get("revised226",{}).values():
   if revision!=true:return false
  if not raw.get("towns") is Dictionary or VillageCousins140.clean(raw.towns,seed_).is_empty():return false
