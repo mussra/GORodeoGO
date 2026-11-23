@@ -20,6 +20,7 @@ var gardener:Sprite2D
 var pose_seconds:float=0.
 var pose_name:String="idle"
 var delivery_retry334:int=0
+var full_notice336:bool=false
 const GARDENER={"idle":preload("res://art/garden212/lucia-idle.png"),"walk":preload("res://art/garden212/lucia-walk.png"),"water":preload("res://art/garden212/lucia-water.png"),"plant":preload("res://art/garden212/lucia-plant.png"),"harvest":preload("res://art/garden212/lucia-harvest.png")}
 func _ready():
  world=get_parent();home=world._npcs98()[1].position
@@ -63,6 +64,7 @@ func can_act(action_:String)->bool:
  if action_=="introduce":return p.distance_to(home)<170. or p.distance_to(plot)<170.
  if action_=="accept":return p.distance_to(plot)<170.
  if action_=="sample":return p.distance_to(sample)<130.
+ if action_=="harvest" and SaveData.world_garden212.crops>Garden212.MAX_CARROTS336-Garden212.HARVEST_CARROTS336:return false
  if action_=="feed":return SaveData.world_garden212.crops>0 and SaveData.world_garden212.food.left<=0.
  if p.distance_to(plot)>150.:return false
  return not (action_=="water" and SaveData.world_garden212.watered)
@@ -104,11 +106,14 @@ func _process(delta:float):
   if pose_seconds<=0.:set_pose("idle")
  var active:bool=world.visible and world.player.is_physics_processing() and world.player.can_process() and not is_instance_valid(panel)
  var distance:float=world.player.position.distance_to(previous);previous=world.player.position
+ if state.stage!="ripe" or state.crops<=Garden212.MAX_CARROTS336-Garden212.HARVEST_CARROTS336:full_notice336=false
  if active:
   var next:=Garden212.tick(state,distance if distance<maxf(100.,delta*800.) else 0.,delta)
   SaveData.world_garden212=next
   if next.stage=="ripe" and Time.get_ticks_msec()>=delivery_retry334:
    var delivered:Dictionary=Garden212.action(next,"harvest")
+   if delivered.is_empty() and next.crops>Garden212.MAX_CARROTS336-Garden212.HARVEST_CARROTS336 and not full_notice336:
+    full_notice336=true;world._toast("Bolsa de zanahorias llena para otra cosecha. Lucía guarda 3 zanahorias y 1 semilla hasta que haya hueco.","garden-full336")
    if not delivered.is_empty():
     SaveData.world_garden212=delivered
     if not SaveData.save_progress():
@@ -123,7 +128,7 @@ func _process(delta:float):
   marker.get_child(0).texture=CARROTS[3] if state.stage=="ripe" else CARROTS[2] if state.watered and state.distance>450. else CARROTS[1] if state.watered else CARROTS[0];marker.get_child(1).visible=state.stage=="search";marker.get_child(3).visible=state.stage=="search"
   description.text="Huerto de Lucía · "+("cosecha lista" if state.stage=="ripe" else "brote cuidado" if state.stage=="growing" and state.watered else "parcela piloto")
  direction_label.visible=active and state.stage!="locked"
- direction_label.text="Huerto · "+location_hint()+(" · alimento: %ds"%ceili(state.food.left) if state.food.left>0. else "")
+ direction_label.text="Huerto · "+("Cosecha pendiente: libera hueco para 3 zanahorias. No se pierde." if state.stage=="ripe" and state.crops>Garden212.MAX_CARROTS336-Garden212.HARVEST_CARROTS336 else location_hint())+(" · alimento: %ds"%ceili(state.food.left) if state.food.left>0. else "")
  button.visible=active and (world.player.position.distance_to(plot)<150. or (state.stage=="search" and world.player.position.distance_to(sample)<130.))
  button.text="Recoger zanahoria silvestre" if state.stage=="search" and world.player.position.distance_to(sample)<130. else "Hablar con Lucía"
  if state.stage!=last_stage:

@@ -23,7 +23,7 @@ func test_cycle_discovers_property_keeps_seed_and_cannot_duplicate_sample():
  assert_eq(Garden212.action(s,"harvest"),{})
  s=Garden212.action(s,"feed","original");assert_eq(s.crops,2);assert_eq(Garden212.multiplier(s,"original"),.85);assert_eq(Garden212.multiplier(s,"other"),1.)
  assert_eq(Garden212.action(s,"feed","other"),{},"No stacking or replacing effect")
- s=Garden212.tick(s,0.,120.);assert_eq(s.food.left,0.);assert_eq(Garden212.multiplier(s,"original"),1.)
+ s=Garden212.tick(s,0.,300.);assert_eq(s.food.left,0.);assert_eq(Garden212.multiplier(s,"original"),1.)
  s=Garden212.action(s,"plant");assert_eq(s.stage,"growing");assert_eq(s.seeds,0)
 func test_sanitization_and_missing_field_are_additive():
  assert_eq(Garden212.clean(null),Garden212.fresh())

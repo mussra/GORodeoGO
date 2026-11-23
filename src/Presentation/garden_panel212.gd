@@ -18,11 +18,11 @@ func rebuild():
  if state.discovered:
   var crop:=TextureRect.new();crop.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;crop.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;crop.texture=garden.CARROTS[4];crop.position=Vector2(48,250);crop.size=Vector2(72,78);add_child(crop)
  var body:=DialogueLabel319.new();body.position=Vector2(164,78);body.size=Vector2(570,260);body.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;add_child(body);DetailCard179.reading_surface(body)
- body.text="¡Hola, "+RiderStory322.NAME+"! "+Garden212.summary(state)+"\n\n"+garden.location_hint()+"\n\n"+("Zanahoria nutritiva: 15% menos gasto al trotar o galopar durante 120 s de juego en Frontera. Sin velocidad ni cambios genéticos." if state.discovered else "La propiedad de esta variedad se descubre con la primera cosecha. Sin árbol genético ni plantas que se marchiten.")
+ body.text="¡Hola, "+RiderStory322.NAME+"! "+Garden212.summary(state)+"\n\n"+garden.location_hint()+"\n\n"+("Zanahoria: 5 minutos de juego, 15% menos gasto al trotar/galopar. Sin velocidad ni genética." if state.discovered else "La propiedad de esta variedad se descubre con la primera cosecha. Sin árbol genético ni plantas que se marchiten.")
  TextFit181.fixed(body,body.size,21,18,13)
  var status:=Label.new();status.position=Vector2(24,348);status.size=Vector2(712,70);status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;add_child(status)
  var horse:Dictionary=SaveData.horse_collection.find(SaveData.horse_collection.selected)
- status.text="Semillas: %d · Cosecha: %d · Caballo: %s"%[state.seeds,state.crops,horse.name]
+ status.text="Semillas: %d · Zanahorias: %d / %d · Caballo: %s"%[state.seeds,state.crops,Garden212.MAX_CARROTS336,horse.name]
  if state.food.left>0.:status.text+="\nAlimento activo: %ds · un solo efecto, sin acumular."%ceili(state.food.left)
  TextFit181.fixed(status,status.size,20,18,3)
  var action_:String={"locked":"introduce","intro":"accept","search":"sample","empty":"plant","growing":"water","ripe":"harvest"}[state.stage]

@@ -37,8 +37,8 @@ func test_nonfinite_world_edits_and_wrong_count_type_rejected():
  assert_false(WorldEdits.valid_op({'type':'add_pigs','pos':Vector2.ZERO,'count':2.5}));assert_false(WorldEdits.valid_op({'type':'add_decor','pos':Vector2.ZERO,'kind':'tree','scale':{}}))
 
 func test_garden_never_generates_inventory_that_cleaner_truncates():
- var state=Garden212.fresh();state.stage='ripe';state.crops=9996;state.seeds=9998;state.harvests=9998
- var next=Garden212.action(state,'harvest');assert_eq(next.crops,9999);assert_eq(Garden212.clean(next),next)
+ var state=Garden212.fresh();state.stage='ripe';state.crops=Garden212.MAX_CARROTS336-Garden212.HARVEST_CARROTS336;state.seeds=9998;state.harvests=9998
+ var next=Garden212.action(state,'harvest');assert_eq(next.crops,Garden212.MAX_CARROTS336);assert_eq(Garden212.clean(next),next)
  state.crops=9997;assert_eq(Garden212.action(state,'harvest'),{});assert_eq(state.crops,9997)
 func test_unknown_herd_version_remains_protected_even_with_bad_color():
  var policy=HerdTown217.fresh(752026,VillageCousins140.fresh(752026,[],FloristJourney138.fresh([])),[],{},[]);policy.version=999

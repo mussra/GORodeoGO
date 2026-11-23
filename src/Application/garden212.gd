@@ -4,8 +4,10 @@ const VERSION:=1
 const BASE_TOWN_ID:="home"
 const NPC_NAME:="Lucía"
 const GROW_DISTANCE:=900.0
-const FOOD_SECONDS:=120.0
+const FOOD_SECONDS:=300.0
 const DRAIN_MULT:=0.85
+const MAX_CARROTS336:=10
+const HARVEST_CARROTS336:=3
 static func fresh()->Dictionary:
  return {"version":VERSION,"town_id":BASE_TOWN_ID,"layout214":2,"anchors":{},"stage":"locked","seeds":0,"crops":0,"watered":false,"distance":0.0,"discovered":false,"harvests":0,"food":{"horse":"","left":0.0}}
 static func clean(raw:Variant)->Dictionary:
@@ -45,8 +47,8 @@ static func action(state:Dictionary,action_:String,horse:String="")->Dictionary:
    if out.stage!="growing" or out.watered:return {}
    out.watered=true
   "harvest":
-   if out.stage!="ripe" or out.crops>9996 or out.seeds>=9999 or out.harvests>=9999:return {}
-   out.stage="empty";out.crops+=3;out.seeds+=1;out.harvests+=1;out.discovered=true;out.distance=0.;out.watered=false
+   if out.stage!="ripe" or out.crops>MAX_CARROTS336-HARVEST_CARROTS336 or out.seeds>=9999 or out.harvests>=9999:return {}
+   out.stage="empty";out.crops+=HARVEST_CARROTS336;out.seeds+=1;out.harvests+=1;out.discovered=true;out.distance=0.;out.watered=false
   "feed":
    if out.crops<1 or horse.is_empty() or out.food.left>0.:return {}
    out.crops-=1;out.food={"horse":horse,"left":FOOD_SECONDS}
@@ -70,7 +72,7 @@ static func summary(state:Dictionary)->String:
   "search":return "Busca la muestra silvestre marcada cerca de la floristería."
   "empty":return "Parcela libre. Conservas %d semilla(s) y %d zanahoria(s)."%[state.seeds,state.crops]
   "growing":return "Riega la parcela para empezar." if not state.watered else "Brote cuidado · %d%%. Explora a caballo: Lucía te enviará la cosecha al inventario. No se marchita."%int(state.distance/GROW_DISTANCE*100.)
-  "ripe":return "Zanahorias listas. Lucía te enviará tres zanahorias y una semilla cuando haya espacio en tu inventario."
+  "ripe":return "Cosecha pendiente: 3 zanahorias y 1 semilla. Necesitas 3 huecos libres. No se pierde nada." if state.crops>MAX_CARROTS336-HARVEST_CARROTS336 else "Zanahorias listas. Lucía te enviará tres zanahorias y una semilla cuando haya espacio en tu inventario."
  return ""
 
 static func lane214(point:Vector2)->PackedVector2Array:

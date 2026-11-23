@@ -1,0 +1,17 @@
+{
+  "version": "3.0.36",
+  "tests": 144,
+  "assertions": 60420,
+  "scripts": 27,
+  "apk_sha256": "d80535b09abeb00ff039cae7b6af3746578b6a012ea6fb0a080d95f41b66c5b1",
+  "food_seconds": 300,
+  "carrot_limit": 10,
+  "legacy_surplus": "Preserved, no incoming harvest until there is room",
+  "whole_harvest": "3 carrots plus 1 seed, waits above 7 stored carrots",
+  "visual": "Feed menu and full-inventory panel inspected, final short text fits without truncation",
+  "limits": [
+    "No physical Android QA",
+    "Synthetic fixtures only",
+    "No new food or new art implemented"
+  ]
+}
