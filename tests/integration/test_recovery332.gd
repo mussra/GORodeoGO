@@ -1,9 +1,10 @@
 extends GutTest
 var original_path:String
 func before_each():
+ SaveData.auto_recovery333=false
  original_path=SaveData.save_path;SaveData.save_path='user://recovery332-'+str(Time.get_ticks_usec())+'.cfg';SaveData.load_progress();SaveData.world_seed=752026;SaveData.world_generator_version=3;SaveData.horse_collection=HorseCollection.new();SaveData.horse_collection.seed_trial();SaveData.equipment_points=321;SaveData.points_legacy_credit_applied=true
 func after_each():
- SaveData.save_path=original_path;SaveData.load_progress()
+ SaveData.auto_recovery333=true;SaveData.save_path=original_path;SaveData.load_progress()
 func fixture332(section:String,key:String,value:Variant)->PackedByteArray:
  assert_true(SaveData.save_progress());var cfg=ConfigFile.new();assert_eq(cfg.load(SaveData.save_path),OK);cfg.set_value(section,key,value);assert_eq(cfg.save(SaveData.save_path),OK);return FileAccess.get_file_as_bytes(SaveData.save_path)
 func test_unknown_color_recovers_only_in_memory_and_warns_once():

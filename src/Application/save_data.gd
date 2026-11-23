@@ -18,7 +18,14 @@ var _load_valid:bool=true
 var cosmetic_protected332:bool=false
 var cosmetic_changes332:Array=[]
 var cosmetic_notices332:Dictionary={}
+var auto_recovery333:bool=true
+var recovery_backup333:String=""
+var recovery_details333:Array=[]
+var recovery_error333:String=""
 func take_cosmetic_notice332()->String:
+	if not recovery_details333.is_empty() and not cosmetic_notices332.has(save_path):
+		cosmetic_notices332[save_path]=true
+		return "Se ha recuperado la apariencia y esta es la partida activa. Cambios: "+", ".join(recovery_details333)+". Copia original intacta: "+recovery_backup333+". Puedes continuar y guardar con normalidad."
 	if cosmetic_changes332.is_empty() or cosmetic_notices332.has(save_path):return ""
 	cosmetic_notices332[save_path]=true
 	return "Se han sustituido valores de apariencia no reconocidos (%d) por valores por defecto, solo en memoria. La partida original está intacta y protegida. En esta sesión no se guardarán cambios. Antes de continuar, consulta Ajustes > Diagnóstico de guardado."%cosmetic_changes332.size()
@@ -356,6 +363,71 @@ func load_progress() -> void:
 	if typeof(wm)==TYPE_DICTIONARY:
 		for id in wm:
 			if typeof(id)==TYPE_STRING and wm[id] in ["offered","encargo","done"]:world_missions[id]=wm[id]
+
+	if cosmetic_protected332 and auto_recovery333:_recover_cosmetics333(config,source_path)
+
+func _recover_cosmetics333(source:ConfigFile,source_path:String)->bool:
+	recovery_error333=""
+	# Reserve a new directory atomically. No existing backup is ever opened for writing.
+	var folder:String=save_path+".backup-"+str(Time.get_unix_time_from_system()).replace(".","-")+"-"+str(Time.get_ticks_usec())
+	if DirAccess.make_dir_absolute(folder)!=OK:
+		recovery_error333="R01 · No se pudo reservar una copia única. El original sigue protegido.";return false
+	var backup:String=folder+"/original.cfg"
+	var bytes:PackedByteArray=FileAccess.get_file_as_bytes(source_path)
+	var original_hash:String=FileAccess.get_sha256(source_path)
+	if bytes.is_empty() or original_hash.is_empty():recovery_error333="R02 · No se pudo leer el original para la copia.";return false
+	var file:=FileAccess.open(backup,FileAccess.WRITE)
+	if file==null:recovery_error333="R03 · No se pudo escribir la copia.";return false
+	file.store_buffer(bytes);file.flush();var error:Error=file.get_error();file.close()
+	if error!=OK or FileAccess.get_sha256(backup)!=original_hash or FileAccess.get_file_as_bytes(backup)!=bytes:
+		recovery_error333="R04 · La copia no coincide. El original sigue protegido.";return false
+	var copied_source:=ConfigFile.new()
+	if copied_source.load(backup)!=OK or not _configs_equal333(source,copied_source):
+		recovery_error333="R05 · La lectura y la copia difieren. Original intacto.";return false
+	# Patch the original ConfigFile, not a re-export of normalized gameplay data.
+	var candidate:=ConfigFile.new()
+	if candidate.parse(source.encode_to_text())!=OK:recovery_error333="R05 · No se pudo preparar la corrección.";return false
+	var changes:Array=[]
+	if candidate.has_section_key("horses_trial","state"):candidate.set_value("horses_trial","state",CosmeticRecovery332.collection(candidate.get_value("horses_trial","state"),changes))
+	for key in ["cousins140","herd_town217"]:
+		if candidate.has_section_key("world",key):
+			var raw:Variant=candidate.get_value("world",key)
+			candidate.set_value("world",key,CosmeticRecovery332.towns(raw,changes) if key=="cousins140" else CosmeticRecovery332.policy(raw,changes))
+	if candidate.has_section_key("appearance","hat_color"):candidate.set_value("appearance","hat_color",HatAppearance.sanitize(candidate.get_value("appearance","hat_color")))
+	var details:Array=[]
+	for section in source.get_sections():
+		for key in source.get_section_keys(section):_recovery_diff333(source.get_value(section,key),candidate.get_value(section,key),section+"/"+key,details)
+	if details.is_empty():recovery_error333="R06 · No se encontró una corrección cosmética verificable.";return false
+	var staged:String=folder+"/corrected.cfg"
+	if candidate.save(staged)!=OK:recovery_error333="R07 · No se pudo escribir el candidato. Original intacto.";return false
+	var reloaded:=ConfigFile.new()
+	if reloaded.load(staged)!=OK or not _configs_equal333(candidate,reloaded):recovery_error333="R08 · El candidato cambió al recargar. Original intacto.";return false
+	var verify:Node=get_script().new();verify.auto_recovery333=false;verify.save_path=staged;verify.load_progress()
+	var valid_:bool=verify._load_valid and not verify.cosmetic_protected332
+	verify.free()
+	if not valid_:recovery_error333="R09 · La corrección no supera la validación completa. Original intacto.";return false
+	if FileAccess.get_sha256(source_path)!=original_hash or FileAccess.get_sha256(backup)!=original_hash:
+		recovery_error333="R10 · El original o la copia cambiaron durante la comprobación.";return false
+	if DirAccess.rename_absolute(staged,save_path)!=OK:recovery_error333="R11 · No se pudo activar la corrección. Original intacto.";return false
+	# The committed file is the exact candidate already validated above.
+	var old_auto:bool=auto_recovery333;auto_recovery333=false;load_progress();auto_recovery333=old_auto
+	recovery_backup333=backup;recovery_details333=details
+	return _load_valid and not cosmetic_protected332
+
+static func _configs_equal333(a:ConfigFile,b:ConfigFile)->bool:
+	if a.get_sections()!=b.get_sections():return false
+	for section in a.get_sections():
+		if a.get_section_keys(section)!=b.get_section_keys(section):return false
+		for key in a.get_section_keys(section):
+			if a.get_value(section,key)!=b.get_value(section,key):return false
+	return true
+static func _recovery_diff333(a:Variant,b:Variant,path_:String,out:Array)->void:
+	if a==b:return
+	if a is Dictionary and b is Dictionary and a.keys()==b.keys():
+		for key in a:_recovery_diff333(a[key],b[key],path_+"/"+str(key),out)
+	elif a is Array and b is Array and a.size()==b.size():
+		for i in a.size():_recovery_diff333(a[i],b[i],path_+"/"+str(i),out)
+	else:out.append(path_+" → "+str(b))
 
 ## One credit for the deducible first win of each completed level. Repeated wins
 ## before this update were not stored. A missing reward definition postpones migration.
@@ -984,6 +1056,8 @@ func save_diagnostic330()->String:
 	lines.append("Modo: "+("DEBUG" if debug_mode else "Normal"))
 	lines.append("Lectura protegida: "+("sí" if not _load_valid or cosmetic_protected332 else "no"))
 	if cosmetic_protected332:lines.append("G04 · Valores de apariencia recuperados solo en memoria: %d. El original no se ha modificado. Esta sesión no guarda cambios."%cosmetic_changes332.size())
+	if not recovery_backup333.is_empty():lines.append("R00 · Copia original: "+recovery_backup333)
+	if not recovery_error333.is_empty():lines.append(recovery_error333)
 	if not save_error330.is_empty():lines.append(save_error330)
 	var cfg:=ConfigFile.new();var err:=cfg.load(save_path)
 	if err!=OK:
@@ -1026,5 +1100,5 @@ func save_diagnostic330()->String:
 	if not pos332 is Vector2 or not pos332.is_finite():errors.append("G30 · Posición del mundo no válida.")
 	if errors.is_empty():lines.append("G00 · Comprobaciones disponibles superadas. No certifica todos los datos posibles.")
 	else:lines.append_array(errors)
-	lines.append("No se ha modificado ningún archivo. Comparte una captura de este diagnóstico si falla el guardado.")
+	lines.append("Este diagnóstico no modifica archivos. Comparte una captura si falla el guardado.")
 	return "\n".join(lines)

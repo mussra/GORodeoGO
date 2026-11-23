@@ -1,0 +1,61 @@
+{
+  "version": "3.0.33",
+  "tests": 125,
+  "assertions": 60286,
+  "scripts": 24,
+  "audit": {
+    "completed": true,
+    "counts": {
+      "breeding_collection": 2000,
+      "capture_commit": 24,
+      "capture_reload": 24,
+      "chunk_determinism": 1440,
+      "contract_claim": 100,
+      "contract_ready": 100,
+      "country_enter": 288,
+      "country_fresh": 288,
+      "country_leave": 288,
+      "country_position": 288,
+      "garden": 21,
+      "herd_policy": 288,
+      "herd_preserved": 24,
+      "invalid_traits": 42,
+      "load_readonly": 24,
+      "market_collection": 60,
+      "market_traits": 360,
+      "optional_appearance": 264,
+      "palette_product": 49896,
+      "quests": 13,
+      "save_reload": 24,
+      "save_write": 24,
+      "town_roundtrip": 288,
+      "victories": 300,
+      "wild_collection": 311,
+      "wild_traits": 1252
+    },
+    "failures": [],
+    "seed": 3322026
+  },
+  "apk_sha256": "62eabc51b72a2bdd54260821d09be3ce147a752f19961701db894c9965e82f42",
+  "backup": "Unique newly reserved directory; byte equality and SHA256 checked before candidate write and before replacement. Original is never opened for write. No backups deleted.",
+  "candidate": "Patch original ConfigFile values only. Unknown sections preserved. Disk roundtrip equality and independent strict SaveData load before atomic activation.",
+  "critical": "Unknown parentage, IDs, receipts, progression, awards, genetic finishes and emblems remain protected.",
+  "scope": "Automatic correction of known cosmetic faults found during load. Newly invalid runtime save candidates remain blocked rather than persisted. No recovery of arbitrary corruption.",
+  "tests_added": [
+    "Exact original backup",
+    "Only cosmetic leaf value changed",
+    "Normal capture/save after recovery",
+    "Critical fault blocks recovery",
+    "Backup directory failure leaves original untouched",
+    "Independent candidate validation failure leaves original untouched",
+    "Second recovery never overwrites first backup",
+    "Unknown sections and genetic finish preserved",
+    "Changed source between read and backup rejected"
+  ],
+  "limitations": [
+    "No Android physical device test.",
+    "No simulated power loss or full-disk fault.",
+    "No save-slot menu.",
+    "No user save opened, changed or deleted. Synthetic fixtures only."
+  ]
+}
