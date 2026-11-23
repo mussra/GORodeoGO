@@ -1,0 +1,37 @@
+{
+  "version": "3.0.34",
+  "tests": 137,
+  "assertions": 60367,
+  "scripts": 25,
+  "audit_checks": 58031,
+  "audit_failures": 0,
+  "apk_sha256": "f959174e01a35a47b0462cc2dccd1752c2e69b028a163b88821a09559b615f05",
+  "slots": [
+    "Unique immutable backup before registering existing Normal/DEBUG files",
+    "Existing save retains original path, including photo and advice references",
+    "New named save is isolated, existing files kept",
+    "Catalog uses append-only revisions with verified staging and atomic activation",
+    "Rename and active slot survive restart",
+    "Failed save or invalid/missing target blocks switching",
+    "Normal and DEBUG selections remain separate",
+    "Thumbnails are new files, previous images retained",
+    "No delete action"
+  ],
+  "garden": [
+    "Lucia and plot visible before introduction",
+    "Direct talk and florist share same persistent intro/accept flow",
+    "Florist offer hidden once introduced",
+    "Remote growth by distance, auto-delivery of three carrots plus seed",
+    "Delivery retries after five seconds on write failure, no granted inventory on failure"
+  ],
+  "visual": "1280x720 actual desktop frames inspected: menu, list, name input, real world thumbnail without controls, direct Lucia conversation.",
+  "limits": [
+    "No physical Android or mobile keyboard QA",
+    "Thumbnails generated on returning from Frontier, placeholder until first return",
+    "Only Frontier growth, not offline clock growth",
+    "Planting another cycle still requires visiting the plot",
+    "No cross-NPC quest exchange",
+    "No slot deletion",
+    "No real user save accessed; synthetic fixtures only"
+  ]
+}

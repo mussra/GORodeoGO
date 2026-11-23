@@ -993,7 +993,17 @@ func _home() -> void:
 	if _travel144!=null:_travel144.choose("ranch")
 
 func _menu() -> void:
-	SaveData.save_world_state(player.position)
+	if not SaveData.save_world_state(player.position):
+		_toast("No se pudo guardar. Sigues en esta partida; revisa el diagnóstico antes de salir.");return
+	if SaveData.slots334!=null and not SaveData.slots334.state.is_empty() and not SaveData.trial_session_active:
+		var hidden334:Array=[]
+		for node334 in find_children("*","CanvasLayer",true,false):
+			if node334.visible:hidden334.append(node334);node334.hide()
+		await RenderingServer.frame_post_draw
+		SaveData.slots334.save_current(SaveData)
+		SaveData.slots334.thumbnail(get_viewport().get_texture().get_image(),SaveData)
+		for node334 in hidden334:node334.show()
+
 	get_tree().change_scene_to_file("res://src/Presentation/main_menu.tscn")
 
 static func arrow_to(from: Vector2, to: Vector2) -> String:

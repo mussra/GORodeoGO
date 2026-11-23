@@ -69,8 +69,8 @@ static func summary(state:Dictionary)->String:
   "intro":return "Soy Lucía. ¿Cuidamos este huerto? Trae una zanahoria silvestre para conservar sus semillas y aprender a cultivarla."
   "search":return "Busca la muestra silvestre marcada cerca de la floristería."
   "empty":return "Parcela libre. Conservas %d semilla(s) y %d zanahoria(s)."%[state.seeds,state.crops]
-  "growing":return "Riega la parcela para empezar." if not state.watered else "Brote cuidado · %d%%. Explora a caballo y vuelve; no se marchita."%int(state.distance/GROW_DISTANCE*100.)
-  "ripe":return "Zanahorias listas. Cosecha: tres para los caballos y una semilla para replantar."
+  "growing":return "Riega la parcela para empezar." if not state.watered else "Brote cuidado · %d%%. Explora a caballo: Lucía te enviará la cosecha al inventario. No se marchita."%int(state.distance/GROW_DISTANCE*100.)
+  "ripe":return "Zanahorias listas. Lucía te enviará tres zanahorias y una semilla cuando haya espacio en tu inventario."
  return ""
 
 static func lane214(point:Vector2)->PackedVector2Array:

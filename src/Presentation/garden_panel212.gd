@@ -26,7 +26,7 @@ func rebuild():
  if state.food.left>0.:status.text+="\nAlimento activo: %ds · un solo efecto, sin acumular."%ceili(state.food.left)
  TextFit181.fixed(status,status.size,20,18,3)
  var action_:String={"locked":"introduce","intro":"accept","search":"sample","empty":"plant","growing":"water","ripe":"harvest"}[state.stage]
- var captions:Dictionary={"introduce":"Pedir presentación","accept":"Aceptar el huerto","sample":"Recoger muestra silvestre","plant":"Sembrar una semilla","water":"Regar y cuidar","harvest":"Cosechar"}
+ var captions:Dictionary={"introduce":"Hablar con Lucía","accept":"Aceptar el huerto","sample":"Recoger muestra silvestre","plant":"Sembrar una semilla","water":"Regar y cuidar","harvest":"Cosechar"}
  var go:=button(captions[action_],Vector2(24,430),Vector2(350,56),func():chosen.emit(action_));go.disabled=not garden.can_act(action_)
  var feed:=button("Dar una al caballo",Vector2(388,430),Vector2(348,56),func():chosen.emit("feed"));feed.disabled=not garden.can_act("feed")
  button("Seguir explorando",Vector2(220,506),Vector2(320,48),func():closed.emit())

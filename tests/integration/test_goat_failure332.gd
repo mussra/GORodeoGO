@@ -66,3 +66,18 @@ func test_town_job_failure_does_not_retry_each_frame():
  for i in 60:world._tick_jobs249()
  assert_eq(SaveData.save_metrics242.calls-calls,1);assert_eq(SaveData.world_jobs249[id].count,0)
  SaveData._load_valid=true;SaveData.world_herd_town217={};world.player.position=target.pos+Vector2(200,0);world._tick_jobs249();world.player.position=target.pos;world._tick_jobs249();assert_eq(SaveData.world_jobs249[id].count,1)
+func test_lucia_is_visible_and_direct_talk_activates_same_garden_mission():
+ SaveData.world_garden212=Garden212.fresh();world.player.position=world.garden212.plot;world.player.set_physics_process(true);world.garden212._process(.01);world.player.set_physics_process(false)
+ assert_true(world.garden212.gardener.visible);assert_true(world.garden212.marker.visible);assert_true(world.garden212.button.visible)
+ world.garden212.open();assert_eq(SaveData.world_garden212.stage,'intro');assert_false(SaveData.world_garden212.anchors.is_empty());world.garden212.act('accept');assert_eq(SaveData.world_garden212.stage,'search');world.garden212.close()
+ var dialog=Control.new();dialog.size=Vector2(600,400);world.add_child(dialog);world.garden212.attach(dialog,{'id':'florist'});assert_eq(dialog.get_child_count(),0);dialog.free()
+func test_florist_still_introduces_lucia_once_without_duplicate_mission():
+ SaveData.world_garden212=Garden212.fresh();var dialog=Control.new();dialog.size=Vector2(600,400);world.add_child(dialog);world.garden212.attach(dialog,{'id':'florist'});assert_eq(dialog.get_child_count(),1)
+ dialog.get_child(0).pressed.emit();assert_eq(SaveData.world_garden212.stage,'intro');world.garden212.close();dialog.free()
+
+func test_garden_delivers_remotely_once_and_preserves_inventory_on_save_failure():
+ var state=Garden212.fresh();state.stage='growing';state.watered=true;state.distance=899.;SaveData.world_garden212=state
+ world.player.set_physics_process(true);world.player.position=Vector2(90000,90000);world.garden212.previous=world.player.position-Vector2(2,0);world.garden212._process(.01)
+ assert_eq(SaveData.world_garden212.stage,'empty');assert_eq(SaveData.world_garden212.crops,3);assert_eq(SaveData.world_garden212.seeds,1)
+ world.garden212._process(.01);assert_eq(SaveData.world_garden212.crops,3)
+ SaveData.world_garden212=state;SaveData._load_valid=false;world.garden212.previous=world.player.position-Vector2(2,0);world.garden212._process(.01);assert_eq(SaveData.world_garden212.crops,0);assert_eq(SaveData.world_garden212.stage,'growing');world.player.set_physics_process(false)

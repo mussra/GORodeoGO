@@ -19,6 +19,7 @@ var notice:String=""
 var gardener:Sprite2D
 var pose_seconds:float=0.
 var pose_name:String="idle"
+var delivery_retry334:int=0
 const GARDENER={"idle":preload("res://art/garden212/lucia-idle.png"),"walk":preload("res://art/garden212/lucia-walk.png"),"water":preload("res://art/garden212/lucia-water.png"),"plant":preload("res://art/garden212/lucia-plant.png"),"harvest":preload("res://art/garden212/lucia-harvest.png")}
 func _ready():
  world=get_parent();home=world._npcs98()[1].position
@@ -59,7 +60,7 @@ func clear_point(base:Vector2)->Vector2:
 func can_act(action_:String)->bool:
  if SaveData.trial_session_active:return false
  var p:Vector2=world.player.position
- if action_=="introduce":return p.distance_to(home)<170.
+ if action_=="introduce":return p.distance_to(home)<170. or p.distance_to(plot)<170.
  if action_=="accept":return p.distance_to(plot)<170.
  if action_=="sample":return p.distance_to(sample)<130.
  if action_=="feed":return SaveData.world_garden212.crops>0 and SaveData.world_garden212.food.left<=0.
@@ -71,7 +72,7 @@ func location_hint()->String:
  var noun:String="Muestra" if state.stage=="search" else "Florista" if state.stage=="locked" else "Parcela"
  return "%s: %s · %d m. %s"%[noun,world.arrow_to(world.player.position,target),int(world.player.position.distance_to(target)/8.),notice]
 func attach(dialog:Control,data:Dictionary):
- if data.id!="florist":return
+ if data.id!="florist" or SaveData.world_garden212.stage!="locked":return
  var b:=Button.new();b.text="Huerto de Lucía · zanahorias";b.position=Vector2(24,dialog.size.y+8);b.size=Vector2(dialog.size.x-48,52);QuestButtonStyle.apply(b);dialog.add_child(b);dialog.size.y+=76
  dialog.call_deferred("_fit165")
  b.pressed.connect(func():
@@ -79,6 +80,9 @@ func attach(dialog:Control,data:Dictionary):
   world._close_npc();open())
 func open():
  if is_instance_valid(panel):return
+ if SaveData.world_garden212.stage=="locked":
+  if not SaveData.garden_action212("introduce","",{"home":home,"plot":plot,"sample":sample}):notice="No se pudo guardar la presentación. La partida sigue intacta."
+
  world.player.cancel_input();world.player.set_physics_process(false)
  panel=GardenPanel212.new();panel.garden=self;world._hud.add_child(panel);panel.closed.connect(close);panel.chosen.connect(act)
 func close():
@@ -86,14 +90,15 @@ func close():
  panel=null;world.player.cancel_input();world.player.set_physics_process(true);notice=""
 func act(action_:String):
  if not can_act(action_):notice="Acércate al lugar indicado para esta acción.";panel.rebuild();return
- if not SaveData.garden_action212(action_,SaveData.horse_collection.selected):notice="No se pudo guardar. No se ha consumido ni concedido nada.";panel.rebuild();return
- notice={"introduce":"Lucía te espera junto a la parcela.","accept":"Busca una muestra silvestre; la parcela queda reservada.","sample":"Ya tienes la semilla. Vuelve a tu parcela.","plant":"Sembrada. Ahora riega y cuida.","water":"Cuidada. Explora a caballo y vuelve.","harvest":"Tres zanahorias y una semilla guardadas.","feed":"Zanahoria consumida; alimento activo."}.get(action_,"")
+ var anchors_:Dictionary={"home":home,"plot":plot,"sample":sample} if action_=="introduce" else {}
+ if not SaveData.garden_action212(action_,SaveData.horse_collection.selected,anchors_):notice="No se pudo guardar. No se ha consumido ni concedido nada.";panel.rebuild();return
+ notice={"introduce":"Lucía te espera junto a la parcela.","accept":"Busca una muestra silvestre; la parcela queda reservada.","sample":"Ya tienes la semilla. Vuelve a tu parcela.","plant":"Sembrada. Ahora riega y cuida.","water":"Cuidada. Sigue explorando: Lucía te enviará la cosecha.","harvest":"Tres zanahorias y una semilla guardadas.","feed":"Zanahoria consumida; alimento activo."}.get(action_,"")
  pose_seconds=2.;set_pose({"plant":"plant","water":"water","harvest":"harvest","sample":"harvest"}.get(action_,"idle"))
  panel.rebuild();marker.queue_redraw()
 func _process(delta:float):
  if not is_instance_valid(world) or not is_instance_valid(world.player):return
  var state:Dictionary=SaveData.world_garden212
- gardener.visible=state.stage!="locked"
+ gardener.visible=true
  if pose_seconds>0.:
   pose_seconds=maxf(0.,pose_seconds-delta)
   if pose_seconds<=0.:set_pose("idle")
@@ -102,18 +107,24 @@ func _process(delta:float):
  if active:
   var next:=Garden212.tick(state,distance if distance<maxf(100.,delta*800.) else 0.,delta)
   SaveData.world_garden212=next
-  if state.stage!=next.stage:
+  if next.stage=="ripe" and Time.get_ticks_msec()>=delivery_retry334:
+   var delivered:Dictionary=Garden212.action(next,"harvest")
+   if not delivered.is_empty():
+    SaveData.world_garden212=delivered
+    if not SaveData.save_progress():
+     SaveData.world_garden212=state;delivery_retry334=Time.get_ticks_msec()+5000
+    else:world._toast("Lucía te envía 3 zanahorias y 1 semilla. Ya están en tu inventario.","garden-delivery334")
+  elif state.stage!=next.stage:
    if not SaveData.save_progress():SaveData.world_garden212=state
-   else:world._toast("Huerto: tus zanahorias ya están listas.")
   state=SaveData.world_garden212
- marker.visible=state.stage!="locked"
+ marker.visible=true
  if marker.visible:
   marker.get_child(0).visible=state.stage in ["growing","ripe"]
   marker.get_child(0).texture=CARROTS[3] if state.stage=="ripe" else CARROTS[2] if state.watered and state.distance>450. else CARROTS[1] if state.watered else CARROTS[0];marker.get_child(1).visible=state.stage=="search";marker.get_child(3).visible=state.stage=="search"
   description.text="Huerto de Lucía · "+("cosecha lista" if state.stage=="ripe" else "brote cuidado" if state.stage=="growing" and state.watered else "parcela piloto")
  direction_label.visible=active and state.stage!="locked"
  direction_label.text="Huerto · "+location_hint()+(" · alimento: %ds"%ceili(state.food.left) if state.food.left>0. else "")
- button.visible=active and state.stage!="locked" and (world.player.position.distance_to(plot)<150. or (state.stage=="search" and world.player.position.distance_to(sample)<130.))
+ button.visible=active and (world.player.position.distance_to(plot)<150. or (state.stage=="search" and world.player.position.distance_to(sample)<130.))
  button.text="Recoger zanahoria silvestre" if state.stage=="search" and world.player.position.distance_to(sample)<130. else "Hablar con Lucía"
  if state.stage!=last_stage:
   last_stage=state.stage;marker.queue_redraw();world.get_node("GardenAccess214").queue_redraw()

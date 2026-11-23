@@ -50,6 +50,8 @@ func _ready() -> void:
 	_layout()
 	call_deferred("_begin_brand_intro")
 	call_deferred("_cosmetic_notice332")
+	var slots_button:=Button.new();slots_button.text="Partidas";slots_button.position=Vector2(32,84);slots_button.size=Vector2(220,58);QuestButtonStyle.apply(slots_button);add_child(slots_button)
+	slots_button.pressed.connect(func():add_child(SaveSlotsPanel334.new()))
 
 ## The logo reveal precedes the existing staggered menu entrance once per process.
 func _begin_brand_intro() -> void:

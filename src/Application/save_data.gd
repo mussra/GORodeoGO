@@ -88,7 +88,12 @@ var world_edits: Array = []  # world-editor ops (see WorldEdits), layered over t
 # Overridden only by isolated persistence tests; production retains its original path.
 var save_path: String = NORMAL_SAVE_PATH
 
+var slots334:SaveSlots334
 func _ready() -> void:
+	slots334=SaveSlots334.new()
+	if not slots334.setup(NORMAL_SAVE_PATH,DEBUG_SAVE_PATH):
+		_load_valid=false;save_error330=slots334.error;return
+	slots334.attach(self)
 	load_progress()
 	apply_legacy_points_credit(EquipmentCatalog.REWARDS)
 
