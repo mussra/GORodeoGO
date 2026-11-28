@@ -47,6 +47,27 @@ static func create() -> Theme:
 	theme.set_icon("arrow","OptionButton",AntIcons187.sized(63,Vector2i(12,12)))
 	# Keep the old12px dropdown footprint despite the larger supplied crop.
 	theme.set_constant("arrow_margin","OptionButton",4)
+	# 3.0.43 (Ant): los desplegables (OptionButton) abrian un PopupMenu gris basico. Mismo marco,
+	# colores y altura tactil que los botones del juego.
+	var popup_panel := box(Color("112d3b"), GOLD, 14)
+	popup_panel.content_margin_left = 8.0
+	popup_panel.content_margin_right = 8.0
+	popup_panel.content_margin_top = 8.0
+	popup_panel.content_margin_bottom = 8.0
+	theme.set_stylebox("panel", "PopupMenu", popup_panel)
+	var popup_hover := box(Color("31616b"), GOLD, 10)
+	popup_hover.content_margin_top = 4.0
+	popup_hover.content_margin_bottom = 4.0
+	theme.set_stylebox("hover", "PopupMenu", popup_hover)
+	theme.set_stylebox("separator", "PopupMenu", box(Color("496f7c"), Color.TRANSPARENT, 2))
+	theme.set_color("font_color", "PopupMenu", CREAM)
+	theme.set_color("font_hover_color", "PopupMenu", Color.WHITE)
+	theme.set_color("font_disabled_color", "PopupMenu", Color("8b8f89"))
+	theme.set_color("font_separator_color", "PopupMenu", GOLD)
+	theme.set_font_size("font_size", "PopupMenu", 24)
+	theme.set_constant("v_separation", "PopupMenu", 18)
+	theme.set_constant("item_start_padding", "PopupMenu", 12)
+	theme.set_constant("item_end_padding", "PopupMenu", 12)
 	return theme
 
 ## Applies the menus' palette to a popup dialog (Salir, confirmaciones, avisos).
