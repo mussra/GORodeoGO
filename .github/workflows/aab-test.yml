@@ -108,9 +108,10 @@ jobs:
           set +e
           G="$HOME/godot/Godot_v4.7.2-stable_linux.x86_64"
           curl -sL -o gen.gd https://raw.githubusercontent.com/mussra/GORodeoGO/feat/open-world-test-20261107/tools/gen_save_fixture.gd
-          "$G" --headless --path . --import > /dev/null 2>&1
+          timeout 600 "$G" --headless --path . --import > import.log 2>&1
           mkdir -p out
-          OUT="$PWD/out/save_${{ matrix.tag }}.dat" "$G" --headless --path . -s gen.gd 2>&1 | grep -a -E "saved|ERROR" | head
+          OUT="$PWD/out/save_${{ matrix.tag }}.dat" timeout 120 "$G" --headless --path . -s gen.gd > gen.log 2>&1
+          grep -a -E "saved" gen.log | head -3; grep -a -c "SCRIPT ERROR" gen.log || true
           ls -la out; head -c 400 out/*.dat
       - uses: actions/upload-artifact@v4
         with:
