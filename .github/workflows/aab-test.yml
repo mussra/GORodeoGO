@@ -27,21 +27,26 @@ jobs:
           set +e
           G="$HOME/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$G" --headless --path . --import > /dev/null 2>&1 || true
-          ls tests/unit/*.gd tests/integration/*.gd | sort > all.txt
+          for f in tests/unit/*.gd tests/integration/*.gd; do grep -q "^func test_" "$f" && echo "$f"; done | sort > all.txt
           awk -v s=${{ matrix.shard }} 'NR%8==s' all.txt > mine.txt
-          : > result.txt
+          : > result.txt; mkdir -p logs
           while read f; do
             n=$(basename "$f" .gd)
             out=$(timeout 150 "$G" --headless --path . -s addons/gut/gut_cmdln.gd -gselect="$n" -gexit 2>&1); rc=$?
-            if [ $rc -eq 124 ]; then echo "TIMEOUT $n" >> result.txt
-            elif echo "$out" | grep -a -q "All tests passed"; then echo "PASS $n" >> result.txt
+            if [ $rc -eq 124 ]; then echo "TIMEOUT $n" >> result.txt; continue; fi
+            if echo "$out" | grep -a -q "All tests passed"; then echo "PASS $n" >> result.txt; continue; fi
+            out2=$(timeout 150 "$G" --headless --path . -s addons/gut/gut_cmdln.gd -gselect="$n" -gexit 2>&1)
+            if echo "$out2" | grep -a -q "All tests passed"; then echo "FLAKY $n" >> result.txt
             else echo "FAIL $n" >> result.txt; fi
+            echo "$out2" | grep -a -E "Failed|SCRIPT ERROR|expected|ERROR|passed|Totals|Passing|Failing|Risky|No tests" | head -12 > logs/$n.txt
           done < mine.txt
           echo "== shard ${{ matrix.shard }}"; sort result.txt | cut -d' ' -f1 | uniq -c; grep -a -v '^PASS' result.txt || true
       - uses: actions/upload-artifact@v4
         with:
           name: resultado-${{ matrix.shard }}
-          path: result.txt
+          path: |
+            result.txt
+            logs
   aab:
     if: ${{ !inputs.fixtures }}
     runs-on: ubuntu-latest
