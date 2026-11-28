@@ -1,3 +1,6 @@
+## 3.0.41, icono con aro
+- Icono redondo con el sprite real del botón redondo de la plancha de Ant (aro dorado claro con remaches y costura), vaquero centrado y encuadre más bajo, cabeza del caballo dentro del aro. Mismo paquete com.zumbel.gorodeogo: instala encima de 3.0.40. versionCode 501.
+
 ## 3.0.37 a 3.0.40, nombre del juego
 - El juego pasa de llamarse Rancho a "Go Rodeo Go" (como el logo). Paquete com.zumbel.gorodeogo, versionCode 500. "rancho" sigue siendo el lugar dentro del juego. Las entradas históricas de abajo conservan el nombre anterior.
 
