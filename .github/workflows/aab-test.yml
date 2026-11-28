@@ -1,0 +1,47 @@
+name: AAB de prueba (sin firma de subida)
+on:
+  workflow_dispatch:
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Godot y plantillas
+        run: |
+          R=https://github.com/godotengine/godot/releases/download/4.7.2-stable
+          mkdir -p "$HOME/godot" && cd "$HOME/godot"
+          curl -sL -o g.zip $R/Godot_v4.7.2-stable_linux.x86_64.zip && unzip -qo g.zip && chmod +x Godot_v4.7.2-stable_linux.x86_64
+          curl -sL -o t.zip $R/Godot_v4.7.2-stable_export_templates.tpz
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.7.2.stable" /tmp/tp
+          unzip -qo t.zip 'templates/android*' 'templates/version.txt' -d /tmp/tp
+          cp /tmp/tp/templates/* "$HOME/.local/share/godot/export_templates/4.7.2.stable/"
+          mkdir -p "$HOME/.config/godot"
+          printf '[gd_resource type="EditorSettings" format=3]\n\n[resource]\nexport/android/java_sdk_path = "%s"\nexport/android/android_sdk_path = "%s"\n' "$JAVA_HOME" "$ANDROID_HOME" > "$HOME/.config/godot/editor_settings-4.7.tres"
+      - name: Plantilla Android
+        run: |
+          mkdir -p android/build
+          unzip -q -o "$HOME/.local/share/godot/export_templates/4.7.2.stable/android_source.zip" -d android/build
+          cp "$HOME/.local/share/godot/export_templates/4.7.2.stable/version.txt" android/.build_version
+          touch android/build/.gdignore
+      - name: Clave temporal (se sustituye por la de subida fuera de GitHub)
+        run: |
+          keytool -genkeypair -keystore "$RUNNER_TEMP/tmp.jks" -alias tmp -keyalg RSA -keysize 2048 -validity 100 -storepass temporal123 -keypass temporal123 -dname "CN=tmp"
+      - name: Importar y exportar AAB
+        env:
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ runner.temp }}/tmp.jks
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: tmp
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: temporal123
+        run: |
+          "$HOME/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --import || true
+          mkdir -p BIN
+          "$HOME/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --export-release "Android Play" "$PWD/BIN/GoRodeoGo-Play-unsigned.aab"
+          ls -la BIN
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GoRodeoGo-Play-aab
+          path: BIN/GoRodeoGo-Play-unsigned.aab
