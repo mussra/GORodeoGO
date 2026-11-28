@@ -5,10 +5,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "UI_000"
-msgstr "RANCHO // FRONTERA 01"
+msgstr "RODEO // FRONTERA 01"
 
 msgid "UI_001"
-msgstr "DOMINA EL LAZO.\nASEGURA EL RANCHO."
+msgstr "DOMINA EL LAZO.\nGANA EL RODEO."
 
 msgid "UI_002"
 msgstr "JUGAR   >   NIVEL %02d"
@@ -65,7 +65,7 @@ msgid "UI_019"
 msgstr "Laza un toro, espera a que se calme y llévalo a la META"
 
 msgid "UI_020"
-msgstr "¡Rancho asegurado!\nTodos los toros en el corral."
+msgstr "¡Rodeo completado!\nTodos los toros en el corral."
 
 msgid "UI_021"
 msgstr "Nivel fallido.\n%s"

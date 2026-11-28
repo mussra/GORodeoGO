@@ -93,6 +93,6 @@ func _draw_destination() -> void:
 	draw_line(p+Vector2(16,-3),p+Vector2(16,-12),Color("e5c47d"),4,true)
 	for x in [-10,10]:draw_circle(p+Vector2(x,7),1.5,Color("564f40"))
 	draw_style_box(RanchTheme.box(Color("213f49"),Color("bba271"),4),Rect2(p+Vector2(-43,-76),Vector2(86,23)))
-	draw_string(ThemeDB.fallback_font,p+Vector2(-38,-59),"RANCHO",HORIZONTAL_ALIGNMENT_CENTER,76,14,Color("fff0c5"))
+	draw_string(ThemeDB.fallback_font,p+Vector2(-38,-59),"RODEO",HORIZONTAL_ALIGNMENT_CENTER,76,14,Color("fff0c5"))
 	# A gold inward chevron makes the front approach visible under the dark floor.
 	draw_polyline(PackedVector2Array([p+Vector2(-7,55),p+Vector2(0,49),p+Vector2(7,55)]),Color("c8ead5"),2,true)

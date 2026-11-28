@@ -1,6 +1,6 @@
 {
-  "RANCHO // FRONTERA 01": "UI_000",
-  "DOMINA EL LAZO.\nASEGURA EL RANCHO.": "UI_001",
+  "RODEO // FRONTERA 01": "UI_000",
+  "DOMINA EL LAZO.\nGANA EL RODEO.": "UI_001",
   "JUGAR   >   NIVEL %02d": "UI_002",
   "NIVELES · AVANZA UNO A UNO": "UI_003",
   "EQUIPO": "UI_004",
@@ -19,7 +19,7 @@
   "NIVEL %02d": "UI_017",
   "Corrales numerados · Abre el cierre · Un toro sigue el camino y abre los siguientes": "UI_018",
   "Laza un toro, espera a que se calme y llévalo a la META": "UI_019",
-  "¡Rancho asegurado!\nTodos los toros en el corral.": "UI_020",
+  "¡Rodeo completado!\nTodos los toros en el corral.": "UI_020",
   "Nivel fallido.\n%s": "UI_021",
   "Pausa": "UI_022",
   "Continuar": "UI_023",

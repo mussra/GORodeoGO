@@ -18,7 +18,7 @@ func _build_menu() -> void:
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hero.add_child(_portrait)
 	_hero.move_child(_portrait,0)
-	_hero.get_node("Tag").text = "TU RANCHO. TU AVENTURA."
+	_hero.get_node("Tag").text = "TU RODEO. TU AVENTURA."
 	_hero.get_node("Tag").add_theme_color_override("font_color",Color("264451"))
 	_hero.get_node("Description").hide()
 	_play.text = "JUEGOS"

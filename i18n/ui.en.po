@@ -5,10 +5,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "UI_000"
-msgstr "RANCHO // FRONTIER 01"
+msgstr "RODEO // FRONTIER 01"
 
 msgid "UI_001"
-msgstr "MASTER THE LASSO.\nSECURE THE RANCH."
+msgstr "MASTER THE LASSO.\nWIN THE RODEO."
 
 msgid "UI_002"
 msgstr "PLAY   >   LEVEL %02d"
@@ -65,7 +65,7 @@ msgid "UI_019"
 msgstr "Lasso a bull, let it calm down, then lead it to the GOAL"
 
 msgid "UI_020"
-msgstr "Ranch secured!\nAll bulls are in the pen."
+msgstr "Rodeo complete!\nAll bulls are in the pen."
 
 msgid "UI_021"
 msgstr "Level failed.\n%s"
