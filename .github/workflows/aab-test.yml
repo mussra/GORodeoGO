@@ -1,8 +1,14 @@
 name: AAB de prueba (sin firma de subida)
 on:
   workflow_dispatch:
+    inputs:
+      fixtures:
+        description: 'Solo generar guardados antiguos'
+        type: boolean
+        default: false
 jobs:
   tests:
+    if: ${{ !inputs.fixtures }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:
@@ -37,6 +43,7 @@ jobs:
           name: resultado-${{ matrix.shard }}
           path: result.txt
   aab:
+    if: ${{ !inputs.fixtures }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -79,3 +86,33 @@ jobs:
         with:
           name: GoRodeoGo-Play-aab
           path: BIN/GoRodeoGo-Play-unsigned.aab
+  fixtures:
+    if: ${{ inputs.fixtures }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: [v3.0.3, v3.0.36]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.tag }}
+      - name: Godot
+        run: |
+          R=https://github.com/godotengine/godot/releases/download/4.7.2-stable
+          mkdir -p "$HOME/godot" && cd "$HOME/godot"
+          curl -sL -o g.zip $R/Godot_v4.7.2-stable_linux.x86_64.zip && unzip -qo g.zip && chmod +x Godot_v4.7.2-stable_linux.x86_64
+      - name: Generar guardado con el codigo de la version
+        run: |
+          set +e
+          G="$HOME/godot/Godot_v4.7.2-stable_linux.x86_64"
+          curl -sL -o gen.gd https://raw.githubusercontent.com/mussra/GORodeoGO/feat/open-world-test-20261107/tools/gen_save_fixture.gd
+          "$G" --headless --path . --import > /dev/null 2>&1
+          mkdir -p out
+          OUT="$PWD/out/save_${{ matrix.tag }}.dat" "$G" --headless --path . -s gen.gd 2>&1 | grep -a -E "saved|ERROR" | head
+          ls -la out; head -c 400 out/*.dat
+      - uses: actions/upload-artifact@v4
+        with:
+          name: guardado-${{ matrix.tag }}
+          path: out/*.dat
