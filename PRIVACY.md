@@ -1,8 +1,8 @@
-# Política de privacidad de Rancho (Zumbel)
+# Política de privacidad de Go Rodeo Go (Zumbel)
 
 Última actualización: noviembre de 2026.
 
-Rancho es un juego offline. No recoge, almacena ni comparte ningún dato personal.
+Go Rodeo Go es un juego offline. No recoge, almacena ni comparte ningún dato personal.
 
 - No requiere crear cuenta ni iniciar sesión.
 - No muestra publicidad.
