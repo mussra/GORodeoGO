@@ -36,3 +36,11 @@ static func panel(target:Control)->void:
  box.content_margin_top=28;box.content_margin_bottom=28
  target.add_theme_stylebox_override("panel",box)
  target.set_meta("tiled300",true)
+
+## 3.0.43: botones estrechos (Ficha, Familia, filtros): mismo marco, margen lateral pequeño para que el texto quepa entero.
+static func compact(button:BaseButton,side:float=10.0)->void:
+ apply(button)
+ for state in ["normal","hover","pressed","disabled","hover_pressed"]:
+  var box:=button.get_theme_stylebox(state).duplicate() as StyleBoxTexture
+  box.content_margin_left=side;box.content_margin_right=side
+  button.add_theme_stylebox_override(state,box)

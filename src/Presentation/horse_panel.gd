@@ -33,7 +33,8 @@ func layout()->void:
 func label(text:String,pos:Vector2,font:int=22)->Label:
  var l:=Label.new();l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.text=text;l.position=pos;l.add_theme_font_size_override("font_size",font);content.add_child(l);TextFit181.fixed(l,Vector2(maxf(80.,1240-pos.x),42),font,18);return l
 func button(text:String,pos:Vector2,cb:Callable,w:float=230)->Button:
- var b:=Button.new();b.text=text;b.position=pos;b.size=Vector2(w,48);b.pressed.connect(cb);content.add_child(b);TextFit181.button(b,Vector2(w,48));return b
+ var b:=Button.new();b.text=text;b.position=pos;b.size=Vector2(w,48);b.pressed.connect(cb);content.add_child(b);if w<200:ButtonSkin272.compact(b)
+ TextFit181.button(b,Vector2(w,48));return b
 func show_page(value:String)->void:
  if value=="detail" and page!="detail":detail_origin=page
  page=value;message="";refresh()
@@ -164,11 +165,11 @@ func breed_view()->void:
  for k in ["coat","pattern","mane","eyes","legs","spots"]:
   var slot:=Vector2(45+(n%3)*410,515+int(n/3)*50)
   label(labels[k],slot+Vector2(0,10),21)
-  button("A" if choices[k]==0 else "B",slot+Vector2(270,0),func():choices[k]=1-int(choices[k]);refresh(),65);n+=1
+  button("De A" if choices[k]==0 else "De B",slot+Vector2(230,0),func():choices[k]=1-int(choices[k]);refresh(),110).name="Heredar_"+k;n+=1
  var finish_source:String=parent_b if choices.get("finish",0)==1 else parent_a
  var finish_value:String=SaveData.horse_collection.find(finish_source).traits.get("finish","normal")
  label(tr("UI_091"),Vector2(45,620),20)
- button(("B" if choices.get("finish",0)==1 else "A")+" · "+("Galaxy" if finish_value=="galaxy" else "Normal"),Vector2(175,610),func():choices["finish"]=1-int(choices.get("finish",0));refresh(),170)
+ button(("De B" if choices.get("finish",0)==1 else "De A")+" · "+("Galaxy" if finish_value=="galaxy" else "Normal"),Vector2(175,610),func():choices["finish"]=1-int(choices.get("finish",0));refresh(),170)
  var t:Dictionary=SaveData.horse_collection.preview(parent_a,parent_b,choices)
  if not t.is_empty():
   var preview_title:=label("Vista de la cría",Vector2(525,225),19)

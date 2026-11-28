@@ -2,7 +2,7 @@ class_name HorseSummaryBar185
 extends VBoxContainer
 static func create(host:Node,h:Dictionary,width:float)->HorseSummaryBar185:
  var view:=HorseSummaryBar185.new();view.name="HorseSummary185_"+str(h.id);view.custom_minimum_size=Vector2(width,48);view.add_theme_constant_override("separation",2);host.add_child(view)
- var button:=Button.new();button.text="Resumen de propiedades";button.custom_minimum_size.y=28;button.add_theme_font_size_override("font_size",18);button.flat=true
+ var button:=Button.new();button.text="Propiedades";button.custom_minimum_size.y=28;button.add_theme_font_size_override("font_size",18);button.flat=true;button.set_meta("skin272",true)
  for state in ["normal","hover","pressed","focus","disabled"]:button.add_theme_stylebox_override(state,StyleBoxEmpty.new())
  TextFit181.button(button);button.tooltip_text=HorseSummary185.HELP;view.add_child(button)
  button.pressed.connect(func():

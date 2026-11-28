@@ -23,7 +23,7 @@ func _layout():
 func _label(text:String,at:Vector2,width:float=280,font:int=20)->Label:
  var l:=Label.new();l.text=text;l.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED;l.position=at;l.size.x=width;l.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;l.tooltip_text=text;l.add_theme_font_size_override("font_size",font);content.add_child(l);TextFit181.fixed(l,Vector2(width,30),font,mini(font,18));return l
 func _button(text:String,at:Vector2,width:float,action:Callable)->Button:
- var b:=Button.new();b.text=text;b.position=at;b.size=Vector2(width,48);content.add_child(b);TextFit181.button(b,Vector2(width,48));b.pressed.connect(action);return b
+ var b:=Button.new();b.text=text;b.position=at;b.size=Vector2(width,48);content.add_child(b);ButtonSkin272.compact(b);TextFit181.button(b,Vector2(width,48));b.pressed.connect(action);return b
 func refresh():
  if content!=null:canvas.remove_child(content);content.queue_free()
  animated.clear();content=Control.new();content.mouse_filter=Control.MOUSE_FILTER_IGNORE;canvas.add_child(content)
@@ -64,9 +64,10 @@ func _card(h:Dictionary,at:Vector2):
  _ground(Rect2(at,Vector2(295,170)))
  _actor(h,at+Vector2(66,104),.95)
  if GalaxyPure143.is_pure(h):_label(GalaxyPure143.BADGE,at+Vector2(4,110),108,12).modulate=RanchTheme.GOLD
- _label(str(h.name),at+Vector2(115,8),170,21)
+ TextFit181.fixed(_label(str(h.name),at+Vector2(115,8),170,21),Vector2(170,30),21,15)
  _label(("Potrillo" if h.get("stage","adult")=="foal" else "Adulto")+(" · equipado" if h.id==SaveData.horse_collection.selected else ""),at+Vector2(115,38),170,18)
  var tap:=_button("",at+Vector2(2,4),108,func():horse_opened.emit(str(h.id)));tap.size.y=124;tap.tooltip_text="Ver ficha: "+str(h.name)
+ tap.set_meta("skin272",true)
  for state in ["normal","hover","pressed","focus","disabled"]:tap.add_theme_stylebox_override(state,StyleBoxEmpty.new())
  for skill in HorseTraining.SKILLS:
   var badge:=JumpBadge.new();badge.skill=skill;badge.capable=HorseTraining.knows(h,skill);badge.position=at+Vector2(116+(0 if skill=="jump" else 40),70);badge.scale=Vector2.ONE*.52;content.add_child(badge)
