@@ -18,6 +18,7 @@ jobs:
           curl -sL -o g.zip $R/Godot_v4.7.2-stable_linux.x86_64.zip && unzip -qo g.zip && chmod +x Godot_v4.7.2-stable_linux.x86_64
       - name: Importar y ejecutar cada script con limite de tiempo
         run: |
+          set +e
           G="$HOME/godot/Godot_v4.7.2-stable_linux.x86_64"
           "$G" --headless --path . --import > /dev/null 2>&1 || true
           ls tests/unit/*.gd tests/integration/*.gd | sort > all.txt
