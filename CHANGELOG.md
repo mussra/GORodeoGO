@@ -1,3 +1,6 @@
+## 3.0.37 a 3.0.40, nombre del juego
+- El juego pasa de llamarse Rancho a "Go Rodeo Go" (como el logo). Paquete com.zumbel.gorodeogo, versionCode 500. "rancho" sigue siendo el lugar dentro del juego. Las entradas históricas de abajo conservan el nombre anterior.
+
 # CHANGELOG — GO Rodeo GO
 
 ## v0.21.16 - Seguimiento por detrás

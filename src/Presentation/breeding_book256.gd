@@ -45,7 +45,7 @@ func show_page(index:int):
  panel(Vector2(645,57),Vector2(557,588),Color("f1ddb0"),Color("caa367"),10)
  panel(Vector2(630,59),Vector2(18,584),Color("ae8051"),Color("ae8051"),3)
  button_("Cerrar" if not tutorial else "Ahora no",Vector2(1050,10),Vector2(160,44),finish)
- label_("RODEO  /  CUADERNO DE ALMA",Vector2(102,81),Vector2(500,32),18,Color("8c633f"))
+ label_("GO RODEO GO  /  CUADERNO DE ALMA",Vector2(102,81),Vector2(500,32),18,Color("8c633f"))
  label_("Índice",Vector2(102,121),Vector2(470,50),38)
  image_("res://art/breeding256/alma.png",Vector2(503,70),Vector2(94,104))
  var read:=BreedingAdvice256.state()

@@ -5,7 +5,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "UI_000"
-msgstr "RODEO // FRONTERA 01"
+msgstr "GO RODEO GO // FRONTERA 01"
 
 msgid "UI_001"
 msgstr "DOMINA EL LAZO.\nGANA EL RODEO."
