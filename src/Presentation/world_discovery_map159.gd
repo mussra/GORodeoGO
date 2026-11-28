@@ -381,6 +381,13 @@ func _draw_fields138(c:Vector2i,mins:Vector2i,cell:float,origin:Vector2)->void:
 
 func _draw() -> void:
  if _markers108!=null:_markers108.queue_redraw()
+## Halo suave del objetivo: sube y baja despacio (ciclo de 2,6 s, sin destellos ni escalado brusco).
+static func goal_halo_phase343(t:float)->float:
+ return .5-.5*cos(TAU*t/2.6)
+func _draw_goal_halo343(point:Vector2,radius:float)->void:
+ var k:float=goal_halo_phase343(_pulse)
+ _markers108.draw_circle(point,radius+4.+k*7.,Color(1.,.84,.4,.10+.30*k))
+ _markers108.draw_arc(point,radius+2.+k*5.,0,TAU,40,Color(1.,.94,.75,.18+.42*k),2.)
 func _draw_markers108()->void:
  if not _terrain_valid:_ensure_terrain()
  if (_map_geometry.data.cells as Array).is_empty():return
@@ -414,6 +421,7 @@ func _draw_markers108()->void:
   var point:Vector2=_town_marker215(id)
   var icon_size:=Vector2(44,32) if expanded else Vector2(26,19)
   if active:
+   _draw_goal_halo343(point,25. if expanded else 16.)
    _markers108.draw_circle(point,25. if expanded else 16.,Color("f2c86d"))
   TownPaint215.icon(_markers108,Rect2(point-icon_size*.5,icon_size),TownIdentity215.look(SaveData.world_cousins140,id))
   if true_point.distance_to(point)>10.:
@@ -442,6 +450,7 @@ func _draw_markers108()->void:
     _markers108.draw_string(font,at2,from_,HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("f2c86d"))
  for item in job_points249():
   var point:Vector2=_to_map(item.pos,mins,cell,origin)
+  if item.kind!="collect_flower":_draw_goal_halo343(point,12. if expanded else 10.)
   _markers108.draw_circle(point,6.,Color("68cfff") if item.kind=="collect_flower" else Color("f2c86d"))
   _markers108.draw_arc(point,8.,0,TAU,16,Color("10252d"),2.)
  MapPlayerMarker99.draw(_markers108,ppos,world.player.velocity,_pulse)

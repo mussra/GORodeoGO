@@ -77,7 +77,9 @@ static func look236(seed_:int,id:String)->Dictionary:
  var node:=TownNetwork234.node_for(seed_,id)
  if node.is_empty():return {}
  var rng:=RandomNumberGenerator.new();rng.seed=hash("identity236-%d-%s"%[seed_,id]);var coat:int=rng.randi_range(0,19);var pattern:int=[0,6,9,10][rng.randi_range(0,3)];var spot:int=spot_index216(seed_,id,coat)
- var pattern_name:String={0:"Liso",6:"Estrella",9:"Cebra",10:"Jirafa"}[pattern]
+ # 3.0.43: el nombre usa la forma real del recinto (misma formula que TownEnclosures227), no el dibujo de la muralla.
+ var shape_word:String=TownEnclosures227.SHAPES[posmod(hash("town-shape236-%d-%s"%[seed_,id]),6)]
+ var pattern_name:String=shape_word.substr(0,1).to_upper()+shape_word.substr(1)
  var sector:String="Inicio" if id=="home" else "%d,%d"%[node.cell.x,node.cell.y]
  var name_:String=pattern_name+" "+HorseCollection.COATS[coat]+" / "+HorseCollection.COATS[spot]+" · "+sector
  var result:Dictionary={"version":2,"coat":coat,"spot_index":spot,"pattern":pattern,"base":HorseAppearance.COLORS[coat],"spot":HorseAppearance.COLORS[spot],"name":name_}
