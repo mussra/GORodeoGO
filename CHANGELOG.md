@@ -1,3 +1,6 @@
+## 3.0.42, icono final
+- Icono aprobado por Ant: aro del sprite real con el cuero original, vaquero y caballo recortados encima (sin fondo), degradado suave solo en la parte baja para que las patas no pisen las costuras. Launcher (adaptativo y legacy) e icon.png del proyecto. Mismo paquete com.zumbel.gorodeogo: instala encima de 3.0.41. versionCode 502.
+
 ## 3.0.41, icono con aro
 - Icono redondo con el sprite real del botón redondo de la plancha de Ant (aro dorado claro con remaches y costura), vaquero centrado y encuadre más bajo, cabeza del caballo dentro del aro. Mismo paquete com.zumbel.gorodeogo: instala encima de 3.0.40. versionCode 501.
 
