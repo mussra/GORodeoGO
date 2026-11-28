@@ -1,0 +1,115 @@
+[meta]
+
+version=3
+
+[progress]
+
+victories240={
+"courses": {},
+"last": 0,
+"version": 1,
+"wins": {}
+}
+rodeo_intro240=false
+highest_level_completed=17
+dual_lasso_intro_shown=false
+
+[world]
+
+bull_returns269={}
+seed=4242
+generator_version=1
+discovered=Array[String]([])
+tamed=Array[String]([])
+position=Vector2(0, 160)
+quests={}
+jobs249={}
+interior_search264={}
+goats_given249=0
+flora138={}
+garden212={
+"anchors": {},
+"crops": 0,
+"discovered": false,
+"distance": 0.0,
+"food": {
+"horse": "",
+"left": 0.0
+},
+"harvests": 0,
+"layout214": 2,
+"seeds": 0,
+"stage": "locked",
+"town_id": "home",
+"version": 1,
+"watered": false
+}
+roaming139={}
+cousins140={}
+herd_town217={}
+places144={}
+siesta_rest166=0.0
+repeat_contract165={
+"active": false,
+"completed": 0,
+"events": [],
+"ready": false,
+"version": 1
+}
+countries146={}
+missions={}
+pigs=Array[String]([])
+notes106={}
+pig_captures=Array[String]([])
+pigs_sold=0
+goat_captures=Array[String]([])
+edits=[]
+
+[appearance]
+
+hat_designs235={
+"hat:v2:10:0:0": true
+}
+hat_color="original"
+
+[horses_trial]
+
+state={
+"affinities": {},
+"ancestors": Array[Dictionary]([]),
+"birth_credits": 0,
+"bought_offers": Array[String]([]),
+"cup_rewards195": {},
+"galaxy_keys173": Array[int]([]),
+"galaxy_rule173": 1,
+"horses": Array[Dictionary]([{
+&"growth_capped255": true,
+"id": "original",
+"name": "Original",
+"parents": [],
+&"stats": {
+&"calm": 1.0,
+&"dodge": 1.0,
+&"handling": 900.0,
+&"power": 0.6,
+&"speed": 260.0
+},
+"traits": {
+"coat": 10,
+"finish": "original",
+"mane": 1,
+"pattern": 0
+}
+}]),
+"mastery_rule179": 1,
+"next_id": 1,
+"selected": "original",
+"training_pair": {}
+}
+
+[equipment]
+
+points=240
+owned=Array[String]([])
+equipped={}
+legacy_credit_applied=true

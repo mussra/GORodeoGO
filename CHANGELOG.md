@@ -1,3 +1,12 @@
+## 3.0.43, version para Play y testers
+- Nombre de cada pueblo por la forma real de su recinto ("Círculo crema / azul") y halo pulsante en el objetivo del mapa.
+- Desplegables (PopupMenu) con el tema del juego. Vista previa del sombrero que sigue a la opción resaltada.
+- Colección: las miniaturas de los caballos vuelven a verse (el área táctil invisible recibía el marco dorado y tapaba al caballo). Botones estrechos con el texto entero ("Ficha", "Familia", "Propiedades"), nombres largos más pequeños antes de cortarse.
+- Cruzar: los selectores de herencia dicen "De A" / "De B". Flechas anterior/siguiente más pequeñas dentro de su marco.
+- Prueba de guardados antiguos: guardados reales de v3.0.3 y v3.0.36 se cargan con el código actual y se pueden volver a guardar.
+- CI: tests en 8 trozos con límite de tiempo, y generador de guardados antiguos.
+- APK firmado con la clave de pruebas estable y AAB firmado con la clave de subida.
+
 ## 3.0.42, icono final
 - Icono aprobado por Ant: aro del sprite real con el cuero original, vaquero y caballo recortados encima (sin fondo), degradado suave solo en la parte baja para que las patas no pisen las costuras. Launcher (adaptativo y legacy) e icon.png del proyecto. Mismo paquete com.zumbel.gorodeogo: instala encima de 3.0.41. versionCode 502.
 
